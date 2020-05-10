@@ -11,7 +11,7 @@
      $ cd rocks
      $ [sudo] pip install -e .
      ```
-  3. Check out the documentation
+  3. Check out the documentation in your browser
      ```
      $ rocks docs
      ```

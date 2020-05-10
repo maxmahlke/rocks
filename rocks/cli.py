@@ -38,9 +38,12 @@ def docs():
     '''Open rocks documentation in browser.
 
     '''
-    path_to_index = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                 '../docs/_build/html/index.html')
+    path_to_index = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                 '../docs/_build/html/',
+                                                 'index.html'))
     webbrowser.open(path_to_index, new=1)  # open docs in new window
+    click.echo('Opening documentation in new window of your browser.')
+    click.echo(path_to_index)
 
 
 @cli_rocks.command()
