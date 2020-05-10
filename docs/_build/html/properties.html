@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Asteroid Properties &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tools" href="tools.html" />
+    <link rel="prev" title="Names, Numbers, Designations" href="names.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="names.html" title="Names, Numbers, Designations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="asteroid-properties">
+<h1>Asteroid Properties<a class="headerlink" href="#asteroid-properties" title="Permalink to this headline">¶</a></h1>
+<p>The SsODNet:datacloud contains a vast collection of asteroid properties. In
+general, the properties have been observed several time (e.g. the albedo). The
+datacloud returns all values, while <code class="docutils literal notranslate"><span class="pre">rocks</span></code> contains aggregation or selection
+functions to select a sensible, single value.</p>
+<p>Implemented so far are merging schemes for</p>
+<ul class="simple">
+<li><p>Albedo</p></li>
+<li><p>Taxonomy</p></li>
+</ul>
+<dl class="py function">
+<dt id="properties.get_property">
+<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">get_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">property_</span></em>, <em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">verbose</span></em>, <em class="sig-param"><span class="n">skip_quaero</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#get_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get asteroid property from SsODNet.</p>
+<p>Queries SsODNet datacloud. Can be passed a list of identifiers.
+First performs a quaero query to verify the asteroid identitfy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>property_</strong> (<em>str</em>) – Asteroid property to get.</p></li>
+<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em>) – Asteroid name, designation, or number.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
+<li><p><strong>skip_quaero</strong> (<em>bool</em>) – Skip initial quaero query to verify asteroid identity.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple, list</em> – Depending on the requested property. The tuple contains the aggregated
+or most likely value of the property. The list contains all available
+data on this property. If input was list of
+identifiers, returns a list of tuples</p></li>
+<li><p><em>False, False</em> – Both return values are False if the query failed.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Each property contains an aggregation or selection function to provide a single
+return value in case of many available. This choice is a subjective
+implementation, e.g. by evaluating the different taxonomic classification
+methods and picking the most likely one <strong>in the opinion of the repository
+maintainers</strong>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">properties</span>
+
+<span class="c1"># A collection of asteroid identifiers with various degrees of abstraction</span>
+<span class="n">ssos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;eos&#39;</span><span class="p">,</span> <span class="s1">&#39;1992EA4&#39;</span><span class="p">,</span> <span class="s1">&#39;SCHWARTZ&#39;</span><span class="p">,</span> <span class="s1">&#39;1950 RW&#39;</span><span class="p">,</span> <span class="s1">&#39;2001je2&#39;</span><span class="p">]</span>
+
+<span class="c1"># Resolve their names and numbers</span>
+<span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">(</span><span class="n">ssos</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">)</span>
+<span class="c1"># [(&#39;Vesta&#39;, 4), (&#39;Eos&#39;, 221), (&#39;1992 EA4&#39;, 30863),</span>
+<span class="c1">#  (&#39;Schwartz&#39;, 13820), (&#39;Gyldenkerne&#39;, 5030), (&#39;2001 JE2&#39;, 131353)]</span>
+
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+
+<span class="c1"># Get their taxonomy</span>
+<span class="n">taxa</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="n">skip_quaero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">taxa</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">classes</span><span class="p">)))</span>
+<span class="c1"># [(&#39;Vesta&#39;, &#39;V&#39;), (&#39;Eos&#39;, &#39;K&#39;), (&#39;1992 EA4&#39;, &#39;Ds&#39;),</span>
+<span class="c1">#  (&#39;Schwartz&#39;, &#39;B&#39;), (&#39;Gyldenkerne&#39;, False), (&#39;2001 JE2&#39;, &#39;CX&#39;)]</span>
+
+<span class="c1"># Get albedos</span>
+<span class="n">albedos</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;albedo&#39;</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">skip_quaero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">albs</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">albedos</span><span class="p">]</span> <span class="c1"># returns weighted average and uncertainty</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">albs</span><span class="p">)))</span>
+<span class="c1"># [(&#39;Vesta&#39;, (0.34, 0.02)), (&#39;Eos&#39;, (0.147, 0.004)), (&#39;1992 EA4&#39;, False),</span>
+<span class="c1">#  (&#39;Schwartz&#39;, (0.051, 0.004)), (&#39;Gyldenkerne&#39;, (0.120, 0.007)), (&#39;2001 JE2&#39;, False)]</span>
+</pre></div>
+</div>
+<span class="target" id="albedo"></span><dl class="py function">
+<dt id="properties.select_albedo">
+<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">select_albedo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">albedos</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#select_albedo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.select_albedo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a single albedo value from multiple measurements.</p>
+<p>Evaluates the methods and computes the weighted average of equally ranked
+methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>albedos</strong> (<em>dict</em>) – Albedo measurements and metadata retrieved from SsODNet:datacloud.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>averaged, tuple</em> – The average albedo and its uncertainty.</p></li>
+<li><p><em>albedos, dict</em> – The input dictionary, with an additional key ‘selected’. True if the
+item was used in the computation of the average, else False.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The method ranking is given below. Albeods acquired with the top-ranked
+method available are used for the weighted average computation. Albedos
+observed with NEATM or STM get an additional 10% uncertainty added.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;SPACE&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;ADAM&#39;</span><span class="p">,</span> <span class="s1">&#39;KOALA&#39;</span><span class="p">,</span> <span class="s1">&#39;SAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;Radar&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;LC+TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+AO&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;TE-IM&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;AO&#39;</span><span class="p">,</span> <span class="s1">&#39;Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;IM&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;NEATM&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s1">&#39;STM&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="taxonomy"></span><dl class="py function">
+<dt id="properties.select_taxonomy">
+<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">select_taxonomy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">taxa</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#select_taxonomy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.select_taxonomy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a single taxonomic classification from multiple choices.</p>
+<p>Evaluates the wavelength ranges, methods, schemes, and recency of
+classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>taxa</strong> (<em>dict</em>) – Taxonomic classifications retrieved from SsODNet:datacloud.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>selected, str</em> – The selected taxonomic classification.</p></li>
+<li><p><em>taxa, dict</em> – The input dictionary, with an additional key ‘selected’. True if the
+item was selected, else False.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">POINTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;scheme&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;bus-demeo&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;bus&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;smass&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;tholen&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;sdss&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">},</span>
+
+    <span class="s1">&#39;waverange&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;vis&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s1">&#39;nir&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;visnir&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="p">},</span>
+
+    <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="s1">&#39;phot&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="names.html"
+                        title="previous chapter">Names, Numbers, Designations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/properties.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="names.html" title="Names, Numbers, Designations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

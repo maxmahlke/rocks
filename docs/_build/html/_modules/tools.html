@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>tools &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for tools</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Author: Max Mahlke</span>
+<span class="sd">    Date: 13 March 2020</span>
+
+<span class="sd">    Utility functions for rocks</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">iterfzf</span> <span class="kn">import</span> <span class="n">iterfzf</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+
+<span class="k">def</span> <span class="nf">_fuzzy_desig_selection</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Fuzzy search of asteroid index file.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">path_index</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                           <span class="s1">&#39;.index&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path_index</span><span class="p">)</span> <span class="k">as</span> <span class="n">ind</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">ind</span><span class="p">:</span>
+            <span class="n">number</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="select_sso_from_index"><a class="viewcode-back" href="../tools.html#tools.select_sso_from_index">[docs]</a><span class="k">def</span> <span class="nf">select_sso_from_index</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39; Selcet SSO numbers and designations from interactive fuzzy search.</span>
+
+<span class="sd">    The index is created with `rocks index`.</span>
+<span class="sd">    The list is retrieved from the Minor Planet Center, at</span>
+<span class="sd">    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    ------</span>
+<span class="sd">    str</span>
+<span class="sd">        asteroid name or designation</span>
+<span class="sd">    int</span>
+<span class="sd">        asteroid number</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">numbername</span> <span class="o">=</span> <span class="n">iterfzf</span><span class="p">(</span><span class="n">_fuzzy_desig_selection</span><span class="p">(),</span> <span class="n">exact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">number</span><span class="p">,</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">numbername</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># no SSO selected</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span></div>
+
+
+<span class="c1"># ------</span>
+<span class="c1"># SsODNet functions</span>
+<div class="viewcode-block" id="get_data"><a class="viewcode-back" href="../tools.html#tools.get_data">[docs]</a><span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get asteroid data from SsODNet:datacloud.</span>
+
+<span class="sd">    Performs a GET request to SsODNet:datacloud for a single asteroid and</span>
+<span class="sd">    property.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    this : str, int</span>
+<span class="sd">        Asteroid name, designation, or number.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Print request diagnostics.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dict, bool</span>
+<span class="sd">        Asteroid data, False if query failed or no data is available</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php&#39;</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;-name&#39;</span><span class="p">:</span> <span class="n">this</span><span class="p">,</span>
+        <span class="s1">&#39;-mime&#39;</span><span class="p">:</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;-from&#39;</span><span class="p">:</span> <span class="s1">&#39;rocks&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">query_ssodnet</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="c1"># Check if query failed</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">422</span><span class="p">,</span> <span class="mi">500</span><span class="p">]:</span>
+
+        <span class="c1"># Query SsODNet:quaero and repeat</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Query failed for </span><span class="si">{</span><span class="n">this</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># See if there is data available</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Encountered JSON error for </span><span class="si">{</span><span class="n">this</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Select the right data entry</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="n">this</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">this</span><span class="si">}</span><span class="s1">_(Asteroid)&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;datacloud&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No data in SsODNet for </span><span class="si">{</span><span class="n">this</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="query_ssodnet"><a class="viewcode-back" href="../tools.html#tools.query_ssodnet">[docs]</a><span class="k">def</span> <span class="nf">query_ssodnet</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Query SsODNet services.</span>
+
+<span class="sd">    Includes validity check of response.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    url : str</span>
+<span class="sd">        Base url of GET request.</span>
+<span class="sd">    payload : dict</span>
+<span class="sd">        The GET request parameters. See</span>
+<span class="sd">        https://ssp.imcce.fr/webservices/ssodnet/api/</span>
+<span class="sd">        for options.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Print request diagnostics.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    r - requests.models.Response</span>
+<span class="sd">        GET request response from SsODNet</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+
+    <span class="n">_RESPONSES</span> <span class="o">=</span> <span class="p">{</span><span class="mi">400</span><span class="p">:</span> <span class="s1">&#39;Bad request&#39;</span><span class="p">,</span>
+                  <span class="mi">422</span><span class="p">:</span> <span class="s1">&#39;Unprocessable Entity&#39;</span><span class="p">,</span>
+                  <span class="mi">500</span><span class="p">:</span> <span class="s1">&#39;Internal Error&#39;</span><span class="p">,</span>
+                  <span class="mi">404</span><span class="p">:</span> <span class="s1">&#39;Not found&#39;</span>
+                  <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">in</span> <span class="n">_RESPONSES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;HTTP code </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">_RESPONSES</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;HTTP code </span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s1">: Unknown error&#39;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">r</span></div>
+
+
+<div class="viewcode-block" id="echo_response"><a class="viewcode-back" href="../tools.html#tools.echo_response">[docs]</a><span class="k">def</span> <span class="nf">echo_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Echo the formatted SsODNet response to STDOUT.</span>
+
+<span class="sd">    The echo function is based on the query mime type.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    response : requests.models.Response</span>
+<span class="sd">        SsODNet GET query response.</span>
+<span class="sd">    payload : dict</span>
+<span class="sd">        GET query payload.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;-mime&#39;</span> <span class="ow">in</span> <span class="n">payload</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;-mime&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">payload</span><span class="p">[</span><span class="s1">&#39;-mime&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;votable&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_index"><a class="viewcode-back" href="../tools.html#tools.read_index">[docs]</a><span class="k">def</span> <span class="nf">read_index</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Read local index of asteroid numbers and names.</span>
+
+<span class="sd">    The index is created with `rocks index`.</span>
+<span class="sd">    The list is retrieved from the Minor Planet Center, at</span>
+<span class="sd">    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dict</span>
+<span class="sd">        Asteroid name: number</span>
+<span class="sd">    dict</span>
+<span class="sd">        Asteroid number: name</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">path_index</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                           <span class="s1">&#39;.index&#39;</span><span class="p">)</span>
+
+    <span class="n">NAME_NUMBER</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">NUMBER_NAME</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_index</span><span class="p">)</span> <span class="k">as</span> <span class="n">index</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
+            <span class="n">number</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+
+            <span class="n">number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">)</span>
+
+            <span class="n">NUMBER_NAME</span><span class="p">[</span><span class="n">number</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="n">NAME_NUMBER</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">number</span>
+    <span class="k">return</span> <span class="n">NAME_NUMBER</span><span class="p">,</span> <span class="n">NUMBER_NAME</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>properties &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for properties</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Author: Max Mahlke</span>
+<span class="sd">    Date: 01 April 2020</span>
+
+<span class="sd">    Retrieve asteroid properties</span>
+
+<span class="sd">    Part of the rocks CL tool</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
+
+
+<span class="c1"># ------</span>
+<span class="c1"># Retrieval methods</span>
+<div class="viewcode-block" id="get_property"><a class="viewcode-back" href="../properties.html#properties.get_property">[docs]</a><span class="k">def</span> <span class="nf">get_property</span><span class="p">(</span><span class="n">property_</span><span class="p">,</span> <span class="n">this</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">skip_quaero</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Get asteroid property from SsODNet.</span>
+
+<span class="sd">    Queries SsODNet datacloud. Can be passed a list of identifiers.</span>
+<span class="sd">    First performs a quaero query to verify the asteroid identitfy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    property_ : str</span>
+<span class="sd">        Asteroid property to get.</span>
+<span class="sd">    this : str, int, float, list, np.array</span>
+<span class="sd">        Asteroid name, designation, or number.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Print request diagnostics.</span>
+<span class="sd">    skip_quaero: bool</span>
+<span class="sd">        Skip initial quaero query to verify asteroid identity.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple, list</span>
+<span class="sd">        Depending on the requested property. The tuple contains the aggregated</span>
+<span class="sd">        or most likely value of the property. The list contains all available</span>
+<span class="sd">        data on this property. If input was list of</span>
+<span class="sd">        identifiers, returns a list of tuples</span>
+
+<span class="sd">    False, False</span>
+<span class="sd">        Both return values are False if the query failed.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">this</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_quaero</span><span class="p">:</span>
+        <span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">names_numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">)):</span>
+            <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">sso</span> <span class="ow">in</span> <span class="n">this</span><span class="p">:</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Check if query failed</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">or</span>\
+                <span class="n">PROPS</span><span class="p">[</span><span class="n">property_</span><span class="p">][</span><span class="s1">&#39;datacloud_key&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Get property</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">PROPS</span><span class="p">[</span><span class="n">property_</span><span class="p">][</span><span class="s1">&#39;datacloud_key&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># Merge the results, identify the most likely</span>
+        <span class="n">selected</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">PROPS</span><span class="p">[</span><span class="n">property_</span><span class="p">][</span><span class="s1">&#39;select_one&#39;</span><span class="p">](</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">properties</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">selected</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">properties</span></div>
+
+
+<span class="c1"># ------</span>
+<span class="c1"># Selection functions for different properties</span>
+<div class="viewcode-block" id="select_taxonomy"><a class="viewcode-back" href="../properties.html#properties.select_taxonomy">[docs]</a><span class="k">def</span> <span class="nf">select_taxonomy</span><span class="p">(</span><span class="n">taxa</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Select a single taxonomic classification from multiple choices.</span>
+
+<span class="sd">    Evaluates the wavelength ranges, methods, schemes, and recency of</span>
+<span class="sd">    classification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    taxa : dict</span>
+<span class="sd">        Taxonomic classifications retrieved from SsODNet:datacloud.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    selected, str</span>
+<span class="sd">        The selected taxonomic classification.</span>
+<span class="sd">    taxa, dict</span>
+<span class="sd">        The input dictionary, with an additional key &#39;selected&#39;. True if the</span>
+<span class="sd">        item was selected, else False.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        POINTS = {</span>
+<span class="sd">            &#39;scheme&#39;: {</span>
+<span class="sd">                &#39;bus-demeo&#39;: 3,</span>
+<span class="sd">                &#39;bus&#39;: 2,</span>
+<span class="sd">                &#39;smass&#39;: 2,</span>
+<span class="sd">                &#39;tholen&#39;: 1,</span>
+<span class="sd">                &#39;sdss&#39;: 1,</span>
+<span class="sd">            },</span>
+
+<span class="sd">            &#39;waverange&#39;: {</span>
+<span class="sd">                &#39;vis&#39;: 1,</span>
+<span class="sd">                &#39;nir&#39;: 3,</span>
+<span class="sd">                &#39;visnir&#39;: 6,</span>
+<span class="sd">                &#39;mix&#39;: 4</span>
+<span class="sd">            },</span>
+
+<span class="sd">            &#39;method&#39;: {</span>
+<span class="sd">                &#39;spec&#39;: 7,</span>
+<span class="sd">                &#39;phot&#39;: 3,</span>
+<span class="sd">                &#39;mix&#39;: 4</span>
+<span class="sd">            }</span>
+<span class="sd">        }</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">POINTS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;scheme&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;bus-demeo&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s1">&#39;bus&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s1">&#39;smass&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s1">&#39;tholen&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;sdss&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">},</span>
+
+        <span class="s1">&#39;waverange&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;vis&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;nir&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s1">&#39;visnir&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+            <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">},</span>
+
+        <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+            <span class="s1">&#39;phot&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Compute points of each classification</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">taxa</span><span class="p">:</span>
+
+        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">POINTS</span><span class="p">[</span><span class="n">crit</span><span class="p">][</span><span class="n">c</span><span class="p">[</span><span class="n">crit</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="k">for</span> <span class="n">crit</span> <span class="ow">in</span>
+                          <span class="p">[</span><span class="s1">&#39;scheme&#39;</span><span class="p">,</span> <span class="s1">&#39;waverange&#39;</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">]]))</span>
+
+        <span class="n">c</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Find index of entry with most points. If maximum is shared,</span>
+    <span class="c1"># return the most recent classification</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">taxa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">points</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="n">selected</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">selected</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">],</span> <span class="n">taxa</span></div>
+
+
+<div class="viewcode-block" id="select_albedo"><a class="viewcode-back" href="../properties.html#properties.select_albedo">[docs]</a><span class="k">def</span> <span class="nf">select_albedo</span><span class="p">(</span><span class="n">albedos</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Compute a single albedo value from multiple measurements.</span>
+
+<span class="sd">    Evaluates the methods and computes the weighted average of equally ranked</span>
+<span class="sd">    methods.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    albedos : dict</span>
+<span class="sd">        Albedo measurements and metadata retrieved from SsODNet:datacloud.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    averaged, tuple</span>
+<span class="sd">        The average albedo and its uncertainty.</span>
+<span class="sd">    albedos, dict</span>
+<span class="sd">        The input dictionary, with an additional key &#39;selected&#39;. True if the</span>
+<span class="sd">        item was used in the computation of the average, else False.</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    The method ranking is given below. Albeods acquired with the top-ranked</span>
+<span class="sd">    method available are used for the weighted average computation. Albedos</span>
+<span class="sd">    observed with NEATM or STM get an additional 10% uncertainty added.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">      [&#39;SPACE&#39;]</span>
+<span class="sd">      [&#39;ADAM&#39;, &#39;KOALA&#39;, &#39;SAGE&#39;, &#39;Radar&#39;]</span>
+<span class="sd">      [&#39;LC+TPM&#39;, &#39;TPM&#39;, &#39;LC+AO&#39;, &#39;LC+Occ&#39;, &#39;TE-IM&#39;]</span>
+<span class="sd">      [&#39;AO&#39;, &#39;Occ&#39;, &#39;IM&#39;]</span>
+<span class="sd">      [&#39;NEATM&#39;]</span>
+<span class="sd">      [&#39;STM&#39;]</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">albedos</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">albedos</span><span class="p">)</span>
+    <span class="n">albedos</span><span class="p">[</span><span class="s1">&#39;albedo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedos</span><span class="p">[</span><span class="s1">&#39;albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">albedos</span><span class="p">[</span><span class="s1">&#39;err_albedo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">albedos</span><span class="p">[</span><span class="s1">&#39;err_albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Remove entries containing only diameters</span>
+    <span class="n">albedos</span> <span class="o">=</span> <span class="n">albedos</span><span class="p">[</span><span class="n">albedos</span><span class="o">.</span><span class="n">albedo</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">albedos</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="c1"># Check methods by hierarchy. If several results on</span>
+    <span class="c1"># same level, compute weighted mean</span>
+    <span class="n">albedos</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># keep track of albedos used for mean</span>
+
+    <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[[</span><span class="s1">&#39;SPACE&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;ADAM&#39;</span><span class="p">,</span> <span class="s1">&#39;KOALA&#39;</span><span class="p">,</span> <span class="s1">&#39;SAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;Radar&#39;</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;LC+TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+AO&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;TE-IM&#39;</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;AO&#39;</span><span class="p">,</span> <span class="s1">&#39;Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;IM&#39;</span><span class="p">],</span>
+                   <span class="p">[</span><span class="s1">&#39;NEATM&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;STM&#39;</span><span class="p">]]:</span>
+
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">method</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">methods</span><span class="p">:</span>  <span class="c1"># at least one element in common</span>
+
+            <span class="n">albs</span> <span class="o">=</span> <span class="n">albedos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">albedos</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">method</span><span class="p">),</span>
+                               <span class="s1">&#39;albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">ealbs</span> <span class="o">=</span> <span class="n">albedos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">albedos</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">method</span><span class="p">),</span>
+                                <span class="s1">&#39;err_albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+            <span class="c1"># NEATM and STM are inherently inaccurate</span>
+            <span class="k">if</span> <span class="s1">&#39;NEATM&#39;</span> <span class="ow">in</span> <span class="n">method</span> <span class="ow">or</span> <span class="s1">&#39;STM&#39;</span> <span class="ow">in</span> <span class="n">method</span><span class="p">:</span>
+                <span class="n">ealbs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ea</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span>
+                                  <span class="n">ea</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ealbs</span><span class="p">,</span> <span class="n">albs</span><span class="p">)])</span>
+
+                <span class="n">albedos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">albedos</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">method</span><span class="p">),</span>
+                            <span class="s1">&#39;err_albedo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ealbs</span>
+
+            <span class="c1"># Compute weighted mean</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">ealbs</span>
+
+            <span class="n">malb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">albs</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+            <span class="n">emalb</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+
+            <span class="c1"># Mark albedos used in computation</span>
+            <span class="n">albedos</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">albedos</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">method</span><span class="p">),</span>
+                        <span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">averaged</span> <span class="o">=</span> <span class="p">(</span><span class="n">malb</span><span class="p">,</span> <span class="n">emalb</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">averaged</span><span class="p">,</span> <span class="n">albedos</span></div>
+
+
+<span class="c1"># ------</span>
+<span class="c1"># Properties metadata</span>
+<span class="n">PROPS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;taxonomy&#39;</span><span class="p">:</span> <span class="p">{</span>
+
+        <span class="c1"># Selection logic for multiple results</span>
+        <span class="s1">&#39;select_one&#39;</span><span class="p">:</span> <span class="n">select_taxonomy</span><span class="p">,</span>
+        <span class="s1">&#39;datacloud_key&#39;</span><span class="p">:</span> <span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span>
+
+    <span class="p">},</span>
+
+    <span class="s1">&#39;albedo&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;select_one&#39;</span><span class="p">:</span> <span class="n">select_albedo</span><span class="p">,</span>
+        <span class="s1">&#39;datacloud_key&#39;</span><span class="p">:</span> <span class="s1">&#39;diamalbedo&#39;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

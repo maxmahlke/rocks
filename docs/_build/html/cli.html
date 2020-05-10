@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Command-Line Interface &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Names, Numbers, Designations" href="names.html" />
+    <link rel="prev" title="rocks" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="names.html" title="Names, Numbers, Designations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="rocks"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="command-line-interface">
+<span id="cli"></span><h1>Command-Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="rocks-docs">
+<span id="cli-docs"></span><h2>rocks docs<a class="headerlink" href="#rocks-docs" title="Permalink to this headline">¶</a></h2>
+<p>Open rocks documentation in browser.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks docs <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="rocks-identify">
+<span id="cli-identify"></span><h2>rocks identify<a class="headerlink" href="#rocks-identify" title="Permalink to this headline">¶</a></h2>
+<p>Get asteroid name and number from string input.</p>
+<p>Queries SsODNet:quaero with the string input. The output is
+printed to STDOUT.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str</span></dt><dd><p>String to identify asteroid.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd>
+</dl>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks identify <span class="o">[</span>OPTIONS<span class="o">]</span> THIS
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-identify-v">
+<span id="cmdoption-rocks-identify-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-identify-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-identify-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-identify-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required argument</p>
+</dd></dl>
+
+</div>
+<p>Asteroid names or designations are queried case- and
+whitespace-insensitive.</p>
+<div class="section" id="rocks-index">
+<span id="cli-index"></span><h2>rocks index<a class="headerlink" href="#rocks-index" title="Permalink to this headline">¶</a></h2>
+<p>Create or update index of numbered SSOs.</p>
+<p>The list is retrieved from the Minor Planet Center, at
+<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks index <span class="o">[</span>OPTIONS<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+<p><strong>For all functions below, providing no argument triggers a selection from the
+asteroid index.</strong></p>
+<div class="section" id="rocks-taxonomy">
+<span id="cli-taxonomy"></span><h2>rocks taxonomy<a class="headerlink" href="#rocks-taxonomy" title="Permalink to this headline">¶</a></h2>
+<p>Get asteroid taxonomic classification for a single minor body.</p>
+<p>Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+identify the asteroid from the input string.  The output is printed
+to STDOUT.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str</span></dt><dd><p>String to identify asteroid.</p>
+</dd>
+</dl>
+<p>verbose : bool, optional</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks taxonomy <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>THIS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-taxonomy-v">
+<span id="cmdoption-rocks-taxonomy-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-taxonomy-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-taxonomy-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-taxonomy-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+<p>A taxonomic classification is highlighted based on the wavelength-range,
+classification method, classification scheme, and recency of the results.
+The values of each category are assigned points, and the classification
+with the most points is chosen. For details, refer to the <a class="reference internal" href="properties.html#taxonomy"><span class="std std-ref">Taxonomy</span></a>
+section of the documentation.</p>
+<div class="section" id="rocks-albedo">
+<span id="cli-albedo"></span><h2>rocks albedo<a class="headerlink" href="#rocks-albedo" title="Permalink to this headline">¶</a></h2>
+<p>Get asteroid albedo measurements for a single minor body.</p>
+<p>Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+identify the asteroid from the input string.  The output is printed
+to STDOUT.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str</span></dt><dd><p>String to identify asteroid.</p>
+</dd>
+</dl>
+<p>verbose : bool, optional</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks albedo <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>THIS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-albedo-v">
+<span id="cmdoption-rocks-albedo-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-albedo-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-albedo-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-albedo-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+<p>An averaged albedo value is output based on the available measurements. The
+methods of albedo determination are ranked. If two measurements are
+available for methods in the top ranks, these values are averaged. For
+details, see the <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">Albedo</span></a> section of the documentation.</p>
+<div class="section" id="rocks-info">
+<span id="cli-info"></span><h2>rocks info<a class="headerlink" href="#rocks-info" title="Permalink to this headline">¶</a></h2>
+<p>Print available data on asteroid.</p>
+<p>Queries SsODNet:datacloud with the provided identification string
+or select asteroid from index.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str, optional</span></dt><dd><p>Identification string for asteroid: name, designation, or number.
+If empty, the user can select the asteroid from the index.</p>
+</dd>
+<dt>mime<span class="classifier">{‘votable’, ‘html’, ‘text’, ‘json’}, optional</span></dt><dd><p>Mime-type of printed SsODNet:datacloud response. Default is json.</p>
+</dd>
+<dt>verbose<span class="classifier">bool, optional</span></dt><dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd>
+</dl>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks info <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>THIS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-info-m">
+<span id="cmdoption-rocks-info-mime"></span><code class="sig-name descname">-m</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--mime</code><code class="sig-prename descclassname"> &lt;mime&gt;</code><a class="headerlink" href="#cmdoption-rocks-info-m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mime type of SsODNet response</p>
+<dl class="field-list simple">
+<dt class="field-odd">Options</dt>
+<dd class="field-odd"><p>votable|html|text|json</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="std option">
+<dt id="cmdoption-rocks-info-v">
+<span id="cmdoption-rocks-info-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-info-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-info-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-info-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Command-Line Interface</a><ul>
+<li><a class="reference internal" href="#rocks-docs">rocks docs</a></li>
+<li><a class="reference internal" href="#rocks-identify">rocks identify</a></li>
+<li><a class="reference internal" href="#rocks-index">rocks index</a></li>
+<li><a class="reference internal" href="#rocks-taxonomy">rocks taxonomy</a></li>
+<li><a class="reference internal" href="#rocks-albedo">rocks albedo</a></li>
+<li><a class="reference internal" href="#rocks-info">rocks info</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter"><code class="docutils literal notranslate"><span class="pre">rocks</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="names.html"
+                        title="next chapter">Names, Numbers, Designations</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cli.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="names.html" title="Names, Numbers, Designations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="rocks"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

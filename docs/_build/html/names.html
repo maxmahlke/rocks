@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Names, Numbers, Designations &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Asteroid Properties" href="properties.html" />
+    <link rel="prev" title="Command-Line Interface" href="cli.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="properties.html" title="Asteroid Properties"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="Command-Line Interface"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="names-numbers-designations">
+<h1>Names, Numbers, Designations<a class="headerlink" href="#names-numbers-designations" title="Permalink to this headline">¶</a></h1>
+<p>SsODNet:quaero provides a fast, fuzzy-searchable index of current and previous
+asteroid designations, names, and numbers. When combining large databases from
+different years, e.g. SDSS MOC4 and VISTA MOVIS, the same asteroid may appear
+with different designations. Quaero gives the list of aliases to identify
+ambiguities and the execution time to comfortably execute it for hundreds of
+thousands of objects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rocks identify &quot;2013 JJ2&quot;
+(nan) 2010 PA1
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">names.get_name_number</span></code> method is a Quaero wrapper.</p>
+<span class="target" id="identify"></span><dl class="py function">
+<dt id="names.get_name_number">
+<code class="sig-prename descclassname">names.</code><code class="sig-name descname">get_name_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/names.html#get_name_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#names.get_name_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get SSO name and number from an identifier.</p>
+<p>Queries SsODNet:quaero. Can be passed a list of identifiers. In this case,
+the local asteroid name index is checked for matches first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em>) – Asteroid name, designation, or number.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Tuple containing asteroid name or designation as str and
+asteroid number as int, NaN if not numbered. If input was list of
+identifiers, returns a list of tuples</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple, (str, int or float)</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Asteroid names or designations are queried case- and
+whitespace-insensitive.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">([</span><span class="s1">&#39;1950 RW&#39;</span><span class="p">,</span> <span class="s1">&#39;2001je2&#39;</span><span class="p">,</span> <span class="s1">&#39;VESTA&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">)</span>
+<span class="go">[(&#39;Gyldenkerne&#39;, 5030), (&#39;2001 JE2&#39;, 131353), (&#39;Vesta&#39;, 4)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>When saving asteroid data, the name or designation is a handy unique identifier
+for the filename. The whitespace in the designations is, however, not
+convenient. The function below removes troublesome characters.</p>
+<dl class="py function">
+<dt id="names.to_filename">
+<code class="sig-prename descclassname">names.</code><code class="sig-name descname">to_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/names.html#to_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#names.to_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates suitable filename from asteroid name or designation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – Asteroid name or designation</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sanitized asteroid name.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">names</span><span class="o">.</span><span class="n">to_filename</span><span class="p">(</span><span class="s1">&#39;2012 P-L&#39;</span><span class="p">)</span>
+<span class="go">2012P-L</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cli.html"
+                        title="previous chapter">Command-Line Interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="properties.html"
+                        title="next chapter">Asteroid Properties</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/names.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="properties.html" title="Asteroid Properties"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cli.html" title="Command-Line Interface"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>

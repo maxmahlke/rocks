@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Tools &#8212; rocks 0.1 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Asteroid Properties" href="properties.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="properties.html" title="Asteroid Properties"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tools">
+<h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+<p>These are general, low-level utility functions.</p>
+<dl class="py function">
+<dt id="tools.get_data">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get asteroid data from SsODNet:datacloud.</p>
+<p>Performs a GET request to SsODNet:datacloud for a single asteroid and
+property.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em>) – Asteroid name, designation, or number.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Asteroid data, False if query failed or no data is available</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict, bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p><cite>get_data</cite> calls <cite>query_ssodnet</cite>.</p>
+<dl class="py function">
+<dt id="tools.query_ssodnet">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">query_ssodnet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#query_ssodnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.query_ssodnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query SsODNet services.</p>
+<p>Includes validity check of response.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<em>str</em>) – Base url of GET request.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em>) – The GET request parameters. See
+<a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/api/">https://ssp.imcce.fr/webservices/ssodnet/api/</a>
+for options.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>GET request response from SsODNet</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>r - requests.models.Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tools.echo_response">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">echo_response</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">response</span></em>, <em class="sig-param"><span class="n">payload</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#echo_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.echo_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Echo the formatted SsODNet response to STDOUT.</p>
+<p>The echo function is based on the query mime type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<em>requests.models.Response</em>) – SsODNet GET query response.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em>) – GET query payload.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tools.read_index">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">read_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#read_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.read_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read local index of asteroid numbers and names.</p>
+<p>The index is created with <cite>rocks index</cite>.
+The list is retrieved from the Minor Planet Center, at
+<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>dict</em> – Asteroid name: number</p></li>
+<li><p><em>dict</em> – Asteroid number: name</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tools.select_sso_from_index">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.select_sso_from_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Selcet SSO numbers and designations from interactive fuzzy search.</p>
+<p>The index is created with <cite>rocks index</cite>.
+The list is retrieved from the Minor Planet Center, at
+<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>str</em> – asteroid name or designation</p></li>
+<li><p><em>int</em> – asteroid number</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="properties.html"
+                        title="previous chapter">Asteroid Properties</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tools.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="properties.html" title="Asteroid Properties"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
+    </div>
+  </body>
+</html>
