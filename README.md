@@ -5,7 +5,6 @@
   1. Clone repo
      ```
      $ git clone https://github.com/maxmahlke/rocks.git
-     $ [sudo] pip install -e .
      ```
   2. Install `rocks` `python` package
      ```
