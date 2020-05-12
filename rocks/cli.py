@@ -14,7 +14,6 @@ import sys
 import webbrowser
 
 import click
-import numpy as np
 
 from rocks import names
 from rocks import properties
@@ -74,7 +73,7 @@ def identify(this, verbose):
     '''
     name, number = names.get_name_number(this, verbose, progress=False)
 
-    if not np.isnan(name):
+    if isinstance(name, (str)):
         click.echo(f'({number}) {name}')
 
 
@@ -107,7 +106,7 @@ def info(this, mime, verbose):
     if not this:
         this, _ = tools.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        this, _ = names.get_name_number(this, verbose)
+        this, _ = names.get_name_number(this, verbose, progress=False)
 
     # Build query
     url = 'https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php'

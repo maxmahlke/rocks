@@ -106,6 +106,7 @@ def _query_quaero(sso, verbose=False):
         sso = int(sso)
         fuzzy = False  # no fuzzy search
     elif isinstance(sso, str):
+        sso = sso.replace(' ', '')
         fuzzy = True   # allow 2 character of fuzziness
     else:
         print(f'Did not understand type of identifier: {type(sso)}'

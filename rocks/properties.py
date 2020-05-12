@@ -51,7 +51,7 @@ def get_property(property_, this, verbose, skip_quaero=False):
         this = [this]
 
     if not skip_quaero:
-        names_numbers = names.get_name_number(this, verbose)
+        names_numbers = names.get_name_number(this, verbose, progress=False)
 
         if isinstance(names_numbers, (tuple)):
             this = [names_numbers[0]]
