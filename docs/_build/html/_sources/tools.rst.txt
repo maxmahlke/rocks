@@ -15,6 +15,9 @@ These are general, low-level utility functions.
 .. autofunction:: echo_response
 
 
+.. autofunction:: create_index
+
+
 .. autofunction:: read_index
 
 

@@ -159,6 +159,12 @@
     <span class="n">j</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
     <span class="c1"># No match found</span>
+    <span class="k">if</span> <span class="s1">&#39;data&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">j</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not find data for identifier </span><span class="si">{</span><span class="n">sso</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">j</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not find match for identifier </span><span class="si">{</span><span class="n">sso</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>

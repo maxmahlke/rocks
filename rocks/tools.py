@@ -10,11 +10,70 @@
 from functools import lru_cache
 import json
 import os.path as path
+import shutil
 import sys
 
 import click
 from iterfzf import iterfzf
 import requests
+
+
+def create_index():
+    '''Create or update index of numbered SSOs.
+
+    The list is retrieved from the Minor Planet Center, at
+    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
+    '''
+    path_index = path.join(path.dirname(path.abspath(__file__)),
+                           '.index')
+
+    click.echo('Retrieving index from MPC..')
+    r = requests.get(f'https://www.minorplanetcenter.net/'
+                     f'iau/lists/NumberedMPs.txt', stream=True)
+
+    # ------
+    # Check that query worked
+    total = r.headers.get('content-length')
+
+    if total is None:
+        click.echo('Remote query failed.')
+        sys.exit()
+
+    total = int(total)
+
+    # Set up progress bar
+    width, _ = shutil.get_terminal_size()
+    width -= 2
+    num_chunks = 1000
+
+    response = []
+
+    for data in r.iter_content(chunk_size=int(total / num_chunks)):
+
+        response.append(data.decode('utf-8'))
+        done = int(width * len(response) / num_chunks)
+
+        sys.stdout.write('\r[{}{}]'.format('=' * done, ' ' * (width - done)))
+        sys.stdout.flush()
+
+    sys.stdout.write('\n')
+
+    # ------
+    # Parse index into number,name format
+    response = ''.join(response)
+    with open(path_index, 'w') as ind:
+        for line in response.split('\n'):
+
+            if not line:
+                continue
+
+            number, name = line.split()[:2]
+
+            if name.isnumeric():  # it's a designation
+                name = ' '.join(line.split()[1:3])
+
+            number = number.strip('()')
+            ind.write(f'{number},{name}\n')
 
 
 def _fuzzy_desig_selection():
