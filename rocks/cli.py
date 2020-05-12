@@ -9,12 +9,12 @@
 
     Call as:	rocks --help
 '''
-
 import os
 import sys
 import webbrowser
 
 import click
+import numpy as np
 
 from rocks import names
 from rocks import properties
@@ -72,8 +72,10 @@ def identify(this, verbose):
     verbose : bool, optional
         Flag to print SsODNet request diagnostics.
     '''
-    name, number = names.get_name_number(this, verbose)
-    click.echo(f'({number}) {name}')
+    name, number = names.get_name_number(this, verbose, progress=False)
+
+    if not np.isnan(name):
+        click.echo(f'({number}) {name}')
 
 
 @cli_rocks.command()
