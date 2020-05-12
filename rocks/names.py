@@ -125,6 +125,12 @@ def _query_quaero(sso, verbose=False):
     j = r.json()
 
     # No match found
+    if 'data' not in j.keys():
+        if verbose:
+            print(f'Could not find data for identifier {sso}.')
+            print(r.url)
+        return (np.nan, np.nan)
+
     if not j['data']:
         if verbose:
             print(f'Could not find match for identifier {sso}.')
