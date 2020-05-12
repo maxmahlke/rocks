@@ -50,18 +50,29 @@ thousands of objects.</p>
 (nan) 2010 PA1
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">names.get_name_number</span></code> method is a Quaero wrapper.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">names.get_name_number</span></code> method is a Quaero wrapper.
+The results are cached during runtime to profit from repeated queries.
+It offers multiprocessing the queries. A small benchmark:</p>
+<ul class="simple">
+<li><p>Serial mode: 24s / 100 queries</p></li>
+<li><p>Parallel mode (2 cores): 13s / 100 queries</p></li>
+<li><p>Parallel mode (4 cores): 8s / 100 queries</p></li>
+<li><p>Parallel mode (8 cores): 7s / 100 queries</p></li>
+</ul>
 <span class="target" id="identify"></span><dl class="py function">
 <dt id="names.get_name_number">
-<code class="sig-prename descclassname">names.</code><code class="sig-name descname">get_name_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/names.html#get_name_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#names.get_name_number" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">names.</code><code class="sig-name descname">get_name_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/names.html#get_name_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#names.get_name_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get SSO name and number from an identifier.</p>
-<p>Queries SsODNet:quaero. Can be passed a list of identifiers. In this case,
-the local asteroid name index is checked for matches first.</p>
+<p>Queries SsODNet:quaero. Can be passed a list of identifiers.
+Parallel queries by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em>) – Asteroid name, designation, or number.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
+<li><p><strong>parallel</strong> (<em>int</em>) – Number of cores to use for queries. Default is 4.
+0 and 1 trigger serial querying.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics. Default is True.</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – Show query progress. Default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

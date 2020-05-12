@@ -13,7 +13,14 @@ thousands of objects.
    $ rocks identify "2013 JJ2"            
    (nan) 2010 PA1
 
-The ``names.get_name_number`` method is a Quaero wrapper.
+The ``names.get_name_number`` method is a Quaero wrapper. 
+The results are cached during runtime to profit from repeated queries.
+It offers multiprocessing the queries. A small benchmark:
+
+- Serial mode: 24s / 100 queries
+- Parallel mode (2 cores): 13s / 100 queries
+- Parallel mode (4 cores): 8s / 100 queries
+- Parallel mode (8 cores): 7s / 100 queries
 
 .. currentmodule:: names
 
