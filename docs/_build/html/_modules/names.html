@@ -50,11 +50,14 @@
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
+
 
 <div class="viewcode-block" id="get_name_number"><a class="viewcode-back" href="../names.html#names.get_name_number">[docs]</a><span class="k">def</span> <span class="nf">get_name_number</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Get SSO name and number from an identifier.</span>
 
-<span class="sd">    Queries SsODNet:quaero. Can be passed a list of identifiers.</span>
+<span class="sd">    Does a local lookup for asteroid identifier in the index. If this fails,</span>
+<span class="sd">    queries SsODNet:quaero. Can be passed a list of identifiers.</span>
 <span class="sd">    Parallel queries by default.</span>
 
 <span class="sd">    Parameters</span>
@@ -79,7 +82,7 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Use asteroid numbers as identifiers for fastest queries. Asteroid</span>
+<span class="sd">    Use integer asteroid numbers as identifiers for fastest queries. Asteroid</span>
 <span class="sd">    names or designations are queried case- and whitespace-insensitive.</span>
 
 <span class="sd">    Examples</span>
@@ -97,14 +100,15 @@
     <span class="c1"># Query</span>
     <span class="k">if</span> <span class="n">parallel</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
-            <span class="n">names_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_query_quaero</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verbose</span><span class="p">),</span>
+            <span class="n">names_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_lookup_or_query</span><span class="p">(</span><span class="n">x</span><span class="p">,</span>
+                                                                     <span class="n">verbose</span><span class="p">),</span>
                                           <span class="n">this</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">this</span><span class="p">)))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">names_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_query_quaero</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verbose</span><span class="p">),</span>
+            <span class="n">names_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_lookup_or_query</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">verbose</span><span class="p">),</span>
                                      <span class="n">this</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pool</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">parallel</span><span class="p">)</span>
-        <span class="n">qq</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_query_quaero</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="n">qq</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_lookup_or_query</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
             <span class="n">names_numbers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">pool</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">qq</span><span class="p">,</span> <span class="n">this</span><span class="p">),</span>
@@ -120,41 +124,75 @@
         <span class="k">return</span> <span class="n">names_numbers</span></div>
 
 
-<span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">_query_quaero</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Quaero query and result parsing for a single object.</span>
+<span class="k">def</span> <span class="nf">_lookup_or_query</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Tries local lookup of asteroid identifier, else calls quaero query.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-
 <span class="sd">    sso : str, int, float</span>
-<span class="sd">        Asteroid name, number, or designation</span>
+<span class="sd">        Asteroid name, number, or designation.</span>
 <span class="sd">    verbose : bool</span>
-<span class="sd">        Print request diagnostics</span>
+<span class="sd">        Print request diagnostics.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    tuple, (str, int or float)</span>
 <span class="sd">        Tuple containing asteroid name or designation as str and</span>
 <span class="sd">        asteroid number as int, NaN if not numbered. If input was list of</span>
-<span class="sd">        identifiers, returns a list of tuples</span>
+<span class="sd">        identifiers, returns a list of tuples.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">))</span> <span class="ow">or</span> <span class="n">sso</span><span class="o">.</span><span class="n">isnumeric</span><span class="p">():</span>
         <span class="n">sso</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span>
-        <span class="n">fuzzy</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># no fuzzy search</span>
+
+        <span class="c1"># Try local lookup</span>
+        <span class="k">if</span> <span class="n">sso</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">NUMBER_NAME</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">tools</span><span class="o">.</span><span class="n">NUMBER_NAME</span><span class="p">[</span><span class="n">sso</span><span class="p">],</span> <span class="n">sso</span>
+
+        <span class="c1"># Else, query quaero</span>
+        <span class="n">fuzzy</span> <span class="o">=</span> <span class="mi">0</span>
+
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Try local lookup</span>
+        <span class="k">if</span> <span class="n">sso</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">NAME_NUMBER</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">sso</span><span class="p">,</span> <span class="n">tools</span><span class="o">.</span><span class="n">NAME_NUMBER</span><span class="p">[</span><span class="n">sso</span><span class="p">]</span>
+
+        <span class="c1"># Else, query quaero</span>
         <span class="n">sso</span> <span class="o">=</span> <span class="n">sso</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">fuzzy</span> <span class="o">=</span> <span class="kc">True</span>   <span class="c1"># allow 2 character of fuzziness</span>
+        <span class="n">fuzzy</span> <span class="o">=</span> <span class="mi">1</span>   <span class="c1"># allow 1 character of fuzziness</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Did not understand type of identifier: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
               <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Should be integer, float, or string.&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 
+    <span class="k">return</span> <span class="n">_query_quaero</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">fuzzy</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_query_quaero</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">fuzzy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Quaero query and result parsing for a single object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sso : str, int, float</span>
+<span class="sd">        Asteroid name, number, or designation.</span>
+<span class="sd">    fuzzy : int</span>
+<span class="sd">        Degree of fuzzy search. Default is 1.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Print request diagnostics. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple, (str, int or float)</span>
+<span class="sd">        Tuple containing asteroid name or designation as str and</span>
+<span class="sd">        asteroid number as int, NaN if not numbered. If input was list of</span>
+<span class="sd">        identifiers, returns a list of tuples.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
     <span class="c1"># Build query</span>
     <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://api.ssodnet.imcce.fr/quaero/1/sso/search&#39;</span>
 
     <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;q&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s1">&#39;type:(&quot;Dwarf Planet&quot; OR Asteroid OR Comet)&#39;</span>
-                   <span class="sa">f</span><span class="s1">&#39; AND </span><span class="si">{</span><span class="n">sso</span><span class="si">}</span><span class="s1">~</span><span class="si">{</span><span class="s2">&quot;2&quot;</span> <span class="k">if</span> <span class="n">fuzzy</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                   <span class="sa">f</span><span class="s1">&#39; AND </span><span class="si">{</span><span class="n">sso</span><span class="si">}</span><span class="s1">~</span><span class="si">{</span><span class="s2">&quot;1&quot;</span> <span class="k">if</span> <span class="n">fuzzy</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
               <span class="s1">&#39;from&#39;</span><span class="p">:</span> <span class="s1">&#39;rocks&#39;</span><span class="p">,</span>
               <span class="s1">&#39;limit&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}</span>
 

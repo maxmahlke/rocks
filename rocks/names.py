@@ -16,11 +16,14 @@ import numpy as np
 import requests
 from tqdm import tqdm
 
+from rocks import tools
+
 
 def get_name_number(this, parallel=4, verbose=True, progress=True):
     ''' Get SSO name and number from an identifier.
 
-    Queries SsODNet:quaero. Can be passed a list of identifiers.
+    Does a local lookup for asteroid identifier in the index. If this fails,
+    queries SsODNet:quaero. Can be passed a list of identifiers.
     Parallel queries by default.
 
     Parameters
@@ -45,7 +48,7 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
 
     Notes
     -----
-    Use asteroid numbers as identifiers for fastest queries. Asteroid
+    Use integer asteroid numbers as identifiers for fastest queries. Asteroid
     names or designations are queried case- and whitespace-insensitive.
 
     Examples
@@ -63,14 +66,15 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
     # Query
     if parallel in [0, 1]:
         if progress:
-            names_numbers = list(tqdm(map(lambda x: _query_quaero(x, verbose),
+            names_numbers = list(tqdm(map(lambda x: _lookup_or_query(x,
+                                                                     verbose),
                                           this), total=len(this)))
         else:
-            names_numbers = list(map(lambda x: _query_quaero(x, verbose),
+            names_numbers = list(map(lambda x: _lookup_or_query(x, verbose),
                                      this))
     else:
         pool = mp.Pool(processes=parallel)
-        qq = partial(_query_quaero, verbose=verbose)
+        qq = partial(_lookup_or_query, verbose=verbose)
 
         if progress:
             names_numbers = list(tqdm(pool.imap(qq, this),
@@ -86,35 +90,69 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
         return names_numbers
 
 
-@lru_cache(128)
-def _query_quaero(sso, verbose=False):
-    '''Quaero query and result parsing for a single object.
+def _lookup_or_query(sso, verbose=False):
+    '''Tries local lookup of asteroid identifier, else calls quaero query.
 
     Parameters
     ----------
-
     sso : str, int, float
-        Asteroid name, number, or designation
+        Asteroid name, number, or designation.
     verbose : bool
-        Print request diagnostics
+        Print request diagnostics.
 
     Returns
     -------
     tuple, (str, int or float)
         Tuple containing asteroid name or designation as str and
         asteroid number as int, NaN if not numbered. If input was list of
-        identifiers, returns a list of tuples
+        identifiers, returns a list of tuples.
     '''
     if isinstance(sso, (int, float, np.int64)) or sso.isnumeric():
         sso = int(sso)
-        fuzzy = False  # no fuzzy search
+
+        # Try local lookup
+        if sso in tools.NUMBER_NAME.keys():
+            return tools.NUMBER_NAME[sso], sso
+
+        # Else, query quaero
+        fuzzy = 0
+
     elif isinstance(sso, str):
+        # Try local lookup
+        if sso in tools.NAME_NUMBER.keys():
+            return sso, tools.NAME_NUMBER[sso]
+
+        # Else, query quaero
         sso = sso.replace(' ', '')
-        fuzzy = True   # allow 2 character of fuzziness
+        fuzzy = 1   # allow 1 character of fuzziness
     else:
         print(f'Did not understand type of identifier: {type(sso)}'
               f'\nShould be integer, float, or string.')
         return (np.nan, np.nan)
+
+    return _query_quaero(sso, fuzzy, verbose)
+
+
+@lru_cache(128)
+def _query_quaero(sso, fuzzy=1, verbose=False):
+    '''Quaero query and result parsing for a single object.
+
+    Parameters
+    ----------
+    sso : str, int, float
+        Asteroid name, number, or designation.
+    fuzzy : int
+        Degree of fuzzy search. Default is 1.
+    verbose : bool
+        Print request diagnostics. Default is False.
+
+    Returns
+    -------
+    tuple, (str, int or float)
+        Tuple containing asteroid name or designation as str and
+        asteroid number as int, NaN if not numbered. If input was list of
+        identifiers, returns a list of tuples.
+    '''
 
     # Build query
     url = 'https://api.ssodnet.imcce.fr/quaero/1/sso/search'

@@ -24,6 +24,9 @@ whitespace-insensitive.
 .. click:: cli:index
   :prog: rocks index
 
+The index is used for local asteroid name and number lookups. It should be kep
+up-to-date. If the index file is older than 30 days, a warning is displayed.
+
 **For all functions below, providing no argument triggers a selection from the
 asteroid index.**
 

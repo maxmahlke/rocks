@@ -50,20 +50,24 @@ thousands of objects.</p>
 (nan) 2010 PA1
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">names.get_name_number</span></code> method is a Quaero wrapper.
+<p>The <code class="docutils literal notranslate"><span class="pre">names.get_name_number</span></code> function first tries to do a local lookup of the
+asteroid identifier, using the index file. If this fails, it queries Quaero.
 The results are cached during runtime to profit from repeated queries.
-It offers multiprocessing the queries. A small benchmark:</p>
+It offers multiprocessing the queries.</p>
+<p>The query speed largely depends on the number of successful local lookups.
+Asteroid numbers should be prioritized as identifiers. A small benchmark using 260,000 lines from the SDSS MOC4:</p>
 <ul class="simple">
 <li><p>Serial mode: 24s / 100 queries</p></li>
 <li><p>Parallel mode (2 cores): 13s / 100 queries</p></li>
-<li><p>Parallel mode (4 cores): 8s / 100 queries</p></li>
-<li><p>Parallel mode (8 cores): 7s / 100 queries</p></li>
+<li><p>Parallel mode (4 cores): 380 queries / s</p></li>
+<li><p>Parallel mode (8 cores): 870 queries / s</p></li>
 </ul>
 <span class="target" id="identify"></span><dl class="py function">
 <dt id="names.get_name_number">
 <code class="sig-prename descclassname">names.</code><code class="sig-name descname">get_name_number</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/names.html#get_name_number"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#names.get_name_number" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get SSO name and number from an identifier.</p>
-<p>Queries SsODNet:quaero. Can be passed a list of identifiers.
+<p>Does a local lookup for asteroid identifier in the index. If this fails,
+queries SsODNet:quaero. Can be passed a list of identifiers.
 Parallel queries by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -85,7 +89,7 @@ identifiers, returns a list of tuples</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Use asteroid numbers as identifiers for fastest queries. Asteroid
+<p>Use integer asteroid numbers as identifiers for fastest queries. Asteroid
 names or designations are queried case- and whitespace-insensitive.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>

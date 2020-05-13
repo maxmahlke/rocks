@@ -12,6 +12,7 @@ import json
 import os.path as path
 import shutil
 import sys
+import time
 
 import click
 from iterfzf import iterfzf
@@ -61,32 +62,38 @@ def create_index():
     # ------
     # Parse index into number,name format
     response = ''.join(response)
-    with open(path_index, 'w') as ind:
-        for line in response.split('\n'):
 
-            if not line:
-                continue
+    index = {}
 
-            number, name = line.split()[:2]
+    for line in response.split('\n'):
+        if not line:
+            continue
 
-            if name.isnumeric():  # it's a designation
-                name = ' '.join(line.split()[1:3])
+        number, name = line.split()[:2]
 
-            number = number.strip('()')
-            ind.write(f'{number},{name}\n')
+        if name.isnumeric():  # it's a designation
+            name = ' '.join(line.split()[1:3])
+
+        number = number.strip('()')
+        index[number] = name
+
+    # Write dict to index file
+    with open(path_index, 'w') as index_file:
+        json.dump(index, index_file)
 
 
 def _fuzzy_desig_selection():
     '''Fuzzy search of asteroid index file.
 
     '''
-    path_index = path.join(path.dirname(path.abspath(__file__)),
-                           '.index')
+    # path_index = path.join(path.dirname(path.abspath(__file__)),
+                           # '.index')
 
-    with click.open_file(path_index) as ind:
-        for line in ind:
-            number, name = line.strip().split(',')
-            yield f'{number} {name}'
+    # with click.open_file(path_index) as index_file:
+        # index = json.load(index_file)
+
+    for number, name in NUMBER_NAME.items():
+        yield f'{number} {name}'
 
 
 def select_sso_from_index():
@@ -263,24 +270,36 @@ def read_index():
 
     Returns
     -------
-
-    dict
-        Asteroid name: number
     dict
         Asteroid number: name
+    dict
+        Asteroid name: number
     '''
     path_index = path.join(path.dirname(path.abspath(__file__)),
                            '.index')
 
-    NAME_NUMBER = {}
-    NUMBER_NAME = {}
+    # Check age of index file
+    mdate = path.getmtime(path_index)
 
-    with open(path_index) as index:
-        for line in index:
-            number, name = line.strip().split(',')
+    if (time.time() - mdate) / (3600 * 24) > 30:
+        click.echo(f'The index file is more than 30 days old. '
+                   f'Consider updating with "rocks index".')
+        time.sleep(1)  # so user doesn't miss the message
 
-            number = int(number)
+    with click.open_file(path_index) as index_file:
+        index = json.load(index_file)
 
-            NUMBER_NAME[number] = name
-            NAME_NUMBER[name] = number
-    return NAME_NUMBER, NUMBER_NAME
+    NUMBER_NAME = index
+    NAME_NUMBER = {name: number for number, name in NUMBER_NAME.items()}
+
+    return NUMBER_NAME, NAME_NUMBER
+
+
+# This needs to be available for name lookups and index selection
+try:
+    NUMBER_NAME, NAME_NUMBER = read_index()
+except FileNotFoundError:
+    if sys.argv[1] != 'index':
+        click.echo(f'Asteroid index could not be find. '
+                   f'Run "rocks index" first.')
+        sys.exit()
