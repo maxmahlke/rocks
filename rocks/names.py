@@ -11,6 +11,7 @@ from functools import lru_cache, partial
 import multiprocessing as mp
 import re
 
+import pandas as pd
 import numpy as np
 import requests
 from tqdm import tqdm
@@ -25,7 +26,7 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
     Parameters
     ----------
 
-    this : str, int, float, list, np.array
+    this : str, int, float, list, np.array, pd.Series
         Asteroid name, designation, or number.
     parallel : int
         Number of cores to use for queries. Default is 4.
@@ -44,8 +45,8 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
 
     Notes
     -----
-    Asteroid names or designations are queried case- and
-    whitespace-insensitive.
+    Use asteroid numbers as identifiers for fastest queries. Asteroid
+    names or designations are queried case- and whitespace-insensitive.
 
     Examples
     --------
@@ -54,6 +55,8 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
     >>> print(names_numbers)
     [('Gyldenkerne', 5030), ('2001 JE2', 131353), ('Vesta', 4)]
     '''
+    if isinstance(this, pd.Series):
+        this = this.values
     if not isinstance(this, (list, np.ndarray)):
         this = [this]
 

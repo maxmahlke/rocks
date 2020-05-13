@@ -68,7 +68,7 @@ Parallel queries by default.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em>) – Asteroid name, designation, or number.</p></li>
+<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em><em>, </em><em>pd.Series</em>) – Asteroid name, designation, or number.</p></li>
 <li><p><strong>parallel</strong> (<em>int</em>) – Number of cores to use for queries. Default is 4.
 0 and 1 trigger serial querying.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics. Default is True.</p></li>
@@ -85,8 +85,8 @@ identifiers, returns a list of tuples</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>Asteroid names or designations are queried case- and
-whitespace-insensitive.</p>
+<p>Use asteroid numbers as identifiers for fastest queries. Asteroid
+names or designations are queried case- and whitespace-insensitive.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">([</span><span class="s1">&#39;1950 RW&#39;</span><span class="p">,</span> <span class="s1">&#39;2001je2&#39;</span><span class="p">,</span> <span class="s1">&#39;VESTA&#39;</span><span class="p">])</span>

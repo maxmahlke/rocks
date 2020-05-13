@@ -85,7 +85,7 @@
         <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">this</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_quaero</span><span class="p">:</span>
-        <span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+        <span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">)):</span>
             <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">names_numbers</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>

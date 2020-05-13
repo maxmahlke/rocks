@@ -45,6 +45,7 @@
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
@@ -59,7 +60,7 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 
-<span class="sd">    this : str, int, float, list, np.array</span>
+<span class="sd">    this : str, int, float, list, np.array, pd.Series</span>
 <span class="sd">        Asteroid name, designation, or number.</span>
 <span class="sd">    parallel : int</span>
 <span class="sd">        Number of cores to use for queries. Default is 4.</span>
@@ -78,8 +79,8 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Asteroid names or designations are queried case- and</span>
-<span class="sd">    whitespace-insensitive.</span>
+<span class="sd">    Use asteroid numbers as identifiers for fastest queries. Asteroid</span>
+<span class="sd">    names or designations are queried case- and whitespace-insensitive.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -88,6 +89,8 @@
 <span class="sd">    &gt;&gt;&gt; print(names_numbers)</span>
 <span class="sd">    [(&#39;Gyldenkerne&#39;, 5030), (&#39;2001 JE2&#39;, 131353), (&#39;Vesta&#39;, 4)]</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">this</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">values</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
         <span class="n">this</span> <span class="o">=</span> <span class="p">[</span><span class="n">this</span><span class="p">]</span>
 
@@ -140,6 +143,7 @@
         <span class="n">sso</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span>
         <span class="n">fuzzy</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># no fuzzy search</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">sso</span> <span class="o">=</span> <span class="n">sso</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="n">fuzzy</span> <span class="o">=</span> <span class="kc">True</span>   <span class="c1"># allow 2 character of fuzziness</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Did not understand type of identifier: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
