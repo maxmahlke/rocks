@@ -120,7 +120,7 @@ def _query_quaero(sso, verbose=False):
     url = 'https://api.ssodnet.imcce.fr/quaero/1/sso/search'
 
     params = {'q': f'type:("Dwarf Planet" OR Asteroid OR Comet)'
-                   f' AND {sso}~{"2" if fuzzy else "0"}',
+                   f' AND {sso}~{"1" if fuzzy else "0"}',
               'from': 'rocks',
               'limit': 100}
 
