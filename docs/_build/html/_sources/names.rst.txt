@@ -21,8 +21,7 @@ It offers multiprocessing the queries.
 The query speed largely depends on the number of successful local lookups.
 Asteroid numbers should be prioritized as identifiers. A small benchmark using 260,000 lines from the SDSS MOC4:
 
-- Serial mode: 24s / 100 queries
-- Parallel mode (2 cores): 13s / 100 queries
+- Serial mode: 80 queries / s 
 - Parallel mode (4 cores): 380 queries / s
 - Parallel mode (8 cores): 870 queries / s
 
