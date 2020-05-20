@@ -13,6 +13,11 @@ thousands of objects.
    $ rocks identify "2013 JJ2"            
    (nan) 2010 PA1
 
+
+**We prioritize local lookups over remote queries. When local fails, we try to
+format the identifier string to a proper designation, number, name, to enable
+zero-fuzzy-search.**
+
 The ``names.get_name_number`` function first tries to do a local lookup of the
 asteroid identifier, using the index file. If this fails, it queries Quaero. 
 The results are cached during runtime to profit from repeated queries.

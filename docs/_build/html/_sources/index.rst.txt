@@ -3,6 +3,12 @@
 
 A ``python`` package to query asteroid data from
 `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
+
+**Disclaimer: The SsODNet service and its database are in an alpha version and
+under constant revision. The provided values and access methods may change
+without notice.**
+
+
 It includes a command-line interface for quick exploration of singular objects,
 
 ::

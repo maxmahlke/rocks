@@ -323,7 +323,7 @@
     <span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path_index</span><span class="p">)</span> <span class="k">as</span> <span class="n">index_file</span><span class="p">:</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">index_file</span><span class="p">)</span>
 
-    <span class="n">NUMBER_NAME</span> <span class="o">=</span> <span class="n">index</span>
+    <span class="n">NUMBER_NAME</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">number</span><span class="p">):</span> <span class="n">name</span> <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">index</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">NAME_NUMBER</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">number</span> <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">NUMBER_NAME</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="k">return</span> <span class="n">NUMBER_NAME</span><span class="p">,</span> <span class="n">NAME_NUMBER</span></div>
