@@ -1,5 +1,7 @@
 # rocks
 
+*Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
+
 ## Install
 
   1. Clone repo
