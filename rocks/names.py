@@ -114,35 +114,58 @@ def _lookup_or_query(sso, verbose=False):
         if sso in tools.NUMBER_NAME.keys():
             return tools.NUMBER_NAME[sso], sso
 
-        # Else, query quaero
-        fuzzy = 0
-
     elif isinstance(sso, str):
+
+        # String identifier. Perform some regex
+        # tests to make sure it's well formatted
+
+        # Asteroid name. Asteroid numbers are caught above in isnumeric
+        if re.match('^[A-Za-z]*$', sso):
+            pass  # no formatting needed
+
+        # Asteroid designation
+        elif re.match('(^([1A][8-9][0-9]{2}[ _]?[A-Za-z]{2}[0-9]{0,3}$)|'
+                      '(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))', sso):
+
+            # Ensure whitespace between year and identifier
+            sso = re.sub('[\W_]+', '', sso)
+            ind = re.search('[A18920]{1,2}[0-9]{2}', sso).end()
+            sso = f'{sso[:ind]} {sso[ind:]}'
+
+            # Replace A by 1
+            sso = re.sub('^A', '1', sso)
+
+        # Palomar-Leiden / Transit 
+        if re.match('^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$', sso):
+            pass
+
+        # Comet
+        if re.match('(^[PDCXAI]/[- 0-9A-Za-z]*)', sso):
+            pass
+
+        # Remaining should be unconvential asteroid names like "G!kun||'homdima"
+        # or packed designaitons
+
         # Try local lookup
         if sso in tools.NAME_NUMBER.keys():
             return sso, tools.NAME_NUMBER[sso]
-
-        # Else, query quaero
-        sso = sso.replace(' ', '')
-        fuzzy = 1   # allow 1 character of fuzziness
     else:
         print(f'Did not understand type of identifier: {type(sso)}'
               f'\nShould be integer, float, or string.')
         return (np.nan, np.nan)
 
-    return _query_quaero(sso, fuzzy, verbose)
+    # Else, query quaero
+    return _query_quaero(sso, verbose)
 
 
 @lru_cache(128)
-def _query_quaero(sso, fuzzy=1, verbose=False):
+def _query_quaero(sso, verbose=False):
     '''Quaero query and result parsing for a single object.
 
     Parameters
     ----------
     sso : str, int, float
         Asteroid name, number, or designation.
-    fuzzy : int
-        Degree of fuzzy search. Default is 1.
     verbose : bool
         Print request diagnostics. Default is False.
 
@@ -158,9 +181,9 @@ def _query_quaero(sso, fuzzy=1, verbose=False):
     url = 'https://api.ssodnet.imcce.fr/quaero/1/sso/search'
 
     params = {'q': f'type:("Dwarf Planet" OR Asteroid OR Comet)'
-                   f' AND {sso}~{"1" if fuzzy else "0"}',
+                   f' AND "{sso}"~0',  # no fuzzy search
               'from': 'rocks',
-              'limit': 100}
+              'limit': 10000}
 
     # Send GET request
     r = requests.get(url, params=params, timeout=5)
@@ -180,41 +203,16 @@ def _query_quaero(sso, fuzzy=1, verbose=False):
         return (np.nan, np.nan)
 
     # Exact search performed
-    if not fuzzy:
-        data = j['data'][0]
-        name = data['name']
-        number = sso
-        return (name, number)
+    data = j['data'][0]
+    name = data['name']
 
-    # Fuzzy search performed
-    if fuzzy:
-        # Checks for:
-        #    - whitespaces
-        #    - capitalization
-        for match in j['data']:
-
-            sso = re.sub(r'\s+', '', sso.lower())
-
-            aliases = [re.sub(r'\s+', '', a.lower()) for a in
-                       match['aliases'] + [match['name']]]
-
-            # If we find our match
-            if sso in aliases:
-                name = match['name']
-
-                # Take lowest numeric alias as number
-                numeric = [int(a) for a in aliases if a.isnumeric()]
-                if numeric:
-                    number = min(numeric)
-                else:
-                    number = np.nan
-
-                return (name, number)
-        else:
-            if verbose:
-                print(f'Could not find match for identifier {sso}')
-                print(r.url)
-            return (np.nan, np.nan)
+    # Take lowest numeric alias as number
+    numeric = [int(a) for a in data['aliases'] if a.isnumeric()]
+    if numeric:
+        number = min(numeric)
+    else:
+        number = np.nan
+    return (name, number)
 
 
 def to_filename(name):

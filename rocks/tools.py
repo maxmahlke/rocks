@@ -289,7 +289,7 @@ def read_index():
     with click.open_file(path_index) as index_file:
         index = json.load(index_file)
 
-    NUMBER_NAME = index
+    NUMBER_NAME = {int(number): name for number, name in index.items()}
     NAME_NUMBER = {name: number for number, name in NUMBER_NAME.items()}
 
     return NUMBER_NAME, NAME_NUMBER

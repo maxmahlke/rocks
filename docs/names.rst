@@ -13,6 +13,7 @@ thousands of objects.
    $ rocks identify "2013 JJ2"            
    (nan) 2010 PA1
 
+
 The ``names.get_name_number`` function first tries to do a local lookup of the
 asteroid identifier, using the index file. If this fails, it queries Quaero. 
 The results are cached during runtime to profit from repeated queries.

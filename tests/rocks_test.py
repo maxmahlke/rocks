@@ -9,6 +9,7 @@
     Call as:	python rocks_test.py
 '''
 import numpy as np
+import re
 
 from rocks import names
 from rocks import properties
@@ -16,10 +17,13 @@ from rocks import properties
 if __name__ == '__main__':
 
     # A collection of asteroid identifiers with various degrees of abstraction
-    ssos = [4, 'eos', '1992EA4', 'SCHWARTZ', '1950 RW', '2001je2', '2010 OR']
+    ssos = [4, 'eos', '1992EA4', 'SCHWARTZ', '1950 RW', '2001je2', '2010 OR',
+            '192', 'A999AB2', '2001 JE2', '2001_JE2', 'P/PANSTARRS',
+            '1290 T-1', 'Vesta', "G!kun||'homdima", '2004BQ102']
 
     # Resolve their names and numbers
     names_numbers = names.get_name_number(ssos, progress=False)
+    print(names_numbers)
 
     names = [nn[0] for nn in names_numbers]
 
