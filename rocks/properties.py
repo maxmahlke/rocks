@@ -261,6 +261,80 @@ def select_albedo(albedos):
     return averaged, albedos
 
 
+
+def select_mass(masses):
+    '''Compute a single mass estimate from multiple measurements.
+
+    Evaluates the methods and computes the weighted average of equally ranked
+    methods.
+
+    Parameters
+    ----------
+    masses : dict
+        Mass estimates and metadata retrieved from SsODNet:datacloud.
+
+    Returns
+    -------
+    averaged, tuple
+        The average mass and its uncertainty.
+    masses, dict
+        The input dictionary, with an additional key 'selected'. True if the
+        item was used in the computation of the average, else False.
+
+
+    Notes
+    -----
+
+    The method ranking is given below. Masses acquired with the top-ranked
+    method available are used for the weighted average computation. 
+
+    .. code-block:: python
+
+      ['SPACE']
+      ['Bin-Genoid']
+      ['Bin-IM', 'Bin-Radar', 'Bin-PheMu']
+      ['EPHEM', 'DEFLECT']
+
+    '''
+
+    masses = pd.DataFrame.from_dict(masses)
+    masses['mass'] = masses['mass'].astype(float)
+    masses['err_mass'] = masses['err_mass'].astype(float)
+
+    # Extract methods
+    methods = set(masses.method.values)
+
+    # Check methods by hierarchy. If several results on
+    # same level, compute weighted mean
+    masses['selected'] = False  # keep track of albedos used for mean
+
+    for method in [['SPACE'], ['Bin-Genoid'],
+                   ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
+                   ['EPHEM', 'DEFLECT']]:
+
+        if set(method) & methods:  # at least one element in common
+
+            m = masses.loc[masses.method.isin(method),
+                               'mass'].values
+            dm = masses.loc[masses.method.isin(method),
+                                'err_mass'].values
+
+            # Compute weighted mean
+            weights = 1 / dm
+
+            mmass = np.average(m, weights=weights)
+            emmass = 1 / np.sum(weights)
+
+            # Mark masses used in computation
+            masses.loc[masses.method.isin(method),
+                        'selected'] = True
+            averaged = (mmass, emmass)
+            break
+
+    return averaged, masses
+
+
+
 # ------
 # Properties metadata
 PROPS = {
@@ -275,5 +349,10 @@ PROPS = {
     'albedo': {
         'select_one': select_albedo,
         'datacloud_key': 'diamalbedo',
+    },
+
+    'mass': {
+        'select_one': select_mass,
+        'datacloud_key': 'masses',
     },
 }

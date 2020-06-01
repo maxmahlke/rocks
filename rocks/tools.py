@@ -97,7 +97,7 @@ def _fuzzy_desig_selection():
 
 
 def select_sso_from_index():
-    ''' Selcet SSO numbers and designations from interactive fuzzy search.
+    ''' Select SSO numbers and designations from interactive fuzzy search.
 
     The index is created with `rocks index`.
     The list is retrieved from the Minor Planet Center, at
