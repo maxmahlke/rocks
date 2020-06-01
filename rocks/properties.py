@@ -199,7 +199,7 @@ def select_albedo(albedos):
     Notes
     -----
 
-    The method ranking is given below. Albeods acquired with the top-ranked
+    The method ranking is given below. Albedos acquired with the top-ranked
     method available are used for the weighted average computation. Albedos
     observed with NEATM or STM get an additional 10% uncertainty added.
 
@@ -259,6 +259,90 @@ def select_albedo(albedos):
             break
 
     return averaged, albedos
+
+
+def select_diameter(diameters):
+    '''Compute a single diameter value from multiple measurements.
+
+    Evaluates the methods and computes the weighted average of equally ranked
+    methods.
+
+    Parameters
+    ----------
+    diameters : dict
+        Diameter measurements and metadata retrieved from SsODNet:datacloud.
+
+    Returns
+    -------
+    averaged, tuple
+        The average diameter and its uncertainty.
+    diameters, dict
+        The input dictionary, with an additional key 'selected'. True if the
+        item was used in the computation of the average, else False.
+
+
+    Notes
+    -----
+
+    The method ranking is given below. Diameters acquired with the top-ranked
+    method available are used for the weighted average computation. Diameters
+    observed with NEATM or STM get an additional 10% uncertainty added.
+
+    .. code-block:: python
+
+      ['SPACE']
+      ['ADAM', 'KOALA', 'SAGE', 'Radar']
+      ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM']
+      ['AO', 'Occ', 'IM']
+      ['NEATM']
+      ['STM']
+
+    '''
+
+    diameters = pd.DataFrame.from_dict(diameters)
+    diameters['diameter'] = diameters['diameter'].astype(float)
+    diameters['err_diameter'] = diameters['err_diameter'].astype(float)
+
+    # Extract methods
+    methods = set(diameters.method.values)
+
+    # Check methods by hierarchy. If several results on
+    # same level, compute weighted mean
+    diameters['selected'] = False  # keep track of albedos used for mean
+
+    for method in [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                   ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
+                   ['AO', 'Occ', 'IM'],
+                   ['NEATM'], ['STM']]:
+
+        if set(method) & methods:  # at least one element in common
+
+            diams = diameters.loc[diameters.method.isin(method),
+                               'diameter'].values
+            ediams = diameters.loc[diameters.method.isin(method),
+                                'err_diameter'].values
+
+            # NEATM and STM are inherently inaccurate
+            if 'NEATM' in method or 'STM' in method:
+                ediams = np.array([np.sqrt(ea**2 + (0.1 * a)**2) for
+                                  ea, a in zip(ediams, diams)])
+
+                diameters.loc[diameters.method.isin(method),
+                            'err_albedo'] = ediams
+
+            # Compute weighted mean
+            weights = 1 / ediams
+
+            mdiam = np.average(diams, weights=weights)
+            emdiam = 1 / np.sum(weights)
+
+            # Mark diameters used in computation
+            diameters.loc[diameters.method.isin(method),
+                        'selected'] = True
+            averaged = (mdiam, emdiam)
+            break
+
+    return averaged, diameters
 
 
 
@@ -348,6 +432,11 @@ PROPS = {
 
     'albedo': {
         'select_one': select_albedo,
+        'datacloud_key': 'diamalbedo',
+    },
+
+    'diameter': {
+        'select_one': select_diameter,
         'datacloud_key': 'diamalbedo',
     },
 

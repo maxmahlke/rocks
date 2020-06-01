@@ -198,6 +198,47 @@ def albedo(this, verbose):
     click.echo(f'\n{"":6}{averaged[0]:.3f} +- {averaged[1]:.3f}')
 
 
+
+@cli_rocks.command()
+@click.argument('this', default='')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Flag to print SsODNet request diagnostics.')
+def diameter(this, verbose):
+    '''Get asteroid diameter measurements for a single minor body.
+
+    Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+    identify the asteroid from the input string.  The output is printed
+    to STDOUT.
+
+    Parameters
+    ----------
+
+    this : str
+        String to identify asteroid.
+    verbose : bool, optional
+    '''
+    if not this:
+        this, _ = tools.select_sso_from_index()
+
+    averaged, diameters = properties.get_property('diameter', this, verbose)
+
+    if diameters is False:
+        click.echo('No diameter on record.')
+        sys.exit()
+
+    # Print results
+    click.echo(f'{"ref":20} {"diameter":9} '
+               f'{"err":7} {"method":8}')
+
+    for ind, d in diameters.iterrows():
+        click.echo(f'{d["shortbib"]:20} {d["diameter"]:8.3f}  '
+                   f'{d["err_diameter"]:7.3f} {d["method"]:8} '
+                   f'[{"X" if d["selected"] else " "}]')
+
+    # weighted mean albedo and error
+    click.echo(f'\n{"":6}{averaged[0]:.3f} +- {averaged[1]:.3f}')
+
+
 @cli_rocks.command()
 @click.argument('this', default='')
 @click.option('--verbose', '-v', is_flag=True,
