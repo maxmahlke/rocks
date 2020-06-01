@@ -53,6 +53,26 @@ methods of albedo determination are ranked. If two measurements are
 available for methods in the top ranks, these values are averaged. For
 details, see the :ref:`Albedo <albedo>` section of the documentation.
 
+.. _cli-diameter:
+
+.. click:: cli:diameter
+  :prog: rocks diameter
+
+An averaged diameter value is output based on the available measurements. The
+methods of diameter determination are ranked. If two measurements are
+available for methods in the top ranks, these values are averaged. For
+details, see the :ref:`diameter <diameter>` section of the documentation.
+
+.. _cli-mass:
+
+.. click:: cli:mass
+  :prog: rocks mass
+
+An averaged mass value is output based on the available measurements. The
+methods of mass determination are ranked. If two measurements are
+available for methods in the top ranks, these values are averaged. For
+details, see the :ref:`mass <mass>` section of the documentation.
+
 .. _cli-info:
 
 .. click:: cli:info

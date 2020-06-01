@@ -26,17 +26,17 @@ It includes a command-line interface for quick exploration of singular objects,
    DeMeo+2009           K     Bus-DeMeo  Spec    VISNIR     [X]
 
    $ rocks albedo Eos
-   ref   albedo err   method
-   3     0.123  0.025 STM      [ ]
-   5     0.140  0.010 STM      [ ]
-   6     0.150  0.012 STM      [ ]
-   6     0.121  0.019 NEATM    [X]
-   9     0.131  0.014 NEATM    [X]
-   10    0.165  0.038 NEATM    [X]
-   16    0.166  0.021 NEATM    [X]
-   68    0.180  0.027 NEATM    [X]
-   25    0.140  0.091 NEATM    [X]
-   25    0.150  0.171 NEATM    [X]
+   ref                  albedo err   method
+   Morrison+2007        0.123  0.025 STM      [ ]
+   Tedesco+2001         0.140  0.010 STM      [ ]
+   Ryan+2010            0.150  0.012 STM      [ ]
+   Ryan+2010            0.121  0.019 NEATM    [X]
+   Usui+2011            0.131  0.014 NEATM    [X]
+   Masiero+2011         0.165  0.038 NEATM    [X]
+   Masiero+2012         0.166  0.021 NEATM    [X]
+   Masiero+2014         0.180  0.027 NEATM    [X]
+   Nugent+2016          0.140  0.091 NEATM    [X]
+   Nugent+2016          0.150  0.171 NEATM    [X]
    
          0.147 +- 0.004
 
@@ -63,7 +63,6 @@ as well as functions to retrieve properties for multiple minor bodies at once:
    #  ('Gyldenkerne', 5030), ('2001 JE2', 131353)]
 
    # Get their taxonomy
-
    taxa = properties.get_property('taxonomy', names, verbose=True, skip_quaero=True)
    classes = [t[0] for t in taxa]
 
@@ -83,6 +82,12 @@ What's been implemented so far
 
 - Get the albedo measurements of asteroids
   :ref:`via the command-line <cli-albedo>`, or :ref:`scripted as batch job <albedo>`.
+
+- Get the diameter measurements of asteroids
+  :ref:`via the command-line <cli-diameter>`, or :ref:`scripted as batch job <albedo>`.
+
+- Get the mass estimates of asteroids
+  :ref:`via the command-line <cli-mass>`, or :ref:`scripted as batch job <albedo>`.
 
 - Get all data availabe on `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_
   for a single asteroid :ref:`via the command-line <cli-info>`.

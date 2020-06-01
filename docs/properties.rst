@@ -63,6 +63,14 @@ maintainers**.
 
 .. autofunction:: select_albedo
 
+.. _diameter:
+
+.. autofunction:: select_diameter
+
+.. _mass:
+
+.. autofunction:: select_mass
+
 .. _taxonomy:
 
 .. autofunction:: select_taxonomy
