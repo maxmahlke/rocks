@@ -73,6 +73,9 @@ def identify(this, verbose):
     verbose : bool, optional
         Flag to print SsODNet request diagnostics.
     '''
+    import os
+    os.system('git branch --show-current')
+
     name, number = names.get_name_number(this, parallel=1,
                                          verbose=verbose, progress=False)
 
