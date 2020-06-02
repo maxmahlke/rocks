@@ -14,9 +14,11 @@ import sys
 import webbrowser
 
 import click
+import numpy as np
 
+from rocks import albedo as alb
 from rocks import names
-from rocks import properties
+from rocks import taxonomy as tax
 from rocks import tools
 
 
@@ -71,7 +73,8 @@ def identify(this, verbose):
     verbose : bool, optional
         Flag to print SsODNet request diagnostics.
     '''
-    name, number = names.get_name_number(this, verbose, progress=False)
+    name, number = names.get_name_number(this, parallel=1,
+                                         verbose=verbose, progress=False)
 
     if isinstance(name, (str)):
         click.echo(f'({number}) {name}')
@@ -106,7 +109,8 @@ def info(this, mime, verbose):
     if not this:
         this, _ = tools.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        this, _ = names.get_name_number(this, verbose, progress=False)
+        this, _ = names.get_name_number(this, parallel=1, verbose=verbose,
+                                        progress=False)
 
     # Build query
     url = 'https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php'
@@ -143,11 +147,13 @@ def taxonomy(this, verbose):
     if not this:
         this, _ = tools.select_sso_from_index()
 
-    selected, taxa = properties.get_property('taxonomy', this, verbose)
+    selected, taxa = tax.get_taxonomy(this, parallel=1, progress=False,
+                                      verbose=verbose)
 
-    if taxa is False:
-        click.echo('No taxonomy on record.')
-        sys.exit()
+    if isinstance(taxa, float):
+        if np.isnan(taxa):
+            click.echo('No taxonomy on record.')
+            sys.exit()
 
     # Print results
     click.echo(f'{"ref":20} {"class":5} {"scheme":11}'
@@ -179,11 +185,13 @@ def albedo(this, verbose):
     if not this:
         this, _ = tools.select_sso_from_index()
 
-    averaged, albedos = properties.get_property('albedo', this, verbose)
+    averaged, albedos = alb.get_albedo(this, parallel=1, progress=False,
+                                       verbose=verbose)
 
-    if albedos is False:
-        click.echo('No albedo on record.')
-        sys.exit()
+    if isinstance(albedos, float):
+        if np.isnan(albedos):
+            click.echo('No albedo on record.')
+            sys.exit()
 
     # Print results
     click.echo(f'{"ref":5} {"albedo":5} '

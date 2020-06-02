@@ -282,8 +282,8 @@ def read_index():
     mdate = path.getmtime(path_index)
 
     if (time.time() - mdate) / (3600 * 24) > 30:
-        click.echo(f'The index file is more than 30 days old. '
-                   f'Consider updating with "rocks index".')
+        click.echo('The index file is more than 30 days old. '
+                   'Consider updating with "rocks index".')
         time.sleep(1)  # so user doesn't miss the message
 
     with click.open_file(path_index) as index_file:
@@ -300,6 +300,6 @@ try:
     NUMBER_NAME, NAME_NUMBER = read_index()
 except FileNotFoundError:
     if sys.argv[1] != 'index':
-        click.echo(f'Asteroid index could not be find. '
-                   f'Run "rocks index" first.')
+        click.echo('Asteroid index could not be found. '
+                   'Run "rocks index" first.')
         sys.exit()

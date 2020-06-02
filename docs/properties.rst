@@ -14,6 +14,7 @@ Implemented so far are merging schemes for
 - Albedo
 - Taxonomy
 
+The general function is
 
 .. autofunction:: get_property
 
@@ -57,7 +58,10 @@ maintainers**.
   # [('Vesta', (0.34, 0.02)), ('Eos', (0.147, 0.004)), ('1992 EA4', False),
   #  ('Schwartz', (0.051, 0.004)), ('Gyldenkerne', (0.120, 0.007)), ('2001 JE2', False)]
 
+Class to complex method.
 
+
+For convenience, function wrappers are defined:
 
 .. _albedo:
 
