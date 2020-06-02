@@ -55,17 +55,17 @@ Clark+2009           K     Bus-DeMeo  Spec    VISNIR     [ ]
 DeMeo+2009           K     Bus-DeMeo  Spec    VISNIR     [X]
 
 $ rocks albedo Eos
-ref   albedo err   method
-3     0.123  0.025 STM      [ ]
-5     0.140  0.010 STM      [ ]
-6     0.150  0.012 STM      [ ]
-6     0.121  0.019 NEATM    [X]
-9     0.131  0.014 NEATM    [X]
-10    0.165  0.038 NEATM    [X]
-16    0.166  0.021 NEATM    [X]
-68    0.180  0.027 NEATM    [X]
-25    0.140  0.091 NEATM    [X]
-25    0.150  0.171 NEATM    [X]
+ref                  albedo err   method
+Morrison+2007        0.123  0.025 STM      [ ]
+Tedesco+2001         0.140  0.010 STM      [ ]
+Ryan+2010            0.150  0.012 STM      [ ]
+Ryan+2010            0.121  0.019 NEATM    [X]
+Usui+2011            0.131  0.014 NEATM    [X]
+Masiero+2011         0.165  0.038 NEATM    [X]
+Masiero+2012         0.166  0.021 NEATM    [X]
+Masiero+2014         0.180  0.027 NEATM    [X]
+Nugent+2016          0.140  0.091 NEATM    [X]
+Nugent+2016          0.150  0.171 NEATM    [X]
 
       0.147 +- 0.004
 
@@ -90,7 +90,6 @@ $ rocks info Eos | grep ProperSemimajor
 <span class="c1">#  (&#39;Gyldenkerne&#39;, 5030), (&#39;2001 JE2&#39;, 131353)]</span>
 
 <span class="c1"># Get their taxonomy</span>
-
 <span class="n">taxa</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">skip_quaero</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">taxa</span><span class="p">]</span>
 
@@ -108,6 +107,10 @@ $ rocks info Eos | grep ProperSemimajor
 <a class="reference internal" href="cli.html#cli-taxonomy"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#taxonomy"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
 <li><p>Get the albedo measurements of asteroids
 <a class="reference internal" href="cli.html#cli-albedo"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
+<li><p>Get the diameter measurements of asteroids
+<a class="reference internal" href="cli.html#cli-diameter"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
+<li><p>Get the mass estimates of asteroids
+<a class="reference internal" href="cli.html#cli-mass"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
 <li><p>Get all data availabe on <a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/">SsODNet</a>
 for a single asteroid <a class="reference internal" href="cli.html#cli-info"><span class="std std-ref">via the command-line</span></a>.</p></li>
 </ul>
@@ -128,6 +131,8 @@ and export them filtered by target, observation, and band</p></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-index">rocks index</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-taxonomy">rocks taxonomy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-albedo">rocks albedo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-diameter">rocks diameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-mass">rocks mass</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-info">rocks info</a></li>
 </ul>
 </li>

@@ -33,7 +33,6 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
         Asteroid name, designation, or number.
     parallel : int
         Number of cores to use for queries. Default is 4.
-        0 and 1 trigger serial querying.
     verbose : bool
         Print request diagnostics. Default is True.
     progress : bool
@@ -63,26 +62,17 @@ def get_name_number(this, parallel=4, verbose=True, progress=True):
     if not isinstance(this, (list, np.ndarray)):
         this = [this]
 
-    # Query
-    if parallel in [0, 1]:
-        if progress:
-            names_numbers = list(tqdm(map(lambda x: _lookup_or_query(x,
-                                                                     verbose),
-                                          this), total=len(this)))
-        else:
-            names_numbers = list(map(lambda x: _lookup_or_query(x, verbose),
-                                     this))
-    else:
-        pool = mp.Pool(processes=parallel)
-        qq = partial(_lookup_or_query, verbose=verbose)
+    pool = mp.Pool(processes=parallel)
+    qq = partial(_lookup_or_query, verbose=verbose)
 
-        if progress:
-            names_numbers = list(tqdm(pool.imap(qq, this),
-                                      total=len(this)))
-        else:
-            names_numbers = list(pool.imap(qq, this))
-        pool.close()
-        pool.join()
+    if progress:
+        names_numbers = list(tqdm(pool.imap(qq, this),
+                                  total=len(this)))
+    else:
+        names_numbers = list(pool.imap(qq, this))
+
+    pool.close()
+    pool.join()
 
     if len(names_numbers) == 1:
         return names_numbers[0]
@@ -107,48 +97,64 @@ def _lookup_or_query(sso, verbose=False):
         asteroid number as int, NaN if not numbered. If input was list of
         identifiers, returns a list of tuples.
     '''
-    if isinstance(sso, (int, float, np.int64)) or sso.isnumeric():
+    if isinstance(sso, (int, float, np.int64)):
         sso = int(sso)
 
         # Try local lookup
         if sso in tools.NUMBER_NAME.keys():
-            return tools.NUMBER_NAME[sso], sso
+            return (tools.NUMBER_NAME[sso], sso)
 
     elif isinstance(sso, str):
 
         # String identifier. Perform some regex
         # tests to make sure it's well formatted
 
-        # Asteroid name. Asteroid numbers are caught above in isnumeric
-        if re.match('^[A-Za-z]*$', sso):
-            pass  # no formatting needed
+        # Asteroid number
+        if sso.isnumeric():
+            sso = int(sso)
+
+            # Try local lookup
+            if sso in tools.NUMBER_NAME.keys():
+                return (tools.NUMBER_NAME[sso], sso)
+
+        # Asteroid name
+        if re.match(r'^[A-Za-z]*$', sso):
+
+            # Ensure proper capitalization
+            sso = sso.capitalize()
 
         # Asteroid designation
-        elif re.match('(^([1A][8-9][0-9]{2}[ _]?[A-Za-z]{2}[0-9]{0,3}$)|'
-                      '(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))', sso):
+        elif re.match(r'(^([1A][8-9][0-9]{2}[ _]?[A-Za-z]{2}[0-9]{0,3}$)|'
+                      r'(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))', sso):
 
             # Ensure whitespace between year and identifier
-            sso = re.sub('[\W_]+', '', sso)
-            ind = re.search('[A18920]{1,2}[0-9]{2}', sso).end()
+            sso = re.sub(r'[\W_]+', '', sso)
+            ind = re.search(r'[A18920]{1,2}[0-9]{2}', sso).end()
             sso = f'{sso[:ind]} {sso[ind:]}'
 
             # Replace A by 1
-            sso = re.sub('^A', '1', sso)
+            sso = re.sub(r'^A', '1', sso)
 
-        # Palomar-Leiden / Transit 
-        if re.match('^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$', sso):
-            pass
+            # Ensure uppercase
+            sso = sso.upper()
+
+        # Palomar-Leiden / Transit
+        if re.match(r'^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$', sso):
+
+            # Ensure whitespace
+            sso = re.sub(r'[ _]+', '', sso)
+            sso = f'{sso[:4]} {sso[4:]}'
 
         # Comet
-        if re.match('(^[PDCXAI]/[- 0-9A-Za-z]*)', sso):
+        if re.match(r'(^[PDCXAI]/[- 0-9A-Za-z]*)', sso):
             pass
 
-        # Remaining should be unconvential asteroid names like "G!kun||'homdima"
-        # or packed designaitons
+        # Remaining should be unconvential asteroid names like
+        # "G!kun||'homdima" or packed designaitons
 
         # Try local lookup
         if sso in tools.NAME_NUMBER.keys():
-            return sso, tools.NAME_NUMBER[sso]
+            return (sso, tools.NAME_NUMBER[sso])
     else:
         print(f'Did not understand type of identifier: {type(sso)}'
               f'\nShould be integer, float, or string.')
@@ -206,12 +212,10 @@ def _query_quaero(sso, verbose=False):
     data = j['data'][0]
     name = data['name']
 
-    # Take lowest numeric alias as number
+    # Take lowest numerical alias as number
     numeric = [int(a) for a in data['aliases'] if a.isnumeric()]
-    if numeric:
-        number = min(numeric)
-    else:
-        number = np.nan
+    number = min(numeric) if numeric else np.nan
+
     return (name, number)
 
 
@@ -234,7 +238,7 @@ def to_filename(name):
     --------
 
     >>> from rocks import names
-    >>> names.to_filename('2012 P-L')
-    2012P-L
+    >>> names.to_filename("G!kun||'homdima")
+    'Gkunhomdima'
     '''
     return re.sub(r'[^\w-]', '', name)

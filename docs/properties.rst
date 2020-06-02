@@ -65,8 +65,22 @@ For convenience, function wrappers are defined:
 
 .. _albedo:
 
+.. currentmodule:: albedo 
+
 .. autofunction:: select_albedo
 
+.. currentmodule:: properties 
+
+.. _diameter:
+
+.. autofunction:: select_diameter
+
+.. _mass:
+
+.. autofunction:: select_mass
+
 .. _taxonomy:
+
+.. currentmodule:: taxonomy 
 
 .. autofunction:: select_taxonomy

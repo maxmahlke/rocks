@@ -131,7 +131,7 @@
 
 
 <div class="viewcode-block" id="select_sso_from_index"><a class="viewcode-back" href="../tools.html#tools.select_sso_from_index">[docs]</a><span class="k">def</span> <span class="nf">select_sso_from_index</span><span class="p">():</span>
-    <span class="sd">&#39;&#39;&#39; Selcet SSO numbers and designations from interactive fuzzy search.</span>
+    <span class="sd">&#39;&#39;&#39; Select SSO numbers and designations from interactive fuzzy search.</span>
 
 <span class="sd">    The index is created with `rocks index`.</span>
 <span class="sd">    The list is retrieved from the Minor Planet Center, at</span>
@@ -316,8 +316,8 @@
     <span class="n">mdate</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">path_index</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">mdate</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3600</span> <span class="o">*</span> <span class="mi">24</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
-        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The index file is more than 30 days old. &#39;</span>
-                   <span class="sa">f</span><span class="s1">&#39;Consider updating with &quot;rocks index&quot;.&#39;</span><span class="p">)</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;The index file is more than 30 days old. &#39;</span>
+                   <span class="s1">&#39;Consider updating with &quot;rocks index&quot;.&#39;</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># so user doesn&#39;t miss the message</span>
 
     <span class="k">with</span> <span class="n">click</span><span class="o">.</span><span class="n">open_file</span><span class="p">(</span><span class="n">path_index</span><span class="p">)</span> <span class="k">as</span> <span class="n">index_file</span><span class="p">:</span>
@@ -334,8 +334,8 @@
     <span class="n">NUMBER_NAME</span><span class="p">,</span> <span class="n">NAME_NUMBER</span> <span class="o">=</span> <span class="n">read_index</span><span class="p">()</span>
 <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;index&#39;</span><span class="p">:</span>
-        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Asteroid index could not be find. &#39;</span>
-                   <span class="sa">f</span><span class="s1">&#39;Run &quot;rocks index&quot; first.&#39;</span><span class="p">)</span>
+        <span class="n">click</span><span class="o">.</span><span class="n">echo</span><span class="p">(</span><span class="s1">&#39;Asteroid index could not be found. &#39;</span>
+                   <span class="s1">&#39;Run &quot;rocks index&quot; first.&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </pre></div>
 

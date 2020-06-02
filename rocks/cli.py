@@ -18,6 +18,7 @@ import numpy as np
 
 from rocks import albedo as alb
 from rocks import names
+from rocks import properties
 from rocks import taxonomy as tax
 from rocks import tools
 
@@ -67,7 +68,6 @@ def identify(this, verbose):
 
     Parameters
     ----------
-
     this : str
         String to identify asteroid.
     verbose : bool, optional
@@ -96,7 +96,6 @@ def info(this, mime, verbose):
 
     Parameters
     ----------
-
     this : str, optional
         Identification string for asteroid: name, designation, or number.
         If empty, the user can select the asteroid from the index.
@@ -139,7 +138,6 @@ def taxonomy(this, verbose):
 
     Parameters
     ----------
-
     this : str
         String to identify asteroid.
     verbose : bool, optional
@@ -177,7 +175,6 @@ def albedo(this, verbose):
 
     Parameters
     ----------
-
     this : str
         String to identify asteroid.
     verbose : bool, optional
@@ -194,13 +191,95 @@ def albedo(this, verbose):
             sys.exit()
 
     # Print results
-    click.echo(f'{"ref":5} {"albedo":5} '
+    click.echo(f'{"ref":20} {"albedo":5} '
                f'{"err":5} {"method":8}')
 
     for ind, a in albedos.iterrows():
-        click.echo(f'{a["iddataset"]:5} {a["albedo"]:.3f}  '
+        click.echo(f'{a["shortbib"]:20} {a["albedo"]:.3f}  '
                    f'{a["err_albedo"]:.3f} {a["method"]:8} '
                    f'[{"X" if a["selected"] else " "}]')
 
     # weighted mean albedo and error
     click.echo(f'\n{"":6}{averaged[0]:.3f} +- {averaged[1]:.3f}')
+
+
+@cli_rocks.command()
+@click.argument('this', default='')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Flag to print SsODNet request diagnostics.')
+def diameter(this, verbose):
+    '''Get asteroid diameter measurements for a single minor body.
+
+    Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+    identify the asteroid from the input string.  The output is printed
+    to STDOUT.
+
+    Parameters
+    ----------
+    this : str
+        String to identify asteroid.
+    verbose : bool, optional
+    '''
+    if not this:
+        this, _ = tools.select_sso_from_index()
+
+    averaged, diameters = properties.get_property('diameter', this,
+                                                  progress=False,
+                                                  parallel=1,
+                                                  verbose=verbose)
+
+    if diameters is False:
+        click.echo('No diameter on record.')
+        sys.exit()
+
+    # Print results
+    click.echo(f'{"ref":20} {"diameter":9} '
+               f'{"err":7} {"method":8}')
+
+    for ind, d in diameters.iterrows():
+        click.echo(f'{d["shortbib"]:20} {d["diameter"]:8.3f}  '
+                   f'{d["err_diameter"]:7.3f} {d["method"]:8} '
+                   f'[{"X" if d["selected"] else " "}]')
+
+    # weighted mean albedo and error
+    click.echo(f'\n{"":6}{averaged[0]:.3f} +- {averaged[1]:.3f}')
+
+
+@cli_rocks.command()
+@click.argument('this', default='')
+@click.option('--verbose', '-v', is_flag=True,
+              help='Flag to print SsODNet request diagnostics.')
+def mass(this, verbose):
+    '''Get asteroid mass estimate for a single minor body.
+
+    Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+    identify the asteroid from the input string.  The output is printed
+    to STDOUT.
+
+    Parameters
+    ----------
+    this : str
+        String to identify asteroid.
+    verbose : bool, optional
+    '''
+    if not this:
+        this, _ = tools.select_sso_from_index()
+
+    averaged, masses = properties.get_property('mass', this, progress=False,
+                                               parallel=1, verbose=verbose)
+
+    if masses is False:
+        click.echo('No mass on record.')
+        sys.exit()
+
+    # Print results
+    click.echo(f'{"ref":20} {"mass":5} '
+               f'{"err":5} {"method":8}')
+
+    for ind, m in masses.iterrows():
+        click.echo(f'{m["shortbib"]:20} {m["mass"]:.4e}  '
+                   f'{m["err_mass"]:.4e} {m["method"]:10} '
+                   f'[{"X" if m["selected"] else " "}]')
+
+    # weighted mean mass and error
+    click.echo(f'\n{"":6}{averaged[0]:.4e} +- {averaged[1]:.4e}')

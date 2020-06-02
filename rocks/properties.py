@@ -59,11 +59,17 @@ def get_property(property_, sso, parallel=4, verbose=True,
 
     # Implemented properties
     PROPS = {
-        'taxonomy': {
-            'datacloud_key': 'taxonomy',
-        },
         'albedo': {
             'datacloud_key': 'diamalbedo',
+        },
+        'diameter': {
+            'datacloud_key': 'diamalbedo',
+        },
+        'mass': {
+            'datacloud_key': 'masses',
+        },
+        'taxonomy': {
+            'datacloud_key': 'taxonomy',
         },
     }
 
@@ -90,6 +96,12 @@ def get_property(property_, sso, parallel=4, verbose=True,
 
     pool.close()
     pool.join()
+
+    # TMP
+    if property_ == 'diameter':
+        properties = [select_diameter(p) for p in properties]
+    elif property_ == 'mass':
+        properties = [select_mass(p) for p in properties]
 
     if len(properties) == 1:
         return properties[0]
@@ -128,3 +140,155 @@ def _query_property(sso, dkey, verbose):
         return np.nan
 
     return data[dkey]
+
+
+def select_diameter(diameters):
+    '''Compute a single diameter value from multiple measurements.
+
+    Evaluates the methods and computes the weighted average of equally ranked
+    methods.
+
+    Parameters
+    ----------
+    diameters : dict
+        Diameter measurements and metadata retrieved from SsODNet:datacloud.
+
+    Returns
+    -------
+    averaged, tuple
+        The average diameter and its uncertainty.
+    diameters, dict
+        The input dictionary, with an additional key 'selected'. True if the
+        item was used in the computation of the average, else False.
+
+    Notes
+    -----
+
+    The method ranking is given below. Diameters acquired with the top-ranked
+    method available are used for the weighted average computation. Diameters
+    observed with NEATM or STM get an additional 10% uncertainty added.
+
+    .. code-block:: python
+
+      ['SPACE']
+      ['ADAM', 'KOALA', 'SAGE', 'Radar']
+      ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM']
+      ['AO', 'Occ', 'IM']
+      ['NEATM']
+      ['STM']
+
+    '''
+
+    diameters = pd.DataFrame.from_dict(diameters)
+    diameters['diameter'] = diameters['diameter'].astype(float)
+    diameters['err_diameter'] = diameters['err_diameter'].astype(float)
+
+    # Extract methods
+    methods = set(diameters.method.values)
+
+    # Check methods by hierarchy. If several results on
+    # same level, compute weighted mean
+    diameters['selected'] = False  # keep track of albedos used for mean
+
+    for method in [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                   ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
+                   ['AO', 'Occ', 'IM'],
+                   ['NEATM'], ['STM']]:
+
+        if set(method) & methods:  # at least one element in common
+
+            diams = diameters.loc[diameters.method.isin(method),
+                                  'diameter'].values
+            ediams = diameters.loc[diameters.method.isin(method),
+                                   'err_diameter'].values
+
+            # NEATM and STM are inherently inaccurate
+            if 'NEATM' in method or 'STM' in method:
+                ediams = np.array([np.sqrt(ea**2 + (0.1 * a)**2) for
+                                   ea, a in zip(ediams, diams)])
+
+                diameters.loc[diameters.method.isin(method),
+                              'err_albedo'] = ediams
+
+            # Compute weighted mean
+            weights = 1 / ediams
+
+            mdiam = np.average(diams, weights=weights)
+            emdiam = 1 / np.sum(weights)
+
+            # Mark diameters used in computation
+            diameters.loc[diameters.method.isin(method),
+                          'selected'] = True
+            averaged = (mdiam, emdiam)
+            break
+
+    return averaged, diameters
+
+
+def select_mass(masses):
+    '''Compute a single mass estimate from multiple measurements.
+
+    Evaluates the methods and computes the weighted average of equally ranked
+    methods.
+
+    Parameters
+    ----------
+    masses : dict
+        Mass estimates and metadata retrieved from SsODNet:datacloud.
+
+    Returns
+    -------
+    averaged, tuple
+        The average mass and its uncertainty.
+    masses, dict
+        The input dictionary, with an additional key 'selected'. True if the
+        item was used in the computation of the average, else False.
+
+    Notes
+    -----
+    The method ranking is given below. Masses acquired with the top-ranked
+    method available are used for the weighted average computation.
+
+    .. code-block:: python
+
+      ['SPACE']
+      ['Bin-Genoid']
+      ['Bin-IM', 'Bin-Radar', 'Bin-PheMu']
+      ['EPHEM', 'DEFLECT']
+
+    '''
+    masses = pd.DataFrame.from_dict(masses)
+    masses['mass'] = masses['mass'].astype(float)
+    masses['err_mass'] = masses['err_mass'].astype(float)
+
+    # Extract methods
+    methods = set(masses.method.values)
+
+    # Check methods by hierarchy. If several results on
+    # same level, compute weighted mean
+    masses['selected'] = False  # keep track of albedos used for mean
+
+    for method in [['SPACE'], ['Bin-Genoid'],
+                   ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
+                   ['EPHEM', 'DEFLECT']]:
+
+        if set(method) & methods:  # at least one element in common
+
+            m = masses.loc[masses.method.isin(method),
+                           'mass'].values
+            dm = masses.loc[masses.method.isin(method),
+                            'err_mass'].values
+
+            # Compute weighted mean
+            weights = 1 / dm
+
+            mmass = np.average(m, weights=weights)
+            emmass = 1 / np.sum(weights)
+
+            # Mark masses used in computation
+            masses.loc[masses.method.isin(method),
+                       'selected'] = True
+            averaged = (mmass, emmass)
+            break
+
+    return averaged, masses

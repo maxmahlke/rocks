@@ -158,6 +158,72 @@ to STDOUT.</p>
 methods of albedo determination are ranked. If two measurements are
 available for methods in the top ranks, these values are averaged. For
 details, see the <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">Albedo</span></a> section of the documentation.</p>
+<div class="section" id="rocks-diameter">
+<span id="cli-diameter"></span><h2>rocks diameter<a class="headerlink" href="#rocks-diameter" title="Permalink to this headline">¶</a></h2>
+<p>Get asteroid diameter measurements for a single minor body.</p>
+<p>Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+identify the asteroid from the input string.  The output is printed
+to STDOUT.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str</span></dt><dd><p>String to identify asteroid.</p>
+</dd>
+</dl>
+<p>verbose : bool, optional</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks diameter <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>THIS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-diameter-v">
+<span id="cmdoption-rocks-diameter-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-diameter-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-diameter-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-diameter-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+<p>An averaged diameter value is output based on the available measurements. The
+methods of diameter determination are ranked. If two measurements are
+available for methods in the top ranks, these values are averaged. For
+details, see the <a class="reference internal" href="properties.html#diameter"><span class="std std-ref">diameter</span></a> section of the documentation.</p>
+<div class="section" id="rocks-mass">
+<span id="cli-mass"></span><h2>rocks mass<a class="headerlink" href="#rocks-mass" title="Permalink to this headline">¶</a></h2>
+<p>Get asteroid mass estimate for a single minor body.</p>
+<p>Queries SsODNet:datacloud with the string input. SsODNet:quaero is used to
+identify the asteroid from the input string.  The output is printed
+to STDOUT.</p>
+<dl class="simple">
+<dt>this<span class="classifier">str</span></dt><dd><p>String to identify asteroid.</p>
+</dd>
+</dl>
+<p>verbose : bool, optional</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>rocks mass <span class="o">[</span>OPTIONS<span class="o">]</span> <span class="o">[</span>THIS<span class="o">]</span>
+</pre></div>
+</div>
+<p class="rubric">Options</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-mass-v">
+<span id="cmdoption-rocks-mass-verbose"></span><code class="sig-name descname">-v</code><code class="sig-prename descclassname"></code><code class="sig-prename descclassname">, </code><code class="sig-name descname">--verbose</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-mass-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag to print SsODNet request diagnostics.</p>
+</dd></dl>
+
+<p class="rubric">Arguments</p>
+<dl class="std option">
+<dt id="cmdoption-rocks-mass-arg-THIS">
+<code class="sig-name descname">THIS</code><code class="sig-prename descclassname"></code><a class="headerlink" href="#cmdoption-rocks-mass-arg-THIS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Optional argument</p>
+</dd></dl>
+
+</div>
+<p>An averaged mass value is output based on the available measurements. The
+methods of mass determination are ranked. If two measurements are
+available for methods in the top ranks, these values are averaged. For
+details, see the <a class="reference internal" href="properties.html#mass"><span class="std std-ref">mass</span></a> section of the documentation.</p>
 <div class="section" id="rocks-info">
 <span id="cli-info"></span><h2>rocks info<a class="headerlink" href="#rocks-info" title="Permalink to this headline">¶</a></h2>
 <p>Print available data on asteroid.</p>
@@ -217,6 +283,8 @@ If empty, the user can select the asteroid from the index.</p>
 <li><a class="reference internal" href="#rocks-index">rocks index</a></li>
 <li><a class="reference internal" href="#rocks-taxonomy">rocks taxonomy</a></li>
 <li><a class="reference internal" href="#rocks-albedo">rocks albedo</a></li>
+<li><a class="reference internal" href="#rocks-diameter">rocks diameter</a></li>
+<li><a class="reference internal" href="#rocks-mass">rocks mass</a></li>
 <li><a class="reference internal" href="#rocks-info">rocks info</a></li>
 </ul>
 </li>
