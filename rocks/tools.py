@@ -185,7 +185,8 @@ def get_data(this, verbose=True):
 
     if data is None:
         if verbose:
-            click.echo(f'No data in SsODNet for {this}')
+            click.echo(f'Datacloud is unavailable or no '
+                       f'data in SsODNet for {this}')
         return False
     return data
 

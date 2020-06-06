@@ -179,6 +179,9 @@ def select_diameter(diameters):
 
     '''
 
+    if diameters is False:
+        return np.nan
+
     diameters = pd.DataFrame.from_dict(diameters)
     diameters['diameter'] = diameters['diameter'].astype(float)
     diameters['err_diameter'] = diameters['err_diameter'].astype(float)
@@ -257,6 +260,9 @@ def select_mass(masses):
       ['EPHEM', 'DEFLECT']
 
     '''
+    if masses is False:
+        return np.nan
+
     masses = pd.DataFrame.from_dict(masses)
     masses['mass'] = masses['mass'].astype(float)
     masses['err_mass'] = masses['err_mass'].astype(float)
