@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
     Author: Max Mahlke
@@ -194,7 +193,7 @@ def select_diameter(diameters):
     diameters['selected'] = False  # keep track of albedos used for mean
 
     for method in [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
-                   ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
+                   ['LC+TPM','LC-TPM','TPM','LC+AO','LC+IM','LC+Occ','TE-IM'],
                    ['AO', 'Occ', 'IM'],
                    ['NEATM'], ['STM']]:
 
