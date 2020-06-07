@@ -111,10 +111,11 @@ def select_taxonomy(taxa):
 
     # Find index of entry with most points. If maximum is shared,
     # return the most recent classification
-    selected = taxa[-1 - np.argmax(points[::-1])]
-    selected['selected'] = True
+    selected_taxonomy = taxa[-1 - np.argmax(points[::-1])]
+    selected_taxonomy['selected'] = True
 
-    return (selected['class'], CLASS_TO_COMPLEX[selected['class']]), taxa
+    # return (selected['class'], CLASS_TO_COMPLEX[selected['class']]), taxa
+    return selected_taxonomy
 
 
 def class_to_complex(class_):

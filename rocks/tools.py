@@ -140,7 +140,6 @@ def get_data(this, verbose=True):
 
     Returns
     -------
-
     dict, bool
         Asteroid data, False if query failed or no data is available
     '''
@@ -167,7 +166,7 @@ def get_data(this, verbose=True):
         data = response.json()['data']
     except (json.decoder.JSONDecodeError, KeyError):
         if verbose:
-            click.echo(f'Encountered JSON error for {this}.')
+            click.echo(f'Encountered JSON error for "{this}".')
         return False
 
     # Select the right data entry
@@ -185,7 +184,7 @@ def get_data(this, verbose=True):
 
     if data is None:
         if verbose:
-            click.echo(f'No data in SsODNet for {this}')
+            click.echo(f'No data in SsODNet for "{this}".')
         return False
     return data
 

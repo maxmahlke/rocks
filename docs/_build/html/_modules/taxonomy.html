@@ -145,10 +145,11 @@
 
     <span class="c1"># Find index of entry with most points. If maximum is shared,</span>
     <span class="c1"># return the most recent classification</span>
-    <span class="n">selected</span> <span class="o">=</span> <span class="n">taxa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">points</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
-    <span class="n">selected</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">selected_taxonomy</span> <span class="o">=</span> <span class="n">taxa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">points</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
+    <span class="n">selected_taxonomy</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">],</span> <span class="n">CLASS_TO_COMPLEX</span><span class="p">[</span><span class="n">selected</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]]),</span> <span class="n">taxa</span></div>
+    <span class="c1"># return (selected[&#39;class&#39;], CLASS_TO_COMPLEX[selected[&#39;class&#39;]]), taxa</span>
+    <span class="k">return</span> <span class="n">selected_taxonomy</span></div>
 
 
 <span class="k">def</span> <span class="nf">class_to_complex</span><span class="p">(</span><span class="n">class_</span><span class="p">):</span>

@@ -109,3 +109,4 @@ What's to come
    names
    properties
    tools
+   core

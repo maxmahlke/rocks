@@ -1,0 +1,51 @@
+``Rock`` class
+==============
+
+The ``Rock`` class provides easy access to the parameters of a single asteroid.
+
+It is instantiated by providing a identifier in form of a string (e.g.
+``'Ceres', '2010 OR'``), integer or float (e.g. ``3``, ``10.0``) which is then
+resolved using SsODNet:quaero. If the identifier cannot be resolved, a warning
+is printed.
+
+.. code-block:: python
+
+  >>> from rocks.core import Rock
+  >>> Ceres = Rock('ceres')
+  >>> print(Ceres)
+  (1) Ceres
+  >>> Vesta = Rock('1807 FA')
+  >>> print(Vesta)
+  (4) Vesta
+  >>> Unknown = Rock('ufo')  # doctest: +SKIP
+  UserWarning: Could not identify "ufo" 
+  >>> print(Unknown)
+  (nan) nan
+
+The instance attributes are common asteroid parameters, retrieved from
+SsODNet. The singular version prints the merged parameter, the plural version
+prints all available measurements of the parameter. Each parameter contains
+metadata like the reference as attribute.
+
+.. code-block:: python
+
+  >>> Ceres = Rock('ceres')
+  >>> print(Ceres.taxonomy)
+  C
+  >>> print(Ceres.taxonomy.shortbib)
+  DeMeo+2009
+  >>> print(Ceres.taxonomies)
+  ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+  >>> print(Ceres.taxonomies.shortbib)
+  ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004', 'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
+  >>> print(Ceres.albedo)
+  0.048299999999999996
+  >>> print(Ceres.albedos)
+  [0.059, 0.0, 0.113, 0.12, 0.104, 0.087, 0.0, 0.0, 0.0, 0.0]
+  >>> print(Ceres.albedos.err_albedo)
+  ['Morrison+2007', 'Drummond+2008', 'Tedesco+2001', 'Ryan+2010', 'Ryan+2010', 'Usui+2011', 'Russell+2016', 'Herald+2019', 'Herald+2019', 'Herald+2019']
+
+.. Note::
+
+  Some keywords are protected in python. They have to be "escaped" with a trailing
+  underscore, e.g. ``class`` becomes ``class_``
