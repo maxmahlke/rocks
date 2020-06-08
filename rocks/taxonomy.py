@@ -24,7 +24,7 @@ def get_taxonomy(sso, **kwargs):
     return (selected, data)
 
 
-def select_taxonomy(taxa):
+def select_taxonomy(taxa, from_Rock=False):
     '''Select a single taxonomic classification from multiple choices.
 
     Evaluates the wavelength ranges, methods, schemes, and recency of
@@ -34,6 +34,8 @@ def select_taxonomy(taxa):
     ----------
     taxa : dict
         Taxonomic classifications retrieved from SsODNet:datacloud.
+    from_Rock : bool
+        Whether the call is done by a Rock instance.
 
     Returns
     -------
@@ -114,8 +116,10 @@ def select_taxonomy(taxa):
     selected_taxonomy = taxa[-1 - np.argmax(points[::-1])]
     selected_taxonomy['selected'] = True
 
-    # return (selected['class'], CLASS_TO_COMPLEX[selected['class']]), taxa
-    return selected_taxonomy
+    if from_Rock:  # current hack to conciliate Rock class and CLI
+        return selected_taxonomy
+    else:
+        return (selected['class'], CLASS_TO_COMPLEX[selected['class']]), taxa
 
 
 def class_to_complex(class_):

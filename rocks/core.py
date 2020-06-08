@@ -13,7 +13,6 @@ import warnings
 
 import numpy as np
 
-from rocks import albedo
 from rocks import names
 from rocks import taxonomy
 from rocks import tools
@@ -43,7 +42,8 @@ class Rock:
 
         # taxonomy
         self.taxonomies = listParameter(data['taxonomy'], 'class', type_=str)
-        selected_taxonomy = taxonomy.select_taxonomy(data['taxonomy'])
+        selected_taxonomy = taxonomy.select_taxonomy(data['taxonomy'],
+                                                     from_Rock=True)
         self.taxonomy = stringParameter(selected_taxonomy, 'class')
 
     def __hash__(self):
