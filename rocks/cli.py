@@ -117,7 +117,7 @@ def info(this, mime, verbose):
     payload = {
         '-name': this,
         '-mime': mime,
-        '-from': 'pythonClient',
+        '-from': 'rocks',
     }
 
     # Execute query and handle responser
