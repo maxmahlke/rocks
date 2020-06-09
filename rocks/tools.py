@@ -16,6 +16,7 @@ import time
 
 import click
 from iterfzf import iterfzf
+import pandas as pd
 import requests
 
 
@@ -25,61 +26,20 @@ def create_index():
     The list is retrieved from the Minor Planet Center, at
     https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
     '''
+    print('Retrieving index from MPC..\r', end='')
+
+    url = 'https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt'
+
+    index = pd.read_fwf(
+        url, colspecs=[(0, 7), (9, 29)],
+        names=['number', 'name'], dtype={'name': str},
+        converters={'number': lambda x: int(x.replace('(', ''))}
+    )
+
     path_index = path.join(path.dirname(path.abspath(__file__)),
                            '.index')
-
-    click.echo('Retrieving index from MPC..')
-    r = requests.get(f'https://www.minorplanetcenter.net/'
-                     f'iau/lists/NumberedMPs.txt', stream=True)
-
-    # ------
-    # Check that query worked
-    total = r.headers.get('content-length')
-
-    if total is None:
-        click.echo('Remote query failed.')
-        sys.exit()
-
-    total = int(total)
-
-    # Set up progress bar
-    width, _ = shutil.get_terminal_size()
-    width -= 2
-    num_chunks = 1000
-
-    response = []
-
-    for data in r.iter_content(chunk_size=int(total / num_chunks)):
-
-        response.append(data.decode('utf-8'))
-        done = int(width * len(response) / num_chunks)
-
-        sys.stdout.write('\r[{}{}]'.format('=' * done, ' ' * (width - done)))
-        sys.stdout.flush()
-
-    sys.stdout.write('\n')
-
-    # ------
-    # Parse index into number,name format
-    response = ''.join(response)
-
-    index = {}
-
-    for line in response.split('\n'):
-        if not line:
-            continue
-
-        number, name = line.split()[:2]
-
-        if name.isnumeric():  # it's a designation
-            name = ' '.join(line.split()[1:3])
-
-        number = number.strip('()')
-        index[number] = name
-
-    # Write dict to index file
-    with open(path_index, 'w') as index_file:
-        json.dump(index, index_file)
+    index.to_csv(path_index, index=False)
+    print('Retrieving index from MPC.. done.')
 
 
 def _fuzzy_desig_selection():
@@ -286,11 +246,10 @@ def read_index():
                    'Consider updating with "rocks index".')
         time.sleep(1)  # so user doesn't miss the message
 
-    with click.open_file(path_index) as index_file:
-        index = json.load(index_file)
+    index = pd.read_csv(path_index, dtype={'number': int, 'name': str})
 
-    NUMBER_NAME = {int(number): name for number, name in index.items()}
-    NAME_NUMBER = {name: number for number, name in NUMBER_NAME.items()}
+    NUMBER_NAME = dict(zip(index.number, index['name']))
+    NAME_NUMBER = dict(zip(index['name'], index.number))
 
     return NUMBER_NAME, NAME_NUMBER
 
