@@ -7,7 +7,7 @@
 
     Part of the rocks CLI suite
 '''
-from functools import partial
+from functools import lru_cache, partial
 import multiprocessing as mp
 
 import numpy as np
@@ -75,7 +75,8 @@ def get_property(property_, sso, parallel=4, verbose=True,
     # Get name and number
     if not skip_quaero:
         names_numbers = names.get_name_number(sso, parallel=parallel,
-                                              verbose=verbose, progress=False)
+                                              verbose=verbose,
+                                              progress=progress)
 
         if isinstance(names_numbers, (tuple)):
             sso = [names_numbers[0]]

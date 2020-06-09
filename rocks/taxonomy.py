@@ -11,7 +11,7 @@ import numpy as np
 from rocks import properties
 
 
-def get_taxonomy(sso, **kwargs):
+def get_taxonomy(sso, from_Rock=False, **kwargs):
 
     data = properties.get_property('taxonomy', sso, **kwargs)
 
@@ -20,8 +20,7 @@ def get_taxonomy(sso, **kwargs):
         if np.isnan(data):
             return (np.nan, np.nan)
 
-    selected, data = select_taxonomy(data)
-    return (selected, data)
+    return select_taxonomy(data, from_Rock)
 
 
 def select_taxonomy(taxa, from_Rock=False):
@@ -101,6 +100,16 @@ def select_taxonomy(taxa, from_Rock=False):
         'P': 'P', 'PC': 'P',
     }
     '''
+    if not isinstance(taxa, (list, dict)):
+        # no classification 
+        # hotfix for classy
+        return {'class': np.nan, 'scheme': np.nan,
+                'method': np.nan, 'shortbib': np.nan}
+
+    # if we have several asteroids, the input will be a list of lists of
+    # classifications
+    if isinstance(taxa[0], list):
+        return [select_taxonomy(t, from_Rock) for t in taxa]
     # Compute points of each classification
     points = []
 
