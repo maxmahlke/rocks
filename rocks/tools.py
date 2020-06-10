@@ -10,7 +10,6 @@
 from functools import lru_cache
 import json
 import os.path as path
-import shutil
 import sys
 import time
 
@@ -23,18 +22,26 @@ import requests
 def create_index():
     '''Create or update index of numbered SSOs.
 
+    Notes
+    -----
     The list is retrieved from the Minor Planet Center, at
     https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
+
+    It is saved in CSV format as ``.index`` in the package directory.
     '''
     print('Retrieving index from MPC..\r', end='')
-
     url = 'https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt'
 
     index = pd.read_fwf(
-        url, colspecs=[(0, 7), (9, 29)],
-        names=['number', 'name'], dtype={'name': str},
+        url, colspecs=[(0, 7), (9, 29), (29, 41)],
+        names=['number', 'name', 'designation'],
+        dtype={'name': str, 'designation': str},
         converters={'number': lambda x: int(x.replace('(', ''))}
     )
+
+    breakpoint()
+    index['name'] = index['name'].fillna(index.designation)
+    index = index.drop(columns=['designation'])
 
     path_index = path.join(path.dirname(path.abspath(__file__)),
                            '.index')
@@ -42,27 +49,52 @@ def create_index():
     print('Retrieving index from MPC.. done.')
 
 
-def _fuzzy_desig_selection():
-    '''Fuzzy search of asteroid index file.
+def read_index():
+    '''Read local index of asteroid numbers and names.
 
+    Returns
+    -------
+    dict
+        Asteroid number: name
+    dict
+        Asteroid name: number
+
+    Notes
+    -----
+    If the index file is older than 30 days, a reminder to update is
+    displayed.
     '''
-    # path_index = path.join(path.dirname(path.abspath(__file__)),
-                           # '.index')
+    path_index = path.join(path.dirname(path.abspath(__file__)),
+                           '.index')
 
-    # with click.open_file(path_index) as index_file:
-        # index = json.load(index_file)
+    # Check age of index file
+    days_since_modification = (time.time() - path.getmtime(path_index)) /\
+        (3600 * 24)
+
+    if days_since_modification > 30:
+        click.echo('The index file is more than 30 days old. '
+                   'Consider updating with "rocks index".')
+        time.sleep(1)  # so user doesn't miss the message
+
+    index = pd.read_csv(path_index, dtype={'number': int, 'name': str})
+
+    NUMBER_NAME = dict(zip(index.number, index['name']))
+    NAME_NUMBER = dict(zip(index['name'], index.number))
+
+    return NUMBER_NAME, NAME_NUMBER
+
+
+def _fuzzy_desig_selection():
+    '''Generator for fuzzy search of asteroid index file. '''
+
+    NUMBER_NAME, _ = read_index()
 
     for number, name in NUMBER_NAME.items():
         yield f'{number} {name}'
 
 
 def select_sso_from_index():
-    ''' Select SSO numbers and designations from interactive fuzzy search.
-
-    The index is created with `rocks index`.
-    The list is retrieved from the Minor Planet Center, at
-    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
-
+    '''Select SSO numbers and designations from interactive fuzzy search.
 
     Returns
     ------
@@ -71,21 +103,27 @@ def select_sso_from_index():
     int
         asteroid number
 
+    Notes
+    -----
+    If the selection is interrupted with ctrl-c, ``(None, None)`` is returned.
+
+    Examples
+    --------
+    >>> from rocks import tools
+    >>> name, number = tools.select_sso_from_index()
     '''
-    numbername = iterfzf(_fuzzy_desig_selection(), exact=True)
-
     try:
-        number, *name = numbername.split()
+        nuna = iterfzf(_fuzzy_desig_selection(), exact=True)
+        number, *name = nuna.split()
     except AttributeError:  # no SSO selected
-        sys.exit()
-
+        return None, None
     return ' '.join(name), int(number)
 
 
 # ------
 # SsODNet functions
 @lru_cache(128)
-def get_data(this, verbose=True):
+def get_data(id_, verbose=True):
     '''Get asteroid data from SsODNet:datacloud.
 
     Performs a GET request to SsODNet:datacloud for a single asteroid and
@@ -93,7 +131,7 @@ def get_data(this, verbose=True):
 
     Parameters
     ----------
-    this : str, int
+    id_ : str, int
         Asteroid name, designation, or number.
     verbose : bool
         Print request diagnostics.
@@ -106,7 +144,7 @@ def get_data(this, verbose=True):
     url = 'https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php'
 
     payload = {
-        '-name': this,
+        '-name': id_,
         '-mime': 'json',
         '-from': 'rocks',
     }
@@ -118,7 +156,7 @@ def get_data(this, verbose=True):
 
         # Query SsODNet:quaero and repeat
         if verbose:
-            click.echo(f'Query failed for {this}.')
+            click.echo(f'Query failed for {id_}.')
         return False
 
     # See if there is data available
@@ -126,12 +164,12 @@ def get_data(this, verbose=True):
         data = response.json()['data']
     except (json.decoder.JSONDecodeError, KeyError):
         if verbose:
-            click.echo(f'Encountered JSON error for "{this}".')
+            click.echo(f'Encountered JSON error for "{id_}".')
         return False
 
     # Select the right data entry
     if len(data.keys()) > 1:
-        for k in [this, f'{this}_(Asteroid)']:
+        for k in [id_, f'{id_}_(Asteroid)']:
             if k in data.keys():
                 key = k
                 break
@@ -145,7 +183,7 @@ def get_data(this, verbose=True):
     if data is None:
         if verbose:
             click.echo(f'Datacloud is unavailable or no '
-                       f'data in SsODNet for {this}')
+                       f'data in SsODNet for {id_}')
         return False
     return data
 
@@ -200,13 +238,11 @@ def echo_response(response, payload):
 
     Parameters
     ----------
-
     response : requests.models.Response
         SsODNet GET query response.
     payload : dict
         GET query payload.
     '''
-
     if '-mime' in payload.keys():
         if payload['-mime'] == 'json':
             data = response.json()
@@ -219,39 +255,6 @@ def echo_response(response, payload):
             click.echo(response.text)
     else:
         click.echo(response.text)
-
-
-def read_index():
-    '''Read local index of asteroid numbers and names.
-
-    The index is created with `rocks index`.
-    The list is retrieved from the Minor Planet Center, at
-    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
-
-    Returns
-    -------
-    dict
-        Asteroid number: name
-    dict
-        Asteroid name: number
-    '''
-    path_index = path.join(path.dirname(path.abspath(__file__)),
-                           '.index')
-
-    # Check age of index file
-    mdate = path.getmtime(path_index)
-
-    if (time.time() - mdate) / (3600 * 24) > 30:
-        click.echo('The index file is more than 30 days old. '
-                   'Consider updating with "rocks index".')
-        time.sleep(1)  # so user doesn't miss the message
-
-    index = pd.read_csv(path_index, dtype={'number': int, 'name': str})
-
-    NUMBER_NAME = dict(zip(index.number, index['name']))
-    NAME_NUMBER = dict(zip(index['name'], index.number))
-
-    return NUMBER_NAME, NAME_NUMBER
 
 
 # This needs to be available for name lookups and index selection
