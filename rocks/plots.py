@@ -51,7 +51,7 @@ s={'avg':{'color':'black'},
    'Spec':{'color':'red', 'marker':'s'}, 
    }
 
-ylabels={'diameter':'Diameter (km)',
+ylabels={'diameter': 'Diameter (km)',
          'mass': 'Mass (kg)', 
          'albedo': 'Albedo'}
 
@@ -68,10 +68,6 @@ def show_scatter_hist(info, par, figname):
     unc=info[1].get('err_'+par).values
     avg=info[0][0]
     std=info[0][1]
-
-    # TBD: Sort values by year? or let it as in ssodnet?
-    # TBD: offer it as option?
-
 
 
     # Define figure layout
@@ -91,11 +87,6 @@ def show_scatter_hist(info, par, figname):
     lstd = ax.axhline(avg-std, 
                color=s['std']['color'], linestyle='dashed')
 
-    # TBD: fill the 1sigma range?
-    #lstd = ax.fill_between(x, avg-std, avg+std,
-    #                label='1$\sigma$ deviation',
-    #                color=s['std']['color'])
- 
     # all methods
     for i in np.unique(info[1].method):
         p=np.where(info[1].method==i)
@@ -108,11 +99,10 @@ def show_scatter_hist(info, par, figname):
         ax.errorbar(x[p],val[p], yerr=unc[p], c=s[i]['color'], linestyle='')
 
     # axes
-    #ax.set_ylabel('Diameter (km)')
     ax.set_ylabel(ylabels[par])
     ax.set_xticks(x)
 
-    # TBD: one legend for avg/std, one for methods?
+    # Legend
     ax.legend(loc='best',ncol=2)
 
 
