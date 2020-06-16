@@ -63,8 +63,8 @@ def docs():
     path_index = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                               '../docs/_build/html/',
                                               'index.html'))
-    webbrowser.open(path_index, new=2)  # open docs in new window
-    click.echo('Opening documentation in new window of your browser.')
+    webbrowser.open(path_index, new=2)  # open docs in new tab
+    click.echo('Opening documentation in new tab of your browser.')
     click.echo(path_index)
 
 
