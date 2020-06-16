@@ -13,6 +13,7 @@ from functools import partial
 import keyword
 import warnings
 
+import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
@@ -102,6 +103,7 @@ class Rock:
                         setup['attribute']
                     ),
                 )
+
             elif setup['type'] is str:
                 setattr(
                     self,
@@ -151,14 +153,14 @@ class Rock:
 class stringParameter(str):
     '''For asteroid parameters which are strings, e.g. taxonomy.'''
 
-    def __new__(self, data, key=False):
-        if key is False:
+    def __new__(self, data, prop=False):
+        if prop is False:
             return str.__new__(self, data)
         else:
-            return str.__new__(self, data[key])
+            return str.__new__(self, data[prop])
 
-    def __init__(self, data, key):
-        str.__init__(data[key])
+    def __init__(self, data, prop):
+        str.__init__(data[prop])
 
         for key, value in data.items():
 
@@ -169,14 +171,14 @@ class stringParameter(str):
 class floatParameter(float):
     '''For asteroid parameters which are floats, e.g. albedo.'''
 
-    def __new__(self, data, key=False):
-        if key is False:
+    def __new__(self, data, prop=False):
+        if prop is False:
             return float.__new__(self, data)
         else:
-            return float.__new__(self, data[key])
+            return float.__new__(self, data[prop])
 
-    def __init__(self, data, key):
-        float.__init__(data[key])
+    def __init__(self, data, prop):
+        float.__init__(data[prop])
 
         for key, value in data.items():
 
@@ -187,12 +189,84 @@ class floatParameter(float):
 class listParameter(list):
     '''For several measurements of a single parameters of any type.'''
 
-    def __init__(self, data, key, type_):
-        list.__init__(self, [type_(d[key]) for d in data])
+    def __init__(self, data, prop, type_):
+        list.__init__(self, [type_(d[prop]) for d in data])
+
+        self.datatype = type_
 
         for key in data[0].keys():
+
+            # Catches python-keywords
             kw = key if not keyword.iskeyword(key) else key + '_'
-            setattr(self, kw, [d[key] for d in data])
+
+            # "err_property" -> err
+            if kw == f'err_{prop}':
+                kw = 'error'
+
+            # Proper typing of values
+            values = [d[key] for d in data]
+
+            try:
+                values = [float(v) for v in values]
+            except ValueError:
+                pass
+
+            setattr(self, kw, values)
+
+    def weighted_average(self):
+        '''Compute weighted average of float-type parameters.
+
+        Returns
+        -------
+        (float, float)
+            Weighted average and its uncertainty.
+        '''
+        if self.datatype is not float:
+            raise TypeError('Property is not of type float.')
+
+        observable = np.array(self)
+
+        # Make uniform weights in case no errors are provided
+        if not hasattr(self, 'error'):
+            error = np.ones(len(self))
+            weights = np.ones(len(self))
+        else:
+            # Remove measurements where the error is zero
+            error = np.array(self.error)
+            observable = observable[error != 0]
+            error = error[error != 0]
+
+        # Compute normalized weights
+        weights = 1 / np.array(error)**2
+        weights = weights / sum(weights)
+
+        # Compute weighted average and uncertainty
+        avg = np.average(observable, weights=weights)
+
+        # Bevington's implementation
+        std_avg = np.sqrt(
+            1 / (len(self) - 1) * sum(w * (s - avg)**2 for w, s in
+                                      zip(weights, self))
+        )
+
+        print('Values: ', observable)
+        print('Errors:', error)
+
+        print('Bevingtons std mean:', std_avg)
+        # Wikipedia
+        std_avg = np.sqrt(
+            sum(w**2 * e**2 for w, e in zip(weights, error))
+        )
+        print('Wikipedias std mean:', std_avg)
+        return (avg, std_avg)
+
+    def scatter(self):
+        '''Placeholder'''
+
+        # "self" is a list of either floats or strings
+        print(self)
+        # On top, self has attributes.
+        print(self.shortbib)
 
 
 def many_rocks(ids, properties, parallel=4, progress=True, verbose=False):
