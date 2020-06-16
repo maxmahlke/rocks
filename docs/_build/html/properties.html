@@ -7,6 +7,7 @@
     <title>Asteroid Properties &#8212; rocks 0.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -15,7 +16,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Tools" href="tools.html" />
-    <link rel="prev" title="Names, Numbers, Designations" href="names.html" /> 
+    <link rel="prev" title="Command-Line Interface" href="cli.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -27,7 +28,7 @@
           <a href="tools.html" title="Tools"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="names.html" title="Names, Numbers, Designations"
+          <a href="cli.html" title="Command-Line Interface"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
       </ul>
@@ -50,36 +51,6 @@ functions to select a sensible, single value.</p>
 <li><p>Taxonomy</p></li>
 </ul>
 <p>The general function is</p>
-<dl class="py function">
-<dt id="properties.get_property">
-<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">get_property</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">property_</span></em>, <em class="sig-param"><span class="n">sso</span></em>, <em class="sig-param"><span class="n">parallel</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">progress</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">skip_quaero</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#get_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.get_property" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get asteroid property from SsODNet.</p>
-<p>Queries SsODNet datacloud. Can be passed a list of identifiers.
-First performs a quaero query to verify the asteroid identitfy.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>property_</strong> (<em>str</em>) – Asteroid property to get.</p></li>
-<li><p><strong>sso</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>list</em><em>, </em><em>np.array</em><em>, </em><em>pd.Series</em>) – Asteroid name, designation, or number.</p></li>
-<li><p><strong>parallel</strong> (<em>int</em>) – Number of cores to use for queries. Default is 4.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
-<li><p><strong>progress</strong> (<em>bool</em>) – Show query progress. Default is True.</p></li>
-<li><p><strong>skip_quaero</strong> (<em>bool</em>) – Skip initial quaero query to verify asteroid identity.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>tuple, list</em> – Depending on the requested property. The tuple contains the aggregated
-or most likely value of the property. The list contains all available
-data on this property. If input was list of
-identifiers, returns a list of tuples</p></li>
-<li><p><em>np.nan, np.nan</em> – Both return values are NaN if the query failed.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
 <p>Each property contains an aggregation or selection function to provide a single
 return value in case of many available. This choice is a subjective
 implementation, e.g. by evaluating the different taxonomic classification
@@ -217,13 +188,16 @@ method available are used for the weighted average computation.</p>
 
 <span class="target" id="taxonomy"></span><dl class="py function">
 <dt id="taxonomy.select_taxonomy">
-<code class="sig-prename descclassname">taxonomy.</code><code class="sig-name descname">select_taxonomy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">taxa</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/taxonomy.html#select_taxonomy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#taxonomy.select_taxonomy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">taxonomy.</code><code class="sig-name descname">select_taxonomy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">taxa</span></em>, <em class="sig-param"><span class="n">from_Rock</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/taxonomy.html#select_taxonomy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#taxonomy.select_taxonomy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a single taxonomic classification from multiple choices.</p>
 <p>Evaluates the wavelength ranges, methods, schemes, and recency of
 classification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>taxa</strong> (<em>dict</em>) – Taxonomic classifications retrieved from SsODNet:datacloud.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>taxa</strong> (<em>dict</em>) – Taxonomic classifications retrieved from SsODNet:datacloud.</p></li>
+<li><p><strong>from_Rock</strong> (<em>bool</em>) – Whether the call is done by a Rock instance.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
@@ -300,8 +274,8 @@ item was selected, else False.</p></li>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="names.html"
-                        title="previous chapter">Names, Numbers, Designations</a></p>
+  <p class="topless"><a href="cli.html"
+                        title="previous chapter">Command-Line Interface</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="tools.html"
                         title="next chapter">Tools</a></p>
@@ -336,7 +310,7 @@ item was selected, else False.</p></li>
           <a href="tools.html" title="Tools"
              >next</a> |</li>
         <li class="right" >
-          <a href="names.html" title="Names, Numbers, Designations"
+          <a href="cli.html" title="Command-Line Interface"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
       </ul>

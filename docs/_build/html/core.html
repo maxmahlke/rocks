@@ -7,6 +7,7 @@
     <title>Rock class &#8212; rocks 0.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -14,7 +15,8 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Tools" href="tools.html" /> 
+    <link rel="next" title="Resolving names, numbers, designations" href="names.html" />
+    <link rel="prev" title="rocks" href="index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,7 +25,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="tools.html" title="Tools"
+          <a href="names.html" title="Resolving names, numbers, designations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="rocks"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
       </ul>
@@ -35,8 +40,8 @@
           <div class="body" role="main">
             
   <div class="section" id="rock-class">
-<h1><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class<a class="headerlink" href="#rock-class" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class provides easy access to the parameters of a single asteroid.</p>
+<span id="id1"></span><h1><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class<a class="headerlink" href="#rock-class" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class provides access to the parameters of a single asteroid.</p>
 <p>It is instantiated by providing a identifier in form of a string (e.g.
 <code class="docutils literal notranslate"><span class="pre">'Ceres',</span> <span class="pre">'2010</span> <span class="pre">OR'</span></code>), integer or float (e.g. <code class="docutils literal notranslate"><span class="pre">3</span></code>, <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) which is then
 resolved using SsODNet:quaero. If the identifier cannot be resolved, a warning
@@ -54,7 +59,7 @@ is printed.</p>
 <span class="go">(nan) nan</span>
 </pre></div>
 </div>
-<p>The instance attributes are common asteroid parameters, retrieved from
+<p>The instance attributes are asteroid parameters, retrieved from
 SsODNet. The singular version prints the merged parameter, the plural version
 prints all available measurements of the parameter. Each parameter contains
 metadata like the reference as attribute.</p>
@@ -71,14 +76,30 @@ metadata like the reference as attribute.</p>
 <span class="go">0.048299999999999996</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedos</span><span class="p">)</span>
 <span class="go">[0.059, 0.0, 0.113, 0.12, 0.104, 0.087, 0.0, 0.0, 0.0, 0.0]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedos</span><span class="o">.</span><span class="n">err_albedo</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedos</span><span class="o">.</span><span class="n">shortbib</span><span class="p">)</span>
 <span class="go">[&#39;Morrison+2007&#39;, &#39;Drummond+2008&#39;, &#39;Tedesco+2001&#39;, &#39;Ryan+2010&#39;, &#39;Ryan+2010&#39;, &#39;Usui+2011&#39;, &#39;Russell+2016&#39;, &#39;Herald+2019&#39;, &#39;Herald+2019&#39;, &#39;Herald+2019&#39;]</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Some keywords are protected in python. They have to be “escaped” with a trailing
-underscore, e.g. <code class="docutils literal notranslate"><span class="pre">class</span></code> becomes <code class="docutils literal notranslate"><span class="pre">class_</span></code></p>
+underscore, e.g. <code class="docutils literal notranslate"><span class="pre">class</span></code> becomes <code class="docutils literal notranslate"><span class="pre">class_</span></code>.</p>
+</div>
+<p>By default, all available asteroid properties from SsODNet are loaded as attributes of the <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instance.
+To get a list of the loaded properties, use the <code class="docutils literal notranslate"><span class="pre">properties</span></code> attribute.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span><span class="o">.</span><span class="n">properties</span>
+<span class="go">[&#39;name&#39;, &#39;number&#39;, &#39;albedo&#39;, &#39;albedos&#39;, &#39;taxonomy&#39;, &#39;taxonomies&#39;,</span>
+<span class="go">&#39;mass&#39;, &#39;masses&#39;, &#39;diameter&#39;, &#39;diameters&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedo</span><span class="o">.</span><span class="n">properties</span>
+<span class="go">[&#39;albedo&#39;, &#39;shortbib&#39;, &#39;err_albedo&#39;]</span>
+</pre></div>
+</div>
+<p>To preserve memory and computation time when processing a large number of asteroids, a list of requested properties can be provided.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Eos</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;Eos&#39;</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="s1">&#39;diameter&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Eos</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Eos</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>  <span class="c1"># AttributeError</span>
+</pre></div>
 </div>
 </div>
 
@@ -89,8 +110,11 @@ underscore, e.g. <code class="docutils literal notranslate"><span class="pre">cl
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="tools.html"
-                        title="previous chapter">Tools</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter"><code class="docutils literal notranslate"><span class="pre">rocks</span></code></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="names.html"
+                        title="next chapter">Resolving names, numbers, designations</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -119,7 +143,10 @@ underscore, e.g. <code class="docutils literal notranslate"><span class="pre">cl
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="tools.html" title="Tools"
+          <a href="names.html" title="Resolving names, numbers, designations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="rocks"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
       </ul>

@@ -1,7 +1,8 @@
+.. _rock_class:
+
 ``Rock`` class
 ==============
-
-The ``Rock`` class provides easy access to the parameters of a single asteroid.
+The ``Rock`` class provides access to the parameters of a single asteroid.
 
 It is instantiated by providing a identifier in form of a string (e.g.
 ``'Ceres', '2010 OR'``), integer or float (e.g. ``3``, ``10.0``) which is then
@@ -42,10 +43,43 @@ metadata like the reference as attribute.
   0.048299999999999996
   >>> print(Ceres.albedos)
   [0.059, 0.0, 0.113, 0.12, 0.104, 0.087, 0.0, 0.0, 0.0, 0.0]
-  >>> print(Ceres.albedos.err_albedo)
+  >>> print(Ceres.albedos.shortbib)
   ['Morrison+2007', 'Drummond+2008', 'Tedesco+2001', 'Ryan+2010', 'Ryan+2010', 'Usui+2011', 'Russell+2016', 'Herald+2019', 'Herald+2019', 'Herald+2019']
 
 .. Note::
 
   Some keywords are protected in python. They have to be "escaped" with a trailing
-  underscore, e.g. ``class`` becomes ``class_``
+  underscore, e.g. ``class`` becomes ``class_``.
+
+By default, all available asteroid properties from SsODNet are loaded as attributes of the ``Rock`` instance.
+To get a list of the loaded properties, use the ``properties`` attribute.
+
+.. code-block:: python
+
+        >>> Ceres.properties
+        ['name', 'number', 'albedo', 'albedos', 'taxonomy', 'taxonomies',
+        'mass', 'masses', 'diameter', 'diameters']
+        >>> Ceres.albedo.properties
+        ['albedo', 'shortbib', 'err_albedo']
+
+To preserve memory and computation time when processing a large number of asteroids, a list of requested properties can be provided.
+
+.. code-block:: python
+
+  >>> Eos = Rock('Eos', only=['mass', 'diameter'])
+  >>> print(Eos.mass)
+  2
+  >>> print(Eos.albedo)  # AttributeError
+
+
+Many_rocks: As Rock instances are created, each name is resolved.
+The "all" properties value should be used with care <insert memory size
+calculation>
+
+In [1]: from rocks.core import many_rocks
+
+In [2]: ids = list(range(1, 100))
+
+In [3]: rocks = many_rocks(ids, properties=['taxonomy'], parallel=1)
+
+In [4]: tax = [asteroid.taxonomy for asteroid in rocks]

@@ -39,7 +39,6 @@ def create_index():
         converters={'number': lambda x: int(x.replace('(', ''))}
     )
 
-    breakpoint()
     index['name'] = index['name'].fillna(index.designation)
     index = index.drop(columns=['designation'])
 
@@ -127,7 +126,7 @@ def get_data(id_, verbose=True):
     '''Get asteroid data from SsODNet:datacloud.
 
     Performs a GET request to SsODNet:datacloud for a single asteroid and
-    property.
+    property. Checks validity of data and extracts it from response.
 
     Parameters
     ----------
@@ -141,15 +140,7 @@ def get_data(id_, verbose=True):
     dict, bool
         Asteroid data, False if query failed or no data is available
     '''
-    url = 'https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php'
-
-    payload = {
-        '-name': id_,
-        '-mime': 'json',
-        '-from': 'rocks',
-    }
-
-    response = query_ssodnet(url, payload, verbose)
+    response = query_ssodnet(id_, verbose=verbose)
 
     # Check if query failed
     if response.status_code in [422, 500]:
@@ -178,39 +169,43 @@ def get_data(id_, verbose=True):
     else:
         key = list(data.keys())[0]
 
-    data = data[key]['datacloud']
+    # data = data[key]['datacloud']
 
-    if data is None:
-        if verbose:
-            click.echo(f'Datacloud is unavailable or no '
-                       f'data in SsODNet for {id_}')
-        return False
-    return data
+    # if data is None:
+        # if verbose:
+            # click.echo(f'Datacloud is unavailable or no '
+                       # f'data in SsODNet for {id_}')
+        # return False
+    return data[key]
 
 
-def query_ssodnet(url, payload, verbose):
+def query_ssodnet(name, mime='json', verbose=False):
     '''Query SsODNet services.
 
     Includes validity check of response.
 
     Parameters
     ----------
-
-    url : str
-        Base url of GET request.
-    payload : dict
-        The GET request parameters. See
-        https://ssp.imcce.fr/webservices/ssodnet/api/
-        for options.
+    name : str, float
+        Asteroid identifier
+    mime : str
+        Response mime type. Default is json.
     verbose : bool
-        Print request diagnostics.
+        Print request diagnostics. Default is False.
 
     Returns
     -------
     r - requests.models.Response
         GET request response from SsODNet
-
     '''
+    url = 'https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php'
+
+    payload = {
+        '-name': f'{name}',
+        '-mime': mime,
+        '-from': 'rocks',
+    }
+
     r = requests.get(url, params=payload)
 
     _RESPONSES = {400: 'Bad request',
@@ -228,10 +223,11 @@ def query_ssodnet(url, payload, verbose):
         if verbose:
             click.echo(message)
             click.echo(r.url)
+        return False
     return r
 
 
-def echo_response(response, payload):
+def echo_response(response, mime):
     '''Echo the formatted SsODNet response to STDOUT.
 
     The echo function is based on the query mime type.
@@ -240,19 +236,16 @@ def echo_response(response, payload):
     ----------
     response : requests.models.Response
         SsODNet GET query response.
-    payload : dict
-        GET query payload.
+    mime : str
+        Mime-type of response.
     '''
-    if '-mime' in payload.keys():
-        if payload['-mime'] == 'json':
-            data = response.json()
-            click.echo(json.dumps(data, indent=2))
+    if mime == 'json':
+        data = response.json()
+        click.echo(json.dumps(data, indent=2))
 
-        elif payload['-mime'] == 'votable':
-            for line in response.content.decode('utf-8').split('\n')[1:]:
-                click.echo(line)
-        else:
-            click.echo(response.text)
+    elif mime == 'votable':
+        for line in response.content.decode('utf-8').split('\n')[1:]:
+            click.echo(line)
     else:
         click.echo(response.text)
 

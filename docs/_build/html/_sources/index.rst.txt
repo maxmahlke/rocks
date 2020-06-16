@@ -1,17 +1,51 @@
 ``rocks``
 =========
+*for space rocks*
 
-A ``python`` package to query asteroid data from
+A ``python`` package to query and explore asteroid data from
 `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
 
 **Disclaimer: The SsODNet service and its database are in an alpha version and
 under constant revision. The provided values and access methods may change
 without notice.**
 
+``rocks`` allows to
 
-It includes a command-line interface for quick exploration of singular objects,
+- :ref:`resolve asteroid names from various identification formats<Asteroid name resolution>`
+- :ref:`explore available asteroid data via the command line<Exploration via the command line>`
+- :ref:`retrieve and compare measurements in a script<Retrieve and compare asteroid data in a script>`
+- :ref:`retrieve parameters for thousands of asteroids in a batch-job<Retrieve parameters for a large number of asteroids>`
 
-::
+Asteroid name resolution
+""""""""""""""""""""""""
+``rocks`` can identify asteroids based on a variety of identifying strings or
+numbers.
+
+.. code-block:: python
+
+   from rocks import names
+   from rocks import properties
+
+   # A collection of asteroid identifiers
+   ssos = [4, 'eos', '1992EA4', 'SCHWARTZ', '1950 RW', '2001je2']
+
+   # Resolve their names and numbers
+   names_numbers = names.get_name_number(ssos)
+   names = [nn[0] for nn in names_numbers]
+
+   print(names_numbers)
+   # [('Vesta', 4), ('Eos', 221), ('1992 EA4', 30863), ('Schwartz', 13820),
+   #  ('Gyldenkerne', 5030), ('2001 JE2', 131353)]
+
+The name resolution algorithm and different use cases are :ref:`documented here<Resolving names, numbers, designations>`.
+
+
+Exploration via the command line
+""""""""""""""""""""""""""""""""
+The ``rocks`` executable is installed system-wide upon installation of the
+package.
+
+.. code-block:: bash
 
    $ rocks identify 221
    (221) Eos
@@ -44,7 +78,51 @@ It includes a command-line interface for quick exploration of singular objects,
           "ProperSemimajorAxis": "3.0123876",
           "err_ProperSemimajorAxis": "0.00001553",
 
-as well as functions to retrieve properties for multiple minor bodies at once:
+See ``rocks --help`` and :ref:`the documentation<Command-Line Interface>` for the implemented functions.
+
+Retrieve and compare asteroid data in a script
+""""""""""""""""""""""""""""""""""""""""""""""
+At the core of the ``rocks`` package is the ``Rock`` class. A ``Rock`` instance represents an asteroid. Its properties are accessible via its attributes.
+
+.. code-block:: python
+
+  from rocks.core import Rock
+
+  Ceres = Rock(1)
+  print(Ceres)
+  # Rock(number=1, name='Ceres')
+
+  Vesta = Rock('vesta')
+  print(Vesta)
+  # Rock(number=4, name='Vesta') 
+
+  print(Ceres.taxonomy)  # singular form: from ssoCard
+  # 'C'
+  print(Ceres.taxonomies)  # plurar form: all datacloud entries
+  # ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+
+  print(Vesta.albedo)
+  # 0.3447431141599281
+
+  print(Vesta.albedo > Ceres.albedo)
+  # True
+
+The properties metadata and uncertainties are again attributes of the property
+itself.
+
+.. code-block:: python
+
+  print(Ceres.taxonomies)
+  # ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+  print(Ceres.taxonomies.shortbib)
+  # ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004', 'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
+  print(Ceres.taxonomies.method)
+  # ['Phot', 'Spec', 'Spec', 'Spec', 'Spec', 'Spec', 'Spec']
+
+See the ``Rock`` :ref:`class documentation<rock_class>` for details.
+
+Retrieve parameters for a large number of asteroids
+"""""""""""""""""""""""""""""""""""""""""""""""""""
 
 .. code-block:: python
 
@@ -70,43 +148,14 @@ as well as functions to retrieve properties for multiple minor bodies at once:
    # [('Vesta', 'V'), ('Eos', 'K'), ('1992 EA4', 'Ds'), ('Schwartz', 'B'),
    #  ('Gyldenkerne', False), ('2001 JE2', 'CX')]
 
-
-What's been implemented so far
-------------------------------
-
-- Identify asteroids based on their number, name, or designation
-  :ref:`via the command-line <cli-identify>`, or :ref:`scripted as batch job <identify>`.
-
-- Get the taxonomic classifications of asteroids
-  :ref:`via the command-line <cli-taxonomy>`, or :ref:`scripted as batch job <taxonomy>`.
-
-- Get the albedo measurements of asteroids
-  :ref:`via the command-line <cli-albedo>`, or :ref:`scripted as batch job <albedo>`.
-
-- Get the diameter measurements of asteroids
-  :ref:`via the command-line <cli-diameter>`, or :ref:`scripted as batch job <albedo>`.
-
-- Get the mass estimates of asteroids
-  :ref:`via the command-line <cli-mass>`, or :ref:`scripted as batch job <albedo>`.
-
-- Get all data availabe on `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_
-  for a single asteroid :ref:`via the command-line <cli-info>`.
-
-
-What's to come
---------------
-
-- Multiprocessing of batch job queries
-- Retrieve all observations at the `Minor Planet Centre <https://minorplanetcenter.net/>`_
-  and export them filtered by target, observation, and band
-   
+And more
+""""""""
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
 
-   cli
+   core
    names
+   cli
    properties
    tools
-   core

@@ -7,6 +7,7 @@
     <title>rocks &#8212; rocks 0.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -14,7 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Command-Line Interface" href="cli.html" /> 
+    <link rel="next" title="Rock class" href="core.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,7 +24,7 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="cli.html" title="Command-Line Interface"
+          <a href="core.html" title="Rock class"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">rocks 0.1 documentation</a> &#187;</li> 
       </ul>
@@ -36,45 +37,117 @@
             
   <div class="section" id="rocks">
 <h1><code class="docutils literal notranslate"><span class="pre">rocks</span></code><a class="headerlink" href="#rocks" title="Permalink to this headline">¶</a></h1>
-<p>A <code class="docutils literal notranslate"><span class="pre">python</span></code> package to query asteroid data from
+<p><em>for space rocks</em></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">python</span></code> package to query and explore asteroid data from
 <a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/">SsODNet</a>.</p>
 <p><strong>Disclaimer: The SsODNet service and its database are in an alpha version and
 under constant revision. The provided values and access methods may change
 without notice.</strong></p>
-<p>It includes a command-line interface for quick exploration of singular objects,</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ rocks identify 221
-(221) Eos
+<p><code class="docutils literal notranslate"><span class="pre">rocks</span></code> allows to</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#asteroid-name-resolution"><span class="std std-ref">resolve asteroid names from various identification formats</span></a></p></li>
+<li><p><a class="reference internal" href="#exploration-via-the-command-line"><span class="std std-ref">explore available asteroid data via the command line</span></a></p></li>
+<li><p><a class="reference internal" href="#retrieve-and-compare-asteroid-data-in-a-script"><span class="std std-ref">retrieve and compare measurements in a script</span></a></p></li>
+<li><p><a class="reference internal" href="#retrieve-parameters-for-a-large-number-of-asteroids"><span class="std std-ref">retrieve parameters for thousands of asteroids in a batch-job</span></a></p></li>
+</ul>
+<div class="section" id="asteroid-name-resolution">
+<h2>Asteroid name resolution<a class="headerlink" href="#asteroid-name-resolution" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rocks</span></code> can identify asteroids based on a variety of identifying strings or
+numbers.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">properties</span>
+
+<span class="c1"># A collection of asteroid identifiers</span>
+<span class="n">ssos</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;eos&#39;</span><span class="p">,</span> <span class="s1">&#39;1992EA4&#39;</span><span class="p">,</span> <span class="s1">&#39;SCHWARTZ&#39;</span><span class="p">,</span> <span class="s1">&#39;1950 RW&#39;</span><span class="p">,</span> <span class="s1">&#39;2001je2&#39;</span><span class="p">]</span>
+
+<span class="c1"># Resolve their names and numbers</span>
+<span class="n">names_numbers</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">get_name_number</span><span class="p">(</span><span class="n">ssos</span><span class="p">)</span>
+<span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">nn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">names_numbers</span><span class="p">)</span>
+<span class="c1"># [(&#39;Vesta&#39;, 4), (&#39;Eos&#39;, 221), (&#39;1992 EA4&#39;, 30863), (&#39;Schwartz&#39;, 13820),</span>
+<span class="c1">#  (&#39;Gyldenkerne&#39;, 5030), (&#39;2001 JE2&#39;, 131353)]</span>
+</pre></div>
+</div>
+<p>The name resolution algorithm and different use cases are <a class="reference internal" href="names.html#resolving-names-numbers-designations"><span class="std std-ref">documented here</span></a>.</p>
+</div>
+<div class="section" id="exploration-via-the-command-line">
+<h2>Exploration via the command line<a class="headerlink" href="#exploration-via-the-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">rocks</span></code> executable is installed system-wide upon installation of the
+package.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ rocks identify <span class="m">221</span>
+<span class="o">(</span><span class="m">221</span><span class="o">)</span> Eos
 
 $ rocks taxonomy Eos
 ref                  class scheme     method  waverange
-Tholen+1989          S     Tholen     Phot    VIS        [ ]
-Bus&amp;Binzel+2002      K     Bus        Spec    VIS        [ ]
-MotheDiniz+2005      K     Bus        Spec    VIS        [ ]
-MotheDiniz+2008a     K     Bus        Spec    VISNIR     [ ]
-Clark+2009           K     Bus-DeMeo  Spec    VISNIR     [ ]
-DeMeo+2009           K     Bus-DeMeo  Spec    VISNIR     [X]
+Tholen+1989          S     Tholen     Phot    VIS        <span class="o">[</span> <span class="o">]</span>
+Bus<span class="p">&amp;</span>Binzel+2002      K     Bus        Spec    VIS        <span class="o">[</span> <span class="o">]</span>
+MotheDiniz+2005      K     Bus        Spec    VIS        <span class="o">[</span> <span class="o">]</span>
+MotheDiniz+2008a     K     Bus        Spec    VISNIR     <span class="o">[</span> <span class="o">]</span>
+Clark+2009           K     Bus-DeMeo  Spec    VISNIR     <span class="o">[</span> <span class="o">]</span>
+DeMeo+2009           K     Bus-DeMeo  Spec    VISNIR     <span class="o">[</span>X<span class="o">]</span>
 
 $ rocks albedo Eos
 ref                  albedo err   method
-Morrison+2007        0.123  0.025 STM      [ ]
-Tedesco+2001         0.140  0.010 STM      [ ]
-Ryan+2010            0.150  0.012 STM      [ ]
-Ryan+2010            0.121  0.019 NEATM    [X]
-Usui+2011            0.131  0.014 NEATM    [X]
-Masiero+2011         0.165  0.038 NEATM    [X]
-Masiero+2012         0.166  0.021 NEATM    [X]
-Masiero+2014         0.180  0.027 NEATM    [X]
-Nugent+2016          0.140  0.091 NEATM    [X]
-Nugent+2016          0.150  0.171 NEATM    [X]
+Morrison+2007        <span class="m">0</span>.123  <span class="m">0</span>.025 STM      <span class="o">[</span> <span class="o">]</span>
+Tedesco+2001         <span class="m">0</span>.140  <span class="m">0</span>.010 STM      <span class="o">[</span> <span class="o">]</span>
+Ryan+2010            <span class="m">0</span>.150  <span class="m">0</span>.012 STM      <span class="o">[</span> <span class="o">]</span>
+Ryan+2010            <span class="m">0</span>.121  <span class="m">0</span>.019 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Usui+2011            <span class="m">0</span>.131  <span class="m">0</span>.014 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Masiero+2011         <span class="m">0</span>.165  <span class="m">0</span>.038 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Masiero+2012         <span class="m">0</span>.166  <span class="m">0</span>.021 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Masiero+2014         <span class="m">0</span>.180  <span class="m">0</span>.027 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Nugent+2016          <span class="m">0</span>.140  <span class="m">0</span>.091 NEATM    <span class="o">[</span>X<span class="o">]</span>
+Nugent+2016          <span class="m">0</span>.150  <span class="m">0</span>.171 NEATM    <span class="o">[</span>X<span class="o">]</span>
 
-      0.147 +- 0.004
+      <span class="m">0</span>.147 +- <span class="m">0</span>.004
 
-$ rocks info Eos | grep ProperSemimajor
-       &quot;ProperSemimajorAxis&quot;: &quot;3.0123876&quot;,
-       &quot;err_ProperSemimajorAxis&quot;: &quot;0.00001553&quot;,
+$ rocks info Eos <span class="p">|</span> grep ProperSemimajor
+       <span class="s2">&quot;ProperSemimajorAxis&quot;</span>: <span class="s2">&quot;3.0123876&quot;</span>,
+       <span class="s2">&quot;err_ProperSemimajorAxis&quot;</span>: <span class="s2">&quot;0.00001553&quot;</span>,
 </pre></div>
 </div>
-<p>as well as functions to retrieve properties for multiple minor bodies at once:</p>
+<p>See <code class="docutils literal notranslate"><span class="pre">rocks</span> <span class="pre">--help</span></code> and <a class="reference internal" href="cli.html#command-line-interface"><span class="std std-ref">the documentation</span></a> for the implemented functions.</p>
+</div>
+<div class="section" id="retrieve-and-compare-asteroid-data-in-a-script">
+<h2>Retrieve and compare asteroid data in a script<a class="headerlink" href="#retrieve-and-compare-asteroid-data-in-a-script" title="Permalink to this headline">¶</a></h2>
+<p>At the core of the <code class="docutils literal notranslate"><span class="pre">rocks</span></code> package is the <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class. A <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instance represents an asteroid. Its properties are accessible via its attributes.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rocks.core</span> <span class="kn">import</span> <span class="n">Rock</span>
+
+<span class="n">Ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="p">)</span>
+<span class="c1"># Rock(number=1, name=&#39;Ceres&#39;)</span>
+
+<span class="n">Vesta</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;vesta&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Vesta</span><span class="p">)</span>
+<span class="c1"># Rock(number=4, name=&#39;Vesta&#39;)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomy</span><span class="p">)</span>  <span class="c1"># singular form: from ssoCard</span>
+<span class="c1"># &#39;C&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="p">)</span>  <span class="c1"># plurar form: all datacloud entries</span>
+<span class="c1"># [&#39;G&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;G&#39;, &#39;C&#39;]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Vesta</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>
+<span class="c1"># 0.3447431141599281</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">Vesta</span><span class="o">.</span><span class="n">albedo</span> <span class="o">&gt;</span> <span class="n">Ceres</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>
+<span class="c1"># True</span>
+</pre></div>
+</div>
+<p>The properties metadata and uncertainties are again attributes of the property
+itself.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="p">)</span>
+<span class="c1"># [&#39;G&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;G&#39;, &#39;C&#39;]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">shortbib</span><span class="p">)</span>
+<span class="c1"># [&#39;Tholen+1989&#39;, &#39;Bus&amp;Binzel+2002&#39;, &#39;Lazzaro+2004&#39;, &#39;Lazzaro+2004&#39;, &#39;DeMeo+2009&#39;, &#39;Fornasier+2014&#39;, &#39;Fornasier+2014&#39;]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">method</span><span class="p">)</span>
+<span class="c1"># [&#39;Phot&#39;, &#39;Spec&#39;, &#39;Spec&#39;, &#39;Spec&#39;, &#39;Spec&#39;, &#39;Spec&#39;, &#39;Spec&#39;]</span>
+</pre></div>
+</div>
+<p>See the <code class="docutils literal notranslate"><span class="pre">Rock</span></code> <a class="reference internal" href="core.html#rock-class"><span class="std std-ref">class documentation</span></a> for details.</p>
+</div>
+<div class="section" id="retrieve-parameters-for-a-large-number-of-asteroids">
+<h2>Retrieve parameters for a large number of asteroids<a class="headerlink" href="#retrieve-parameters-for-a-large-number-of-asteroids" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">names</span>
 <span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">properties</span>
 
@@ -98,48 +171,16 @@ $ rocks info Eos | grep ProperSemimajor
 <span class="c1">#  (&#39;Gyldenkerne&#39;, False), (&#39;2001 JE2&#39;, &#39;CX&#39;)]</span>
 </pre></div>
 </div>
-<div class="section" id="what-s-been-implemented-so-far">
-<h2>What’s been implemented so far<a class="headerlink" href="#what-s-been-implemented-so-far" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Identify asteroids based on their number, name, or designation
-<a class="reference internal" href="cli.html#cli-identify"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="names.html#identify"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
-<li><p>Get the taxonomic classifications of asteroids
-<a class="reference internal" href="cli.html#cli-taxonomy"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#taxonomy"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
-<li><p>Get the albedo measurements of asteroids
-<a class="reference internal" href="cli.html#cli-albedo"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
-<li><p>Get the diameter measurements of asteroids
-<a class="reference internal" href="cli.html#cli-diameter"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
-<li><p>Get the mass estimates of asteroids
-<a class="reference internal" href="cli.html#cli-mass"><span class="std std-ref">via the command-line</span></a>, or <a class="reference internal" href="properties.html#albedo"><span class="std std-ref">scripted as batch job</span></a>.</p></li>
-<li><p>Get all data availabe on <a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/">SsODNet</a>
-for a single asteroid <a class="reference internal" href="cli.html#cli-info"><span class="std std-ref">via the command-line</span></a>.</p></li>
-</ul>
 </div>
-<div class="section" id="what-s-to-come">
-<h2>What’s to come<a class="headerlink" href="#what-s-to-come" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Multiprocessing of batch job queries</p></li>
-<li><p>Retrieve all observations at the <a class="reference external" href="https://minorplanetcenter.net/">Minor Planet Centre</a>
-and export them filtered by target, observation, and band</p></li>
-</ul>
+<div class="section" id="and-more">
+<h2>And more<a class="headerlink" href="#and-more" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-docs">rocks docs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-identify">rocks identify</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-index">rocks index</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-taxonomy">rocks taxonomy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-albedo">rocks albedo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-diameter">rocks diameter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-mass">rocks mass</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cli.html#rocks-info">rocks info</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="names.html">Names, Numbers, Designations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html"><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="names.html">Resolving names, numbers, designations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command-Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="properties.html">Asteroid Properties</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
-<li class="toctree-l1"><a class="reference internal" href="core.html"><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
 </ul>
 </div>
 </div>
@@ -154,15 +195,18 @@ and export them filtered by target, observation, and band</p></li>
   <h3><a href="#">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">rocks</span></code></a><ul>
-<li><a class="reference internal" href="#what-s-been-implemented-so-far">What’s been implemented so far</a></li>
-<li><a class="reference internal" href="#what-s-to-come">What’s to come</a></li>
+<li><a class="reference internal" href="#asteroid-name-resolution">Asteroid name resolution</a></li>
+<li><a class="reference internal" href="#exploration-via-the-command-line">Exploration via the command line</a></li>
+<li><a class="reference internal" href="#retrieve-and-compare-asteroid-data-in-a-script">Retrieve and compare asteroid data in a script</a></li>
+<li><a class="reference internal" href="#retrieve-parameters-for-a-large-number-of-asteroids">Retrieve parameters for a large number of asteroids</a></li>
+<li><a class="reference internal" href="#and-more">And more</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="cli.html"
-                        title="next chapter">Command-Line Interface</a></p>
+  <p class="topless"><a href="core.html"
+                        title="next chapter"><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -191,7 +235,7 @@ and export them filtered by target, observation, and band</p></li>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="cli.html" title="Command-Line Interface"
+          <a href="core.html" title="Rock class"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">rocks 0.1 documentation</a> &#187;</li> 
       </ul>

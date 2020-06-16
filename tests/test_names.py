@@ -27,6 +27,7 @@ IDS_RESULTS_LOCAL = [
     ['2001je2', ('2001 JE2', 131353), True],
     ['2001_JE2', ('2001 JE2', 131353), True],
     ['2010 OR', ('2010 OR', np.nan), False],
+    ['2014_ye64', ('2014 YE64', 545135), True],
     ['2004BQ102', ('2004 BQ102', 450274), True],
     ['A999AB2', ('1999 AB2', 53103), True],
     [9e7, (np.nan, np.nan), False],
@@ -76,7 +77,7 @@ def test_local_vs_remote(id_, expected, local, monkeypatch):
     def mockreturn(sso, verbose):
         return False
 
-    monkeypatch.setattr(names, "_query_quaero", mockreturn)
+    monkeypatch.setattr(names, '_query_quaero', mockreturn)
 
     result = names.get_name_number(id_, progress=False, parallel=1)
 

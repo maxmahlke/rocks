@@ -7,6 +7,7 @@
     <title>taxonomy &#8212; rocks 0.1 documentation</title>
     <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
@@ -45,7 +46,7 @@
 <span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">properties</span>
 
 
-<span class="k">def</span> <span class="nf">get_taxonomy</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_taxonomy</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="n">from_Rock</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">get_property</span><span class="p">(</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="n">sso</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -54,11 +55,10 @@
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
 
-    <span class="n">selected</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">select_taxonomy</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">selected</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">select_taxonomy</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">from_Rock</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="select_taxonomy"><a class="viewcode-back" href="../properties.html#taxonomy.select_taxonomy">[docs]</a><span class="k">def</span> <span class="nf">select_taxonomy</span><span class="p">(</span><span class="n">taxa</span><span class="p">):</span>
+<div class="viewcode-block" id="select_taxonomy"><a class="viewcode-back" href="../properties.html#taxonomy.select_taxonomy">[docs]</a><span class="k">def</span> <span class="nf">select_taxonomy</span><span class="p">(</span><span class="n">taxa</span><span class="p">,</span> <span class="n">from_Rock</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Select a single taxonomic classification from multiple choices.</span>
 
 <span class="sd">    Evaluates the wavelength ranges, methods, schemes, and recency of</span>
@@ -68,6 +68,8 @@
 <span class="sd">    ----------</span>
 <span class="sd">    taxa : dict</span>
 <span class="sd">        Taxonomic classifications retrieved from SsODNet:datacloud.</span>
+<span class="sd">    from_Rock : bool</span>
+<span class="sd">        Whether the call is done by a Rock instance.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -133,6 +135,16 @@
 <span class="sd">        &#39;P&#39;: &#39;P&#39;, &#39;PC&#39;: &#39;P&#39;,</span>
 <span class="sd">    }</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">taxa</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+        <span class="c1"># no classification </span>
+        <span class="c1"># hotfix for classy</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;scheme&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;shortbib&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">}</span>
+
+    <span class="c1"># if we have several asteroids, the input will be a list of lists of</span>
+    <span class="c1"># classifications</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">taxa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">select_taxonomy</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">from_Rock</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">taxa</span><span class="p">]</span>
     <span class="c1"># Compute points of each classification</span>
     <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -148,8 +160,11 @@
     <span class="n">selected_taxonomy</span> <span class="o">=</span> <span class="n">taxa</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">points</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])]</span>
     <span class="n">selected_taxonomy</span><span class="p">[</span><span class="s1">&#39;selected&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="c1"># return (selected[&#39;class&#39;], CLASS_TO_COMPLEX[selected[&#39;class&#39;]]), taxa</span>
-    <span class="k">return</span> <span class="n">selected_taxonomy</span></div>
+    <span class="k">if</span> <span class="n">from_Rock</span><span class="p">:</span>  <span class="c1"># current hack to conciliate Rock class and CLI</span>
+        <span class="k">return</span> <span class="n">selected_taxonomy</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">selected_taxonomy</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">],</span>
+                <span class="n">CLASS_TO_COMPLEX</span><span class="p">[</span><span class="n">selected_taxonomy</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]]),</span> <span class="n">taxa</span></div>
 
 
 <span class="k">def</span> <span class="nf">class_to_complex</span><span class="p">(</span><span class="n">class_</span><span class="p">):</span>

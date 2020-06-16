@@ -7,6 +7,7 @@
     <title>Tools &#8212; rocks 0.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
@@ -14,7 +15,6 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Rock class" href="core.html" />
     <link rel="prev" title="Asteroid Properties" href="properties.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -23,9 +23,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="core.html" title="Rock class"
-             accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="properties.html" title="Asteroid Properties"
              accesskey="P">previous</a> |</li>
@@ -41,16 +38,74 @@
   <div class="section" id="tools">
 <h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
 <p>These are general, low-level utility functions.</p>
+<div class="section" id="asteroid-name-number-index">
+<h2>Asteroid name-number Index<a class="headerlink" href="#asteroid-name-number-index" title="Permalink to this headline">¶</a></h2>
+<p>To speed up name-number lookups, a local index file is kept. It contains the
+list of numbered asteroids and their names or designations.</p>
+<dl class="py function">
+<dt id="tools.create_index">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">create_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#create_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.create_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create or update index of numbered SSOs.</p>
+<p class="rubric">Notes</p>
+<p>The list is retrieved from the Minor Planet Center, at
+<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
+<p>It is saved in CSV format as <code class="docutils literal notranslate"><span class="pre">.index</span></code> in the package directory.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="tools.read_index">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">read_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#read_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.read_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read local index of asteroid numbers and names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>dict</em> – Asteroid number: name</p></li>
+<li><p><em>dict</em> – Asteroid name: number</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the index file is older than 30 days, a reminder to update is
+displayed.</p>
+</dd></dl>
+
+<p>The index can be fuzzy-searched interactively using</p>
+<dl class="py function">
+<dt id="tools.select_sso_from_index">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.select_sso_from_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select SSO numbers and designations from interactive fuzzy search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>str</em> – asteroid name or designation</p></li>
+<li><p><em>int</em> – asteroid number</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the selection is interrupted with ctrl-c, <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code> is returned.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">select_sso_from_index</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="ssodnet-query-functions">
+<h2>SsODNet Query Functions<a class="headerlink" href="#ssodnet-query-functions" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="tools.get_data">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">this</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id_</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get asteroid data from SsODNet:datacloud.</p>
 <p>Performs a GET request to SsODNet:datacloud for a single asteroid and
-property.</p>
+property. Checks validity of data and extracts it from response.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>this</strong> (<em>str</em><em>, </em><em>int</em>) – Asteroid name, designation, or number.</p></li>
+<li><p><strong>id_</strong> (<em>str</em><em>, </em><em>int</em>) – Asteroid name, designation, or number.</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
 </ul>
 </dd>
@@ -104,38 +159,9 @@ for options.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt id="tools.create_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">create_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#create_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.create_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create or update index of numbered SSOs.</p>
-<p>The list is retrieved from the Minor Planet Center, at
-<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tools.read_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">read_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#read_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.read_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read local index of asteroid numbers and names.</p>
-<p>The index is created with <cite>rocks index</cite>.
-The list is retrieved from the Minor Planet Center, at
-<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>dict</em> – Asteroid number: name</p></li>
-<li><p><em>dict</em> – Asteroid name: number</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tools.select_sso_from_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.select_sso_from_index" title="Permalink to this definition">¶</a></dt>
+<dt id="id0">
+<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select SSO numbers and designations from interactive fuzzy search.</p>
-<p>The index is created with <cite>rocks index</cite>.
-The list is retrieved from the Minor Planet Center, at
-<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -145,8 +171,16 @@ The list is retrieved from the Minor Planet Center, at
 </p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>If the selection is interrupted with ctrl-c, <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code> is returned.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">select_sso_from_index</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
+</div>
 </div>
 
 
@@ -155,12 +189,18 @@ The list is retrieved from the Minor Planet Center, at
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Tools</a><ul>
+<li><a class="reference internal" href="#asteroid-name-number-index">Asteroid name-number Index</a></li>
+<li><a class="reference internal" href="#ssodnet-query-functions">SsODNet Query Functions</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="properties.html"
                         title="previous chapter">Asteroid Properties</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="core.html"
-                        title="next chapter"><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -188,9 +228,6 @@ The list is retrieved from the Minor Planet Center, at
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="core.html" title="Rock class"
-             >next</a> |</li>
         <li class="right" >
           <a href="properties.html" title="Asteroid Properties"
              >previous</a> |</li>

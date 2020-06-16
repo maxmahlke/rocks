@@ -38,7 +38,8 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.napoleon',
-    'sphinx_click.ext'
+    'sphinx_click.ext',
+    'sphinx.ext.graphviz',
 ]
 
 # Print out todos in documentation?
@@ -52,6 +53,8 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
+
+graphviz_output_format = 'svg'
 
 # -- Options for HTML output -------------------------------------------------
 
