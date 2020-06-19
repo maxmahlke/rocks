@@ -15,7 +15,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from rich.progress import track
 
 from rocks import names
 from rocks import properties
@@ -86,21 +86,48 @@ class Rock:
 
             data = data_.copy()
             for key in setup['ssodnet_path']:
-                data = data[key]
+                data = data[key] if key in data.keys() else {}
 
-            setattr(
-                self,
-                setup['collection'],
-                listParameter(data, setup['attribute'], type_=setup['type'])
-            )
+            if not data:  # properties without data are set to NaN or None
+                if setup['type'] is float:
+                    setattr(self, prop, np.nan)
+                elif setup['type'] is str:
+                    setattr(self, prop, None)
+                if 'collection' in setup.keys():
+                    setattr(self, setup['collection'], [])
+                continue
 
+            prop_name_ssodnet = setup['attribute']
+
+            # remove property == 0 and error_property == 0 if float property
+            if setup['type'] is float:
+                data = [d for d in data if d[prop_name_ssodnet] != '0']
+                try:
+                    data = [d for d in data if
+                            d[f'err_{prop_name_ssodnet}'] != '0']
+                except KeyError:
+                    pass  # not all properties have errors
+
+            # Set collection properties (eg masses, taxonomies)
+            if 'collection' in setup.keys():
+                setattr(
+                    self,
+                    setup['collection'],
+                    listParameter(
+                        data,
+                        prop_name_ssodnet,
+                        type_=setup['type']
+                    ),
+                )
+
+            # Set aggregated property (eg mass, taxonomy)
             if setup['type'] is float:
                 setattr(
                     self,
                     prop,
                     floatParameter(
-                        setup['selection'](data),
-                        setup['attribute']
+                        setup['selection'](data, prop_name_ssodnet),
+                        prop_name_ssodnet,
                     ),
                 )
 
@@ -110,7 +137,7 @@ class Rock:
                     prop,
                     stringParameter(
                         setup['selection'](data),
-                        setup['attribute']
+                        prop_name_ssodnet,
                     ),
                 )
 
@@ -228,37 +255,13 @@ class listParameter(list):
 
         # Make uniform weights in case no errors are provided
         if not hasattr(self, 'error'):
+            warnings.warn('No error provided, using uniform weights.')
             error = np.ones(len(self))
-            weights = np.ones(len(self))
         else:
             # Remove measurements where the error is zero
             error = np.array(self.error)
-            observable = observable[error != 0]
-            error = error[error != 0]
 
-        # Compute normalized weights
-        weights = 1 / np.array(error)**2
-        weights = weights / sum(weights)
-
-        # Compute weighted average and uncertainty
-        avg = np.average(observable, weights=weights)
-
-        # Bevington's implementation
-        std_avg = np.sqrt(
-            1 / (len(self) - 1) * sum(w * (s - avg)**2 for w, s in
-                                      zip(weights, self))
-        )
-
-        print('Values: ', observable)
-        print('Errors:', error)
-
-        print('Bevingtons std mean:', std_avg)
-        # Wikipedia
-        std_avg = np.sqrt(
-            sum(w**2 * e**2 for w, e in zip(weights, error))
-        )
-        print('Wikipedias std mean:', std_avg)
-        return (avg, std_avg)
+        return tools.weighted_average(observable, error)
 
     def scatter(self):
         '''Placeholder'''
@@ -301,6 +304,9 @@ def many_rocks(ids, properties, parallel=4, progress=True, verbose=False):
 
     # Create Rocks
     pool = Pool(max_workers=parallel)
-    rocks = list(tqdm(pool.map(build_rock, ids), total=len(ids),
-                      disable=not progress))
+    if progress:
+        rocks = list(track(pool.map(build_rock, ids), total=len(ids),
+                           description='Building Rocks...'))
+    else:
+        rocks = list(pool.map(build_rock, ids))
     return rocks

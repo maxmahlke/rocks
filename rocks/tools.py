@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 '''
     Author: Max Mahlke
     Date: 13 March 2020
@@ -15,6 +14,7 @@ import time
 
 import click
 from iterfzf import iterfzf
+import numpy as np
 import pandas as pd
 import requests
 
@@ -29,23 +29,32 @@ def create_index():
 
     It is saved in CSV format as ``.index`` in the package directory.
     '''
-    print('Retrieving index from MPC..\r', end='')
-    url = 'https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt'
-
-    index = pd.read_fwf(
-        url, colspecs=[(0, 7), (9, 29), (29, 41)],
-        names=['number', 'name', 'designation'],
-        dtype={'name': str, 'designation': str},
-        converters={'number': lambda x: int(x.replace('(', ''))}
+    from rich.progress import (
+        BarColumn,
+        TextColumn,
+        Progress,
     )
 
-    index['name'] = index['name'].fillna(index.designation)
-    index = index.drop(columns=['designation'])
+    with Progress(TextColumn(" [yellow]Retrieving index from MPC",
+                             justify="right"),
+                  BarColumn(bar_width=None)) as progress:
+        progress.add_task(" [yellow]Retrieving index from MPC", total=3,
+                          start=False)
+        url = 'https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt'
 
-    path_index = path.join(path.dirname(path.abspath(__file__)),
-                           '.index')
-    index.to_csv(path_index, index=False)
-    print('Retrieving index from MPC.. done.')
+        index = pd.read_fwf(
+            url, colspecs=[(0, 7), (9, 29), (29, 41)],
+            names=['number', 'name', 'designation'],
+            dtype={'name': str, 'designation': str},
+            converters={'number': lambda x: int(x.replace('(', ''))}
+        )
+
+        index['name'] = index['name'].fillna(index.designation)
+        index = index.drop(columns=['designation'])
+
+        path_index = path.join(path.dirname(path.abspath(__file__)),
+                               '.index')
+        index.to_csv(path_index, index=False)
 
 
 def read_index():
@@ -250,11 +259,153 @@ def echo_response(response, mime):
         click.echo(response.text)
 
 
+def pretty_print(SSO, property_name):
+    '''Pretty-print asteroid property to console.
+
+    Parameters
+    ----------
+    SSO : rocks.core.Rock
+        The Rock instance representing the asteroid.
+    property_name : str
+        The attribute name of property to pretty-print.
+    '''
+    from rich import print as rprint
+    from rocks import core
+    from rocks.properties import PROPERTIES as PROPS
+
+    property_value = getattr(SSO, property_name)
+
+    if property_value is np.nan or property_value is None:
+        print(f'No {property_name} on record for ({SSO.number}) {SSO.name}')
+        sys.exit()
+
+    # Output type depends on property type
+    if isinstance(property_value, core.stringParameter):
+        print(property_value)
+
+    elif isinstance(property_value, core.floatParameter):
+        formatting = '.2E' if property_value >= 1000 else '.3f'
+
+        if 'error' in dir(property_value):
+            print(u' \u00B1 '.join([  # unicode string is +-
+                f'{property_value:{formatting}}',
+                f'{property_value.error:{formatting}}'
+            ]), '[unit]')
+        else:
+            print(f'{property_value:{formatting}}', '[unit]')
+
+    elif isinstance(property_value, core.listParameter):
+        from rich import box
+        from rich.table import Table
+
+        # ------
+        # build table
+        table = Table(
+            header_style='bold blue',
+            caption=f'({SSO.number}) {SSO.name}',
+            box=box.SQUARE,
+            show_footer=property_value.datatype is float,
+            footer_style='dim'
+        )
+
+        # ------
+        # add columns to table
+        columns = ['shortbib', property_name, 'method']
+
+        # add property dependent columns
+        for property_singular, setup in PROPS.items():
+            if 'collection' in setup.keys() and\
+                    setup['collection'] == property_name:
+                break
+        columns[-1:-1] = PROPS[property_singular]['extra_columns']
+
+        if property_value.datatype is float:
+            columns[2:2] = ['error']
+
+        for c in columns:
+            table.add_column(
+                c,
+                justify='right' if c != 'shortbib' else 'left',
+                style=None if c != 'shortbib' else 'dim',
+                footer='unit' if c in [property_name, 'error'] else '',
+            )
+
+        # find column indices of preferred solution
+        preferred_solution = getattr(SSO, property_singular).index_selection
+        preferred_solution = [range(len(property_value))[i]
+                              for i in preferred_solution]
+
+        # ------
+        # add rows by evaluating values
+        for i, p in enumerate(property_value):
+
+            values = []
+
+            for c in columns:
+
+                # Get column value
+                if c == property_name:
+                    value = property_value[i]
+
+                else:
+                    value = getattr(property_value, c)[i]
+
+                # Select formatting
+                if isinstance(value, str):
+                    values.append(value)
+                elif isinstance(value, float):
+                    formatting = '.2E' if value >= 1000 else '.3f'
+                    values.append(f'{value:{formatting}}')
+
+                # Bold print row if it belongs to the preferred solution
+                if i in preferred_solution:
+                    values = [f'[bold green]{v}[\bold green]' for v in values]
+
+            table.add_row(*values)
+
+        rprint(table)
+
+
+def weighted_average(observable, error):
+    """Computes weighted average of observable.
+
+    Parameters
+    ----------
+    observable : np.ndarray
+        Float values of observable
+    error : np.ndarray
+        Corresponding errors of observable.
+
+    Returns
+    -------
+    (float, float)
+        Weighted average and its standard error.
+    """
+    if len(observable) == 1:
+        return (observable[0], error[0])
+
+    # Compute normalized weights
+    weights = 1 / np.array(error)**2
+    weights = weights / sum(weights)
+
+    # Compute weighted average and uncertainty
+    avg = np.average(observable, weights=weights)
+
+    # Kirchner Case II
+    # http://seismo.berkeley.edu/~kirchner/Toolkits/Toolkit_12.pdf
+    var_avg = len(observable) / (len(observable) - 1) * (
+        sum(w * o**2 for w, o in zip(weights, observable)) /
+        sum(weights) - avg**2
+    )
+
+    std_avg = np.sqrt(var_avg / len(observable))
+    return (avg, std_avg)
+
+
 # This needs to be available for name lookups and index selection
 try:
     NUMBER_NAME, NAME_NUMBER = read_index()
 except FileNotFoundError:
-    if sys.argv[1] != 'index':
-        click.echo('Asteroid index could not be found. '
-                   'Run "rocks index" first.')
-        sys.exit()
+    click.echo('Asteroid index could not be found. '
+               'Run "rocks index" first.')
+    sys.exit()

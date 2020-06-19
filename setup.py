@@ -10,9 +10,8 @@ setup(
         'click',
         'iterfzf',
         'numpy',
-        'pandarallel',
         'pandas',
-        'tqdm'
+        'rich'
     ],
     entry_points='''
         [console_scripts]

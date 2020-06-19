@@ -32,8 +32,9 @@ class AliasedGroup(click.Group):
             return rv
 
         # If unknown subcommand, check if it's a valid property
-        valid_props = [(k, PROPS[k]['collection']) for k in PROPS.keys()]
-        valid_props = [item for sublist in valid_props for item in sublist]
+        valid_props = [k for k in PROPS.keys()]  # properties
+        valid_props[-1:-1] = [v['collection'] for _, v in PROPS.items()
+                              if 'collection' in v.keys()]  # collections
 
         if cmd_name not in valid_props:
             return None
@@ -141,8 +142,19 @@ def info(this, mime, verbose):
 @cli_rocks.command()
 def properties():
     '''Echo valid asteroid properties for rocks query. '''
-    valid_props = [(k, PROPS[k]['collection']) for k in PROPS.keys()]
-    click.echo(valid_props)
+    from rich.columns import Columns
+    from rich.panel import Panel
+    from rich import print
+
+    valid = [(k, v['collection']) if 'collection' in v.keys() else (k, None)
+             for k, v in PROPS.items()]
+
+    prop_columns = [Panel(f'[b]{prop}[/b]\n[yellow]{col}', expand=True)
+                    if col is not None else
+                    Panel(f'[b]{prop}[/b]\n ', expand=True)
+                    for prop, col in valid]
+
+    print(Columns(prop_columns))
 
 
 def echo_property(property_, name=False):
@@ -162,9 +174,7 @@ def echo_property(property_, name=False):
         name, _ = tools.select_sso_from_index()
 
     SSO = Rock(name)
-    property_ = getattr(SSO, property_)
-
-    click.echo(property_)  # to be replaced by pretty_print call
+    tools.pretty_print(SSO, property_)
 
     sys.exit()  # otherwise click prints Error
 

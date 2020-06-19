@@ -10,6 +10,8 @@
 import numpy as np
 import pandas as pd
 
+from rocks import tools
+
 
 def select_taxonomy(taxa, from_Rock=False):
     '''Select a single taxonomic classification from multiple choices.
@@ -133,262 +135,77 @@ def select_taxonomy(taxa, from_Rock=False):
     # return the most recent classification
     selected_taxonomy = taxa[-1 - np.argmax(points[::-1])]
     selected_taxonomy['selected'] = True
-
+    selected_taxonomy['index_selection'] = [-1 - np.argmax(points[::-1])]
     return selected_taxonomy
 
 
-def select_albedo(albedos):
-    '''Compute a single albedo value from multiple measurements.
-
-    Evaluates the methods and computes the weighted average of equally ranked
-    methods.
+def select_numeric_property(measurements, property_name):
+    '''Aggregate multiple measurements of property by ranking methods and
+    computing the weighted average.
 
     Parameters
     ----------
-    albedos : dict
-        Albedo measurements and metadata retrieved from SsODNet:datacloud.
+    measurements : dict
+        Property measurements and metadata retrieved from SsODNet:datacloud.
+    property_name : str
+        Name of the asteroid property to aggregate.
 
     Returns
     -------
-    averaged, tuple
-        The average albedo and its uncertainty.
-    albedos, dict
-        The input dictionary, with an additional key 'selected'. True if the
-        item was used in the computation of the average, else False.
-
+    selected, dict
+        The collapsed selected entries of the input measurements, with
+        additional entries for the weighted average
 
     Notes
     -----
-
-    The method ranking is given below. Albeods acquired with the top-ranked
-    method available are used for the weighted average computation. Albedos
-    observed with NEATM or STM get an additional 10% uncertainty added.
-
-    .. code-block:: python
-
-      ['SPACE']
-      ['ADAM', 'KOALA', 'SAGE', 'Radar']
-      ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM']
-      ['AO', 'Occ', 'IM']
-      ['NEATM']
-      ['STM']
-
+    The method ranking depends on the observable.
     '''
-    albedos = pd.DataFrame.from_dict(albedos)
-    albedos['albedo'] = albedos['albedo'].astype(float)
-    albedos['err_albedo'] = albedos['err_albedo'].astype(float)
-
-    # Remove entries containing only diameters
-    albedos = albedos[albedos.albedo > 0]
-    methods = set(albedos.method.values)
+    obs = pd.DataFrame.from_dict(measurements)
+    obs[property_name] = obs[property_name].astype(float)
+    obs[f'err_{property_name}'] = obs[f'err_{property_name}'].astype(float)
 
     # Check methods by hierarchy. If several results on
     # same level, compute weighted mean
-    albedos['selected'] = False  # keep track of albedos used for mean
+    obs['selected'] = False
 
-    RANKING = [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
-               ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
-               ['AO', 'Occ', 'IM'],
-               ['NEATM'], ['STM']]
+    RANKING = PROPERTIES[property_name]['ranking']
+    methods = set(obs.method.values)
 
     for method in RANKING:
 
-        if set(method) & methods:  # at least one element in common
+        if set(method) & methods:  # method used at least once
 
-            albs = albedos.loc[albedos.method.isin(method),
-                               'albedo'].values
-            ealbs = albedos.loc[albedos.method.isin(method),
-                                'err_albedo'].values
+            prop_values = obs.loc[
+                obs.method.isin(method), property_name
+            ].values
+            prop_errors = obs.loc[
+                obs.method.isin(method), f'err_{property_name}'
+            ].values
 
             # NEATM and STM are inherently inaccurate
             if 'NEATM' in method or 'STM' in method:
-                ealbs = np.array([np.sqrt(ea**2 + (0.1 * a)**2) for
-                                  ea, a in zip(ealbs, albs)])
+                prop_errors = np.array([np.sqrt(ep**2 + (0.1 * p)**2)
+                                        for ep, p in
+                                        zip(prop_errors, prop_values)])
 
-                albedos.loc[albedos.method.isin(method),
-                            'err_albedo'] = ealbs
+                obs.loc[obs.method.isin(method),
+                        f'err_{property_name}'] = prop_errors
 
             # Compute weighted mean
-            weights = 1 / ealbs
-
-            malb = np.average(albs, weights=weights)
-            emalb = 1 / np.sum(weights)
+            avg, std_avg = tools.weighted_average(prop_values, prop_errors)
 
             # Mark albedos used in computation
-            albedos.loc[albedos.method.isin(method),
-                        'selected'] = True
+            obs.loc[obs.method.isin(method), 'selected'] = True
             break
 
     # Return dictionary with averaged, uncertainty, and merged attirbutes of
     # used data entries
-    merged = albedos[albedos.selected].to_dict(orient='list')
-    merged['albedo'] = malb
-    merged['error'] = emalb
-    return merged
+    merged = obs[obs.selected].to_dict(orient='list')
 
+    merged[property_name] = avg
+    merged['error'] = std_avg
+    merged['index_selection'] = obs.loc[obs.selected].index
 
-def select_diameter(diameters):
-    '''Compute a single diameter value from multiple measurements.
-
-    Evaluates the methods and computes the weighted average of equally ranked
-    methods.
-
-    Parameters
-    ----------
-    diameters : dict
-        Diameter measurements and metadata retrieved from SsODNet:datacloud.
-
-    Returns
-    -------
-    averaged, tuple
-        The average diameter and its uncertainty.
-    diameters, dict
-        The input dictionary, with an additional key 'selected'. True if the
-        item was used in the computation of the average, else False.
-
-    Notes
-    -----
-    The method ranking is given below. Diameters acquired with the top-ranked
-    method available are used for the weighted average computation. Diameters
-    observed with NEATM or STM get an additional 10% uncertainty added.
-
-    .. code-block:: python
-
-      ['SPACE']
-      ['ADAM', 'KOALA', 'SAGE', 'Radar']
-      ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM']
-      ['AO', 'Occ', 'IM']
-      ['NEATM']
-      ['STM']
-
-    '''
-    if diameters is False:
-        return np.nan
-
-    diameters = pd.DataFrame.from_dict(diameters)
-    diameters['diameter'] = diameters['diameter'].astype(float)
-    diameters['err_diameter'] = diameters['err_diameter'].astype(float)
-
-    # Extract methods
-    methods = set(diameters.method.values)
-
-    # Check methods by hierarchy. If several results on
-    # same level, compute weighted mean
-    diameters['selected'] = False  # keep track of albedos used for mean
-
-    for method in [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
-                   ['LC+TPM', 'LC-TPM', 'TPM', 'LC+AO', 'LC+IM',
-                    'LC+Occ', 'TE-IM'],
-                   ['AO', 'Occ', 'IM'],
-                   ['NEATM'], ['STM']]:
-
-        if set(method) & methods:  # at least one element in common
-
-            diams = diameters.loc[diameters.method.isin(method),
-                                  'diameter'].values
-            ediams = diameters.loc[diameters.method.isin(method),
-                                   'err_diameter'].values
-
-            # NEATM and STM are inherently inaccurate
-            if 'NEATM' in method or 'STM' in method:
-                ediams = np.array([np.sqrt(ea**2 + (0.1 * a)**2) for
-                                   ea, a in zip(ediams, diams)])
-
-                diameters.loc[diameters.method.isin(method),
-                              'err_albedo'] = ediams
-
-            # Compute weighted mean
-            weights = 1 / ediams
-
-            mdiam = np.average(diams, weights=weights)
-            emdiam = 1 / np.sum(weights)
-
-            # Mark diameters used in computation
-            diameters.loc[diameters.method.isin(method),
-                          'selected'] = True
-            break
-
-    # Return dictionary with averaged, uncertainty, and merged attirbutes of
-    # used data entries
-    merged = diameters[diameters.selected].to_dict(orient='list')
-    merged['diameter'] = mdiam
-    merged['error'] = emdiam
-    return merged
-
-
-def select_mass(masses):
-    '''Compute a single mass estimate from multiple measurements.
-
-    Evaluates the methods and computes the weighted average of equally ranked
-    methods.
-
-    Parameters
-    ----------
-    masses : dict
-        Mass estimates and metadata retrieved from SsODNet:datacloud.
-
-    Returns
-    -------
-    averaged, tuple
-        The average mass and its uncertainty.
-    masses, dict
-        The input dictionary, with an additional key 'selected'. True if the
-        item was used in the computation of the average, else False.
-
-    Notes
-    -----
-    The method ranking is given below. Masses acquired with the top-ranked
-    method available are used for the weighted average computation.
-
-    .. code-block:: python
-
-      ['SPACE']
-      ['Bin-Genoid']
-      ['Bin-IM', 'Bin-Radar', 'Bin-PheMu']
-      ['EPHEM', 'DEFLECT']
-
-    '''
-    if masses is False:
-        return np.nan
-
-    masses = pd.DataFrame.from_dict(masses)
-    masses['mass'] = masses['mass'].astype(float)
-    masses['err_mass'] = masses['err_mass'].astype(float)
-
-    # Extract methods
-    methods = set(masses.method.values)
-
-    # Check methods by hierarchy. If several results on
-    # same level, compute weighted mean
-    masses['selected'] = False  # keep track of albedos used for mean
-
-    for method in [['SPACE'], ['Bin-Genoid'],
-                   ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
-                   ['EPHEM', 'DEFLECT']]:
-
-        if set(method) & methods:  # at least one element in common
-
-            m = masses.loc[masses.method.isin(method),
-                           'mass'].values
-            dm = masses.loc[masses.method.isin(method),
-                            'err_mass'].values
-
-            # Compute weighted mean
-            weights = 1 / dm
-
-            mmass = np.average(m, weights=weights)
-            emmass = 1 / np.sum(weights)
-
-            # Mark masses used in computation
-            masses.loc[masses.method.isin(method),
-                       'selected'] = True
-            break
-
-    # Return dictionary with averaged, uncertainty, and merged attirbutes of
-    # used data entries
-    merged = masses[masses.selected].to_dict(orient='list')
-    merged['mass'] = mmass
-    merged['error'] = emmass
     return merged
 
 
@@ -396,10 +213,11 @@ def select_mass(masses):
 PROPERTIES = {
 
     # TEMPLATE
-    # property_name : Rock instance attribute name
+    # property_name: Rock instance attribute name
     #   attribute: attribute key in datacloud
     #   collection: Rock instance attribute name for collection of parameters
     #               Use plural form
+    #   extra_columns: names of additional columns to output on CLI
     #   ssodnet_path: json path to asteroid property
     #                 (to be replaced by ssoCard
     #   type: asteroid property type, float or str
@@ -407,15 +225,33 @@ PROPERTIES = {
     'albedo': {
         'attribute': 'albedo',
         'collection': 'albedos',
-        'selection': select_albedo,
+        'extra_columns': [],
+        'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                    ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
+                    ['AO', 'Occ', 'IM'],
+                    ['NEATM'], ['STM']],
+        'selection': select_numeric_property,
         'ssodnet_path': ['datacloud', 'diamalbedo'],
+        'type': float,
+    },
+
+    'eccentricity': {
+        'attribute': 'Eccentricity',
+        'ssodnet_path': ['datacloud', 'astorb'],
+        'selection': lambda x, _: x[0],  # do nothing
         'type': float,
     },
 
     'diameter': {
         'attribute': 'diameter',
         'collection': 'diameters',
-        'selection': select_diameter,
+        'extra_columns': [],
+        'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                    ['LC+TPM', 'LC-TPM', 'TPM', 'LC+AO', 'LC+IM',
+                     'LC+Occ', 'TE-IM'],
+                    ['AO', 'Occ', 'IM'],
+                    ['NEATM'], ['STM']],
+        'selection': select_numeric_property,
         'ssodnet_path': ['datacloud', 'diamalbedo'],
         'type': float,
     },
@@ -423,14 +259,26 @@ PROPERTIES = {
     'mass': {
         'attribute': 'mass',
         'collection': 'masses',
-        'selection': select_mass,
+        'extra_columns': [],
+        'ranking': [['SPACE'], ['Bin-Genoid'],
+                    ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
+                    ['EPHEM', 'DEFLECT']],
+        'selection': select_numeric_property,
         'ssodnet_path': ['datacloud', 'masses'],
+        'type': float,
+    },
+
+    'semimajoraxis': {
+        'attribute': 'SemimajorAxis',
+        'ssodnet_path': ['datacloud', 'astorb'],
+        'selection': lambda x, _: x[0],  # do nothing
         'type': float,
     },
 
     'taxonomy': {
         'attribute': 'class',
         'collection': 'taxonomies',
+        'extra_columns': ['scheme', 'waverange'],
         'selection': select_taxonomy,
         'ssodnet_path': ['datacloud', 'taxonomy'],
         'type': str,
