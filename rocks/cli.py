@@ -157,6 +157,22 @@ def properties():
     print(Columns(prop_columns))
 
 
+@cli_rocks.command()
+def status():
+    '''Prints the availability of SsODNet:datacloud. '''
+    import warnings
+    warnings.filterwarnings('ignore')
+
+    from rich import print
+
+    Ceres = Rock(1, only=['taxonomy'])
+
+    if hasattr(Ceres, 'taxonomy'):
+        print(r'[bold green]Datacloud is available.[\bold green]')
+    else:
+        print(r'[bold red]Datacloud is not available.[\bold red]')
+
+
 def echo_property(property_, name=False):
     '''Echo asteroid property for a single minor body.
 
@@ -174,8 +190,9 @@ def echo_property(property_, name=False):
         name, _ = tools.select_sso_from_index()
 
     SSO = Rock(name)
-    tools.pretty_print(SSO, property_)
 
+    if hasattr(SSO, property_):
+        tools.pretty_print(SSO, property_)
     sys.exit()  # otherwise click prints Error
 
 

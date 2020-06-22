@@ -177,14 +177,6 @@ def get_data(id_, verbose=True):
             key = list(data.keys())[0]
     else:
         key = list(data.keys())[0]
-
-    # data = data[key]['datacloud']
-
-    # if data is None:
-        # if verbose:
-            # click.echo(f'Datacloud is unavailable or no '
-                       # f'data in SsODNet for {id_}')
-        # return False
     return data[key]
 
 
