@@ -386,7 +386,7 @@ def weighted_average(observable, error):
 
     # Compute normalized weights
     weights = 1 / np.array(error)**2
-    weights = weights / sum(weights)
+    #weights = weights / sum(weights)
 
     # Compute weighted average and uncertainty
     avg = np.average(observable, weights=weights)
@@ -397,7 +397,6 @@ def weighted_average(observable, error):
         sum(w * o**2 for w, o in zip(weights, observable)) /
         sum(weights) - avg**2
     )
-
     std_avg = np.sqrt(var_avg / len(observable))
     return (avg, std_avg)
 
