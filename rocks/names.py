@@ -10,6 +10,7 @@
 from functools import lru_cache, partial
 import multiprocessing as mp
 import re
+import warnings
 
 import pandas as pd
 import numpy as np
@@ -98,7 +99,12 @@ def _lookup_or_query(sso, verbose=False):
         identifiers, returns a list of tuples.
     '''
     if isinstance(sso, (int, float, np.int64)):
-        sso = int(sso)
+
+        try:
+            sso = int(sso)
+        except ValueError:  # np.nan
+            warnings.warn('This identifier appears to be NaN: {sso}')
+            return np.nan, np.nan
 
         # Try local lookup
         if sso in tools.NUMBER_NAME.keys():
