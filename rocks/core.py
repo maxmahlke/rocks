@@ -47,7 +47,7 @@ s={'avg':{'color':'black'},
    'TE-IM':{'color':'blue', 'marker':'o'},
   #-2d on sky
    'OCC':{'color':'brown', 'marker':'P'}, 
-   'IM':{'color':'oranged', 'marker':'p'}, 
+   'IM':{'color':'orange', 'marker':'p'}, 
    'IM-PSF':{'color':'tomato', 'marker':'H'}, 
   #-Mass from binary
    'Bin-IM':{'color':'navy', 'marker':'v'}, 
@@ -315,50 +315,50 @@ class listParameter(list):
         return tools.weighted_average(observable, error)
 
     def scatter(self):
-        '''Placeholder'''
+        '''Create scatter/histogram figure for float parameters'''
 
-        ## "self" is a list of either floats or strings
-        #print(self)
-        ## On top, self has attributes.
-        #print(self.shortbib)
-
+        # X Axis and Average
         n=len(self)
         x=np.linspace(1,n,n)
-
         avg, std = self.weighted_average()
 
-        # Define figure layout
+        # Figure layout
         fig = plt.figure(figsize=(12, 8))
         gs = fig.add_gridspec(1, 2, width_ratios=(7, 2), wspace=0.05, 
                               left=0.07, right=0.97, bottom=0.05, top=0.87)
         ax = fig.add_subplot(gs[0])
         ax_histy = fig.add_subplot(gs[1], sharey=ax)
 
-        # the scatter plot:
-        # mean and std
+        # Scatter plot:
+        # Average and deviation of the mean
         lavg = ax.axhline(avg, label='Average',
-                   color=s['avg']['color'])
-        lstd = ax.axhline(avg+std, label='1$\sigma$ deviation',
-                   color=s['std']['color'], linestyle='dashed')
-        lstd = ax.axhline(avg-std, 
-                   color=s['std']['color'], linestyle='dashed')
+                          color=s['avg']['color'])
+        lstd_u = ax.axhline(avg+std, label='1$\sigma$ deviation',
+                            color=s['std']['color'], linestyle='dashed')
+        lstd_d = ax.axhline(avg-std, 
+                            color=s['std']['color'], linestyle='dashed')
 
-        # all methods
-        ax.scatter(x, self)
-        ax.errorbar(x,self, yerr=self.error, linestyle='')
+        # All values
+        for i,m in enumerate(np.unique(self.method)):
+            cur=np.where(np.asarray(self.method)==m)
+            fcol='none'
+            print(s[m])
+            ax.scatter(x[cur], np.asarray(self)[cur], label=m, 
+                       marker=s[m]['marker'],
+                       s=80, 
+                       facecolors=fcol,
+                       edgecolors=s[m]['color'] )
+            ax.errorbar(x[cur], np.asarray(self)[cur],
+                    yerr=np.asarray(self.error)[cur],
+                    c=s[m]['color'], linestyle='')
 
-        # axes
+        # Axes and Legend
         #ax.set_ylabel(ylabels[par])
         ax.set_xticks(x)
-
-        # Legend
-        ax.legend(loc='best',ncol=2)
-
-
-        # place shortbib on top for quick identification 
         axtop = ax.twiny()
         axtop.set_xticks(x)
         axtop.set_xticklabels(self.shortbib, rotation=25, ha='left') 
+        ax.legend(loc='best',ncol=2)
 
         # Histogram
         range=ax.get_ylim()
@@ -369,10 +369,22 @@ class listParameter(list):
                 orientation='horizontal', color='grey', label='All')
 
         ax_histy.legend(loc='lower right')
-
-
-
         return fig, ax
+
+
+    def hist(self, nbins=10):
+        '''Create histogram figure for float parameters'''
+
+        fig = plt.figure(figsize=(8, 6))
+        na, ba, pa = plt.hist(self, bins=nbins, label='Estimates')
+        avg, std = self.weighted_average()
+        plt.errorbar(avg, 0.5, xerr=std, label='Average', marker='o')
+        plt.legend(loc='upper right')
+        plt.xlabel('Distribution')
+        return fig
+
+
+
 
 
 def many_rocks(ids, properties, parallel=4, progress=True, verbose=False):
