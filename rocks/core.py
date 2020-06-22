@@ -119,7 +119,7 @@ class Rock:
         # Set attributes using datacloud
         data_ = tools.get_data(self.name)
 
-        if data_ is False:
+        if data_ is False:  # failed SsODNet query
             warnings.warn(f'Could not retrieve data for ({self.number}) '
                           f'{self.name}.')
             return
@@ -130,6 +130,12 @@ class Rock:
                 continue
 
             data = data_.copy()
+
+            if data['datacloud'] is None:  # failed datacloud query
+                warnings.warn(f'Could not retrieve data for ({self.number}) '
+                              f'{self.name}. Datacloud might be unavailable.')
+                return
+
             for key in setup['ssodnet_path']:
                 data = data[key] if key in data.keys() else {}
 
