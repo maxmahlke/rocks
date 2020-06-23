@@ -331,12 +331,10 @@ class listParameter(list):
 
         # Scatter plot:
         # Average and deviation of the mean
-        lavg = ax.axhline(avg, label='Average',
-                          color=s['avg']['color'])
-        lstd_u = ax.axhline(avg+std, label='1$\sigma$ deviation',
+        ax.axhline(avg, label='Average', color=s['avg']['color'])
+        ax.axhline(avg+std, label='1$\sigma$ deviation',
                             color=s['std']['color'], linestyle='dashed')
-        lstd_d = ax.axhline(avg-std, 
-                            color=s['std']['color'], linestyle='dashed')
+        ax.axhline(avg-std, color=s['std']['color'], linestyle='dashed')
 
         # All values
         for i,m in enumerate(np.unique(self.method)):
@@ -365,7 +363,7 @@ class listParameter(list):
         nbins=10
         ax_histy.tick_params(axis="y", labelleft=False)
 
-        na, ba, pa = ax_histy.hist(self, bins=nbins, range=range,
+        ax_histy.hist(self, bins=nbins, range=range,
                 orientation='horizontal', color='grey', label='All')
 
         ax_histy.legend(loc='lower right')
@@ -376,7 +374,7 @@ class listParameter(list):
         '''Create histogram figure for float parameters'''
 
         fig = plt.figure(figsize=(8, 6))
-        na, ba, pa = plt.hist(self, bins=nbins, label='Estimates')
+        plt.hist(self, bins=nbins, label='Estimates')
         avg, std = self.weighted_average()
         plt.errorbar(avg, 0.5, xerr=std, label='Average', marker='o')
         plt.legend(loc='upper right')
