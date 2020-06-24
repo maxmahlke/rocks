@@ -24,49 +24,6 @@ from rocks import tools
 
 import matplotlib.pyplot as plt
 
-# Define colors/markers for all methods in ssodnet
-s={'avg':{'color':'black'},
-   'std':{'color':'darkgrey'},
-  #-Space mission
-   'SPACE':{'color':'gold', 'marker':'X'}, 
-  #-3d shape modeling
-   'ADAM':{'color':'navy', 'marker':'v'}, 
-   'SAGE':{'color':'mediumblue', 'marker':'^'}, 
-   'KOALA':{'color':'slateblue', 'marker':'<'}, 
-   'Radar':{'color':'cornflowerblue', 'marker':'>'}, 
-  #-LC with scaling
-   'LC+OCC':{'color':'lightgreen', 'marker':'v'}, 
-   'LC+AO':{'color':'forestgreen', 'marker':'^'},  #deprecated =LC+IM
-   'LC+IM':{'color':'forestgreen', 'marker':'^'}, 
-   'LC+TPM':{'color':'darkgreen', 'marker':'<'}, 
-   'LC-TPM':{'color':'green', 'marker':'>'}, 
-  #-Thermal models
-   'STM':{'color':'grey', 'marker':'D'}, 
-   'NEATM':{'color':'grey', 'marker':'o'}, 
-   'TPM':{'color':'darkgrey', 'marker':'s'}, 
-  #-triaxial ellipsoid
-   'TE-IM':{'color':'blue', 'marker':'o'},
-  #-2d on sky
-   'OCC':{'color':'brown', 'marker':'P'}, 
-   'IM':{'color':'orange', 'marker':'p'}, 
-   'IM-PSF':{'color':'tomato', 'marker':'H'}, 
-  #-Mass from binary
-   'Bin-IM':{'color':'navy', 'marker':'v'}, 
-   'Bin-Genoid':{'color':'mediumblue', 'marker':'^'}, 
-   'Bin-PheMu':{'color':'slateblue', 'marker':'<'}, 
-   'Bin-Radar':{'color':'cornflowerblue', 'marker':'>'}, 
-  #-Mass from deflection
-   'DEFLECT':{'color':'brown', 'marker':'D'}, 
-   'EPHEM':{'color':'red', 'marker':'o'}, 
-  #-Taxonomy
-   'Phot':{'color':'red', 'marker':'s'}, 
-   'Spec':{'color':'red', 'marker':'s'}, 
-   }
-
-ylabels={'diameter': 'Diameter (km)',
-         'mass': 'Mass (kg)', 
-         'albedo': 'Albedo'}
-
 
 class Rock:
     'For space rocks. Instance for accessing the SsODNet:SSOCard'
@@ -332,24 +289,24 @@ class listParameter(list):
 
         # Scatter plot:
         # Average and deviation of the mean
-        ax.axhline(avg, label='Average', color=s['avg']['color'])
+        ax.axhline(avg, label='Average', color=tools.METHODS['avg']['color'])
         ax.axhline(avg+std, label='1$\sigma$ deviation',
-                            color=s['std']['color'], linestyle='dashed')
-        ax.axhline(avg-std, color=s['std']['color'], linestyle='dashed')
+                            color=tools.METHODS['std']['color'], linestyle='dashed')
+        ax.axhline(avg-std, color=tools.METHODS['std']['color'], linestyle='dashed')
 
         # All values
         for i,m in enumerate(np.unique(self.method)):
             cur=np.where(np.asarray(self.method)==m)
             fcol='none'
-            print(s[m])
+            # print(s[m])
             ax.scatter(x[cur], np.asarray(self)[cur], label=m, 
-                       marker=s[m]['marker'],
+                       marker=tools.METHODS[m]['marker'],
                        s=80, 
                        facecolors=fcol,
-                       edgecolors=s[m]['color'] )
+                       edgecolors=tools.METHODS[m]['color'] )
             ax.errorbar(x[cur], np.asarray(self)[cur],
                     yerr=np.asarray(self.error)[cur],
-                    c=s[m]['color'], linestyle='')
+                    c=tools.METHODS[m]['color'], linestyle='')
 
         # Axes and Legend
         #ax.set_ylabel(ylabels[par])

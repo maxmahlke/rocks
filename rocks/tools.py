@@ -378,7 +378,6 @@ def weighted_average(observable, error):
 
     # Compute normalized weights
     weights = 1 / np.array(error)**2
-    #weights = weights / sum(weights)
 
     # Compute weighted average and uncertainty
     avg = np.average(observable, weights=weights)
@@ -400,3 +399,164 @@ except FileNotFoundError:
     click.echo('Asteroid index could not be found. '
                'Run "rocks index" first.')
     sys.exit()
+
+# ------
+# Measurement Methods Defintions
+METHODS = {
+
+    'avg': {
+        'color': 'black'
+    },
+
+    'std': {
+        'color': 'darkgrey'
+    },
+
+    # Space mission
+    'SPACE': {
+        'color': 'gold',
+        'marker': 'X'
+    },
+
+    # 3d shape modeling
+    'ADAM': {
+        'color': 'navy',
+        'marker': 'v'
+    },
+
+    'SAGE': {
+        'color': 'mediumblue',
+        'marker': '^'
+    },
+
+    'KOALA': {
+        'color': 'slateblue',
+        'marker': '<'
+    },
+
+    'Radar': {
+        'color': 'cornflowerblue',
+        'marker': '>'
+    },
+
+    # LC with scaling
+    'LC+OCC': {
+        'color': 'lightgreen',
+        'marker': 'v'
+    },
+
+    'LC+AO': {
+        'color': 'forestgreen',
+        'marker': '^'
+    },  # deprecated =LC+IM
+
+    'LC+IM': {
+        'color': 'forestgreen',
+        'marker': '^'
+    },
+
+    'LC+TPM': {
+        'color': 'darkgreen',
+        'marker': '<'
+    },
+
+    'LC-TPM': {
+        'color': 'green',
+        'marker': '>'
+    },
+
+    # Thermal models
+    'STM': {
+        'color': 'grey',
+        'marker': 'D'
+    },
+
+    'NEATM': {
+        'color': 'grey',
+        'marker': 'o'
+    },
+
+    'TPM': {
+        'color': 'darkgrey',
+        'marker': 's'
+    },
+
+    # triaxial ellipsoid
+    'TE-IM': {
+        'color': 'blue',
+        'marker': 'o'
+    },
+
+    # 2d on sky
+    'OCC': {
+        'color': 'brown',
+        'marker': 'P'
+    },
+
+    'IM': {
+        'color': 'orange',
+        'marker': 'p'
+    },
+
+    'IM-PSF': {
+        'color': 'tomato',
+        'marker': 'H'
+    },
+
+    # Mass from binary
+    'Bin-IM': {
+        'color': 'navy',
+        'marker': 'v'
+    },
+
+    'Bin-Genoid': {
+        'color': 'mediumblue',
+        'marker': '^'
+    },
+
+    'Bin-PheMu': {
+        'color': 'slateblue',
+        'marker': '<'
+    },
+
+    'Bin-Radar': {
+        'color': 'cornflowerblue',
+        'marker': '>'
+    },
+
+    # Mass from deflection
+    'DEFLECT': {
+        'color': 'brown',
+        'marker': 'D'
+    },
+
+    'EPHEM': {
+        'color': 'red',
+        'marker': 'o'
+    },
+
+    # Taxonomy
+    'Phot': {
+        'color': 'red',
+        'marker': 's'
+    },
+
+    'Spec': {
+        'color': 'red',
+        'marker': 's'
+    },
+
+}
+
+
+# ------
+# Plotting definitions
+PLOTTING = {
+
+    'LABELS': {
+
+        'diameter': 'Diameter (km)',
+        'mass': 'Mass (kg)',
+        'albedo': 'Albedo',
+    }
+}
