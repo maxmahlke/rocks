@@ -11,6 +11,7 @@
 from concurrent.futures import ProcessPoolExecutor as Pool
 from functools import partial
 import keyword
+from multiprocessing import cpu_count
 import warnings
 
 import numpy as np
@@ -385,9 +386,8 @@ class listParameter(list):
 
 
 
-
-
-def many_rocks(ids, properties, parallel=4, progress=True, verbose=False):
+def many_rocks(ids, properties, parallel=cpu_count(),
+               progress=True, verbose=False):
     '''Get Rock instances with a subset of properties for many asteroids.
 
     Queries SsODNet datacloud. Can be passed a list of identifiers.
@@ -400,7 +400,7 @@ def many_rocks(ids, properties, parallel=4, progress=True, verbose=False):
     properties : list of str
         Asteroid properties to get.
     parallel : int
-        Number of jobs to use for queries. Default is 4.
+        Number of jobs to use for queries. Default is number of CPUs available.
     progress : bool
         Show progress. Default is True.
     verbose : bool
