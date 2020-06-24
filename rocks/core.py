@@ -198,6 +198,8 @@ class stringParameter(str):
     def __init__(self, data, prop):
         str.__init__(data[prop])
 
+        self.__name__ = prop
+
         for key, value in data.items():
 
             kw = key if not keyword.iskeyword(key) else key + '_'
@@ -216,6 +218,8 @@ class floatParameter(float):
     def __init__(self, data, prop):
         float.__init__(data[prop])
 
+        self.__name__ = prop
+
         for key, value in data.items():
 
             kw = key if not keyword.iskeyword(key) else key + '_'
@@ -228,6 +232,7 @@ class listParameter(list):
     def __init__(self, data, prop, type_):
         list.__init__(self, [type_(d[prop]) for d in data])
 
+        self.__name__ = prop
         self.datatype = type_
 
         for key in data[0].keys():
