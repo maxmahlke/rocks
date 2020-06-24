@@ -272,7 +272,7 @@ class listParameter(list):
 
         return tools.weighted_average(observable, error)
 
-    def scatter(self):
+    def scatter(self, show=False):
         '''Create scatter/histogram figure for float parameters'''
 
         # X Axis and Average
@@ -325,10 +325,16 @@ class listParameter(list):
                 orientation='horizontal', color='grey', label='All')
 
         ax_histy.legend(loc='lower right')
+
+        if show:
+            plt.show()
+            plt.close()
+            return
+
         return fig, ax
 
 
-    def hist(self, nbins=10):
+    def hist(self, nbins=10, show=False):
         '''Create histogram figure for float parameters'''
 
         fig = plt.figure(figsize=(8, 6))
@@ -337,8 +343,13 @@ class listParameter(list):
         plt.errorbar(avg, 0.5, xerr=std, label='Average', marker='o')
         plt.legend(loc='upper right')
         plt.xlabel('Distribution')
-        return fig
 
+        if show:
+            plt.show()
+            plt.close()
+            return
+
+        return fig
 
 
 def many_rocks(ids, properties, parallel=cpu_count(),

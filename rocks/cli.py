@@ -14,7 +14,7 @@ import webbrowser
 
 import click
 
-from rocks.core import Rock
+from rocks.core import listParameter, Rock
 from rocks import names
 from rocks.properties import PROPERTIES as PROPS
 from rocks import tools
@@ -39,11 +39,37 @@ class AliasedGroup(click.Group):
         if cmd_name not in valid_props:
             return None
 
-        if len(sys.argv) > 3:
+        # Parse arguments
+        args = sys.argv[1:]
+
+        for i, arg in enumerate(args):
+
+            if arg in ['-s', '--scatter']:
+                args.pop(i)
+                scatter = True
+                break
+        else:
+            scatter = False
+
+        for i, arg in enumerate(args):
+
+            if arg in ['-h', '--hist']:
+                args.pop(i)
+                hist = True
+                break
+        else:
+            hist = False
+
+        if len(args) > 2:
             raise TooManyRocksError('Provide one or no asteroid identifiers.')
+        elif len(args) == 2:
+            property_, name = args
+        elif len(args) == 1:
+            property_ = args[0]
+            name = False
 
         # Perform property query
-        return echo_property(*sys.argv[1:])
+        return echo_property(property_, name, scatter=scatter, hist=hist)
 
 
 @click.group(cls=AliasedGroup)
@@ -173,7 +199,7 @@ def status():
         print(r'[bold red]Datacloud is not available.[\bold red]')
 
 
-def echo_property(property_, name=False):
+def echo_property(property_, name=False, scatter=False, hist=False):
     '''Echo asteroid property for a single minor body.
 
     Queries SsODNet:datacloud with the string input. If no identifier is
@@ -185,6 +211,10 @@ def echo_property(property_, name=False):
         Asteroid property from properites.PROPERTIES.keys()
     name : str
         Asteroid name, optional
+    scatter : bool, otional
+        Show scatter plot of floatParameter proptery. Default if False.
+    hist : bool, otional
+        Show histogram plot of floatParameter proptery. Default if False.
     '''
     if name is False:
         name, _ = tools.select_sso_from_index()
@@ -193,6 +223,25 @@ def echo_property(property_, name=False):
 
     if hasattr(SSO, property_):
         tools.pretty_print(SSO, property_)
+
+        property_ = getattr(SSO, property_)
+
+        if hist or scatter:
+
+            if not isinstance(property_, listParameter):
+                click.echo('\nPlotting is only implemented for property'
+                           ' collections.')
+                sys.exit()
+
+            if property_.datatype is not float:
+                click.echo('\nCan only plot properties of type float.')
+                sys.exit()
+
+            if hist:
+                property_.hist(show=True)
+            if scatter:
+                property_.scatter(show=True)
+
     sys.exit()  # otherwise click prints Error
 
 
