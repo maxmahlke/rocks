@@ -418,7 +418,7 @@ METHODS = {
         'marker': 'X'
     },
 
-    # 3d shape modeling
+    # 3D shape modeling
     'ADAM': {
         'color': 'navy',
         'marker': 'v'
@@ -481,13 +481,13 @@ METHODS = {
         'marker': 's'
     },
 
-    # triaxial ellipsoid
+    # Triaxial ellipsoid
     'TE-IM': {
         'color': 'blue',
         'marker': 'o'
     },
 
-    # 2d on sky
+    # 2D on sky
     'OCC': {
         'color': 'brown',
         'marker': 'P'
