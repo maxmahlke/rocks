@@ -277,59 +277,51 @@ class listParameter(list):
 
         return tools.weighted_average(observable, error)
 
-    def scatter(self, show=False):
+    def scatter(self, nbins=10, show=False, savefig=None):
         '''Create scatter/histogram figure for float parameters'''
 
-        # X Axis and Average
-        n=len(self)
-        x=np.linspace(1,n,n)
-        avg, std = self.weighted_average()
-
-        # Figure layout
         fig = plt.figure(figsize=(12, 8))
         gs = fig.add_gridspec(1, 2, width_ratios=(7, 2), wspace=0.05, 
                               left=0.07, right=0.97, bottom=0.05, top=0.87)
         ax = fig.add_subplot(gs[0])
         ax_histy = fig.add_subplot(gs[1], sharey=ax)
 
-        # Scatter plot:
-        # Average and deviation of the mean
+        avg, std = self.weighted_average()
         ax.axhline(avg, label='Average', color=tools.METHODS['avg']['color'])
-        ax.axhline(avg+std, label='1$\sigma$ deviation',
-                            color=tools.METHODS['std']['color'], linestyle='dashed')
-        ax.axhline(avg-std, color=tools.METHODS['std']['color'], linestyle='dashed')
+        ax.axhline(avg+std, label='1$\sigma$ deviation', linestyle='dashed',
+                            color=tools.METHODS['std']['color'])
+        ax.axhline(avg-std, linestyle='dashed',
+                            color=tools.METHODS['std']['color'])
 
-        # All values
+        x=np.linspace(1,len(self),len(self))
         for i,m in enumerate(np.unique(self.method)):
             cur=np.where(np.asarray(self.method)==m)
             fcol='none'
-            # print(s[m])
             ax.scatter(x[cur], np.asarray(self)[cur], label=m, 
                        marker=tools.METHODS[m]['marker'],
                        s=80, 
                        facecolors=fcol,
                        edgecolors=tools.METHODS[m]['color'] )
             ax.errorbar(x[cur], np.asarray(self)[cur],
-                    yerr=np.asarray(self.error)[cur],
-                    c=tools.METHODS[m]['color'], linestyle='')
+                        yerr=np.asarray(self.error)[cur],
+                        c=tools.METHODS[m]['color'], linestyle='')
 
-        # Axes and Legend
-        #ax.set_ylabel(ylabels[par])
         ax.set_xticks(x)
         axtop = ax.twiny()
         axtop.set_xticks(x)
         axtop.set_xticklabels(self.shortbib, rotation=25, ha='left') 
+        ax.set_ylabel(tools.PLOTTING['LABELS'][self.__name__])
         ax.legend(loc='best',ncol=2)
 
-        # Histogram
         range=ax.get_ylim()
-        nbins=10
         ax_histy.tick_params(axis="y", labelleft=False)
-
         ax_histy.hist(self, bins=nbins, range=range,
                 orientation='horizontal', color='grey', label='All')
-
         ax_histy.legend(loc='lower right')
+
+        if savefig is not None:
+            fig.savefig(savefig)
+            return
 
         if show:
             plt.show()
@@ -339,7 +331,7 @@ class listParameter(list):
         return fig, ax
 
 
-    def hist(self, nbins=10, show=False):
+    def hist(self, nbins=10, show=False, savefig=None):
         '''Create histogram figure for float parameters'''
 
         fig = plt.figure(figsize=(8, 6))
@@ -347,7 +339,12 @@ class listParameter(list):
         avg, std = self.weighted_average()
         plt.errorbar(avg, 0.5, xerr=std, label='Average', marker='o')
         plt.legend(loc='upper right')
-        plt.xlabel('Distribution')
+        plt.xlabel(tools.PLOTTING['LABELS'][self.__name__])
+        plt.ylabel('Distribution')
+
+        if savefig is not None:
+            fig.savefig(savefig)
+            return
 
         if show:
             plt.show()
