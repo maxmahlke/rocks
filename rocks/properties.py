@@ -235,6 +235,13 @@ PROPERTIES = {
         'type': float,
     },
 
+    'H': {
+        'attribute': 'H',
+        'ssodnet_path': ['datacloud', 'astdys'],
+        'selection': lambda x, _: x[0],  # do nothing
+        'type': float,
+    },
+
     'eccentricity': {
         'attribute': 'Eccentricity',
         'ssodnet_path': ['datacloud', 'astorb'],
