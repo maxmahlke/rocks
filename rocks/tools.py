@@ -251,6 +251,17 @@ def echo_response(response, mime):
         click.echo(response.text)
 
 
+def get_ssocard():
+    """Placeholder function, currently just returns local
+    Ceres json file"""
+
+    path_to_card = '/home/max/astro/rocks/tests/data/Ceres_ssoCard.json'
+
+    with open(path_to_card, 'r') as card_file:
+        card = json.load(card_file)
+    return card
+
+
 def pretty_print(SSO, property_name):
     '''Pretty-print asteroid property to console.
 

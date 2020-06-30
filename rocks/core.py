@@ -61,7 +61,7 @@ class Rock:
             identifier,
             parallel=1,
             progress=False,
-            verbose=False
+            verbose=False,
         )
 
         if not isinstance(self.name, str):
@@ -81,6 +81,42 @@ class Rock:
             warnings.warn(f'Could not retrieve data for ({self.number}) '
                           f'{self.name}.')
             return
+
+        # --- SSOCARD BEGIN
+        # Build rock from ssoCard
+        card = tools.get_ssocard()
+
+        # Walk through ssocard, add parameters and attributes (units, errors)
+        for key, value in card.items():
+
+            if key in properties.DONT_INCLUDE:
+                continue
+
+            if isinstance(value, str):
+
+                # Lookup property setup in rocks definitions
+                try:
+                    setup = properties.PROPERTIES[key]
+                except KeyError:
+                    warnings.warn(f'Unrecognized parameter {key} in ssoCard.')
+                    continue
+
+                prop_name = setup['attr_name']
+                # Catch python-keywords
+                prop_name = prop_name if not keyword.iskeyword(prop_name)\
+                    else prop_name + '_'
+
+                if setup['type'] is float:
+                    setattr(self, prop_name, floatParameter(float(value)))
+
+                elif setup['type'] is str:
+                    setattr(self, prop_name, stringParameter(value))
+
+                # add __name__ attribute to property
+                setattr(getattr(self, prop_name), '__name__', prop_name)
+        return
+
+        # --- SSOCARD END
 
         for prop, setup in properties.PROPERTIES.items():
 
@@ -189,41 +225,24 @@ class Rock:
 class stringParameter(str):
     '''For asteroid parameters which are strings, e.g. taxonomy.'''
 
-    def __new__(self, data, prop=False):
-        if prop is False:
-            return str.__new__(self, data)
-        else:
-            return str.__new__(self, data[prop])
+    def __new__(self, value):
+        return str.__new__(self, value)
 
-    def __init__(self, data, prop):
-        str.__init__(data[prop])
-
-        self.__name__ = prop
-
-        for key, value in data.items():
-
-            kw = key if not keyword.iskeyword(key) else key + '_'
-            setattr(self, kw, value)
+    def __init__(self, value):
+        str.__init__(value)
 
 
 class floatParameter(float):
-    '''For asteroid parameters which are floats, e.g. albedo.'''
+    '''For asteroid parameters which are floats, e.g. albedo.
 
-    def __new__(self, data, prop=False):
-        if prop is False:
-            return float.__new__(self, data)
-        else:
-            return float.__new__(self, data[prop])
+    Allows to assign attributes.
+    '''
 
-    def __init__(self, data, prop):
-        float.__init__(data[prop])
+    def __new__(self, value):
+        return float.__new__(self, value)
 
-        self.__name__ = prop
-
-        for key, value in data.items():
-
-            kw = key if not keyword.iskeyword(key) else key + '_'
-            setattr(self, kw, value)
+    def __init__(self, value):
+        float.__init__(value)
 
 
 class listParameter(list):

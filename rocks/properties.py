@@ -222,70 +222,89 @@ PROPERTIES = {
     #                 (to be replaced by ssoCard
     #   type: asteroid property type, float or str
 
-    'albedo': {
-        'attribute': 'albedo',
-        'collection': 'albedos',
-        'extra_columns': [],
-        'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
-                    ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
-                    ['AO', 'Occ', 'IM'],
-                    ['NEATM'], ['STM']],
-        'selection': select_numeric_property,
-        'ssodnet_path': ['datacloud', 'diamalbedo'],
-        'type': float,
-    },
-
-    'eccentricity': {
-        'attribute': 'Eccentricity',
-        'ssodnet_path': ['datacloud', 'astorb'],
-        'selection': lambda x, _: x[0],  # do nothing
-        'type': float,
-    },
-
-    'diameter': {
-        'attribute': 'diameter',
-        'collection': 'diameters',
-        'extra_columns': [],
-        'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
-                    ['LC+TPM', 'LC-TPM', 'TPM', 'LC+AO', 'LC+IM',
-                     'LC+Occ', 'TE-IM'],
-                    ['AO', 'Occ', 'IM'],
-                    ['NEATM'], ['STM']],
-        'selection': select_numeric_property,
-        'ssodnet_path': ['datacloud', 'diamalbedo'],
-        'type': float,
-    },
-
-    'mass': {
-        'attribute': 'mass',
-        'collection': 'masses',
-        'extra_columns': [],
-        'ranking': [['SPACE'], ['Bin-Genoid'],
-                    ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
-                    ['EPHEM', 'DEFLECT']],
-        'selection': select_numeric_property,
-        'ssodnet_path': ['datacloud', 'masses'],
-        'type': float,
-    },
-
-    'semimajoraxis': {
-        'attribute': 'SemimajorAxis',
-        'ssodnet_path': ['datacloud', 'astorb'],
-        'selection': lambda x, _: x[0],  # do nothing
-        'type': float,
-    },
-
-    'taxonomy': {
-        'attribute': 'class',
-        'collection': 'taxonomies',
-        'extra_columns': ['scheme', 'waverange'],
-        'selection': select_taxonomy,
-        'ssodnet_path': ['datacloud', 'taxonomy'],
+    'type': {
+        'attr_name': 'type',
         'type': str,
     },
 
+    'class': {
+        'attr_name': 'class',
+        'type': str,
+    },
+
+    'parent': {
+        'attr_name': 'parent',
+        'type': str,
+    },
+
+    'system': {
+        'attr_name': 'system',
+        'type': str,
+    },
 
 }
+
+    # 'albedo': {
+        # 'attribute': 'albedo',
+        # 'collection': 'albedos',
+        # 'extra_columns': [],
+        # 'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                    # ['LC+TPM', 'TPM', 'LC+AO', 'LC+Occ', 'TE-IM'],
+                    # ['AO', 'Occ', 'IM'],
+                    # ['NEATM'], ['STM']],
+        # 'selection': select_numeric_property,
+        # 'ssodnet_path': ['datacloud', 'diamalbedo'],
+        # 'type': float,
+    # },
+
+    # 'eccentricity': {
+        # 'attribute': 'Eccentricity',
+        # 'ssodnet_path': ['datacloud', 'astorb'],
+        # 'selection': lambda x, _: x[0],  # do nothing
+        # 'type': float,
+    # },
+
+    # 'diameter': {
+        # 'attribute': 'diameter',
+        # 'collection': 'diameters',
+        # 'extra_columns': [],
+        # 'ranking': [['SPACE'], ['ADAM', 'KOALA', 'SAGE', 'Radar'],
+                    # ['LC+TPM', 'LC-TPM', 'TPM', 'LC+AO', 'LC+IM',
+                     # 'LC+Occ', 'TE-IM'],
+                    # ['AO', 'Occ', 'IM'],
+                    # ['NEATM'], ['STM']],
+        # 'selection': select_numeric_property,
+        # 'ssodnet_path': ['datacloud', 'diamalbedo'],
+        # 'type': float,
+    # },
+
+    # 'mass': {
+        # 'attribute': 'mass',
+        # 'collection': 'masses',
+        # 'extra_columns': [],
+        # 'ranking': [['SPACE'], ['Bin-Genoid'],
+                    # ['Bin-IM', 'Bin-Radar', 'Bin-PheMu'],
+                    # ['EPHEM', 'DEFLECT']],
+        # 'selection': select_numeric_property,
+        # 'ssodnet_path': ['datacloud', 'masses'],
+        # 'type': float,
+    # },
+
+    # 'semimajoraxis': {
+        # 'attribute': 'SemimajorAxis',
+        # 'ssodnet_path': ['datacloud', 'astorb'],
+        # 'selection': lambda x, _: x[0],  # do nothing
+        # 'type': float,
+    # },
+
+    # 'taxonomy': {
+        # 'attribute': 'class',
+        # 'collection': 'taxonomies',
+        # 'extra_columns': ['scheme', 'waverange'],
+        # 'selection': select_taxonomy,
+        # 'ssodnet_path': ['datacloud', 'taxonomy'],
+        # 'type': str,
+    # },
 
 
 # Classes to complexes mapping
@@ -318,3 +337,6 @@ CLASS_TO_COMPLEX = {
     'PD': 'P',
     'P': 'P', 'PC': 'P',
 }
+
+# Don't parse these ssoCard properties
+DONT_INCLUDE = ['id', 'name', 'quaero_link', 'structure', 'datacloud']
