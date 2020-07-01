@@ -325,7 +325,7 @@ CLASS_TO_COMPLEX = {
     'SG': 'U', 'Sk': 'S', 'Sl': 'S', 'SMU': 'U', 'SO': 'S', 'Sq': 'S', 'SQ': 'S',
     'Sqw': 'S', 'Sr': 'S', 'SR': 'S', 'Srw': 'S',
     'ST': 'U', 'STD': 'U', 'STGD': 'U', 'STU': 'U', 'SU': 'U',
-    'SV': 'S', 'Sv': 'S', 'Svw': 'S', 'Sw': 'S',
+    'SV': 'S', 'Sv': 'S', 'Svw': 'S', 'Sw': 'S', 'SX': 'U', 
     'T': 'T', 'TCG': 'U', 'TD': 'U', 'TDG': 'U', 'TDS': 'U', 'TS': 'U', 'TSD': 'U',
     'TX': 'U',
     'V': 'V', 'Vw': 'V',
