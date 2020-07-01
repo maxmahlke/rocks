@@ -122,6 +122,8 @@ def _lookup_or_query(sso, verbose=False):
             # Try local lookup
             if sso in tools.NUMBER_NAME.keys():
                 return (tools.NUMBER_NAME[sso], sso)
+            else:
+                return _query_quaero(sso, verbose)
 
         # Asteroid name
         if re.match(r'^[A-Za-z]*$', sso):
@@ -202,7 +204,7 @@ def _query_quaero(sso, verbose=False):
     j = r.json()
 
     # No match found
-    if 'data' not in j.keys():
+    if 'data' not in j.keys():  # pragma: no cover
         if verbose:
             print(f'Could not find data for identifier {sso}.')
             print(r.url)
