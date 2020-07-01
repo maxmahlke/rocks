@@ -1,13 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-    Author: Max Mahlke
-    Date: 02 June 2020
-
-    Core class of rocks package
-
-    Call as:	rocks
-'''
+"""
+    Core functionality of rocks package
+"""
 from concurrent.futures import ProcessPoolExecutor as Pool
 from functools import partial
 import keyword
@@ -26,10 +21,10 @@ import matplotlib.pyplot as plt
 
 
 class Rock:
-    'For space rocks. Instance for accessing the SsODNet:SSOCard'
+    """For space rocks. Instance for accessing the SsODNet:SSOCard."""
 
     def __init__(self, identifier, only=[]):
-        '''Identify an asteroid and retrieve its properties from SsODNet.
+        """Identify an asteroid and retrieve its properties from SsODNet.
 
         Parameters
         ----------
@@ -52,10 +47,10 @@ class Rock:
         Example
         -------
         >>> from rocks.core import Rock
-        >>> Ceres = Rock('ceres')
-        >>> Ceres.taxonomy
+        >>> ceres = Rock('ceres')
+        >>> ceres.taxonomy
         'C'
-        '''
+        """
 
         self.name, self.number = names.get_name_number(
             identifier,
@@ -71,8 +66,8 @@ class Rock:
             raise TypeError(f'Type of "only" is {type(only)}, '
                             f'excpeted list.')
         if not all(isinstance(param, str) for param in only):
-            raise ValueError('List of requested properties can only '
-                             'contain str.')
+            raise TypeError('List of requested properties can only '
+                            'contain str.')
 
         # Set attributes using datacloud
         data_ = tools.get_data(self.name)
