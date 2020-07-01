@@ -293,6 +293,7 @@ class listParameter(list):
         ax.axhline(avg-std, linestyle='dashed',
                             color=tools.METHODS['std']['color'])
 
+
         x=np.linspace(1,len(self),len(self))
         for i,m in enumerate(np.unique(self.method)):
             cur=np.where(np.asarray(self.method)==m)
