@@ -237,7 +237,7 @@ PROPERTIES = {
 
     'H': {
         'attribute': 'H',
-        'ssodnet_path': ['datacloud', 'astdys'],
+        'ssodnet_path': ['datacloud', 'mpcorb'],
         'selection': lambda x, _: x[0],  # do nothing
         'type': float,
     },

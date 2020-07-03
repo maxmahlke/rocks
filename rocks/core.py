@@ -163,22 +163,22 @@ class Rock:
     def __lt__(self, other):
         if self.__class__ is other.__class__:
             return (self.number, self.name) < (other.number, other.name)
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     def __le__(self, other):
         if self.__class__ is other.__class__:
             return (self.number, self.name) <= (other.number, other.name)
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     def __gt__(self, other):
         if self.__class__ is other.__class__:
             return (self.number, self.name) > (other.number, other.name)
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
     def __ge__(self, other):
         if self.__class__ is other.__class__:
             return (self.number, self.name) >= (other.number, other.name)
-        return NotImplemented
+        return NotImplemented  # pragma: no cover
 
 
 class stringParameter(str):
@@ -232,10 +232,8 @@ class listParameter(list):
 
         for key in data[0].keys():
 
-            # Catches python-keywords
             kw = key if not keyword.iskeyword(key) else key + '_'
 
-            # "err_property" -> err
             if kw == f'err_{prop}':
                 kw = 'error'
 
