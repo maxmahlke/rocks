@@ -322,11 +322,6 @@ def pretty_print(SSO, property_name):
                 footer='unit' if c in [property_name, 'error'] else '',
             )
 
-        # find column indices of preferred solution
-        preferred_solution = getattr(SSO, property_singular).index_selection
-        preferred_solution = [range(len(property_value))[i]
-                              for i in preferred_solution]
-
         # ------
         # add rows by evaluating values
         for i, p in enumerate(property_value):
@@ -350,7 +345,7 @@ def pretty_print(SSO, property_name):
                     values.append(f'{value:{formatting}}')
 
                 # Bold print row if it belongs to the preferred solution
-                if i in preferred_solution:
+                if property_value.selected[i]:
                     values = [f'[bold green]{v}[\bold green]' for v in values]
 
             table.add_row(*values)

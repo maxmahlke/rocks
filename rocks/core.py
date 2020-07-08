@@ -112,6 +112,13 @@ class Rock:
                 except KeyError:
                     pass  # not all properties have errors
 
+            # Select or aggegrate property values - to be replaced by ssocard
+            data = setup['selection'](data, prop_name_ssodnet)
+
+            # Data is sometimes list of dicts, sometimes dict. Make uniform.
+            if not isinstance(data, list):
+                data = [data]
+
             # Set collection properties (eg masses, taxonomies)
             if 'collection' in setup.keys():
                 setattr(
@@ -130,7 +137,7 @@ class Rock:
                     self,
                     prop,
                     floatParameter(
-                        setup['selection'](data, prop_name_ssodnet),
+                        data[-1],  # last entry is aggregated value
                         prop_name_ssodnet,
                     ),
                 )
@@ -140,7 +147,7 @@ class Rock:
                     self,
                     prop,
                     stringParameter(
-                        setup['selection'](data),
+                        [d for d in data if d['selected']][0],
                         prop_name_ssodnet,
                     ),
                 )
@@ -225,6 +232,10 @@ class listParameter(list):
     '''For several measurements of a single parameters of any type.'''
 
     def __init__(self, data, prop, type_):
+
+        if type_ is float:
+            data = data[:-1]  # last entry is merged value
+
         list.__init__(self, [type_(d[prop]) for d in data])
 
         self.__name__ = prop
@@ -241,7 +252,8 @@ class listParameter(list):
             values = [d[key] for d in data]
 
             try:
-                values = [float(v) for v in values]
+                if not isinstance(values[0], bool):  # keep booleans
+                    values = [float(v) for v in values]
             except ValueError:
                 pass
 
@@ -380,10 +392,17 @@ def many_rocks(ids, properties, parallel=cpu_count(),
     build_rock = partial(Rock, only=properties)
 
     # Create Rocks
-    pool = Pool(max_workers=parallel)
-    if progress:
-        rocks = list(track(pool.map(build_rock, ids), total=len(ids),
-                           description='Building Rocks...'))
+    if parallel > 1:
+        pool = Pool(max_workers=parallel)
+        if progress:
+            rocks = list(track(pool.map(build_rock, ids), total=len(ids),
+                               description='Building Rocks...'))
+        else:
+            rocks = list(pool.map(build_rock, ids))
     else:
-        rocks = list(pool.map(build_rock, ids))
+        if progress:
+            rocks = list(track(map(build_rock, ids), total=len(ids),
+                               description='Building Rocks...'))
+        else:
+            rocks = list(map(build_rock, ids))
     return rocks

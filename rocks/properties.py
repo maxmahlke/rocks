@@ -133,10 +133,8 @@ def select_taxonomy(taxa, from_Rock=False):
 
     # Find index of entry with most points. If maximum is shared,
     # return the most recent classification
-    selected_taxonomy = taxa[-1 - np.argmax(points[::-1])]
-    selected_taxonomy['selected'] = True
-    selected_taxonomy['index_selection'] = [-1 - np.argmax(points[::-1])]
-    return selected_taxonomy
+    taxa[-1 - np.argmax(points[::-1])]['selected'] = True
+    return taxa
 
 
 def select_numeric_property(measurements, property_name):
@@ -200,13 +198,10 @@ def select_numeric_property(measurements, property_name):
 
     # Return dictionary with averaged, uncertainty, and merged attirbutes of
     # used data entries
-    merged = obs[obs.selected].to_dict(orient='list')
+    obs = obs.to_dict(orient='records')
+    obs.append({property_name: avg, 'error': std_avg, 'selected': False})
 
-    merged[property_name] = avg
-    merged['error'] = std_avg
-    merged['index_selection'] = obs.loc[obs.selected].index
-
-    return merged
+    return obs
 
 
 # In alphabetic order
