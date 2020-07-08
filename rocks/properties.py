@@ -314,7 +314,7 @@ CLASS_TO_COMPLEX = {
     'M': 'M', 'MU': 'U', 
     'O': 'O', 'OV': 'U', 
     'P': 'P', 'PC': 'U', 'PCD': 'U', 'PD': 'U', 'PDC': 'U', 'PF': 'U', 'PU': 'U', 
-    'Q': 'Q', 'QO': 'Q', 'QRS': 'Q', 'QSV': 'Q', 'Q': 'U', 'QV': 'Q', 'Qw': 'Q',
+    'Q': 'Q', 'QO': 'Q', 'QRS': 'U', 'QSV': 'U', 'QV': 'U', 'Qw': 'Q',
     'R': 'R',
     'S': 'S', 'SA': 'S', 'Sa': 'S', 'SC': 'U', 'SCTU': 'U', 'SD': 'U', 'SDU': 'U',
     'SG': 'U', 'Sk': 'S', 'Sl': 'S', 'SMU': 'U', 'SO': 'S', 'Sq': 'S', 'SQ': 'S',
