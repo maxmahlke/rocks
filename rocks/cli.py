@@ -79,11 +79,11 @@ def cli_rocks():
     For more information: rocks docs
 
     '''
-    pass
+    pass  # pragma: no cover
 
 
 @cli_rocks.command()
-def docs():
+def docs():  # pragma: no cover
     '''Open rocks documentation in browser.
 
     '''
