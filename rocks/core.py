@@ -302,7 +302,12 @@ class listParameter(list):
         x=np.linspace(1,len(self),len(self))
         for i,m in enumerate(np.unique(self.method)):
             cur=np.where(np.asarray(self.method)==m)
-            fcol='none'
+            #breakpoint()
+            if True in np.asarray(self.selected)[cur]:
+                fcol=tools.METHODS[m]['color']
+            else:
+                fcol='none'
+            #fcol='none'
             ax.scatter(x[cur], np.asarray(self)[cur], label=m, 
                        marker=tools.METHODS[m]['marker'],
                        s=80, 
