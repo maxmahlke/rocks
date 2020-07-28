@@ -280,7 +280,7 @@ PROPERTIES = {
     'taxonomy': {
         'attribute': 'class',
         'collection': 'taxonomies',
-        'extra_columns': ['scheme', 'waverange'],
+        'extra_columns': ['complex', 'scheme', 'waverange'],
         'selection': select_taxonomy,
         'ssodnet_path': ['datacloud', 'taxonomy'],
         'type': str,
@@ -329,4 +329,5 @@ CLASS_TO_COMPLEX = {
     'XF': 'U', 'XFC': 'U', 'XFCU': 'U', 'XFU': 'U', 'Xk': 'X', 'XL': 'U', 'Xn': 'X',
     'XS': 'U', 'XSC': 'U', 'XSCU': 'U', 'XT': 'U', 'Xt': 'X', 'XU': 'U',
     'Z': 'U',
+    np.nan: np.nan, None: np.nan
 }
