@@ -111,6 +111,9 @@ class Rock:
                             d[f'err_{prop_name_ssodnet}'] != '0']
                 except KeyError:
                     pass  # not all properties have errors
+            # this removal might have affected all entries
+            if not data:
+                continue
 
             # Select or aggegrate property values - to be replaced by ssocard
             data = setup['selection'](data, prop_name_ssodnet)
