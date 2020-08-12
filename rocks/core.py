@@ -77,6 +77,13 @@ class Rock:
                           f'{self.name}.')
             return
 
+        # Fill identity attributes
+        for prop in ['type', 'class', 'parent', 'system', 'aliases']:
+
+            attr_name = prop if not keyword.iskeyword(prop) else prop + '_'
+            setattr(self, attr_name, data_['identity'][prop])
+
+        # Fill datacloud attributes
         for prop, setup in properties.PROPERTIES.items():
 
             if only and prop not in only:
