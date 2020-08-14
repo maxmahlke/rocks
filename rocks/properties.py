@@ -237,6 +237,13 @@ PROPERTIES = {
         'type': float,
     },
 
+    'inclination': {
+        'attribute': 'Inclination',
+        'ssodnet_path': ['datacloud', 'astorb'],
+        'selection': lambda x, _: x[0],  # do nothing
+        'type': float,
+    },
+
     'eccentricity': {
         'attribute': 'Eccentricity',
         'ssodnet_path': ['datacloud', 'astorb'],
