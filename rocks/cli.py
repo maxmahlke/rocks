@@ -75,7 +75,7 @@ class AliasedGroup(click.Group):
                     valid = True
                     if len(cmd_name.split(".")) > 1:
                         # single property
-                        prop = cmd_name
+                        prop = '.'.join([cat, *cmd_name.split(".")[1:]])
                     else:
                         # catalogue overview
                         prop = cat
