@@ -137,9 +137,9 @@ async def _query_and_resolve(
 
     if response:
         name, number, ssodnet_id = _parse_quaero_response(response["data"], str(id_))
-        return (name, number, ssodnet_id)
-    else:
-        return (np.nan, np.nan, np.nan)
+        if isinstance(ssodnet_id, str):
+            return (name, number, ssodnet_id)
+    return (np.nan, np.nan, np.nan)
 
 
 def standardize_id_(id_):
@@ -253,6 +253,8 @@ async def _query_quaero(id_, session, verbose):
     try:
         response = await session.request(method="GET", url=url, params=params)
         response_json = await response.json()
+        print(f"{response_json}")
+
     except (requests.exceptions.RequestException, asyncio.exceptions.TimeoutError) as e:
         if verbose:
             warnings.warn(f"An error occurred during the name resolution: {e}")

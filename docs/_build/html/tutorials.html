@@ -58,7 +58,7 @@
     <section class="site-nav">
     
     
-        <p class="caption"><span class="caption-text">Contents:</span></p>
+        <p class="caption"><span class="caption-text">Contents</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Intro to rocks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
@@ -102,12 +102,39 @@
                 
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p>Using the <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class for asteroid parameter access</p></li>
-<li><p>Plotting asteroid albedo distributions for C-types</p></li>
-</ul>
-<div class="section" id="rock-class-for-accessing-asteroid-parameters">
-<h2><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class for accessing asteroid parameters<a class="headerlink" href="#rock-class-for-accessing-asteroid-parameters" title="Permalink to this headline">¶</a></h2>
+<p>To do: Include code examples as jupyter notebooks and on webpage.</p>
+<p>The code below retrieves the ssoCards and taxonomies for the first 1,000 numbered objects. To see the effect of caching the ssoCards, run it first after deleting the cache in <code class="docutils literal notranslate"><span class="pre">$USER/.cache/rocks/ssoCards/</span></code>. The second time should be much faster.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;Retrieve taxonomies of first 1000 numbered minor planets with rocks.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">rocks</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="c1"># Create list of identifiers for first 1000 asteroids</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Create the rocks instances</span>
+<span class="n">asteroids</span> <span class="o">=</span> <span class="n">rocks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+<span class="c1"># Create a dataframe containing the asteroid names, numbers,</span>
+<span class="c1"># their taxonomic class.</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;class_&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">class_</span><span class="p">}</span> <span class="k">for</span> <span class="n">ast</span> <span class="ow">in</span> <span class="n">asteroids</span>
+<span class="p">]</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Print the distribution of taxonomic classes</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">class_</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 

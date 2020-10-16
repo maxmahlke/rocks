@@ -79,6 +79,17 @@ Providing the catalogue name and a property returns the property.
 
 The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 
+For the ``albedos``, ``diameters``, and ``masses`` catalogues, quick visualization can be triggered using optional arguments. Providing ``-h`` or ``--hist`` will plot a histogram of the respective property, while ``-s`` or ``--scatter`` open scatterplot.
+
+.. code-block:: bash       
+
+  $ rocks masses --scatter 3
+
+.. image:: gfx/masses_scatter_3.png
+   :scale: 70 %
+   :align: center
+
+
 .. _subcommands:
 
 rocks docs

@@ -85,7 +85,7 @@ def create_index():
 
     # Get ids of missing entries, append to index
     names, numbers, ids = zip(
-        *rocks.identify(sorted(missing), return_id=True, verbose=False, progress=True)
+        *rocks.identify(missing, return_id=True, verbose=False, progress=True)
     )
 
     index = index.append(pd.DataFrame({"name": names, "number": numbers, "id_": ids}))

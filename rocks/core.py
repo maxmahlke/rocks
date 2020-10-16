@@ -3,7 +3,6 @@
 """
 from functools import singledispatch
 import json
-import keyword
 import os
 from types import SimpleNamespace
 import warnings
@@ -154,19 +153,25 @@ class Rock:
 
     def __add_metadata(self):
         """docstring for __add_metadata"""
-        # TODO slow, replace by dict mapping
-        for meta in ["unit", "uncertainty"]:
-            for path in pd.json_normalize(TEMPLATE).columns:
-                if meta in path:
-                    quantity = path.replace(f".{meta}", "")
-                    try:
-                        setattr(
-                            rocks.utils.rgetattr(self, quantity),
-                            meta,
-                            rocks.utils.rgetattr(self, path),
-                        )
-                    except AttributeError:
-                        pass  # some unit paths are ill-defined
+        for meta, target in META_MAPPING.items():
+            try:
+                setattr(
+                    rocks.utils.rgetattr(self, target),
+                    "uncertainty",
+                    rocks.utils.rgetattr(self, meta),
+                )
+            except AttributeError:
+                # some unit paths are currently ill-defined
+                pass
+            try:
+                setattr(
+                    rocks.utils.rgetattr(self, target),
+                    "unit",
+                    rocks.utils.rgetattr(self, meta.replace("uncertainty", "unit")),
+                )
+            except AttributeError:
+                # some unit paths are currently ill-defined
+                pass
 
     def __add_datacloud_catalogue(self, catalogue):
         """docstring for __add_datacloud_catalogue"""
@@ -335,7 +340,9 @@ def rocks_(identifier, datacloud=[]):
         identifier = identifier.values
 
     # Ensure we know these objects
-    ids = [id_ for name, number, id_ in identify(identifier, return_id=True)]
+    ids = [
+        id_ for name, number, id_ in rocks.resolver.identify(identifier, return_id=True)
+    ]
     # Sent POST request
     ssoCards = rocks.utils.get_ssoCard(ids)
     # Build rocks
@@ -378,4 +385,10 @@ __TYPES = {
     float: floatParameter,
     dict: propertyCollection,
     list: _cast_list,
+}
+
+META_MAPPING = {
+    v: v.replace(".uncertainty", "")
+    for v in pd.json_normalize(TEMPLATE).columns
+    if ".uncertainty" in v
 }
