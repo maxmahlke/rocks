@@ -1,159 +1,398 @@
-
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Rock class &#8212; rocks 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Resolving names, numbers, designations" href="names.html" />
-    <link rel="prev" title="rocks" href="index.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="names.html" title="Resolving names, numbers, designations"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="rocks"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    
+    <title>The Rock class</title>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="rock-class">
-<span id="id1"></span><h1><code class="docutils literal notranslate"><span class="pre">Rock</span></code> class<a class="headerlink" href="#rock-class" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class provides access to the parameters of a single asteroid.</p>
-<p>It is instantiated by providing a identifier in form of a string (e.g.
-<code class="docutils literal notranslate"><span class="pre">'Ceres',</span> <span class="pre">'2010</span> <span class="pre">OR'</span></code>), integer or float (e.g. <code class="docutils literal notranslate"><span class="pre">3</span></code>, <code class="docutils literal notranslate"><span class="pre">10.0</span></code>) which is then
-resolved using SsODNet:quaero. If the identifier cannot be resolved, a warning
-is printed.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks.core</span> <span class="kn">import</span> <span class="n">Rock</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;ceres&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="p">)</span>
-<span class="go">(1) Ceres</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Vesta</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;1807 FA&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Vesta</span><span class="p">)</span>
-<span class="go">(4) Vesta</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Unknown</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;ufo&#39;</span><span class="p">)</span>  
-<span class="go">UserWarning: Could not identify &quot;ufo&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Unknown</span><span class="p">)</span>
-<span class="go">(nan) nan</span>
+    <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="rocks 0.1 documentation" href="index.html"/>
+    <link rel="next" title="Command-Line Interface" href="cli.html"/>
+    <link rel="prev" title="rocks" href="index.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="index.html" class="branding-link">
+    
+        rocks
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <p class="caption"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Intro to rocks</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">rocks CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="index.html">Docs</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <div class="section" id="the-rock-class">
+<span id="rock-class"></span><h1>The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class<a class="headerlink" href="#the-rock-class" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#rocks-rock"><span class="std std-ref">Rock</span></a> class is used to inspect the properties of a single asteroid. The asteroid is specified by providing its number, name, or designation to the class.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">Rock</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span>
+<span class="n">Rock</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ceres&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">vesta</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s2">&quot;1807 FA&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">vesta</span>
+<span class="n">Rock</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Vesta&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>The instance attributes are asteroid parameters, retrieved from
-SsODNet. The singular version prints the merged parameter, the plural version
-prints all available measurements of the parameter. Each parameter contains
-metadata like the reference as attribute.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;ceres&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomy</span><span class="p">)</span>
-<span class="go">C</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">shortbib</span><span class="p">)</span>
-<span class="go">DeMeo+2009</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="p">)</span>
-<span class="go">[&#39;G&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;C&#39;, &#39;G&#39;, &#39;C&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">shortbib</span><span class="p">)</span>
-<span class="go">[&#39;Tholen+1989&#39;, &#39;Bus&amp;Binzel+2002&#39;, &#39;Lazzaro+2004&#39;, &#39;Lazzaro+2004&#39;, &#39;DeMeo+2009&#39;, &#39;Fornasier+2014&#39;, &#39;Fornasier+2014&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>
-<span class="go">0.048299999999999996</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedos</span><span class="p">)</span>
-<span class="go">[0.059, 0.0, 0.113, 0.12, 0.104, 0.087, 0.0, 0.0, 0.0, 0.0]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedos</span><span class="o">.</span><span class="n">shortbib</span><span class="p">)</span>
-<span class="go">[&#39;Morrison+2007&#39;, &#39;Drummond+2008&#39;, &#39;Tedesco+2001&#39;, &#39;Ryan+2010&#39;, &#39;Ryan+2010&#39;, &#39;Usui+2011&#39;, &#39;Russell+2016&#39;, &#39;Herald+2019&#39;, &#39;Herald+2019&#39;, &#39;Herald+2019&#39;]</span>
+<p>During instantiation, the asteroid properties are retrieved from <a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/">SsODNet</a> and assigned to the attributes following the structure of the <code class="docutils literal notranslate"><span class="pre">ssoCard</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">class_</span>
+<span class="n">C</span>
+<span class="o">&gt;&gt;</span> <span class="n">vesta</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dynamical</span><span class="o">.</span><span class="n">proper_elements</span><span class="o">.</span><span class="n">proper_semi_major_aixs</span>
+<span class="mf">2.3615126</span>
+</pre></div>
+</div>
+<p>To reduce wordiness, the <code class="docutils literal notranslate"><span class="pre">parameters</span></code> and <code class="docutils literal notranslate"><span class="pre">physical</span></code>/<code class="docutils literal notranslate"><span class="pre">dynamical</span></code> attributes can be skipped. Units and uncertainties can be appended to the property.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">vesta</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="o">.</span><span class="n">diameter</span>
+<span class="mf">468.3</span>
+<span class="o">&gt;&gt;</span> <span class="n">vesta</span><span class="o">.</span><span class="n">diameter</span>
+<span class="mf">468.3</span>
+<span class="o">&gt;&gt;</span> <span class="n">vesta</span><span class="o">.</span><span class="n">diameter</span><span class="o">.</span><span class="n">unit</span>
+<span class="s1">&#39;km&#39;</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Some keywords are protected in python. They have to be “escaped” with a trailing
-underscore, e.g. <code class="docutils literal notranslate"><span class="pre">class</span></code> becomes <code class="docutils literal notranslate"><span class="pre">class_</span></code>.</p>
+<p>The “class” property clashes with the python-protected <code class="docutils literal notranslate"><span class="pre">class</span></code> keyword. The property name is changed to “class_”.</p>
 </div>
-<p>By default, all available asteroid properties from SsODNet are loaded as attributes of the <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instance.
-To get a list of the loaded properties, use the <code class="docutils literal notranslate"><span class="pre">properties</span></code> attribute.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span><span class="o">.</span><span class="n">properties</span>
-<span class="go">[&#39;name&#39;, &#39;number&#39;, &#39;albedo&#39;, &#39;albedos&#39;, &#39;taxonomy&#39;, &#39;taxonomies&#39;,</span>
-<span class="go">&#39;mass&#39;, &#39;masses&#39;, &#39;diameter&#39;, &#39;diameters&#39;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Ceres</span><span class="o">.</span><span class="n">albedo</span><span class="o">.</span><span class="n">properties</span>
-<span class="go">[&#39;albedo&#39;, &#39;shortbib&#39;, &#39;err_albedo&#39;]</span>
+<div class="section" id="access-of-datacloud-tables">
+<h2>Access of <code class="docutils literal notranslate"><span class="pre">datacloud</span></code> tables<a class="headerlink" href="#access-of-datacloud-tables" title="Permalink to this headline">¶</a></h2>
+<p>SsODNet:datacloud contains tables of albedo, mass, taxonomic class estimations and more for a large number of asteroids. By default, they are not loaded when creating a <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instance, as each table requires an additional remote query. Tables can be requested using the <code class="docutils literal notranslate"><span class="pre">datacloud</span></code> argument, using the catalogues given in the left column of the table below. They are assigned to the attributes given in the right column.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 62%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Datacloud Table</p></td>
+<td><p>Attribute Name</p></td>
+</tr>
+<tr class="row-even"><td><p>aams</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">aams</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>astdys</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">astdys</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>astorb</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">astorb</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>binarymp_tab</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">binaries</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>diamalbedo</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">diamalbedo</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>families</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">families</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>masses</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">masses</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>mpcatobs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mpc</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>pairs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pairs</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>taxonomy</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">taxonomies</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The properties in each table row entry are concatenated into lists, grouping properties of the same type together.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="s1">&#39;masses&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">class_</span>
+<span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">shortbib</span>
+<span class="p">[</span><span class="s1">&#39;Tholen+1989&#39;</span><span class="p">,</span> <span class="s1">&#39;Bus&amp;Binzel+2002&#39;</span><span class="p">,</span> <span class="s1">&#39;Lazzaro+2004&#39;</span><span class="p">,</span> <span class="s1">&#39;Lazzaro+2004&#39;</span><span class="p">,</span>
+ <span class="s1">&#39;DeMeo+2009&#39;</span><span class="p">,</span> <span class="s1">&#39;Fornasier+2014&#39;</span><span class="p">,</span> <span class="s1">&#39;Fornasier+2014&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
-<p>To preserve memory and computation time when processing a large number of asteroids, a list of requested properties can be provided.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Eos</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;Eos&#39;</span><span class="p">,</span> <span class="n">only</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="s1">&#39;diameter&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Eos</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
-<span class="go">2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Eos</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>  <span class="c1"># AttributeError</span>
+<p>If the properties are of type <code class="docutils literal notranslate"><span class="pre">float</span></code>, methods for <a class="reference internal" href="#rocks-wa"><span class="std std-ref">weighted averaging</span></a> and <a class="reference internal" href="#rocks-plots"><span class="std std-ref">plotting</span></a> are available.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">mass</span>
+<span class="p">[</span><span class="mf">9.55e+20</span><span class="p">,</span> <span class="mf">9.54e+20</span><span class="p">,</span> <span class="mf">9.94e+20</span><span class="p">,</span> <span class="mf">9.19e+20</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">9.39e+20</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">weighted_average</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">err_mass</span><span class="p">)</span>
+<span class="p">(</span><span class="mf">9.387431170184913e+20</span><span class="p">,</span> <span class="mf">3.282260016750655e+17</span><span class="p">)</span>
 </pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The units and uncertainties are not appended to properties in the datacloud catalgoues. This may be implemented in a later version.</p>
+</div>
+</div>
+<div class="section" id="creating-many-rocks">
+<h2>Creating many <code class="docutils literal notranslate"><span class="pre">Rock</span></code>s<a class="headerlink" href="#creating-many-rocks" title="Permalink to this headline">¶</a></h2>
+<p>The <a class="reference internal" href="#rocks-rocks"><span class="std std-ref">rocks.rocks()</span></a> function quickly creates many <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instances. It accepts a list of asteroid numbers, names, or designations and returns a list of <code class="docutils literal notranslate"><span class="pre">Rock</span></code> instances.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">rocks</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">themis_family</span> <span class="o">=</span> <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">62</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">104</span><span class="p">,</span> <span class="mi">171</span><span class="p">,</span> <span class="mi">222</span><span class="p">,</span> <span class="mi">223</span><span class="p">,</span> <span class="mi">316</span><span class="p">,</span> <span class="mi">379</span><span class="p">,</span>
+<span class="go">        383, 468, 492, 515, 526, 767, 846]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">themis_family</span> <span class="o">=</span> <span class="n">rocks</span><span class="p">(</span><span class="n">themis_family</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">themis_family</span>
+<span class="go">[Rock(number=316, name=&#39;Goberta&#39;), Rock(number=492, name=&#39;Gismonda&#39;),</span>
+<span class="go">Rock(number=767, name=&#39;Bondia&#39;), Rock(number=90, name=&#39;Antiope&#39;), ... ]</span>
+</pre></div>
+</div>
+<p>Accessing the properties can now be done with a loop or list comprehension.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">themis_taxonomies</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">class_</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">themis_family</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Counter</span><span class="p">(</span><span class="n">themis_taxonomies</span><span class="p">)</span>
+<span class="go">Counter({&#39;C&#39;: 8, &#39;B&#39;: 2, &#39;Ch&#39;: 2, &#39;BU&#39;: 1, &#39;Xc&#39;: 1, &#39;Xk&#39;: 1, &#39;Cb&#39;: 1})</span>
+</pre></div>
+</div>
+<p>Any property not present in the ssoCard of an asteroid is set to <code class="docutils literal notranslate"><span class="pre">NaN</span></code>. This ensures that accessing attributes in a loop does not fail.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ssoCards are cached for shorter execution times. The cache directory is <code class="docutils literal notranslate"><span class="pre">$HOME/.cache/rocks/</span></code>.</p>
+</div>
+<p>In the <a class="reference internal" href="tutorials.html#tutorials"><span class="std std-ref">Tutorials</span></a> we show how to utilise <code class="docutils literal notranslate"><span class="pre">rocks()</span></code> to investigate the taxonomic distribution of asteroids in large catalogues.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="api-of-rock-and-rocks">
+<h2>API of <code class="docutils literal notranslate"><span class="pre">Rock</span></code> and <code class="docutils literal notranslate"><span class="pre">rocks</span></code><a class="headerlink" href="#api-of-rock-and-rocks" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="rocks-rock"></span><dl class="py class">
+<dt id="core.Rock">
+<em class="property">class </em><code class="sig-prename descclassname">core.</code><code class="sig-name descname">Rock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">ssoCard</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">datacloud</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">skip_id_check</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core.html#Rock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Rock" title="Permalink to this definition">¶</a></dt>
+<dd><p>For space rocks.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="core.Rock.__init__">
+<code class="sig-prename descclassname">Rock.</code><code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">ssoCard</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">datacloud</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">skip_id_check</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core.html#Rock.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.Rock.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identify a minor body  and retrieve its properties from SsODNet.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>float</em>) – Identifying asteroid name, designation, or number</p></li>
+<li><p><strong>ssoCard</strong> (<em>dict</em>) – Optional previously acquired ssoCard.</p></li>
+<li><p><strong>datacloud</strong> (<em>list of str</em>) – List of additional catalogues to retrieve from datacloud.
+Default is no additional catalogues.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An asteroid class instance, with its properties as attributes.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>rocks.core.Rock</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the asteroid could not be identified, the name and number are None
+and no further attributes are set.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks.core</span> <span class="kn">import</span> <span class="n">Rock</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="s1">&#39;ceres&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ceres</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">class_</span>
+<span class="go">&#39;C&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ceres</span><span class="o">.</span><span class="n">taxonomy</span><span class="o">.</span><span class="n">shortbib</span>
+<span class="go">&#39;DeMeo+2009&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ceres</span><span class="o">.</span><span class="n">diameter</span>
+<span class="go">848.4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ceres</span><span class="o">.</span><span class="n">diameter</span><span class="o">.</span><span class="n">unit</span>
+<span class="go">&#39;km&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="rocks-rocks"></span><dl class="py function">
+<dt id="core.rocks">
+<code class="sig-prename descclassname">core.</code><code class="sig-name descname">rocks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">identifier</span></em>, <em class="sig-param"><span class="n">datacloud</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core.html#rocks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.rocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create multiple Rock instances via POST request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<em>list of str</em><em>, </em><em>list of int</em><em>, </em><em>list of float</em><em>, </em><em>np.array</em><em>, </em><em>pd.Series</em>) – An iterable containing minor body identifiers.</p></li>
+<li><p><strong>datacloud</strong> (<em>list of str</em>) – List of additional catalogues to retrieve from datacloud. Default is
+[], no additional data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of Rock instances</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of rocks.core.Rock</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="rocks-wa"></span><dl class="py function">
+<dt id="core.listSameTypeParameter.weighted_average">
+<code class="sig-prename descclassname">core.listSameTypeParameter.</code><code class="sig-name descname">weighted_average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.listSameTypeParameter.weighted_average" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute weighted average of float-type parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>errors</strong> (<em>list of floats</em><em>, </em><em>np.ndarraya of floats</em>) – Optional list of associated uncertainties.  Default is unit
+unceratinty.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>(float, float)</em></p></li>
+<li><p><em>Weighted average and its uncertainty.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="rocks-plots"></span><dl class="py function">
+<dt id="core.listSameTypeParameter.hist">
+<code class="sig-prename descclassname">core.listSameTypeParameter.</code><code class="sig-name descname">hist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.listSameTypeParameter.hist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="core.listSameTypeParameter.scatter">
+<code class="sig-prename descclassname">core.listSameTypeParameter.</code><code class="sig-name descname">scatter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.listSameTypeParameter.scatter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter"><code class="docutils literal notranslate"><span class="pre">rocks</span></code></a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="names.html"
-                        title="next chapter">Resolving names, numbers, designations</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/core.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+            </div>
+
+        </section>
+
+        
+            <nav class="site-bottom-navigation" role="navigation">
+            
+                <a href="cli.html" class="btn btn--primary btn--next right"
+                    title="Command-Line Interface" accesskey="n">
+                    Next
+                </a>
+            
+            
+                <a href="index.html" class="btn btn--primary btn--prev"
+                    title="rocks" accesskey="p">
+                    Previous
+                </a>
+            
+            </nav>
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="_sources/core.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Max Mahlke, Benoit Carry.
+        </p>
     </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="names.html" title="Resolving names, numbers, designations"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="index.html" title="rocks"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
-    </div>
-  </body>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/js/theme-min.js"></script> 
+</body>
 </html>

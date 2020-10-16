@@ -1,72 +1,161 @@
 .. _rock_class:
 
-``Rock`` class
-==============
-The ``Rock`` class provides access to the parameters of a single asteroid.
+The ``Rock`` class
+==================
 
-It is instantiated by providing a identifier in form of a string (e.g.
-``'Ceres', '2010 OR'``), integer or float (e.g. ``3``, ``10.0``) which is then
-resolved using SsODNet:quaero. If the identifier cannot be resolved, a warning
-is printed.
+The :ref:`Rock<rocks-Rock>` class is used to inspect the properties of a single asteroid. The asteroid is specified by providing its number, name, or designation to the class.
 
 .. code-block:: python
 
-  >>> from rocks.core import Rock
-  >>> Ceres = Rock('ceres')
-  >>> print(Ceres)
-  (1) Ceres
-  >>> Vesta = Rock('1807 FA')
-  >>> print(Vesta)
-  (4) Vesta
-  >>> Unknown = Rock('ufo')  # doctest: +SKIP
-  UserWarning: Could not identify "ufo" 
-  >>> print(Unknown)
-  (nan) nan
+    >> from rocks import Rock
+    >> ceres = Rock(1)
+    >> ceres
+    Rock(number=1, name='Ceres')
+    >> vesta = Rock("1807 FA")
+    >> vesta
+    Rock(number=4, name='Vesta')
 
-The instance attributes are asteroid parameters, retrieved from
-SsODNet. The singular version prints the merged parameter, the plural version
-prints all available measurements of the parameter. Each parameter contains
-metadata like the reference as attribute.
+During instantiation, the asteroid properties are retrieved from `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_ and assigned to the attributes following the structure of the ``ssoCard``.
 
 .. code-block:: python
 
-  >>> Ceres = Rock('ceres')
-  >>> print(Ceres.taxonomy)
-  C
-  >>> print(Ceres.taxonomy.shortbib)
-  DeMeo+2009
-  >>> print(Ceres.taxonomies)
-  ['G', 'C', 'C', 'C', 'C', 'G', 'C']
-  >>> print(Ceres.taxonomies.shortbib)
-  ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004', 'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
-  >>> print(Ceres.albedo)
-  0.048299999999999996
-  >>> print(Ceres.albedos)
-  [0.059, 0.0, 0.113, 0.12, 0.104, 0.087, 0.0, 0.0, 0.0, 0.0]
-  >>> print(Ceres.albedos.shortbib)
-  ['Morrison+2007', 'Drummond+2008', 'Tedesco+2001', 'Ryan+2010', 'Ryan+2010', 'Usui+2011', 'Russell+2016', 'Herald+2019', 'Herald+2019', 'Herald+2019']
+    >> ceres.parameters.physical.taxonomy.class_
+    C
+    >> vesta.parameters.dynamical.proper_elements.proper_semi_major_aixs
+    2.3615126
+
+
+To reduce wordiness, the ``parameters`` and ``physical``/``dynamical`` attributes can be skipped. Units and uncertainties can be appended to the property.
+
+.. code-block:: python
+
+   >> vesta.parameters.physical.diameter
+   468.3
+   >> vesta.diameter
+   468.3
+   >> vesta.diameter.unit
+   'km'
+
 
 .. Note::
 
-  Some keywords are protected in python. They have to be "escaped" with a trailing
-  underscore, e.g. ``class`` becomes ``class_``.
+   The "class" property clashes with the python-protected ``class`` keyword. The property name is changed to "class\_".
 
-By default, all available asteroid properties from SsODNet are loaded as attributes of the ``Rock`` instance.
-To get a list of the loaded properties, use the ``properties`` attribute.
+Access of ``datacloud`` tables
+------------------------------
+
+SsODNet:datacloud contains tables of albedo, mass, taxonomic class estimations and more for a large number of asteroids. By default, they are not loaded when creating a ``Rock`` instance, as each table requires an additional remote query. Tables can be requested using the ``datacloud`` argument, using the catalogues given in the left column of the table below. They are assigned to the attributes given in the right column.
+
++-----------------+----------------------------+
+| Datacloud Table | Attribute Name             |
++-----------------+----------------------------+
+| aams            | ``aams``                   |
++-----------------+----------------------------+
+| astdys          | ``astdys``                 |
++-----------------+----------------------------+
+| astorb          | ``astorb``                 |
++-----------------+----------------------------+
+| binarymp_tab    | ``binaries``               |
++-----------------+----------------------------+
+| diamalbedo      | ``diamalbedo``             |
++-----------------+----------------------------+
+| families        | ``families``               |
++-----------------+----------------------------+
+| masses          | ``masses``                 |
++-----------------+----------------------------+
+| mpcatobs        | ``mpc``                    |
++-----------------+----------------------------+
+| pairs           | ``pairs``                  |
++-----------------+----------------------------+
+| taxonomy        | ``taxonomies``             |
++-----------------+----------------------------+
+
+The properties in each table row entry are concatenated into lists, grouping properties of the same type together.
 
 .. code-block:: python
 
-        >>> Ceres.properties
-        ['name', 'number', 'albedo', 'albedos', 'taxonomy', 'taxonomies',
-        'mass', 'masses', 'diameter', 'diameters']
-        >>> Ceres.albedo.properties
-        ['albedo', 'shortbib', 'err_albedo']
+    >> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
+    >> ceres.taxonomies.class_
+    ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+    >> ceres.taxonomies.shortbib
+    ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004',
+     'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
 
-To preserve memory and computation time when processing a large number of asteroids, a list of requested properties can be provided.
+If the properties are of type ``float``, methods for :ref:`weighted averaging<rocks-wa>` and :ref:`plotting<rocks-plots>` are available.
 
 .. code-block:: python
 
-  >>> Eos = Rock('Eos', only=['mass', 'diameter'])
-  >>> print(Eos.mass)
-  2
-  >>> print(Eos.albedo)  # AttributeError
+    >> ceres.masses.mass
+    [9.55e+20, 9.54e+20, 9.94e+20, 9.19e+20, ..., 9.39e+20]
+    >> ceres.masses.mass.weighted_average(errors=ceres.masses.err_mass)
+    (9.387431170184913e+20, 3.282260016750655e+17)
+
+.. Note::
+
+   The units and uncertainties are not appended to properties in the datacloud catalgoues. This may be implemented in a later version.
+
+Creating many ``Rock``\ s
+-------------------------
+
+The :ref:`rocks.rocks()<rocks-rocks>` function quickly creates many ``Rock`` instances. It accepts a list of asteroid numbers, names, or designations and returns a list of ``Rock`` instances.
+
+.. code-block:: python
+
+    >>> from rocks import rocks
+    >>> themis_family = [24, 62, 90, 104, 171, 222, 223, 316, 379,
+            383, 468, 492, 515, 526, 767, 846]
+    >>> themis_family = rocks(themis_family)
+    >>> themis_family
+    [Rock(number=316, name='Goberta'), Rock(number=492, name='Gismonda'),
+    Rock(number=767, name='Bondia'), Rock(number=90, name='Antiope'), ... ]
+
+Accessing the properties can now be done with a loop or list comprehension.
+
+    >>> from collections import Counter
+    >>> themis_taxonomies = [t.taxonomy.class_ for t in themis_family]
+    >>> Counter(themis_taxonomies)
+    Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
+
+Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail. 
+
+.. Note::
+
+  ssoCards are cached for shorter execution times. The cache directory is ``$HOME/.cache/rocks/``.
+
+In the :ref:`Tutorials<Tutorials>` we show how to utilise ``rocks()`` to investigate the taxonomic distribution of asteroids in large catalogues. 
+
+
+-------------------
+
+API of ``Rock`` and ``rocks``
+-----------------------------
+
+.. _rocks-Rock:
+
+.. currentmodule:: core
+
+.. autoclass:: Rock
+
+.. automethod:: Rock.__init__
+
+
+.. _rocks-rocks:
+
+.. currentmodule:: core
+
+.. autofunction:: rocks
+
+
+.. _rocks-wa:
+
+.. currentmodule:: core
+
+.. autofunction:: core.listSameTypeParameter.weighted_average
+
+.. _rocks-plots:
+
+.. autofunction:: core.listSameTypeParameter.hist
+
+.. autofunction:: core.listSameTypeParameter.scatter
+
+

@@ -1,40 +1,104 @@
-
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Tools &#8212; rocks 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Asteroid Properties" href="properties.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="properties.html" title="Asteroid Properties"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    
+    <title>Tools</title>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+    <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="rocks 0.1 documentation" href="index.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="index.html" class="branding-link">
+    
+        rocks
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Intro to rocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">rocks CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="index.html">Docs</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Tools</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
   <div class="section" id="tools">
 <h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
 <p>These are general, low-level utility functions.</p>
@@ -42,201 +106,68 @@
 <h2>Asteroid name-number Index<a class="headerlink" href="#asteroid-name-number-index" title="Permalink to this headline">¶</a></h2>
 <p>To speed up name-number lookups, a local index file is kept. It contains the
 list of numbered asteroids and their names or designations.</p>
-<dl class="py function">
-<dt id="tools.create_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">create_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#create_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.create_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create or update index of numbered SSOs.</p>
-<p class="rubric">Notes</p>
-<p>The list is retrieved from the Minor Planet Center, at
-<a class="reference external" href="https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt">https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt</a></p>
-<p>It is saved in CSV format as <code class="docutils literal notranslate"><span class="pre">.index</span></code> in the package directory.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tools.read_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">read_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#read_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.read_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read local index of asteroid numbers and names.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>dict</em> – Asteroid number: name</p></li>
-<li><p><em>dict</em> – Asteroid name: number</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>If the index file is older than 30 days, a reminder to update is
-displayed.</p>
-</dd></dl>
-
 <p>The index can be fuzzy-searched interactively using</p>
-<dl class="py function">
-<dt id="tools.select_sso_from_index">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.select_sso_from_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select SSO numbers and designations from interactive fuzzy search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>str</em> – asteroid name or designation</p></li>
-<li><p><em>int</em> – asteroid number</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>If the selection is interrupted with ctrl-c, <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code> is returned.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">select_sso_from_index</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </div>
 <div class="section" id="ssodnet-query-functions">
 <h2>SsODNet Query Functions<a class="headerlink" href="#ssodnet-query-functions" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="tools.get_data">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">get_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id_</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get asteroid data from SsODNet:datacloud.</p>
-<p>Performs a GET request to SsODNet:datacloud for a single asteroid and
-property. Checks validity of data and extracts it from response.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id_</strong> (<em>str</em><em>, </em><em>int</em>) – Asteroid name, designation, or number.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>Asteroid data, False if query failed or no data is available</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict, bool</p>
-</dd>
-</dl>
-</dd></dl>
-
 <p><cite>get_data</cite> calls <cite>query_ssodnet</cite>.</p>
-<dl class="py function">
-<dt id="tools.query_ssodnet">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">query_ssodnet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span></em>, <em class="sig-param"><span class="n">payload</span></em>, <em class="sig-param"><span class="n">verbose</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#query_ssodnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.query_ssodnet" title="Permalink to this definition">¶</a></dt>
-<dd><p>Query SsODNet services.</p>
-<p>Includes validity check of response.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>url</strong> (<em>str</em>) – Base url of GET request.</p></li>
-<li><p><strong>payload</strong> (<em>dict</em>) – The GET request parameters. See
-<a class="reference external" href="https://ssp.imcce.fr/webservices/ssodnet/api/">https://ssp.imcce.fr/webservices/ssodnet/api/</a>
-for options.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em>) – Print request diagnostics.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>GET request response from SsODNet</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>r - requests.models.Response</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="tools.echo_response">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">echo_response</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">response</span></em>, <em class="sig-param"><span class="n">payload</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#echo_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.echo_response" title="Permalink to this definition">¶</a></dt>
-<dd><p>Echo the formatted SsODNet response to STDOUT.</p>
-<p>The echo function is based on the query mime type.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>response</strong> (<em>requests.models.Response</em>) – SsODNet GET query response.</p></li>
-<li><p><strong>payload</strong> (<em>dict</em>) – GET query payload.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="id0">
-<code class="sig-prename descclassname">tools.</code><code class="sig-name descname">select_sso_from_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tools.html#select_sso_from_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select SSO numbers and designations from interactive fuzzy search.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><em>str</em> – asteroid name or designation</p></li>
-<li><p><em>int</em> – asteroid number</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>If the selection is interrupted with ctrl-c, <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code> is returned.</p>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">tools</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">select_sso_from_index</span><span class="p">()</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </div>
 </div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Tools</a><ul>
-<li><a class="reference internal" href="#asteroid-name-number-index">Asteroid name-number Index</a></li>
-<li><a class="reference internal" href="#ssodnet-query-functions">SsODNet Query Functions</a></li>
-</ul>
-</li>
-</ul>
+            </div>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="properties.html"
-                        title="previous chapter">Asteroid Properties</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/tools.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+        </section>
+
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="_sources/tools.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Max Mahlke, Benoit Carry.
+        </p>
     </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="properties.html" title="Asteroid Properties"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
-    </div>
-  </body>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/js/theme-min.js"></script> 
+</body>
 </html>

@@ -1,176 +1,121 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Implement the Rock class and other core rocks functionality.
 """
-    Core functionality of rocks package
-"""
-from concurrent.futures import ProcessPoolExecutor as Pool
-from functools import partial
+from functools import singledispatch
+import json
 import keyword
-from multiprocessing import cpu_count
+import os
+from types import SimpleNamespace
 import warnings
 
 import numpy as np
 import pandas as pd
 from rich.progress import track
 
-from rocks import names
-from rocks import properties
-from rocks import tools
+from rocks.identify import identify
+from rocks import utils
+from rocks import plots
 
-import matplotlib.pyplot as plt
+# Read ssoCard template
+path_cache = os.path.join(os.path.expanduser("~"), ".cache/rocks")
+path_template = os.path.join(path_cache, "ssoCard_template.json")
+
+if not os.path.isfile(path_template):
+    print("Missing ssoCard template, retrieving..")
+    utils.create_ssocard_template()
+
+with open(path_template, "r") as file_:
+    TEMPLATE = json.load(file_)
 
 
 class Rock:
-    """For space rocks. Instance for accessing the SsODNet:SSOCard."""
+    "For space rocks."
 
-    def __init__(self, identifier, only=[]):
-        """Identify an asteroid and retrieve its properties from SsODNet.
+    def __init__(self, identifier, ssoCard=None, datacloud=[], skip_id_check=False):
+        """Identify a minor body  and retrieve its properties from SsODNet.
 
         Parameters
-        ----------
+        ==========
         identifier : str, int, float
             Identifying asteroid name, designation, or number
-        only : list of str
-            Optional: only get the specified propertiers.
-            By default retrieves all properties.
+        ssoCard : dict
+            Optional previously acquired ssoCard.
+        datacloud : list of str
+            List of additional catalogues to retrieve from datacloud.
+            Default is no additional catalogues.
 
         Returns
-        -------
+        =======
         rocks.core.Rock
             An asteroid class instance, with its properties as attributes.
 
         Notes
-        -----
+        =====
         If the asteroid could not be identified, the name and number are None
         and no further attributes are set.
 
         Example
-        -------
+        =======
         >>> from rocks.core import Rock
         >>> ceres = Rock('ceres')
-        >>> ceres.taxonomy
+        >>> ceres.taxonomy.class_
         'C'
+        >>> ceres.taxonomy.shortbib
+        'DeMeo+2009'
+        >>> ceres.diameter
+        848.4
+        >>> ceres.diameter.unit
+        'km'
         """
 
-        self.name, self.number = names.get_name_number(
-            identifier,
-            parallel=1,
-            progress=False,
-            verbose=False
-        )
+        # Identify minor body
+        if not skip_id_check:
+            self.name, self.number, self.id = identify(
+                identifier, return_id=True, progress=False
+            )
+        else:
+            self.id = identifier
 
-        if not isinstance(self.name, str):
-            warnings.warn(f'Could not identify "{identifier}"')
-            return
-        if not isinstance(only, list):
-            raise TypeError(f'Type of "only" is {type(only)}, '
-                            f'excpeted list.')
-        if not all(isinstance(param, str) for param in only):
-            raise TypeError('List of requested properties can only '
-                            'contain str.')
-
-        # Set attributes using datacloud
-        data_ = tools.get_data(self.name)
-
-        if data_ is False:  # failed SsODNet query
-            warnings.warn(f'Could not retrieve data for ({self.number}) '
-                          f'{self.name}.')
+        if not isinstance(self.id, str):
             return
 
-        # Fill identity attributes
-        for prop in ['type', 'class', 'parent', 'system', 'aliases']:
+        # Fill attributes from argument, cache, or query
+        ssoCard = ssoCard if ssoCard is not None else utils.get_ssoCard(self.id)
+        # No ssoCard exists
+        if ssoCard is None:
+            return
 
-            attr_name = prop if not keyword.iskeyword(prop) else prop + '_'
-            setattr(self, attr_name, data_['identity'][prop])
+        # Initialize from template
+        attributes = TEMPLATE
+        attributes = utils.update_ssoCard(TEMPLATE, ssoCard)
+        attributes = utils.sanitize_keys(attributes)
 
-        # Fill datacloud attributes
-        for prop, setup in properties.PROPERTIES.items():
+        # Add JSON keys as attributes, mapping to the appropriate type
+        for attribute in attributes.keys():
+            setattr(
+                self,
+                attribute,
+                cast_types(attributes[attribute]),
+            )
 
-            if only and prop not in only:
-                continue
+        # Set uncertainties and values
+        self.__add_metadata()
 
-            data = data_.copy()
-
-            if data['datacloud'] is None:  # failed datacloud query
-                warnings.warn(f'Could not retrieve data for ({self.number}) '
-                              f'{self.name}. Datacloud might be unavailable.')
-                return
-
-            for key in setup['ssodnet_path']:
-                data = data[key] if key in data.keys() else {}
-
-            if not data:  # properties without data are set to NaN or None
-                if setup['type'] is float:
-                    setattr(self, prop, np.nan)
-                elif setup['type'] is str:
-                    setattr(self, prop, None)
-                if 'collection' in setup.keys():
-                    setattr(self, setup['collection'], [])
-                continue
-
-            prop_name_ssodnet = setup['attribute']
-
-            # remove property == 0 and error_property == 0 if float property
-            if setup['type'] is float:
-                data = [d for d in data if d[prop_name_ssodnet] != '0']
-                try:
-                    data = [d for d in data if
-                            d[f'err_{prop_name_ssodnet}'] != '0']
-                except KeyError:
-                    pass  # not all properties have errors
-            # this removal might have affected all entries
-            if not data:
-                continue
-
-            # Select or aggegrate property values - to be replaced by ssocard
-            data = setup['selection'](data, prop_name_ssodnet)
-
-            # Data is sometimes list of dicts, sometimes dict. Make uniform.
-            if not isinstance(data, list):
-                data = [data]
-
-            # Set collection properties (eg masses, taxonomies)
-            if 'collection' in setup.keys():
-                setattr(
-                    self,
-                    setup['collection'],
-                    listParameter(
-                        data,
-                        prop_name_ssodnet,
-                        type_=setup['type']
-                    ),
-                )
-
-            # Set aggregated property (eg mass, taxonomy)
-            if setup['type'] is float:
-                setattr(
-                    self,
-                    prop,
-                    floatParameter(
-                        data[-1],  # last entry is aggregated value
-                        prop_name_ssodnet,
-                    ),
-                )
-
-            elif setup['type'] is str:
-                setattr(
-                    self,
-                    prop,
-                    stringParameter(
-                        [d for d in data if d['selected']][0],
-                        prop_name_ssodnet,
-                    ),
-                )
+        # Add datacloud list attributes
+        for catalogue in datacloud:
+            self.__add_datacloud_catalogue(catalogue)
 
     def __hash__(self):
         return hash(self.name)
 
     def __repr__(self):
-        return self.__class__.__qualname__ +\
-            f'(number={self.number!r}, name={self.name!r})'
+        return (
+            self.__class__.__qualname__
+            + f"(number={self.number!r}, name={self.name!r})"
+        )
 
     def __str__(self):
-        return f'({self.number}) {self.name}'
+        return f"({self.number}) {self.name}"
 
     def __eq__(self, other):
         if self.__class__ is other.__class__:
@@ -197,227 +142,234 @@ class Rock:
             return (self.number, self.name) >= (other.number, other.name)
         return NotImplemented  # pragma: no cover
 
+    def __getattr__(self, name):
+        """Implement attribute shortcuts.
+        Only gets called if getattribute fails.
+        """
+        # Implements shortcuts: omission of parameters.physical/dynamical
+        if hasattr(self.parameters.physical, name):
+            return getattr(self.parameters.physical, name)
+        elif hasattr(self.parameters.dynamical, name):
+            return getattr(self.parameters.dynamical, name)
+        else:
+            raise AttributeError(f"Unknown attribute {name}")
+
+    def __add_metadata(self):
+        """docstring for __add_metadata"""
+        # TODO slow, replace by dict mapping
+        for meta in ["unit", "uncertainty"]:
+            for path in pd.json_normalize(TEMPLATE).columns:
+                if meta in path:
+                    quantity = path.replace(f".{meta}", "")
+                    try:
+                        setattr(
+                            utils.rgetattr(self, quantity),
+                            meta,
+                            utils.rgetattr(self, path),
+                        )
+                    except AttributeError:
+                        pass  # some unit paths are ill-defined
+
+    def __add_datacloud_catalogue(self, catalogue):
+        """docstring for __add_datacloud_catalogue"""
+        if not hasattr(getattr(self, "datacloud"), catalogue):
+            warnings.warn(f"Unknown datacloud catalogue requested: {catalogue}")
+            return
+
+        catalogue_dict = utils.retrieve_catalogue(
+            getattr(getattr(self, "datacloud"), catalogue)
+        )
+
+        catalogue_list = catalogue_dict[self.id]["datacloud"][catalogue]
+        catalogue_list = [utils.sanitize_keys(dict_) for dict_ in catalogue_list]
+
+        setattr(
+            self,
+            utils.DATACLOUD_META[catalogue]["attr_name"],
+            cast_types(catalogue_list),
+        )
+
 
 class stringParameter(str):
-    '''For asteroid parameters which are strings, e.g. taxonomy.'''
+    """For minor body parameters which are strings, e.g. taxonomy."""
 
-    def __new__(self, data, prop=False):
-        if prop is False:
-            return str.__new__(self, data)
-        else:
-            return str.__new__(self, data[prop])
+    def __new__(self, value):
+        return str.__new__(self, value)
 
-    def __init__(self, data, prop):
-        str.__init__(data[prop])
-
-        self.__name__ = prop
-
-        for key, value in data.items():
-
-            kw = key if not keyword.iskeyword(key) else key + '_'
-            setattr(self, kw, value)
+    def __init__(self, value):
+        str.__init__(value)
 
 
 class floatParameter(float):
-    '''For asteroid parameters which are floats, e.g. albedo.'''
+    """For minor body parameters which are floats, e.g. albedo.
 
-    def __new__(self, data, prop=False):
-        if prop is False:
-            return float.__new__(self, data)
+    Allows to assign attributes.
+    """
+
+    def __new__(self, value):
+        return float.__new__(self, value)
+
+    def __init__(self, value):
+        float.__init__(value)
+
+
+class intParameter(int):
+    """For minor body parameters which are floats, e.g. number.
+
+    Allows to assign attributes.
+    """
+
+    def __new__(self, value):
+        return int.__new__(self, value)
+
+    def __init__(self, value):
+        float.__init__(value)
+
+
+class propertyCollection(SimpleNamespace):
+    """For collections of data, e.g. taxonomy -> class, method, shortbib.
+
+    Collections of float properties have plotting and averaging methods.
+    """
+
+    def __repr__(self):
+        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+
+    def __str__(self):
+        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+
+
+class listSameTypeParameter(list):
+    """For several measurements of a single parameters of any type
+    in datcloud catalogues.
+    """
+
+    def __init__(self, data):
+        """Construct list which allows for assigning attributes.
+
+        Parameters
+        ==========
+        data : iterable
+            The minor body data from datacloud.
+        """
+        self.datatype = self.__get_type(data[-1])
+
+        if self.datatype is not None:
+            list.__init__(self, [self.datatype(d) for d in data])
         else:
-            return float.__new__(self, data[prop])
+            list.__init__(self, [None for d in data])
 
-    def __init__(self, data, prop):
-        float.__init__(data[prop])
-
-        self.__name__ = prop
-
-        for key, value in data.items():
-
-            kw = key if not keyword.iskeyword(key) else key + '_'
-            setattr(self, kw, value)
-
-
-class listParameter(list):
-    '''For several measurements of a single parameters of any type.'''
-
-    def __init__(self, data, prop, type_):
-
-        if type_ is float:
-            data = data[:-1]  # last entry is merged value
-
-        list.__init__(self, [type_(d[prop]) for d in data])
-
-        self.__name__ = prop
-        self.datatype = type_
-
-        for key in data[0].keys():
-
-            kw = key if not keyword.iskeyword(key) else key + '_'
-
-            if kw == f'err_{prop}':
-                kw = 'error'
-
-            # Proper typing of values
-            values = [d[key] for d in data]
-
+    def __get_type(self, string):
+        """Infers type from str variable."""
+        if not string:
+            return None
+        else:
             try:
-                if not isinstance(values[0], bool):  # keep booleans
-                    values = [float(v) for v in values]
+                var = float(string)
+                # scientific notation is not understood by int
+                if var.is_integer() and "e" not in string and "E" not in string:
+                    return float
+                else:
+                    return float
             except ValueError:
-                pass
+                return str
 
-            setattr(self, kw, values)
+    def weighted_average(self, errors=False):
+        """Compute weighted average of float-type parameters.
 
-    def weighted_average(self):
-        '''Compute weighted average of float-type parameters.
+        Parameters
+        ==========
+        errors : list of floats, np.ndarraya of floats
+            Optional list of associated uncertainties.  Default is unit
+            unceratinty.
 
         Returns
-        -------
+        ======
         (float, float)
-            Weighted average and its uncertainty.
-        '''
+        Weighted average and its uncertainty.
+        """
         if self.datatype is not float:
-            raise TypeError('Property is not of type float.')
+            raise TypeError("Property is not of type float.")
 
         observable = np.array(self)
 
         # Make uniform weights in case no errors are provided
-        if not hasattr(self, 'error'):
-            warnings.warn('No error provided, using uniform weights.')
-            error = np.ones(len(self))
+        if not errors:
+            warnings.warn("No error provided, using uniform weights.")
+            errors = np.ones(len(self))
         else:
             # Remove measurements where the error is zero
-            error = np.array(self.error)
+            errors = np.array(errors)
+        return utils.weighted_average(observable, errors)
 
-        return tools.weighted_average(observable, error)
+    def scatter(self, **kwargs):
+        return plots.scatter(self, **kwargs)
 
-    def scatter(self, nbins=10, show=False, savefig=None):
-        '''Create scatter/histogram figure for float parameters'''
-
-        fig = plt.figure(figsize=(12, 8))
-        gs = fig.add_gridspec(1, 2, width_ratios=(7, 2), wspace=0.05, 
-                              left=0.07, right=0.97, bottom=0.05, top=0.87)
-        ax = fig.add_subplot(gs[0])
-        ax_histy = fig.add_subplot(gs[1], sharey=ax)
-
-        avg, std = self.weighted_average()
-        ax.axhline(avg, label='Average', color=tools.METHODS['avg']['color'])
-        ax.axhline(avg+std, label='1$\sigma$ deviation', linestyle='dashed',
-                            color=tools.METHODS['std']['color'])
-        ax.axhline(avg-std, linestyle='dashed',
-                            color=tools.METHODS['std']['color'])
+    def hist(self, **kwargs):
+        return plots.hist(self, **kwargs)
 
 
-        x=np.linspace(1,len(self),len(self))
-        for i,m in enumerate(np.unique(self.method)):
-            cur=np.where(np.asarray(self.method)==m)
-            #breakpoint()
-            if True in np.asarray(self.selected)[cur]:
-                fcol=tools.METHODS[m]['color']
-            else:
-                fcol='none'
-            #fcol='none'
-            ax.scatter(x[cur], np.asarray(self)[cur], label=m, 
-                       marker=tools.METHODS[m]['marker'],
-                       s=80, 
-                       facecolors=fcol,
-                       edgecolors=tools.METHODS[m]['color'] )
-            ax.errorbar(x[cur], np.asarray(self)[cur],
-                        yerr=np.asarray(self.error)[cur],
-                        c=tools.METHODS[m]['color'], linestyle='')
-
-        ax.set_xticks(x)
-        axtop = ax.twiny()
-        axtop.set_xticks(x)
-        axtop.set_xticklabels(self.shortbib, rotation=25, ha='left') 
-        ax.set_ylabel(tools.PLOTTING['LABELS'][self.__name__])
-        ax.legend(loc='best',ncol=2)
-
-        range=ax.get_ylim()
-        ax_histy.tick_params(axis="y", labelleft=False)
-        ax_histy.hist(self, bins=nbins, range=range,
-                orientation='horizontal', color='grey', label='All')
-        ax_histy.legend(loc='lower right')
-
-        if savefig is not None:
-            fig.savefig(savefig)
-            return
-
-        if show:
-            plt.show()
-            plt.close()
-            return
-
-        return fig, ax
-
-
-    def hist(self, nbins=10, show=False, savefig=None):
-        '''Create histogram figure for float parameters'''
-
-        fig = plt.figure(figsize=(8, 6))
-        plt.hist(self, bins=nbins, label='Estimates')
-        avg, std = self.weighted_average()
-        plt.errorbar(avg, 0.5, xerr=std, label='Average', marker='o')
-        plt.legend(loc='upper right')
-        plt.xlabel(tools.PLOTTING['LABELS'][self.__name__])
-        plt.ylabel('Distribution')
-
-        if savefig is not None:
-            fig.savefig(savefig)
-            return
-
-        if show:
-            plt.show()
-            plt.close()
-            return
-
-        return fig
-
-
-def many_rocks(ids, properties, parallel=cpu_count(),
-               progress=True, verbose=False):
-    '''Get Rock instances with a subset of properties for many asteroids.
-
-    Queries SsODNet datacloud. Can be passed a list of identifiers.
-    Optionally performs a quaero query to verify the asteroid identitfy.
+def rocks(identifier, datacloud=[]):
+    """Create multiple Rock instances via POST request.
 
     Parameters
-    ----------
-    ids : list of str, list of int, list of float, np.array, pd.Series
-        An iterable containing asteroid identifiers.
-    properties : list of str
-        Asteroid properties to get.
-    parallel : int
-        Number of jobs to use for queries. Default is number of CPUs available.
-    progress : bool
-        Show progress. Default is True.
-    verbose : bool
-        Print request diagnostics. Default is False.
+    ==========
+    identifier : list of str, list of int, list of float, np.array, pd.Series
+        An iterable containing minor body identifiers.
+    datacloud : list of str
+        List of additional catalogues to retrieve from datacloud. Default is
+        [], no additional data.
 
     Returns
-    -------
-    list of Rock
-        A list of Rock instances containing the requested properties as
-        attributes.
-    '''
-    if isinstance(ids, pd.Series):
-        ids = ids.values
+    =======
+    list of rocks.core.Rock
+        A list of Rock instances
+    """
+    if isinstance(identifier, pd.Series):
+        identifier = identifier.values
 
-    build_rock = partial(Rock, only=properties)
+    # Ensure we know these objects
+    ids = [id_ for name, number, id_ in identify(identifier, return_id=True)]
+    # Sent POST request
+    ssoCards = utils.get_ssoCard(ids)
+    # Build rocks
+    rocks_ = []
+    for id_, ssoCard in track(
+        zip(ids, ssoCards), total=len(ids), description="Building rocks"
+    ):
+        rocks_.append(Rock(id_, ssoCard, datacloud, skip_id_check=True))
 
-    # Create Rocks
-    if parallel > 1:
-        pool = Pool(max_workers=parallel)
-        if progress:
-            rocks = list(track(pool.map(build_rock, ids), total=len(ids),
-                               description='Building Rocks...'))
-        else:
-            rocks = list(pool.map(build_rock, ids))
-    else:
-        if progress:
-            rocks = list(track(map(build_rock, ids), total=len(ids),
-                               description='Building Rocks...'))
-        else:
-            rocks = list(map(build_rock, ids))
-    return rocks
+    return rocks_
+
+
+@singledispatch
+def cast_types(value):
+    return value
+
+
+@cast_types.register(dict)
+def _cast_dict(value):
+    return propertyCollection(
+        **{
+            k: cast_types(v) if isinstance(v, dict) else __TYPES[type(v)](v)
+            for k, v in value.items()
+        }
+    )
+
+
+@cast_types.register(list)
+def _cast_list(li):
+    """Turn lists of dicts into a dict of lists."""
+    return propertyCollection(
+        **{k: listSameTypeParameter([dic[k] for dic in li]) for k in li[0]}
+    )
+
+
+__TYPES = {
+    None: lambda v: None,
+    int: intParameter,
+    str: stringParameter,
+    float: floatParameter,
+    dict: propertyCollection,
+    list: _cast_list,
+}

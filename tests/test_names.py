@@ -32,6 +32,7 @@ IDS_RESULTS_LOCAL = [
     ['A999AB2', ('1999 AB2', 53103), True],
     [9e7, (np.nan, np.nan), False],
     [None, (np.nan, np.nan), True],
+    [np.nan, (np.nan, np.nan), True],
 ]
 
 SSO_IDS = [it[0] for it in IDS_RESULTS_LOCAL]
@@ -82,6 +83,6 @@ def test_local_vs_remote(id_, expected, local, monkeypatch):
     result = names.get_name_number(id_, progress=False, parallel=1)
 
     if local:
-        assert result == expected
+        np.testing.assert_equal(result, expected)
     else:
         assert result is False

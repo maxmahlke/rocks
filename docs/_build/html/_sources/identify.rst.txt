@@ -1,0 +1,37 @@
+Identify asteroids
+==================
+
+Fast, flexible resolution of asteroid designations. 
+
+From the command line
+---------------------
+
+Use rocks identify or just rocks id
+
+From a script
+-------------
+from rocks.identify import identify
+
+identify('1950 RW')
+identify('RioDeJaneiro')
+identify(3728)
+identify('SCHWARTZ')
+identify(['SCHWARTZ', 1, '2012 AB'])
+
+from rocks import Rock, rocks, identify
+
+Guidelines
+----------
+The key to speed is a succesful, local look-up on the first try.
+
+- Use numbers if possible
+- Misspelled names are the largest source of errors: MontyPython does not resolve. Use the number or designation instead.
+
+The bottleneck is performance are the GET queries to quaero. For these, we use asznchronous single-threaded python processes
+
+Queries fail silently if not specified otherwise! If a name cannot be resolved the methods return NaNs
+
+
+Quick fix tries:
+- Insert whitespace in front of capitalized letter
+- Insert - in front of capitalized letter
