@@ -15,7 +15,7 @@ setup(
         "matplotlib",
         "numpy",
         "pandas",
-        "rich",
+        "rich>=8",
         "requests",
     ],
     entry_points="""
