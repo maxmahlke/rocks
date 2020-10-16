@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    
+    <title>core</title>
+    
+
+    <link rel="stylesheet" href="../_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="rocks 0.1 documentation" href="../index.html"/>
+    <link rel="up" title="Module code" href="index.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="../index.html" class="branding-link">
+    
+        rocks
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="../search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Intro to rocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">rocks CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="../index.html">Docs</a> /
+        </li>
+        
+        <li>
+            <a href="index.html">Module code</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">core</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
+  <h1>Source code for core</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="sd">&quot;&quot;&quot;Implement the Rock class and other core rocks functionality.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">keyword</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">rich.progress</span> <span class="kn">import</span> <span class="n">track</span>
+
+<span class="kn">from</span> <span class="nn">rocks.identify</span> <span class="kn">import</span> <span class="n">identify</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">plots</span>
+
+<span class="c1"># Read ssoCard template</span>
+<span class="n">path_cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.cache/rocks&quot;</span><span class="p">)</span>
+<span class="n">path_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_cache</span><span class="p">,</span> <span class="s2">&quot;ssoCard_template.json&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path_template</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Missing ssoCard template, retrieving..&quot;</span><span class="p">)</span>
+    <span class="n">utils</span><span class="o">.</span><span class="n">create_ssocard_template</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_template</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Rock"><a class="viewcode-back" href="../core.html#core.Rock">[docs]</a><span class="k">class</span> <span class="nc">Rock</span><span class="p">:</span>
+    <span class="s2">&quot;For space rocks.&quot;</span>
+
+<div class="viewcode-block" id="Rock.__init__"><a class="viewcode-back" href="../core.html#core.Rock.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">ssoCard</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[],</span> <span class="n">skip_id_check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Identify a minor body  and retrieve its properties from SsODNet.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ==========</span>
+<span class="sd">        identifier : str, int, float</span>
+<span class="sd">            Identifying asteroid name, designation, or number</span>
+<span class="sd">        ssoCard : dict</span>
+<span class="sd">            Optional previously acquired ssoCard.</span>
+<span class="sd">        datacloud : list of str</span>
+<span class="sd">            List of additional catalogues to retrieve from datacloud.</span>
+<span class="sd">            Default is no additional catalogues.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        =======</span>
+<span class="sd">        rocks.core.Rock</span>
+<span class="sd">            An asteroid class instance, with its properties as attributes.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        =====</span>
+<span class="sd">        If the asteroid could not be identified, the name and number are None</span>
+<span class="sd">        and no further attributes are set.</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        =======</span>
+<span class="sd">        &gt;&gt;&gt; from rocks.core import Rock</span>
+<span class="sd">        &gt;&gt;&gt; ceres = Rock(&#39;ceres&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; ceres.taxonomy.class_</span>
+<span class="sd">        &#39;C&#39;</span>
+<span class="sd">        &gt;&gt;&gt; ceres.taxonomy.shortbib</span>
+<span class="sd">        &#39;DeMeo+2009&#39;</span>
+<span class="sd">        &gt;&gt;&gt; ceres.diameter</span>
+<span class="sd">        848.4</span>
+<span class="sd">        &gt;&gt;&gt; ceres.diameter.unit</span>
+<span class="sd">        &#39;km&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Identify minor body</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_id_check</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">identify</span><span class="p">(</span>
+                <span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">identifier</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Fill attributes from argument, cache, or query</span>
+        <span class="n">ssoCard</span> <span class="o">=</span> <span class="n">ssoCard</span> <span class="k">if</span> <span class="n">ssoCard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_ssoCard</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="c1"># No ssoCard exists</span>
+        <span class="k">if</span> <span class="n">ssoCard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Initialize from template</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">TEMPLATE</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">update_ssoCard</span><span class="p">(</span><span class="n">TEMPLATE</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">sanitize_keys</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+
+        <span class="c1"># Add JSON keys as attributes, mapping to the appropriate type</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="nb">setattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">attribute</span><span class="p">,</span>
+                <span class="n">cast_types</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="n">attribute</span><span class="p">]),</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Set uncertainties and values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_metadata</span><span class="p">()</span>
+
+        <span class="c1"># Add datacloud list attributes</span>
+        <span class="k">for</span> <span class="n">catalogue</span> <span class="ow">in</span> <span class="n">datacloud</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__add_datacloud_catalogue</span><span class="p">(</span><span class="n">catalogue</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;(number=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="si">!r}</span><span class="s2">, name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="si">}</span><span class="s2">) </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span> <span class="fm">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span> <span class="fm">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span> <span class="fm">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span> <span class="fm">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span> <span class="ow">is</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Implement attribute shortcuts.</span>
+<span class="sd">        Only gets called if getattribute fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Implements shortcuts: omission of parameters.physical/dynamical</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dynamical</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dynamical</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown attribute </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;docstring for __add_metadata&quot;&quot;&quot;</span>
+        <span class="c1"># TODO slow, replace by dict mapping</span>
+        <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;unit&quot;</span><span class="p">,</span> <span class="s2">&quot;uncertainty&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">json_normalize</span><span class="p">(</span><span class="n">TEMPLATE</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+                    <span class="n">quantity</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">meta</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="nb">setattr</span><span class="p">(</span>
+                            <span class="n">utils</span><span class="o">.</span><span class="n">rgetattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">quantity</span><span class="p">),</span>
+                            <span class="n">meta</span><span class="p">,</span>
+                            <span class="n">utils</span><span class="o">.</span><span class="n">rgetattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="k">pass</span>  <span class="c1"># some unit paths are ill-defined</span>
+
+    <span class="k">def</span> <span class="nf">__add_datacloud_catalogue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">catalogue</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;docstring for __add_datacloud_catalogue&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;datacloud&quot;</span><span class="p">),</span> <span class="n">catalogue</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown datacloud catalogue requested: </span><span class="si">{</span><span class="n">catalogue</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">catalogue_dict</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">retrieve_catalogue</span><span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;datacloud&quot;</span><span class="p">),</span> <span class="n">catalogue</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">catalogue_list</span> <span class="o">=</span> <span class="n">catalogue_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">][</span><span class="s2">&quot;datacloud&quot;</span><span class="p">][</span><span class="n">catalogue</span><span class="p">]</span>
+        <span class="n">catalogue_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">utils</span><span class="o">.</span><span class="n">sanitize_keys</span><span class="p">(</span><span class="n">dict_</span><span class="p">)</span> <span class="k">for</span> <span class="n">dict_</span> <span class="ow">in</span> <span class="n">catalogue_list</span><span class="p">]</span>
+
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">utils</span><span class="o">.</span><span class="n">DATACLOUD_META</span><span class="p">[</span><span class="n">catalogue</span><span class="p">][</span><span class="s2">&quot;attr_name&quot;</span><span class="p">],</span>
+            <span class="n">cast_types</span><span class="p">(</span><span class="n">catalogue_list</span><span class="p">),</span>
+        <span class="p">)</span></div>
+
+
+<span class="k">class</span> <span class="nc">stringParameter</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For minor body parameters which are strings, e.g. taxonomy.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">str</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">floatParameter</span><span class="p">(</span><span class="nb">float</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For minor body parameters which are floats, e.g. albedo.</span>
+
+<span class="sd">    Allows to assign attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">float</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">intParameter</span><span class="p">(</span><span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For minor body parameters which are floats, e.g. number.</span>
+
+<span class="sd">    Allows to assign attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="nb">float</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">propertyCollection</span><span class="p">(</span><span class="n">SimpleNamespace</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For collections of data, e.g. taxonomy -&gt; class, method, shortbib.</span>
+
+<span class="sd">    Collections of float properties have plotting and averaging methods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">listSameTypeParameter</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;For several measurements of a single parameters of any type</span>
+<span class="sd">    in datcloud catalogues.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct list which allows for assigning attributes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ==========</span>
+<span class="sd">        data : iterable</span>
+<span class="sd">            The minor body data from datacloud.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Infers type from str variable.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">string</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">var</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="c1"># scientific notation is not understood by int</span>
+                <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;e&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span> <span class="ow">and</span> <span class="s2">&quot;E&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">float</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">float</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="nf">weighted_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Compute weighted average of float-type parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ==========</span>
+<span class="sd">        errors : list of floats, np.ndarraya of floats</span>
+<span class="sd">            Optional list of associated uncertainties.  Default is unit</span>
+<span class="sd">            unceratinty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ======</span>
+<span class="sd">        (float, float)</span>
+<span class="sd">        Weighted average and its uncertainty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Property is not of type float.&quot;</span><span class="p">)</span>
+
+        <span class="n">observable</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Make uniform weights in case no errors are provided</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No error provided, using uniform weights.&quot;</span><span class="p">)</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Remove measurements where the error is zero</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">weighted_average</span><span class="p">(</span><span class="n">observable</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">plots</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">plots</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="rocks"><a class="viewcode-back" href="../core.html#core.rocks">[docs]</a><span class="k">def</span> <span class="nf">rocks</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[]):</span>
+    <span class="sd">&quot;&quot;&quot;Create multiple Rock instances via POST request.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ==========</span>
+<span class="sd">    identifier : list of str, list of int, list of float, np.array, pd.Series</span>
+<span class="sd">        An iterable containing minor body identifiers.</span>
+<span class="sd">    datacloud : list of str</span>
+<span class="sd">        List of additional catalogues to retrieve from datacloud. Default is</span>
+<span class="sd">        [], no additional data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    =======</span>
+<span class="sd">    list of rocks.core.Rock</span>
+<span class="sd">        A list of Rock instances</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Ensure we know these objects</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">id_</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">identify</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+    <span class="c1"># Sent POST request</span>
+    <span class="n">ssoCards</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_ssoCard</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="c1"># Build rocks</span>
+    <span class="n">rocks_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span> <span class="ow">in</span> <span class="n">track</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">ssoCards</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Building rocks&quot;</span>
+    <span class="p">):</span>
+        <span class="n">rocks_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Rock</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">,</span> <span class="n">datacloud</span><span class="p">,</span> <span class="n">skip_id_check</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">rocks_</span></div>
+
+
+<span class="nd">@singledispatch</span>
+<span class="k">def</span> <span class="nf">cast_types</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="nd">@cast_types</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_cast_dict</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">propertyCollection</span><span class="p">(</span>
+        <span class="o">**</span><span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">cast_types</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">__TYPES</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">v</span><span class="p">)](</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@cast_types</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_cast_list</span><span class="p">(</span><span class="n">li</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Turn lists of dicts into a dict of lists.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">propertyCollection</span><span class="p">(</span>
+        <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">listSameTypeParameter</span><span class="p">([</span><span class="n">dic</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">dic</span> <span class="ow">in</span> <span class="n">li</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">li</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+    <span class="p">)</span>
+
+
+<span class="n">__TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="kc">None</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="nb">int</span><span class="p">:</span> <span class="n">intParameter</span><span class="p">,</span>
+    <span class="nb">str</span><span class="p">:</span> <span class="n">stringParameter</span><span class="p">,</span>
+    <span class="nb">float</span><span class="p">:</span> <span class="n">floatParameter</span><span class="p">,</span>
+    <span class="nb">dict</span><span class="p">:</span> <span class="n">propertyCollection</span><span class="p">,</span>
+    <span class="nb">list</span><span class="p">:</span> <span class="n">_cast_list</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+
+            </div>
+
+        </section>
+
+        
+
+        
+            <div class="source-link">
+            
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Max Mahlke, Benoit Carry.
+        </p>
+    </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
+</div>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/theme-min.js"></script> 
+</body>
+</html>
