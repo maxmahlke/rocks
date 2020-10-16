@@ -178,6 +178,14 @@ class Rock:
             getattr(getattr(self, "datacloud"), catalogue)
         )
 
+        if catalogue_dict[self.id]["datacloud"] is None:
+            setattr(
+                self,
+                rocks.utils.DATACLOUD_META[catalogue]["attr_name"],
+                None,
+            )
+            return
+
         catalogue_list = catalogue_dict[self.id]["datacloud"][catalogue]
         catalogue_list = [rocks.utils.sanitize_keys(dict_) for dict_ in catalogue_list]
 
@@ -235,6 +243,12 @@ class propertyCollection(SimpleNamespace):
 
     def __str__(self):
         return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+
+    def scatter(self, **kwargs):
+        return rocks.plots.scatter(self, **kwargs)
+
+    def hist(self, **kwargs):
+        return rocks.plots.hist(self, **kwargs)
 
 
 class listSameTypeParameter(list):
@@ -299,12 +313,6 @@ class listSameTypeParameter(list):
             # Remove measurements where the error is zero
             errors = np.array(errors)
         return rocks.utils.weighted_average(observable, errors)
-
-    def scatter(self, **kwargs):
-        return rocks.plots.scatter(self, **kwargs)
-
-    def hist(self, **kwargs):
-        return rocks.plots.hist(self, **kwargs)
 
 
 def rocks_(identifier, datacloud=[]):
