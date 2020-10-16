@@ -1008,3 +1008,9 @@ DATACLOUD_META = {
 
 class TooManyRocksError(Exception):
     pass
+
+path_template = os.path.join(PATH_CACHE, "ssoCard_template.json")
+
+if not os.path.isfile(path_template):
+    print("Missing ssoCard template, retrieving..")
+    create_ssocard_template()

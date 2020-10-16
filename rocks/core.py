@@ -17,12 +17,15 @@ import rocks
 path_cache = os.path.join(os.path.expanduser("~"), ".cache/rocks")
 path_template = os.path.join(path_cache, "ssoCard_template.json")
 
-if not os.path.isfile(path_template):
-    print("Missing ssoCard template, retrieving..")
-    rocks.utils.create_ssocard_template()
+if os.path.isfile(path_template):
+    with open(path_template, "r") as file_:
+        TEMPLATE = json.load(file_)
 
-with open(path_template, "r") as file_:
-    TEMPLATE = json.load(file_)
+    META_MAPPING = {
+        v: v.replace(".uncertainty", "")
+        for v in pd.json_normalize(TEMPLATE).columns
+        if ".uncertainty" in v
+    }
 
 
 class Rock:
@@ -387,8 +390,3 @@ __TYPES = {
     list: _cast_list,
 }
 
-META_MAPPING = {
-    v: v.replace(".uncertainty", "")
-    for v in pd.json_normalize(TEMPLATE).columns
-    if ".uncertainty" in v
-}
