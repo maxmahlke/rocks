@@ -83,9 +83,18 @@ class AliasedGroup(click.Group):
                     break
 
         if valid:
+
+            arguments = sys.argv.copy()
+
+            plot = False
+            for p in ['-h', '--hist', '-s', '--scatter']:
+                if p in arguments:
+                    plot = True
+                    arguments.remove(p)
+
             # Identify rock and check datacloud catalogue
-            if len(sys.argv) == 3:
-                id_ = sys.argv[-1]
+            if len(arguments) == 3:
+                id_ = arguments[-1]
                 skip_id_check = False
             else:
                 _, _, id_ = rocks.utils.select_sso_from_index()
@@ -96,7 +105,7 @@ class AliasedGroup(click.Group):
                 sys.exit()
 
             prop = rocks.utils.rgetattr(rock, prop)
-            return rocks.utils.echo_property(rock, prop)
+            return rocks.utils.echo_property(rock, prop, plot=plot)
         else:
             return None
 

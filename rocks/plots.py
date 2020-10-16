@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 """ Plotting utilities for rocks.
 """
+import sys
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -117,15 +119,15 @@ def show_scatter_hist(info, par, figname):
     axtop.set_xticklabels(info[1].shortbib, rotation=25, ha="left")
 
     # Histogram
-    range = ax.get_ylim()
+    range_ = ax.get_ylim()
     nbins = 10
     ax_histy.tick_params(axis="y", labelleft=False)
-    sel = np.where(info[1].selected == True)
+    sel = np.where(info[1].selected)
 
     na, ba, pa = ax_histy.hist(
         val,
         bins=nbins,
-        range=range,
+        range=range_,
         orientation="horizontal",
         color="grey",
         label="All",
@@ -133,7 +135,7 @@ def show_scatter_hist(info, par, figname):
     ns, bs, ps = ax_histy.hist(
         val[sel],
         bins=nbins,
-        range=range,
+        range_=range_,
         orientation="horizontal",
         color="gold",
         label="Selected",
@@ -145,9 +147,28 @@ def show_scatter_hist(info, par, figname):
     plt.close()
 
 
-def scatter(self, nbins=10, show=False, savefig=None):
-    """Create scatter/histogram figure for float parameters"""
+def scatter(catalogue, nbins=10, show=False, savefig=""):
+    """Create scatter/histogram figure for float parameters.
 
+    Parameters
+    ==========
+    catalogue : rocks.core.propertyCollection
+        A datacloud catalogue ingested in Rock instance.
+    nbins : int
+        Number of bins in histogram. Default is 10
+    show : bool
+        Show plot. Default is False.
+    save_to : str
+        Save figure to path. Default is no saving.
+
+    Returns
+    =======
+    matplotlib.figures.Figure instance, matplotib.axes.Axis instance
+    """
+    prop, errors, prop_name = _property_errors(catalogue)
+
+    # ------
+    # Build figure
     fig = plt.figure(figsize=(12, 8))
     gs = fig.add_gridspec(
         1,
@@ -159,10 +180,11 @@ def scatter(self, nbins=10, show=False, savefig=None):
         bottom=0.05,
         top=0.87,
     )
+
     ax = fig.add_subplot(gs[0])
     ax_histy = fig.add_subplot(gs[1], sharey=ax)
 
-    avg, std = self.weighted_average()
+    avg, std = prop.weighted_average(errors)
     ax.axhline(avg, label="Average", color=rocks.utils.METHODS["avg"]["color"])
     ax.axhline(
         avg + std,
@@ -172,13 +194,13 @@ def scatter(self, nbins=10, show=False, savefig=None):
     )
     ax.axhline(avg - std, linestyle="dashed", color=rocks.utils.METHODS["std"]["color"])
 
-    x = np.linspace(1, len(self), len(self))
-    for i, m in enumerate(np.unique(self.method)):
-        cur = np.where(np.asarray(self.method) == m)
+    x = np.linspace(1, len(prop), len(prop))
+    for i, m in enumerate(np.unique(catalogue.method)):
+        cur = np.where(np.asarray(catalogue.method) == m)
     fcol = "none"
     ax.scatter(
         x[cur],
-        np.asarray(self)[cur],
+        np.asarray(prop)[cur],
         label=m,
         marker=rocks.utils.METHODS[m]["marker"],
         s=80,
@@ -187,8 +209,8 @@ def scatter(self, nbins=10, show=False, savefig=None):
     )
     ax.errorbar(
         x[cur],
-        np.asarray(self)[cur],
-        yerr=np.asarray(self.error)[cur],
+        np.asarray(prop)[cur],
+        yerr=np.asarray(errors)[cur],
         c=rocks.utils.METHODS[m]["color"],
         linestyle="",
     )
@@ -196,14 +218,14 @@ def scatter(self, nbins=10, show=False, savefig=None):
     ax.set_xticks(x)
     axtop = ax.twiny()
     axtop.set_xticks(x)
-    axtop.set_xticklabels(self.shortbib, rotation=25, ha="left")
-    ax.set_ylabel(rocks.utils.PLOTTING["LABELS"][self.__name__])
+    axtop.set_xticklabels(catalogue.shortbib, rotation=25, ha="left")
+    ax.set_ylabel(rocks.utils.PLOTTING["LABELS"][prop_name])
     ax.legend(loc="best", ncol=2)
 
     range_ = ax.get_ylim()
     ax_histy.tick_params(axis="y", labelleft=False)
     ax_histy.hist(
-        self,
+        prop,
         bins=nbins,
         range=range_,
         orientation="horizontal",
@@ -212,36 +234,96 @@ def scatter(self, nbins=10, show=False, savefig=None):
     )
     ax_histy.legend(loc="lower right")
 
-    if savefig is not None:
+    if savefig:
         fig.savefig(savefig)
-    return
 
     if show:
         plt.show()
-    plt.close()
-    return
+        plt.close()
 
     return fig, ax
 
 
-def hist(self, nbins=10, show=False, savefig=None):
-    """Create histogram figure for float parameters"""
+def hist(catalogue, nbins=10, show=False, save_to=""):
+    """Create histogram figure for float parameters.
 
+    Parameters
+    ==========
+    catalogue : rocks.core.propertyCollection
+        A datacloud catalogue ingested in Rock instance.
+    nbins : int
+        Number of bins in histogram. Default is 10
+    show : bool
+        Show plot. Default is False.
+    save_to : str
+        Save figure to path. Default is no saving.
+
+    Returns
+    =======
+    matplotlib.figures.Figure instance, matplotib.axes.Axis instance
+    """
+
+    # inferred from propertyCollection
+    prop, errors, prop_name = _property_errors(catalogue)
+
+    # ------
+    # Build figure
     fig = plt.figure(figsize=(8, 6))
-    plt.hist(self, bins=nbins, label="Estimates")
-    avg, std = self.weighted_average()
+
+    plt.hist(prop, bins=nbins, label="Estimates")
+
+    avg, std = prop.weighted_average(errors)
+
     plt.errorbar(avg, 0.5, xerr=std, label="Average", marker="o")
+
     plt.legend(loc="upper right")
-    plt.xlabel(rocks.utils.PLOTTING["LABELS"][self.__name__])
+
+    plt.xlabel(rocks.utils.PLOTTING["LABELS"][prop_name])
     plt.ylabel("Distribution")
 
-    if savefig is not None:
-        fig.savefig(savefig)
-    return
+    if save_to:
+        fig.savefig(save_to)
 
     if show:
         plt.show()
-    plt.close()
-    return
+        plt.close()
 
-    return fig
+    return fig, plt.gca()
+
+
+def _property_errors(catalogue):
+    """Retrieve main property and its errors from a datacloud catalogue.
+    masses -> mass, diamalbedo -> either albedos or diameters
+
+    Parameters
+    ==========
+    catalogue : rocks.core.propertyCollection
+        Datacloud catalogue ingested into Rock instance.
+
+    Returns
+    =======
+    ndarray, ndarray
+        The main property as defined in utils.DATACLOUD_META and its error.
+    str
+        The property name.
+    """
+    # ------
+    # Data selection: if called from command line, get from arguments
+    # TODO Fails if user renames executable. Should be
+    if sys.argv[0].endswith("rocks"):
+        prop = sys.argv[1]  # eg masses, diameters, albedos
+
+        if prop in ["diameters", "albedos"]:
+            cat_name = "diamalbedo"
+        else:
+            cat_name = prop
+
+        # Actual attribute name is singular version
+        prop_name = rocks.utils.DATACLOUD_META[cat_name]["prop_name"][prop]
+        prop = getattr(catalogue, prop_name)  # listSameTypeParameter
+
+    if hasattr(catalogue, f"err_{prop_name}"):
+        errors = getattr(catalogue, f"err_{prop_name}")
+    else:
+        errors = np.ones(np.array(prop).shape)
+    return prop, errors, prop_name

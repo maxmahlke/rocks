@@ -722,7 +722,7 @@ def weighted_average(observable, error):
     return (avg, std_avg)
 
 
-def echo_property(rock, prop):
+def echo_property(rock, prop, plot=False):
     """Echo asteroid property for a single minor body.
     Print datacloud collections. Optionally open plots.
 
@@ -732,6 +732,8 @@ def echo_property(rock, prop):
         The asteroid Rock instance
     prop : str
         Asteroid property, attribute from JSON template
+    plot : bool
+        Plot propertyCollection. Default is False.
     """
     # TODO Add these as __str__ to classes
     if isinstance(prop, rocks.core.stringParameter):
@@ -741,7 +743,7 @@ def echo_property(rock, prop):
     elif isinstance(prop, rocks.core.floatParameter):
         _echo_floatParameter(prop)
     elif isinstance(prop, rocks.core.propertyCollection):
-        _echo_propertyCollection(rock, prop)
+        _echo_propertyCollection(rock, prop, plot)
     elif isinstance(prop, rocks.core.listSameTypeParameter):
         _echo_listSameTyeParameter(prop)
     else:
@@ -788,7 +790,7 @@ def _echo_floatParameter(prop):
         print(f"{prop}")
 
 
-def _echo_propertyCollection(rock, prop):
+def _echo_propertyCollection(rock, prop, plot):
     from rich import box
     from rich.table import Table
     from rich import print as rprint
@@ -816,7 +818,7 @@ def _echo_propertyCollection(rock, prop):
         "idcollection",
         "selection",
         "source",
-        "resourcename"
+        "resourcename",
     ]
     # keys are table property names
     keys = list(prop.__dict__.keys())
@@ -857,25 +859,11 @@ def _echo_propertyCollection(rock, prop):
 
     rprint(table)
 
-    #  if hasattr(rock, prop):
-    #  rocks.utils.pretty_print(rock, prop)
-
-    #  prop = getattr(rock, prop)
-
-    #  if hist or scatter:
-
-    #  if not isinstance(prop, rocks.core.listSameTypeParameter):
-    #  click.echo("\nPlotting is only implemented for property collections.")
-    #  sys.exit()
-
-    #  if prop.datatype is not float:
-    #  click.echo("\nCan only plot properties of type float.")
-    #  sys.exit()
-
-    #  if hist:
-    #  prop.hist(show=True)
-    #  if scatter:
-    #  prop.scatter(show=True)
+    if plot:
+        if any([p in sys.argv for p in ['-h', '--hist']]):
+            prop.hist(show=True)
+        if any([p in sys.argv for p in ['-s', '--scatter']]):
+            prop.scatter(show=True)
 
     sys.exit()  # otherwise click prints Error
 
@@ -885,9 +873,6 @@ def _echo_listSameTyeParameter(prop):
     # TODO Add weighted average for floatParameters
     # TODO Plots
     prop.scatter()
-
-
-
 
     # collection is attr_name in DATACLOUD_META
     # Parse arguments
@@ -983,6 +968,9 @@ PLOTTING = {
 }
 
 DATACLOUD_META = {
+    # datacloud key : rocks name
+    #     attr_name : Rock.xyz
+    #     prop_name : Name of property in catalogue
     "aams": {
         "attr_name": "aams",
     },
@@ -997,12 +985,14 @@ DATACLOUD_META = {
     },
     "diamalbedo": {
         "attr_name": "diamalbedo",
+        "prop_name": {"diameters": "diameter", "albedos": "albedo"},
     },
     "families": {
         "attr_name": "families",
     },
     "masses": {
         "attr_name": "masses",
+        "prop_name": {"masses": "mass"},
     },
     "mpcatobs": {
         "attr_name": "mpc",
