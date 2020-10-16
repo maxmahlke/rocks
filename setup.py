@@ -1,20 +1,25 @@
 from setuptools import find_packages, setup
+import rocks
 
 setup(
-    name='rocks',
-    version='0.1',
-    packages=find_packages(),
+    name="rocks",
+    version=rocks.__version__,
+    packages=find_packages("rocks"),
     include_package_data=True,
-    py_modules=['rocks'],
+    description="For space rocks.",
+    py_modules=["rocks"],
     install_requires=[
-        'click',
-        'iterfzf',
-        'numpy',
-        'pandas',
-        'rich'
+        "aiohttp",
+        "click",
+        "iterfzf",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "rich",
+        "requests",
     ],
-    entry_points='''
+    entry_points="""
         [console_scripts]
         rocks=rocks.cli:cli_rocks
-    ''',
+    """,
 )

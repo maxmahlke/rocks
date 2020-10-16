@@ -1,0 +1,8 @@
+aiohttp
+click
+iterfzf
+matplotlib
+numpy
+pandas
+rich
+requests

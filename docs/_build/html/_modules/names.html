@@ -1,37 +1,109 @@
-
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>names &#8212; rocks 0.1 documentation</title>
-    <link rel="stylesheet" href="../_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/language_data.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
-      </ul>
-    </div>  
+    
+    <title>names</title>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+    <link rel="stylesheet" href="../_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="rocks 0.1 documentation" href="../index.html"/>
+    <link rel="up" title="Module code" href="index.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="../index.html" class="branding-link">
+    
+        rocks
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="../search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Intro to rocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core.html">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">rocks CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="../index.html">Docs</a> /
+        </li>
+        
+        <li>
+            <a href="index.html">Module code</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">names</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
   <h1>Source code for names</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
@@ -45,6 +117,7 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span><span class="p">,</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -133,7 +206,12 @@
 <span class="sd">        identifiers, returns a list of tuples.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sso</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)):</span>
-        <span class="n">sso</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sso</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sso</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>  <span class="c1"># np.nan</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;This identifier appears to be NaN: </span><span class="si">{sso}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="c1"># Try local lookup</span>
         <span class="k">if</span> <span class="n">sso</span> <span class="ow">in</span> <span class="n">tools</span><span class="o">.</span><span class="n">NUMBER_NAME</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -279,38 +357,54 @@
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^\w-]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 </pre></div>
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+            </div>
+
+        </section>
+
+        
+
+        
+            <div class="source-link">
+            
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Max Mahlke, Benoit Carry.
+        </p>
     </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="nav-item nav-item-0"><a href="../index.html">rocks 0.1 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
-    </div>
-  </body>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <script type="text/javascript" src="../_static/js/theme-min.js"></script> 
+</body>
 </html>

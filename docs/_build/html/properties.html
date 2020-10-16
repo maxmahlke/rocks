@@ -1,44 +1,104 @@
-
 <!DOCTYPE html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Asteroid Properties &#8212; rocks 0.1 documentation</title>
-    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tools" href="tools.html" />
-    <link rel="prev" title="Command-Line Interface" href="cli.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="tools.html" title="Tools"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="cli.html" title="Command-Line Interface"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>  
+    
+    <title>Asteroid Properties</title>
+    
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+    <link rel="stylesheet" href="_static/css/redactor.css" type="text/css" />
+    
+    <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+    
+    
+    <link rel="index" title="Index" href="genindex.html"/>
+    <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="rocks 0.1 documentation" href="index.html"/> 
+</head>
+
+<body role="document">
+     
+
+    
+<a href="#" id="js-navigation-toggle" class="navigation-toggle">
+    <i class="mdi mdi-menu"></i><i class="mdi mdi-close"></i>
+</a>
+
+<section class="site-sidebar">
+
+<nav>
+
+
+    <a href="index.html" class="branding-link">
+    
+        rocks
+    
+    
+    
+        
+        
+    
+    </a>
+
+    
+<section role="search">
+    <form action="search.html" method="get" class="site-searchform">
+        <input type="text" name="q" placeholder="Search docs" />
+        <input type="hidden" name="check_keywords" value="yes" />
+        <input type="hidden" name="area" value="default" />
+      </form>
+</section>
+
+
+
+    <section class="site-nav">
+    
+    
+        <p class="caption"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Intro to rocks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core.html">The <code class="docutils literal notranslate"><span class="pre">Rock</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">rocks CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+
+    
+    </section>
+
+</nav>
+
+</section>
+
+    <main class="site-main" role="main">
+        
+
+
+
+
+
+
+
+
+
+
+
+<nav class="site-breadcrumbs">
+    <ul>
+    
+        <li>
+            <a href="index.html">Docs</a> /
+        </li>
+        
+        <li class="site-breadcrumbs__leaf">Asteroid Properties</li>
+    
+    </ul>
+</nav>
+        <section class="site-content">
+            <div class="container">
+                
   <div class="section" id="asteroid-properties">
 <h1>Asteroid Properties<a class="headerlink" href="#asteroid-properties" title="Permalink to this headline">¶</a></h1>
 <p>The SsODNet:datacloud contains a vast collection of asteroid properties. In
@@ -90,234 +150,62 @@ maintainers</strong>.</p>
 </div>
 <p>Class to complex method.</p>
 <p>For convenience, function wrappers are defined:</p>
-<span class="target" id="albedo"></span><dl class="py function">
-<dt id="albedo.select_albedo">
-<code class="sig-prename descclassname">albedo.</code><code class="sig-name descname">select_albedo</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">albedos</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/albedo.html#select_albedo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#albedo.select_albedo" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute a single albedo value from multiple measurements.</p>
-<p>Evaluates the methods and computes the weighted average of equally ranked
-methods.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>albedos</strong> (<em>dict</em>) – Albedo measurements and metadata retrieved from SsODNet:datacloud.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>averaged, tuple</em> – The average albedo and its uncertainty.</p></li>
-<li><p><em>albedos, dict</em> – The input dictionary, with an additional key ‘selected’. True if the
-item was used in the computation of the average, else False.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The method ranking is given below. Albeods acquired with the top-ranked
-method available are used for the weighted average computation. Albedos
-observed with NEATM or STM get an additional 10% uncertainty added.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;SPACE&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;ADAM&#39;</span><span class="p">,</span> <span class="s1">&#39;KOALA&#39;</span><span class="p">,</span> <span class="s1">&#39;SAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;Radar&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;LC+TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+AO&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;TE-IM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;AO&#39;</span><span class="p">,</span> <span class="s1">&#39;Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;IM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;NEATM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;STM&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<span class="target" id="diameter"></span><dl class="py function">
-<dt id="properties.select_diameter">
-<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">select_diameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">diameters</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#select_diameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.select_diameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute a single diameter value from multiple measurements.</p>
-<p>Evaluates the methods and computes the weighted average of equally ranked
-methods.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>diameters</strong> (<em>dict</em>) – Diameter measurements and metadata retrieved from SsODNet:datacloud.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>averaged, tuple</em> – The average diameter and its uncertainty.</p></li>
-<li><p><em>diameters, dict</em> – The input dictionary, with an additional key ‘selected’. True if the
-item was used in the computation of the average, else False.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The method ranking is given below. Diameters acquired with the top-ranked
-method available are used for the weighted average computation. Diameters
-observed with NEATM or STM get an additional 10% uncertainty added.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;SPACE&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;ADAM&#39;</span><span class="p">,</span> <span class="s1">&#39;KOALA&#39;</span><span class="p">,</span> <span class="s1">&#39;SAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;Radar&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;LC+TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;TPM&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+AO&#39;</span><span class="p">,</span> <span class="s1">&#39;LC+Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;TE-IM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;AO&#39;</span><span class="p">,</span> <span class="s1">&#39;Occ&#39;</span><span class="p">,</span> <span class="s1">&#39;IM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;NEATM&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;STM&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<span class="target" id="mass"></span><dl class="py function">
-<dt id="properties.select_mass">
-<code class="sig-prename descclassname">properties.</code><code class="sig-name descname">select_mass</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masses</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/properties.html#select_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#properties.select_mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute a single mass estimate from multiple measurements.</p>
-<p>Evaluates the methods and computes the weighted average of equally ranked
-methods.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>masses</strong> (<em>dict</em>) – Mass estimates and metadata retrieved from SsODNet:datacloud.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>averaged, tuple</em> – The average mass and its uncertainty.</p></li>
-<li><p><em>masses, dict</em> – The input dictionary, with an additional key ‘selected’. True if the
-item was used in the computation of the average, else False.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>The method ranking is given below. Masses acquired with the top-ranked
-method available are used for the weighted average computation.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="s1">&#39;SPACE&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;Bin-Genoid&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;Bin-IM&#39;</span><span class="p">,</span> <span class="s1">&#39;Bin-Radar&#39;</span><span class="p">,</span> <span class="s1">&#39;Bin-PheMu&#39;</span><span class="p">]</span>
-<span class="p">[</span><span class="s1">&#39;EPHEM&#39;</span><span class="p">,</span> <span class="s1">&#39;DEFLECT&#39;</span><span class="p">]</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<span class="target" id="taxonomy"></span><dl class="py function">
-<dt id="taxonomy.select_taxonomy">
-<code class="sig-prename descclassname">taxonomy.</code><code class="sig-name descname">select_taxonomy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">taxa</span></em>, <em class="sig-param"><span class="n">from_Rock</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/taxonomy.html#select_taxonomy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#taxonomy.select_taxonomy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select a single taxonomic classification from multiple choices.</p>
-<p>Evaluates the wavelength ranges, methods, schemes, and recency of
-classification.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>taxa</strong> (<em>dict</em>) – Taxonomic classifications retrieved from SsODNet:datacloud.</p></li>
-<li><p><strong>from_Rock</strong> (<em>bool</em>) – Whether the call is done by a Rock instance.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>(class, complex)</strong> (<em>tuple of str</em>) – The selected taxonomic classification and the complex.</p></li>
-<li><p><strong>taxa</strong> (<em>dict</em>) – The input dictionary, with an additional key ‘selected’. True if the
-item was selected, else False.</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">POINTS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;scheme&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;bus-demeo&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s1">&#39;bus&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s1">&#39;smass&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s1">&#39;tholen&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s1">&#39;sdss&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="p">},</span>
-
-    <span class="s1">&#39;waverange&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;vis&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="s1">&#39;nir&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s1">&#39;visnir&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-        <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
-    <span class="p">},</span>
-
-    <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-        <span class="s1">&#39;phot&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="s1">&#39;mix&#39;</span><span class="p">:</span> <span class="mi">4</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<dl class="simple">
-<dt>CLASS_TO_COMPLEX = {</dt><dd><p>‘A’: ‘A’, ‘AQ’: ‘A’,
-‘B’: ‘B’, ‘BU’: ‘B’, ‘F’: ‘B’, ‘FC’: ‘B’,
-‘C’: ‘C’, ‘Cb’: ‘C’, ‘Cg’: ‘C’, ‘Cgx’: ‘C’, ‘CX’: ‘C’,
-‘c’: ‘C’, ‘CB’: ‘C’, ‘CD’: ‘C’, ‘CX’: ‘C’, ‘CF’: ‘C’, ‘CG’: ‘C’,
-‘CL’: ‘C’, ‘Co’: ‘C’, ‘CO’: ‘C’, ‘CQ’: ‘C’,
-‘Cgh’: ‘Ch’, ‘Ch’: ‘Ch’,
-‘D’: ‘D’, ‘DP’: ‘D’, ‘DU’: ‘D’, ‘DS’: ‘D’,
-‘K’: ‘K’,
-‘L’: ‘L’, ‘Ld’: ‘L’, ‘LA’: ‘L’, ‘LQ’: ‘L’,
-‘Q’: ‘Q’,
-‘S’: ‘S’, ‘Sa’: ‘S’, ‘SD’: ‘S’, ‘Sk’: ‘S’, ‘Sl’: ‘S’, ‘Sq’: ‘S’,
-‘SQ’: ‘S’, ‘Sqw’: ‘S’, ‘Sr’: ‘S’, ‘Srw’: ‘S’, ‘Sw’: ‘S’,
-‘s’: ‘S’, ‘SA’: ‘S’, ‘Sp’: ‘S’, ‘SV’: ‘S’,
-‘Sv’: ‘S’,
-‘T’: ‘T’,
-‘O’: ‘O’,
-‘R’: ‘R’,
-‘Q’: ‘Q’, ‘QV’: ‘Q’, ‘QO’: ‘Q’,
-‘V’: ‘V’,
-‘Xc’: ‘X’, ‘XC’: ‘X’, ‘Xe’: ‘X’, ‘Xk’: ‘X’, ‘XL’: ‘X’, ‘X’: ‘X’,
-‘Xn’: ‘X’, ‘XL’: ‘X’, ‘Xt’: ‘X’, ‘XC’: ‘X’,
-‘XD’: ‘X’,
-‘E’: ‘E’,
-‘M’: ‘M’,
-‘PD’: ‘P’,
-‘P’: ‘P’, ‘PC’: ‘P’,</p>
-</dd>
-</dl>
-<p>}</p>
-</dd></dl>
-
-</div>
+<span class="target" id="taxonomy"><span id="mass"></span><span id="diameter"></span><span id="albedo"></span></span></div>
 
 
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="cli.html"
-                        title="previous chapter">Command-Line Interface</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="tools.html"
-                        title="next chapter">Tools</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/properties.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
-      <input type="submit" value="Go" />
-    </form>
+            </div>
+
+        </section>
+
+        
+
+        
+            <div class="source-link">
+            
+                
+                    <a href="_sources/properties.rst.txt" rel="nofollow">
+                        <i class="mdi mdi-code-tags"></i>
+                        View page source
+                    </a>
+                
+            
+            </div>
+        
+
+
+
+    </main>
+
+    <footer class="site-footer">
+<div class="container">
+
+    <div role="contentinfo">
+        <p>
+                &copy; Copyright 2020, Max Mahlke, Benoit Carry.
+        </p>
     </div>
+        <p>Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+        <a href="https://github.com/testthedocs/sphinx_ttd_theme">theme</a>
+        provided by <a href="https://testthedocs">TestTheDocs</a>. 
+
 </div>
-<script>$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="tools.html" title="Tools"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="cli.html" title="Command-Line Interface"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">rocks 0.1 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Max Mahlke, Benoit Carry.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 3.0.3.
-    </div>
-  </body>
+</footer>
+
+    
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script type="text/javascript" src="_static/js/theme-min.js"></script> 
+</body>
 </html>

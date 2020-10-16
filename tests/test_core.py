@@ -11,17 +11,27 @@
 from os import path
 
 import json
+import numpy as np
 import pytest
 
 from rocks.core import Rock
 from rocks import tools
 
-# IDs = ['ceres', '1807 FA', 10, 20.]
-# NANUS = [(1, 'Ceres'), (4, 'Vesta'), (10, 'Hygiea'),
-         # (20, 'Massalia')]
 IDs = ['ceres', 2, 4.]
 NANUS = [(1, 'Ceres'), (2, 'Pallas'), (4, 'Vesta')]
 TAX = ['C', 'B', 'V']
+
+
+# MONKEYPATCH
+# Read from file rather than query ssodnet for test
+def read_data(name):
+    path_data = path.join(path.dirname(__file__),
+                          f'data/{name}_datacloud.json')
+
+    with open(path_data, 'r') as file_:
+        data = json.load(file_)
+
+    return data['data'][name]
 
 
 @pytest.mark.parametrize('id_, nanu, tax', zip(IDs, NANUS, TAX), ids=str)
@@ -47,41 +57,69 @@ def test_partial_instantiation(id_, nanu, tax, monkeypatch):
     assert not hasattr(SSO, 'albedo')
 
 
-# Ceres = Rock('Ceres')
-# print(Ceres.taxonomy)
-# print(Ceres.taxonomy.shortbib)
-# print(Ceres.taxonomies)
-# print(Ceres.taxonomies.shortbib)
+def test_failed_instantiation(monkeypatch):
+    '''Verify failed class instantiation.'''
+    SSO = Rock(None)
+    np.testing.assert_equal(SSO.name, np.nan)
 
-# print(Ceres.albedo)
-# print(Ceres.albedos)
-# print(Ceres.albedos.err_albedo)
-# C
-# ['C', 'G', 'C', 'C']
-# Ceres = Rock('Ceres')
-# Pallas = Rock('pallas')
-# Juno = Rock(3.)
+    with pytest.raises(TypeError):
+        SSO = Rock(1, only={})
+    with pytest.raises(TypeError):
+        SSO = Rock(1, only=[2])
 
-# _2010OR = Rock('2010OR')
-# _2010OR2 = Rock('2010OR')
+    monkeypatch.setattr(tools, 'get_data', lambda x: False)
+    SSO = Rock(1)
+    assert hasattr(SSO, 'albedo') is False
 
-# print(_2010OR == _2010OR2)
-# # equality comparison happens on name only
-# a = {Ceres: 'this'}
+    monkeypatch.setattr(tools, 'get_data', lambda x: {'datacloud': None})
+    SSO = Rock(1)
+    assert hasattr(SSO, 'albedo') is False
 
-# print(sorted([Juno, Pallas, Ceres, _2010OR]))
-# # print(Juno.number)
-# # Juno.number = 2
-# # print(Juno.number)
+    monkeypatch.setattr(tools, 'get_data', lambda x: {'datacloud': {}})
+    SSO = Rock(1)
+    np.testing.assert_equal(SSO.albedo, np.nan)
+    np.testing.assert_equal(SSO.taxonomy, None)
+    np.testing.assert_equal(SSO.taxonomies, [])
 
 
-# MONKEYPATCH
-# Read from file rather than query ssodnet for test
-def read_data(name):
-    path_data = path.join(path.dirname(__file__),
-                          f'data/{name}_datacloud.json')
+def test_class_dunders(monkeypatch):
+    '''Verifies class dunder methods.'''
+    monkeypatch.setattr(tools, 'get_data', read_data)
 
-    with open(path_data, 'r') as file_:
-        data = json.load(file_)
+    ceres = Rock(1)
+    pallas = Rock(2)
 
-    return data['data'][name]
+    # hash
+    my_ssos = {ceres: '1', 'Pallas': pallas}
+
+    # repr and str
+    print(my_ssos)
+    print(ceres)
+
+    # comparison
+    assert ceres != pallas
+    assert ceres != 1
+
+    my_ssos = [ceres, pallas]
+    my_ssos = sorted(my_ssos)
+
+    assert ceres <= pallas
+    assert pallas >= ceres
+    assert ceres < pallas
+    assert pallas > ceres
+
+
+def test_weighted_average():
+    '''Verify input check and computation of weighted average.'''
+    ceres = Rock(1)
+    ceres.albedos.weighted_average()
+
+    with pytest.raises(TypeError):
+        ceres.taxonomies.weighted_average()
+
+
+def test_plots():
+    '''Verify scatter plot and histogram creation.'''
+    ceres = Rock(1)
+    ceres.albedos.scatter()
+    ceres.albedos.hist()
