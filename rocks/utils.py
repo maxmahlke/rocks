@@ -91,7 +91,7 @@ def create_index():
     index = index.append(pd.DataFrame({"name": names, "number": numbers, "id_": ids}))
 
     # Save index to file
-    path_index = os.path.join(PATH_CACHE, "index")
+    path_index = os.path.join(os.path.dirname(__file__), "../.index")
 
     index = (
         index.dropna(how="any")
@@ -115,7 +115,7 @@ def read_index():
     If the index file is older than 30 days, a reminder to update is
     displayed.
     """
-    path_index = os.path.join(PATH_CACHE, "index")
+    path_index = os.path.join(os.path.dirname(__file__), "../.index")
 
     if not os.path.isfile(path_index):
         if sys.argv[-1] != "update":
