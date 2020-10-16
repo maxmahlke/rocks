@@ -12,9 +12,7 @@ import numpy as np
 import pandas as pd
 from rich.progress import track
 
-from rocks.identify import identify
-from rocks import utils
-from rocks import plots
+import rocks
 
 # Read ssoCard template
 path_cache = os.path.join(os.path.expanduser("~"), ".cache/rocks")
@@ -22,7 +20,7 @@ path_template = os.path.join(path_cache, "ssoCard_template.json")
 
 if not os.path.isfile(path_template):
     print("Missing ssoCard template, retrieving..")
-    utils.create_ssocard_template()
+    rocks.utils.create_ssocard_template()
 
 with open(path_template, "r") as file_:
     TEMPLATE = json.load(file_)
@@ -70,7 +68,7 @@ class Rock:
 
         # Identify minor body
         if not skip_id_check:
-            self.name, self.number, self.id = identify(
+            self.name, self.number, self.id = rocks.resolver.identify(
                 identifier, return_id=True, progress=False
             )
         else:
@@ -80,15 +78,15 @@ class Rock:
             return
 
         # Fill attributes from argument, cache, or query
-        ssoCard = ssoCard if ssoCard is not None else utils.get_ssoCard(self.id)
+        ssoCard = ssoCard if ssoCard is not None else rocks.utils.get_ssoCard(self.id)
         # No ssoCard exists
         if ssoCard is None:
             return
 
         # Initialize from template
         attributes = TEMPLATE
-        attributes = utils.update_ssoCard(TEMPLATE, ssoCard)
-        attributes = utils.sanitize_keys(attributes)
+        attributes = rocks.utils.update_ssoCard(TEMPLATE, ssoCard)
+        attributes = rocks.utils.sanitize_keys(attributes)
 
         # Add JSON keys as attributes, mapping to the appropriate type
         for attribute in attributes.keys():
@@ -163,9 +161,9 @@ class Rock:
                     quantity = path.replace(f".{meta}", "")
                     try:
                         setattr(
-                            utils.rgetattr(self, quantity),
+                            rocks.utils.rgetattr(self, quantity),
                             meta,
-                            utils.rgetattr(self, path),
+                            rocks.utils.rgetattr(self, path),
                         )
                     except AttributeError:
                         pass  # some unit paths are ill-defined
@@ -176,16 +174,16 @@ class Rock:
             warnings.warn(f"Unknown datacloud catalogue requested: {catalogue}")
             return
 
-        catalogue_dict = utils.retrieve_catalogue(
+        catalogue_dict = rocks.utils.retrieve_catalogue(
             getattr(getattr(self, "datacloud"), catalogue)
         )
 
         catalogue_list = catalogue_dict[self.id]["datacloud"][catalogue]
-        catalogue_list = [utils.sanitize_keys(dict_) for dict_ in catalogue_list]
+        catalogue_list = [rocks.utils.sanitize_keys(dict_) for dict_ in catalogue_list]
 
         setattr(
             self,
-            utils.DATACLOUD_META[catalogue]["attr_name"],
+            rocks.utils.DATACLOUD_META[catalogue]["attr_name"],
             cast_types(catalogue_list),
         )
 
@@ -300,16 +298,16 @@ class listSameTypeParameter(list):
         else:
             # Remove measurements where the error is zero
             errors = np.array(errors)
-        return utils.weighted_average(observable, errors)
+        return rocks.utils.weighted_average(observable, errors)
 
     def scatter(self, **kwargs):
-        return plots.scatter(self, **kwargs)
+        return rocks.plots.scatter(self, **kwargs)
 
     def hist(self, **kwargs):
-        return plots.hist(self, **kwargs)
+        return rocks.plots.hist(self, **kwargs)
 
 
-def rocks(identifier, datacloud=[]):
+def rocks_(identifier, datacloud=[]):
     """Create multiple Rock instances via POST request.
 
     Parameters
@@ -331,7 +329,7 @@ def rocks(identifier, datacloud=[]):
     # Ensure we know these objects
     ids = [id_ for name, number, id_ in identify(identifier, return_id=True)]
     # Sent POST request
-    ssoCards = utils.get_ssoCard(ids)
+    ssoCards = rocks.utils.get_ssoCard(ids)
     # Build rocks
     rocks_ = []
     for id_, ssoCard in track(

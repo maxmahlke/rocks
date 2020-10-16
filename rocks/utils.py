@@ -883,6 +883,11 @@ def _echo_propertyCollection(rock, prop):
 def _echo_listSameTyeParameter(prop):
     print(prop)
     # TODO Add weighted average for floatParameters
+    # TODO Plots
+    prop.scatter()
+
+
+
 
     # collection is attr_name in DATACLOUD_META
     # Parse arguments
