@@ -73,29 +73,22 @@ def identify(id_, return_id=False, verbose=True, progress=True):
         )
 
         async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
+
             tasks = [
-                _query_and_resolve(
-                    i, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose
+                asyncio.ensure_future(
+                    _query_and_resolve(
+                        i,
+                        session,
+                        NUMBER_NAME_ID,
+                        NAME_NUMBER_ID,
+                        ID_NUMBER_NAME,
+                        verbose,
+                    )
                 )
                 for i in id_
             ]
 
-            if progress:
-
-                with rocks.utils.progress_context() as prog:
-
-                    results = [
-                        await f
-                        for f in prog.track(
-                            asyncio.as_completed(tasks),
-                            total=len(tasks),
-                            description="Identifying rocks",
-                        )
-                    ]
-
-            else:
-                results = [await f for f in asyncio.as_completed(tasks)]
-
+            results = await asyncio.gather(*tasks)
             return results
 
     loop = asyncio.get_event_loop()
