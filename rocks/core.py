@@ -272,22 +272,28 @@ class listSameTypeParameter(list):
         data : iterable
             The minor body data from datacloud.
         """
-        self.datatype = self.__get_type(data[-1])
+        self.datatype = self.__get_type(data)
 
         if self.datatype is not None:
             list.__init__(self, [self.datatype(d) for d in data])
         else:
             list.__init__(self, [None for d in data])
 
-    def __get_type(self, string):
+    def __get_type(self, values):
         """Infers type from str variable."""
-        if not string:
+        if not values:
             return None
         else:
             try:
-                var = float(string)
-                # scientific notation is not understood by int
-                if var.is_integer() and "e" not in string and "E" not in string:
+                values = [float(value) for value in values]
+                if all(
+                    [
+                        value.is_integer()
+                        and "e" not in str(value)
+                        and "E" not in str(value)
+                        for value in values
+                    ]
+                ):
                     return int
                 else:
                     return float
@@ -389,4 +395,3 @@ __TYPES = {
     dict: propertyCollection,
     list: _cast_list,
 }
-
