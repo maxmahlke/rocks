@@ -1,6 +1,6 @@
 """For space rocks. Interface for SsODNet."""
 from .core import Rock
-from .core import rocks_
+from .core import rocks_ as rocks
 from .resolver import identify
 from . import resolver
 from . import utils
