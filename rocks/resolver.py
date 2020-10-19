@@ -253,7 +253,6 @@ async def _query_quaero(id_, session, verbose):
     try:
         response = await session.request(method="GET", url=url, params=params)
         response_json = await response.json()
-        print(f"{response_json}")
 
     except (requests.exceptions.RequestException, asyncio.exceptions.TimeoutError) as e:
         if verbose:
