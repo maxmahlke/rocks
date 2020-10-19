@@ -4,7 +4,6 @@
 """
 import os
 import sys
-import warnings
 import webbrowser
 
 import click
@@ -67,8 +66,8 @@ class AliasedGroup(click.Group):
 
             requested_catalogue = cmd_name.split(".")[0]
 
-            if requested_catalogue in ['diameters', 'albedos']:
-                requested_catalogue = 'diamalbedo'
+            if requested_catalogue in ["diameters", "albedos"]:
+                requested_catalogue = "diamalbedo"
 
             for datacloud, cat in valid_catalogues:
 
@@ -76,7 +75,7 @@ class AliasedGroup(click.Group):
                     valid = True
                     if len(cmd_name.split(".")) > 1:
                         # single property
-                        prop = '.'.join([cat, *cmd_name.split(".")[1:]])
+                        prop = ".".join([cat, *cmd_name.split(".")[1:]])
                     else:
                         # catalogue overview
                         prop = cat
@@ -88,7 +87,7 @@ class AliasedGroup(click.Group):
             arguments = sys.argv.copy()
 
             plot = False
-            for p in ['-h', '--hist', '-s', '--scatter']:
+            for p in ["-h", "--hist", "-s", "--scatter"]:
                 if p in arguments:
                     plot = True
                     arguments.remove(p)
@@ -142,7 +141,8 @@ def update():
 
 @cli_rocks.command()
 @click.argument("this", required=1)
-def identify(this):
+@click.option("--verbose", "-v", is_flag=True, help="Print resolution diagnostic.")
+def identify(this, verbose):
     """Get asteroid name and number from string input.
 
     Parameters
@@ -150,8 +150,7 @@ def identify(this):
     this : str
         String to identify asteroid.
     """
-    warnings.filterwarnings("ignore")
-    name, number = rocks.identify(this, progress=False)
+    name, number = rocks.identify(this, progress=False, verbose=verbose)
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -190,6 +189,7 @@ def properties():
     """Prints the ssoCard JSON keys."""
     keys = sorted(pd.json_normalize(rocks.core.TEMPLATE).columns, key=len)
     import pprint
+
     pprint.pprint(keys)
 
 
