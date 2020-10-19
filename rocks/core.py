@@ -288,7 +288,7 @@ class listSameTypeParameter(list):
                 var = float(string)
                 # scientific notation is not understood by int
                 if var.is_integer() and "e" not in string and "E" not in string:
-                    return float
+                    return int
                 else:
                     return float
             except ValueError:
