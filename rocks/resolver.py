@@ -129,7 +129,9 @@ async def _query_and_resolve(
     response = await _query_quaero(id_, session, verbose)
 
     if response:
-        name, number, ssodnet_id = _parse_quaero_response(response["data"], str(id_))
+        name, number, ssodnet_id = _parse_quaero_response(
+            response["data"], str(id_), verbose
+        )
         if isinstance(ssodnet_id, str):
             return (name, number, ssodnet_id)
     return (np.nan, np.nan, np.nan)
@@ -168,7 +170,11 @@ def standardize_id_(id_):
         elif re.match(r"^[A-Za-z]*$", id_):
 
             # Ensure proper capitalization
-            id_ = id_.capitalize()
+            if (
+                not id_.startswith(("Mc", "van", "Van", "De", "de", "Von", "von"))
+                and not id_ == id_.upper()
+            ):
+                id_ = id_.capitalize()
 
         # Asteroid designation
         elif re.match(
@@ -266,7 +272,7 @@ async def _query_quaero(id_, session, verbose):
             return response_json
 
 
-def _parse_quaero_response(data_json, id_):
+def _parse_quaero_response(data_json, id_, verbose):
     """Parse JSON response3 from Quaero.
 
     Parameters
@@ -275,6 +281,8 @@ def _parse_quaero_response(data_json, id_):
         Quaero query response in json format.
     id_ : str, int, float
         Asteroid name, number, or designation.
+    verbose : bool
+        Print query diagnostics. Default is True.
 
     Returns
     =======
@@ -291,10 +299,11 @@ def _parse_quaero_response(data_json, id_):
             break
     else:
         # Unclear which match is correct.
+        if verbose:
+            warnings.warn(f"Could not find match for id {id_}.")
         return (np.nan, np.nan, np.nan)
 
     # Found match
     numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]
     number = min(numeric) if numeric else np.nan
-
     return (match["name"], number, match["id"])
