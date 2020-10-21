@@ -60,7 +60,7 @@ def identify(id_, return_id=False, verbose=True, progress=True):
             )
         )
         NAME_NUMBER_ID = dict(
-            (name, (number, id_))
+            (name.upper(), (number, id_))
             for number, name, id_ in zip(
                 index.number.values, index["name"].values, index.id_.values
             )
@@ -118,7 +118,8 @@ async def _query_and_resolve(
     elif isinstance(id_, (str)):
         if id_ in NAME_NUMBER_ID.keys():
             number, ssodnet_id = NAME_NUMBER_ID[id_]
-            return (id_, number, ssodnet_id)
+            name, _ = NUMBER_NAME_ID[number]
+            return (name, number, ssodnet_id)
         elif id_ in ID_NUMBER_NAME.keys():
             number, name = ID_NUMBER_NAME[id_]
             return (name, number, id_)
@@ -168,13 +169,7 @@ def standardize_id_(id_):
 
         # Asteroid name
         elif re.match(r"^[A-Za-z]*$", id_):
-
-            # Ensure proper capitalization
-            if (
-                not id_.startswith(("Mc", "van", "Van", "De", "de", "Von", "von"))
-                and not id_ == id_.upper()
-            ):
-                id_ = id_.capitalize()
+            id_ = id_.upper()  # get around capitalization issues
 
         # Asteroid designation
         elif re.match(
