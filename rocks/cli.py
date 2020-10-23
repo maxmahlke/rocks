@@ -49,7 +49,7 @@ class AliasedGroup(click.Group):
         # Check if valid ssoCard property
         for prop in valid_props:
 
-            if prop.endswith("class"):
+            if prop.endswith("class") or prop.endswith('complex'):
                 prop += "_"
 
             if prop.endswith(cmd_name):
