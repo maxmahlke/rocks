@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""rocks command line suite
-"""
+"""rocks command line suite."""
 import os
 import sys
 import webbrowser
@@ -36,7 +34,7 @@ class AliasedGroup(click.Group):
         # ssoCard properties
         valid_props = [
             p
-            for p in pd.json_normalize(rocks.core.TEMPLATE).columns
+            for p in pd.json_normalize(rocks.TEMPLATE).columns
             if not p.startswith("datacloud")
         ]
         # missing intermediate levels
@@ -105,7 +103,7 @@ class AliasedGroup(click.Group):
                 sys.exit()
 
             prop = rocks.utils.rgetattr(rock, prop)
-            return rocks.utils.echo_property(rock, prop, plot=plot)
+            return rocks.utils.pretty_print_property(rock, prop, plot=plot)
         else:
             return None
 
@@ -187,7 +185,7 @@ def info(this, minimal):
 @cli_rocks.command()
 def properties():
     """Prints the ssoCard JSON keys."""
-    keys = sorted(pd.json_normalize(rocks.core.TEMPLATE).columns, key=len)
+    keys = sorted(pd.json_normalize(rocks.TEMPLATE).columns, key=len)
     import pprint
 
     pprint.pprint(keys)

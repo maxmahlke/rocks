@@ -1,6 +1,7 @@
 # rocks repo
 tmp/
 TODO
+MANIFEST.in
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

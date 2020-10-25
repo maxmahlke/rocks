@@ -1,14 +1,13 @@
 #!/usr/bin/env python
-""" Utility functions for rocks
-"""
-import collections.abc
-from functools import reduce, lru_cache
+"""Utility functions for rocks."""
+import collections
+from functools import reduce
 import json
 import keyword
 import os
+import pickle
 import sys
 import time
-from types import SimpleNamespace
 import warnings
 
 import click
@@ -16,90 +15,41 @@ from iterfzf import iterfzf
 import numpy as np
 import pandas as pd
 import requests
-import rich.progress
 
 import rocks
 
-PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
-os.makedirs(PATH_CACHE, exist_ok=True)
 
-
-def progress_context():
-    """docstring for progress_context"""
-    return rich.progress.Progress(
-        "[progress.description]{task.description}",
-        rich.progress.BarColumn(),
-        "{task.completed:,}/{task.total:,}",
-        rich.progress.TimeRemainingColumn(),
-    )
-
-
-def update_ssoCard(dict_, update):
-    for key, val in update.items():
-        if isinstance(val, collections.abc.Mapping):
-            dict_[key] = update_ssoCard(dict_.get(key, {}), val)
-        else:
-            if isinstance(dict_, list):  # multiple pair members
-                dict_ = dict_[-1]
-            if isinstance(val, list):  # multiple taxonomies
-                val = val[-1]
-            dict_[key] = val
-    return dict_
-
-
-def rsetattr(obj, attr, val):
-    pre, _, post = attr.rpartition(".")
-    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
-
-
-def rgetattr(obj, attr, *args):
-    def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
-
-    return reduce(_getattr, [obj] + attr.split("."))
-
-
+# ------
+# Index functions
 def create_index():
-    """Create or update index of numbered SSOs.
+    """Update index of numbered SSOs."""
 
-    Notes
-    -----
-    The list is retrieved from the Minor Planet Center, at
-    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
-    Each number is associated to its SsODNet id.
-    """
     # Get list of numbered asteroids from MPC
     url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
-
-    numbered = pd.read_fwf(
-        url,
-        colspecs=[(0, 7), (9, 29), (29, 41)],
-        names=["number", "name", "designation"],
-        dtype={"name": str, "designation": str},
-        converters={"number": lambda x: int(x.replace("(", ""))},
-    )
+    numbered = pd.read_fwf(url, colspecs=[(0, 7)], names=["number"])
+    numbered = set([int(n.strip(" (")) for n in numbered.number])
 
     # Compare list to index
     index = read_index()
-    missing = numbered.loc[~numbered.number.isin(index["number"]), "number"]
+    missing = set(index.number) ^ set(numbered)
+
+    if not missing:  # up-to-date
+        return
 
     # Get ids of missing entries, append to index
-    names, numbers, ids = zip(
-        *rocks.identify(missing, return_id=True, verbose=False, progress=True)
-    )
-
+    names, numbers, ids = zip(*rocks.identify(missing, return_id=True, verbose=False))
     index = index.append(pd.DataFrame({"name": names, "number": numbers, "id_": ids}))
 
     # Save index to file
-    path_index = os.path.join(os.path.dirname(__file__), "../.index")
-
     index = (
         index.dropna(how="any")
         .drop_duplicates("number")
         .sort_values("number", ascending=True)
         .astype({"number": np.int64, "name": str, "id_": str})
     )
-    index.to_csv(path_index, index=False)
+
+    with open(rocks.PATH_INDEX, "wb") as ind:
+        pickle.dump(index, ind, pickle.HIGHEST_PROTOCOL)
 
 
 def read_index():
@@ -115,15 +65,8 @@ def read_index():
     If the index file is older than 30 days, a reminder to update is
     displayed.
     """
-    path_index = os.path.join(os.path.dirname(__file__), "../.index")
-
-    if not os.path.isfile(path_index):
-        if sys.argv[-1] != "update":
-            click.echo("No index file found. Run 'rocks update' to create it.")
-        return pd.DataFrame(data={"name": [], "number": [], "id_": []})
-
     # Check age of index file
-    days_since_mod = (time.time() - os.path.getmtime(path_index)) / (3600 * 24)
+    days_since_mod = (time.time() - os.path.getmtime(rocks.PATH_INDEX)) / (3600 * 24)
 
     if days_since_mod > 30:
         click.echo(
@@ -133,7 +76,9 @@ def read_index():
         )
         time.sleep(1)  # so user doesn't miss the message
 
-    index = pd.read_csv(path_index, dtype={"number": int, "name": str, "id_": str})
+    with open(rocks.PATH_INDEX, "rb") as ind:
+        index = pickle.load(ind)
+
     return index
 
 
@@ -159,8 +104,8 @@ def select_sso_from_index():
 
     Examples
     --------
-    >>> from rocks import utils
-    >>> name, number, id_ = utils.select_sso_from_index()
+    >>> import rocks
+    >>> name, number, id_ = rocks.utils.select_sso_from_index()
     """
     index = read_index()
 
@@ -174,51 +119,69 @@ def select_sso_from_index():
     return " ".join(name), int(number), id_
 
 
+# ------
+# ssoCard utility functions
+def update_ssoCard(dict_, update):
+    """Recursively update ssoCard template with retrieved values.
+
+    Parameters
+    ==========
+    dict_ : dict, list
+        The values in the template or retrieved ssoCard.
+    update : dict, list
+        The values in the retrieved ssoCard.
+
+    Returns
+    =======
+    dict
+        The updated ssoCard.
+    """
+    for key, val in update.items():
+        if isinstance(val, collections.abc.Mapping):
+            dict_[key] = update_ssoCard(dict_.get(key, {}), val)
+        else:
+            if isinstance(dict_, list):  # multiple pair members
+                dict_ = dict_[-1]
+            if isinstance(val, list):  # multiple taxonomies
+                val = val[-1]
+            dict_[key] = val
+    return dict_
+
+
+def rsetattr(obj, attr, val):
+    """Deep version of setattr."""
+    pre, _, post = attr.rpartition(".")
+    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+
+
+def rgetattr(obj, attr, *args):
+    """Deep version of getattr."""
+
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
+
+    return reduce(_getattr, [obj] + attr.split("."))
+
+
 def create_ssocard_template():
-    """Retrieves current ssoCard template from SsODNet and saves
+    """Retrieve current ssoCard template from SsODNet and save
     simplified version to file.
     """
+    response = requests.get(
+        "https://ssp.imcce.fr/webservices/ssodnet/api/"
+        "ssocard/templates/catalogue-template_aster-astorb.json"
+    )
 
-    # Retrieve current template from SsODNet
-    url = "https://ssp.imcce.fr/webservices/ssodnet/api/"
-    url = f"{url}ssocard/templates/catalogue-template_aster-astorb.json"
-
-    response = requests.get(url)
     ssoCard = response.json()
+    ssoCard = set_endpoints_to_nan(ssoCard)
+    ssoCard = sanitize_keys(ssoCard)
 
-    # Simplify unit and uncertainty acces
-    ssoCard = __set_endpoints_to_none(ssoCard)
-
-    # Add missing recods
-    ssoCard["datacloud"] = {
-        "aams": np.nan,
-        "astdys": np.nan,
-        "astorb": np.nan,
-        "binarymp_tab": np.nan,
-        "binarymp_ref": np.nan,
-        "diamalbedo": np.nan,
-        "families": np.nan,
-        "masses": np.nan,
-        "mpcatobs": np.nan,
-        "mpcorb": np.nan,
-        "pairs": np.nan,
-        "taxonomy": np.nan,
-    }
-
-    ssoCard["source"] = {
-        "osculating_elements": np.nan,
-        "proper_elements": np.nan,
-        "family": np.nan,
-        "pair": np.nan,
-    }
-
-    path_template = os.path.join(PATH_CACHE, "ssoCard_template.json")
-    with open(path_template, "w") as file_:
+    with open(rocks.PATH_TEMPLATE, "w") as file_:
         json.dump(ssoCard, file_)
 
 
 def sanitize_keys(dict_):
-    """docstring for __find_endpoint"""
+    """Recursively ensure that dict keys are not python keywords."""
     for key, value in dict_.copy().items():
         if isinstance(value, dict):
             dict_[key] = sanitize_keys(dict_[key])
@@ -228,33 +191,11 @@ def sanitize_keys(dict_):
     return dict_
 
 
-def __move_level_up(dict_, key):
-    """Moves nested dictionatry level to top level and removes original key.
-
-    Parameters
-    ==========
-    dict_ : dict
-        Dictionary to adapt.
-    key : str
-        Dictionary key to flatten and remove.
-
-    Returns
-    =======
-    dict
-        Updated dictionary.
-    """
-    for k, v in dict_[key].items():
-        dict_[k] = v
-
-    dict_.pop(key, None)
-    return dict_
-
-
-def __set_endpoints_to_none(dict_):
-    """docstring for __find_endpoint"""
+def set_endpoints_to_nan(dict_):
+    """Recursively sets dict values to NaN if they are not of type dict or unit."""
     for key, value in dict_.copy().items():
         if isinstance(value, dict):
-            dict_[key] = __set_endpoints_to_none(dict_[key])
+            dict_[key] = set_endpoints_to_nan(dict_[key])
         else:
             if key == "unit":
                 continue
@@ -263,150 +204,45 @@ def __set_endpoints_to_none(dict_):
     return dict_
 
 
-def __sanitize_keyword(k):
-    """docstring for __sanitize_keyword"""
-    if keyword.iskeyword(k):
-        return f"{k}_"
-    else:
-        return k
-
-
 # ------
 # SsODNet functions
-def retrieve_catalogue(url):
-    """Retrieve catalogue from datacloud."""
-
-    response = requests.get(url.replace("SsODNetSsoCard", "rocks"))
-    catalogue = response.json()["data"]
-
-    catalogue = sanitize_keys(catalogue)
-    return catalogue
-
-
-@lru_cache(128)
-def get_data(id_, verbose=True):
-    """Get asteroid data from SsODNet:datacloud.
-
-    Performs a GET request to SsODNet:datacloud for a single asteroid and
-    property. Checks validity of data and extracts it from response.
+def get_ssoCard(id_, only_cache=False):
+    """Retrieve single ssoCard either from cache or SsODNet.
 
     Parameters
-    ----------
-    id_ : str, int
-        Asteroid name, designation, or number.
-    verbose : bool
-        Print request diagnostics.
+    ==========
+    id_ : str
+        Single Minor body target id from SsODNet.
+    only_cache : bool
+        Do not query SsODNet, return None instead.
 
     Returns
-    -------
-    dict, bool
-        Asteroid data, False if query failed or no data is available
+    =======
+    dict, None
+        Single ssoCard in json format if successful.
+        None if query failed or not queried.
     """
-    response = query_ssodnet(id_, verbose=verbose)
+    if not isinstance(id_, str):
+        warnings.warn(f"Expected string identifier, got {type(id_)}.")
+        return None
 
-    # Check if query failed
-    if response.status_code in [422, 500]:
+    # Check presence in cache
+    PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{id_}.json")
 
-        # Query SsODNet:quaero and repeat
-        if verbose:
-            click.echo(f"Query failed for {id_}.")
-        return False
-
-    # See if there is data available
-    try:
-        data = response.json()["data"]
-    except (json.decoder.JSONDecodeError, KeyError):
-        if verbose:
-            click.echo(f'Encountered JSON error for "{id_}".')
-        return False
-
-    # Select the right data entry
-    if len(data.keys()) > 1:
-        for k in [id_, f"{id_}_(Asteroid)"]:
-            if k in data.keys():
-                key = k
-                break
+    if not os.path.isfile(PATH_CARD):
+        if not only_cache:
+            return __query_ssoCards(id_)
         else:
-            key = list(data.keys())[0]
+            return None
     else:
-        key = list(data.keys())[0]
-    return data[key]
+        with open(PATH_CARD, "r") as file_:
+            ssoCard = json.load(file_)
+        return ssoCard
 
 
-def query_ssodnet(name, mime="json", verbose=False):
-    """Query SsODNet services.
-
-    Includes validity check of response.
-
-    Parameters
-    ----------
-    name : str, float
-        Asteroid identifier
-    mime : str
-        Response mime type. Default is json.
-    verbose : bool
-        Print request diagnostics. Default is False.
-
-    Returns
-    -------
-    r - requests.models.Response
-        GET request response from SsODNet
-    """
-    url = "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php"
-
-    payload = {
-        "-name": f"{name}",
-        "-mime": mime,
-        "-from": "rocks",
-    }
-
-    r = requests.get(url, params=payload)
-
-    _RESPONSES = {
-        400: "Bad request",
-        422: "Unprocessable Entity",
-        500: "Internal Error",
-        404: "Not found",
-    }
-
-    if r.status_code != 200:
-        if r.status_code in _RESPONSES.keys() and verbose:
-            message = f"HTTP code {r.status_code}: {_RESPONSES[r.status_code]}"
-        else:
-            message = f"HTTP code {r.status_code}: Unknown error"
-
-        if verbose:
-            click.echo(message)
-            click.echo(r.url)
-        return False
-    return r
-
-
-def echo_response(response, mime):
-    """Echo the formatted SsODNet response to STDOUT.
-
-    The echo function is based on the query mime type.
-
-    Parameters
-    ----------
-    response : requests.models.Response
-        SsODNet GET query response.
-    mime : str
-        Mime-type of response.
-    """
-    if mime == "json":
-        data = response.json()
-        click.echo(json.dumps(data, indent=2))
-
-    elif mime == "votable":
-        for line in response.content.decode("utf-8").split("\n")[1:]:
-            click.echo(line)
-    else:
-        click.echo(response.text)
-
-
-def get_ssoCard(ids):
-    """Return target ssoCard. Use cache if existant, else, query SsODNet and cache results.
+def get_ssoCards(ids):
+    """Return target ssoCard. Use cache if existant, else, query SsODNet
+    and cache results. Accepts multiple ids.
 
     Parameters
     ==========
@@ -417,7 +253,7 @@ def get_ssoCard(ids):
     Returns
     =======
     dict, list of dict, None
-        Sinlgle or list of ssoCards in json format if successful.
+        Single or list of ssoCards in json format if successful.
         None if query failed.
     """
     if isinstance(ids, str):
@@ -425,65 +261,28 @@ def get_ssoCard(ids):
     elif isinstance(ids, pd.Series):
         ids = ids.values
 
-    path_ssocards = os.path.join(PATH_CACHE, "ssoCards")
-    os.makedirs(path_ssocards, exist_ok=True)
+    id_card = collections.OrderedDict(
+        (id_, get_ssoCard(id_, only_cache=True)) for id_ in ids
+    )
+    missing = [id_ for id_, card in id_card.items() if card is None]
 
-    missing = []
+    # Perform POST query for missing cards in chunks
+    for subset in [missing[i : i + 500] for i in range(0, len(missing), 500)]:
 
-    for id_ in ids:
-        if not isinstance(id_, str):
-            warnings.warn(f"Expected string identifier, got {type(id_)}.")
-            id_ = None
-            continue
+        ssoCards = __query_ssoCards(subset)
 
-        # Check presence in cache
-        path_card = os.path.join(path_ssocards, f"{id_}.json")
-        if not os.path.isfile(path_card):
-            missing.append(id_)
+        for id_, ssoCard in zip(subset, ssoCards):
 
-    # Perform POST query for missing cards.
-    ssoCards = __query_ssoCards(missing)
+            if ssoCard is None:
+                continue
 
-    if len(ids) == 1:
-        ssoCards = [ssoCards]
+            id_card[id_] = ssoCard
 
-    # Save to cache
-    for id_, ssoCard in zip(missing, ssoCards):
-
-        if ssoCard is None:
-            continue
-
-        #  ssoCard = simplify_ssoCard(ssoCard)
-
-        path_card = os.path.join(path_ssocards, f"{id_}.json")
-
-        with open(path_card, "w") as file_:
-            json.dump(ssoCard, file_)
+            with open(f"{rocks.PATH_CACHE}/{id_}.json", "w") as file_:
+                json.dump(ssoCard, file_)
 
     # Return requested ssoCards
-    ssoCards = []
-
-    for id_ in ids:
-
-        if id_ is None:
-            ssoCards.append(None)
-
-        path_card = os.path.join(path_ssocards, f"{id_}.json")
-
-        if os.path.isfile(path_card):
-
-            with open(path_card, "r") as file_:
-                ssoCard = json.load(file_)
-
-            ssoCards.append(ssoCard)
-
-        else:
-            ssoCards.append(None)
-
-    if len(ids) == 1:
-        return ssoCards[0]
-    else:
-        return ssoCards
+    return id_card.values()
 
 
 def __query_ssoCards(ids):
@@ -522,13 +321,7 @@ def __query_ssoCards(ids):
         warnings.warn(f"An error occurred when retrieving the ssoCards: {e}")
         return False
 
-    if len(ids) > 100:
-        ssoCards = []
-        with progress_context() as prog:
-            for id_ in prog.track(ids, description=("Retrieving ssoCards")):
-                ssoCards.append(response[id_])
-    else:
-        ssoCards = [response[id_] for id_ in ids]
+    ssoCards = [response[id_] for id_ in ids]
 
     if len(ids) == 1:
         return ssoCards[0]
@@ -536,8 +329,20 @@ def __query_ssoCards(ids):
         return ssoCards
 
 
+def retrieve_catalogue(url):
+    """Retrieve catalogue from datacloud."""
+    response = requests.get(url.replace("SsODNetSsoCard", "rocks"))
+
+    catalogue = response.json()["data"]
+    catalogue = sanitize_keys(catalogue)
+
+    return catalogue
+
+
+# ------
+# Pretty-print methods
 def pretty_print_card(ssoCard, minimal):
-    """Pretty-print ssoCard to terminal.
+    """Pretty-print ssoCard to terminal. Called by rocks info.
 
     Parameters
     ==========
@@ -551,6 +356,7 @@ def pretty_print_card(ssoCard, minimal):
     console = Console()
 
     if not minimal:
+        # Print entire JSON
         console.print(ssoCard)
     else:
 
@@ -568,122 +374,128 @@ def pretty_print_card(ssoCard, minimal):
         console.print(Panel(minimal_card, title=f"({rock.number}) {rock.name}"))
 
 
-def pretty_print(SSO, property_name):
-    """Pretty-print asteroid property to console.
+def pretty_print_property(rock, prop, plot=False):
+    """Echo asteroid property for a single minor body.
+    Print datacloud collections. Optionally open plots.
 
     Parameters
     ==========
-    SSO : rocks.core.Rock
-        The Rock instance representing the asteroid.
-    property_name : str
-        The attribute name of property to pretty-print.
+    rock : rocks.Rock
+        The asteroid Rock instance
+    prop : str
+        Asteroid property, attribute from JSON template
+    plot : bool
+        Plot propertyCollection. Default is False.
     """
+    if isinstance(prop, rocks.core.stringParameter):
+        _echo_stringParameter(prop)
+    elif isinstance(prop, rocks.core.intParameter):
+        _echo_intParameter(prop)
+    elif isinstance(prop, rocks.core.floatParameter):
+        _echo_floatParameter(prop)
+    elif isinstance(prop, rocks.core.propertyCollection):
+        _echo_propertyCollection(rock, prop, plot)
+    elif isinstance(prop, rocks.core.listSameTypeParameter):
+        _echo_listSameTyeParameter(prop, plot)
+    else:
+        print(prop)
+
+    sys.exit()
+
+
+def _echo_stringParameter(prop):
+    """Echos stringParameter value."""
+    print(prop)
+
+
+def _echo_intParameter(prop):
+    """Echos intParameter value."""
+    if hasattr(prop, "unit"):
+        unit = getattr(prop, "unit")
+    else:
+        unit = ""
+    if hasattr(prop, "uncertainty"):
+        uncert = getattr(prop, "uncertainty")
+    else:
+        uncert = ""
+
+    if uncert:
+        print(f"{prop:,} +- {uncert:,} {unit}")
+    else:
+        print(f"{prop}")
+
+
+def _echo_floatParameter(prop):
+    """Echos floatParameter value."""
+    if hasattr(prop, "unit"):
+        unit = getattr(prop, "unit")
+    else:
+        unit = ""
+    if hasattr(prop, "uncertainty"):
+        uncert = getattr(prop, "uncertainty")
+    else:
+        uncert = ""
+
+    if uncert:
+        print(f"{float(prop):.4} +- {float(uncert):.3} {unit}")
+    else:
+        print(f"{prop}")
+
+
+def _echo_propertyCollection(rock, prop, plot):
+    """Echos propertyCollection value.
+
+    Parameters
+    ==========
+    rock : rocks.core.Rock
+        The Rock instance.
+    prop
+        The attribute to print.
+    """
+    from rich import box
+    from rich.table import Table
     from rich import print as rprint
-    from rocks import core
-    from rocks.properties import PROPERTIES as PROPS
 
-    property_value = getattr(SSO, property_name)
+    table = Table(
+        header_style="bold blue",
+        caption=f"({rock.number}) {rock.name}",
+        box=box.SQUARE,
+        footer_style="dim",
+    )
 
-    if property_value is np.nan or property_value is None:
-        print(f"No {property_name} on record for ({SSO.number}) {SSO.name}")
-        sys.exit()
+    # Keys are table property names
+    keys = [k for k in list(prop.__dict__.keys()) if k not in DONT_PRINT]
+    map(table.add_column, keys)
 
-    # Output type depends on property type
-    if isinstance(property_value, (int, str)):
-        print(property_value)
+    # Values are entries for each field
+    values = list(prop.__dict__.values())
+    n = len(values[0]) if isinstance(values[0], list) else 1
 
-    elif isinstance(property_value, float):
-        formatting = ".2E" if property_value >= 1000 else ".3f"
+    if n > 1:
+        for i, entry in enumerate(range(n)):
+            table.add_row(*[str(prop.__dict__[key][i]) for key in keys], style="white")
+    else:
+        table.add_row(*[str(prop.__dict__[key]) for key in keys], style="white")
+    rprint(table)
 
-        if "error" in dir(property_value):
-            print(
-                " \u00B1 ".join(
-                    [  # unicode string is +-
-                        f"{property_value:{formatting}}",
-                        f"{property_value.error:{formatting}}",
-                    ]
-                ),
-                "[unit]",
-            )
-        else:
-            print(f"{property_value:{formatting}}", "[unit]")
+    if plot:
+        if any([p in sys.argv for p in ["-h", "--hist"]]):
+            prop.hist(show=True)
+        if any([p in sys.argv for p in ["-s", "--scatter"]]):
+            prop.scatter(show=True)
 
-    elif isinstance(property_value, core.listSameTypeParameter):
-        from rich import box
-        from rich.table import Table
-
-        # ------
-        # build table
-        table = Table(
-            header_style="bold blue",
-            caption=f"({SSO.number}) {SSO.name}",
-            box=box.SQUARE,
-            show_footer=property_value.datatype is float,
-            footer_style="dim",
-        )
-
-        # ------
-        # add columns to table
-        columns = ["shortbib", property_name, "method"]
-
-        # add property dependent columns
-        for property_singular, setup in PROPS.items():
-            if "collection" in setup.keys() and setup["collection"] == property_name:
-                break
-        columns[-1:-1] = PROPS[property_singular]["extra_columns"]
-
-        if property_value.datatype is float:
-            columns[2:2] = ["error"]
-
-        for c in columns:
-            table.add_column(
-                c,
-                justify="right" if c != "shortbib" else "left",
-                style=None if c != "shortbib" else "dim",
-                footer="unit" if c in [property_name, "error"] else "",
-            )
-
-        # find column indices of preferred solution
-        preferred_solution = getattr(SSO, property_singular).shortbib
-        preferred_solution = [
-            i
-            for i, bib in enumerate(getattr(SSO, property_name).shortbib)
-            if bib in preferred_solution
-        ]
-
-        # ------
-        # add rows by evaluating values
-        for i, p in enumerate(property_value):
-
-            values = []
-
-            for c in columns:
-
-                # Get column value
-                if c == property_name:
-                    value = property_value[i]
-
-                else:
-                    value = getattr(property_value, c)[i]
-
-                # Select formatting
-                if isinstance(value, str):
-                    values.append(value)
-                elif isinstance(value, float):
-                    formatting = ".2E" if value >= 1000 else ".3f"
-                    values.append(f"{value:{formatting}}")
-
-                # Bold print row if it belongs to the preferred solution
-                #  if i in preferred_solution:
-                #  values = [rf"[bold green]{v}[\bold green]" for v in values]
-
-            table.add_row(
-                *values, style="bold green" if i in preferred_solution else None
-            )
-
-        rprint(table)
+    sys.exit()  # otherwise click prints Error
 
 
+def _echo_listSameTyeParameter(prop):
+    print(prop)
+    # TODO Add weighted average for floatParameters
+    # TODO Plots
+    prop.scatter()
+
+
+# ------
+# Numerical methods
 def weighted_average(observable, error):
     """Computes weighted average of observable.
 
@@ -722,251 +534,8 @@ def weighted_average(observable, error):
     return (avg, std_avg)
 
 
-def echo_property(rock, prop, plot=False):
-    """Echo asteroid property for a single minor body.
-    Print datacloud collections. Optionally open plots.
-
-    Parameters
-    ==========
-    rock : rocks.Rock
-        The asteroid Rock instance
-    prop : str
-        Asteroid property, attribute from JSON template
-    plot : bool
-        Plot propertyCollection. Default is False.
-    """
-    # TODO Add these as __str__ to classes
-    if isinstance(prop, rocks.core.stringParameter):
-        _echo_stringParameter(prop)
-    elif isinstance(prop, rocks.core.intParameter):
-        _echo_intParameter(prop)
-    elif isinstance(prop, rocks.core.floatParameter):
-        _echo_floatParameter(prop)
-    elif isinstance(prop, rocks.core.propertyCollection):
-        _echo_propertyCollection(rock, prop, plot)
-    elif isinstance(prop, rocks.core.listSameTypeParameter):
-        _echo_listSameTyeParameter(prop)
-    else:
-        print(prop)
-
-    sys.exit()
-    # Check type: floatParameter, intParameter, strParameter, propertyCollection
-    #  sys.exit()  # required for click
-
-
-def _echo_stringParameter(prop):
-    print(prop)
-
-
-def _echo_intParameter(prop):
-    if hasattr(prop, "unit"):
-        unit = getattr(prop, "unit")
-    else:
-        unit = ""
-    if hasattr(prop, "uncertainty"):
-        uncert = getattr(prop, "uncertainty")
-    else:
-        uncert = ""
-
-    if uncert:
-        print(f"{prop:,} +- {uncert:,} {unit}")
-    else:
-        print(f"{prop}")
-
-
-def _echo_floatParameter(prop):
-    if hasattr(prop, "unit"):
-        unit = getattr(prop, "unit")
-    else:
-        unit = ""
-    if hasattr(prop, "uncertainty"):
-        uncert = getattr(prop, "uncertainty")
-    else:
-        uncert = ""
-
-    if uncert:
-        print(f"{float(prop):.4} +- {float(uncert):.3} {unit}")
-    else:
-        print(f"{prop}")
-
-
-def _echo_propertyCollection(rock, prop, plot):
-    from rich import box
-    from rich.table import Table
-    from rich import print as rprint
-
-    # ------
-    # build table
-    table = Table(
-        header_style="bold blue",
-        caption=f"({rock.number}) {rock.name}",
-        box=box.SQUARE,
-        footer_style="dim",
-    )
-
-    DONT_PRINT = [
-        "num",
-        "name",
-        "id",
-        "iddataset",
-        "title",
-        "url",
-        "doi",
-        "bibcode",
-        "link",
-        "datasetname",
-        "idcollection",
-        "selection",
-        "source",
-        "resourcename",
-    ]
-    # keys are table property names
-    keys = list(prop.__dict__.keys())
-    for key in keys:
-
-        # don't print all keys
-        if key in DONT_PRINT:
-            continue
-        table.add_column(key)
-
-    # values are entries for each field
-    values = list(prop.__dict__.values())
-
-    if isinstance(values[0], list):
-        n = len(values[0])
-    else:
-        n = 1
-
-    for i, entry in enumerate(range(n)):
-
-        row = []
-
-        for j, p in enumerate(prop.__dict__.values()):
-            if keys[j] in DONT_PRINT:
-                continue
-            if isinstance(p, list):
-                row.append(str(p[i]))
-            else:
-                row.append(str(p))
-
-        style = "white"
-        # TODO Implement decision trees
-        #  if "selection" in keys:
-        #  if prop.__dict__["selection"][i]:
-        #  style = "bold green"
-
-        table.add_row(*row, style=style)
-
-    rprint(table)
-
-    if plot:
-        if any([p in sys.argv for p in ['-h', '--hist']]):
-            prop.hist(show=True)
-        if any([p in sys.argv for p in ['-s', '--scatter']]):
-            prop.scatter(show=True)
-
-    sys.exit()  # otherwise click prints Error
-
-
-def _echo_listSameTyeParameter(prop):
-    print(prop)
-    # TODO Add weighted average for floatParameters
-    # TODO Plots
-    prop.scatter()
-
-    # collection is attr_name in DATACLOUD_META
-    # Parse arguments
-    #  args = sys.argv[1:]
-
-    #  for i, arg in enumerate(args):
-
-    #  if arg in ["-s", "--scatter"]:
-    #  args.pop(i)
-    #  scatter = True
-    #  break
-    #  else:
-    #  scatter = False
-
-    #  for i, arg in enumerate(args):
-
-    #  if arg in ["-h", "--hist"]:
-    #  args.pop(i)
-    #  hist = True
-    #  break
-    #  else:
-    #  hist = False
-
-    #  if len(args) > 2:
-    #  raise TooManyRocksError("Provide one or no asteroid identifiers.")
-    #  elif len(args) == 2:
-    #  property_, name = args
-    #  elif len(args) == 1:
-    #  property_ = args[0]
-    #  name = False
-
-    #  # Perform property query
-    #  return echo_property(property_, name, scatter=scatter, hist=hist)
-
-
-# This needs to be available for name lookups and index selection
-#  try:
-#  NUMBER_NAME, NAME_NUMBER = read_index()
-#  except FileNotFoundError:
-#  click.echo("Asteroid index could not be found. " 'Run "rocks index" first.')
-#  sys.exit()
-
 # ------
-# Measurement Methods Defintions
-METHODS = {
-    "avg": {"color": "black"},
-    "std": {"color": "darkgrey"},
-    # Space mission
-    "SPACE": {"color": "gold", "marker": "X"},
-    # 3D shape modeling
-    "ADAM": {"color": "navy", "marker": "v"},
-    "SAGE": {"color": "mediumblue", "marker": "^"},
-    "KOALA": {"color": "slateblue", "marker": "<"},
-    "Radar": {"color": "cornflowerblue", "marker": ">"},
-    # LC with scaling
-    "LC+OCC": {"color": "lightgreen", "marker": "v"},
-    "LC+AO": {"color": "forestgreen", "marker": "^"},  # deprecated =LC+IM
-    "LC+IM": {"color": "forestgreen", "marker": "^"},
-    "LC+TPM": {"color": "darkgreen", "marker": "<"},
-    "LC-TPM": {"color": "green", "marker": ">"},
-    # Thermal models
-    "STM": {"color": "grey", "marker": "D"},
-    "NEATM": {"color": "grey", "marker": "o"},
-    "TPM": {"color": "darkgrey", "marker": "s"},
-    # Triaxial ellipsoid
-    "TE-IM": {"color": "blue", "marker": "o"},
-    # 2D on sky
-    "OCC": {"color": "brown", "marker": "P"},
-    "IM": {"color": "orange", "marker": "p"},
-    "IM-PSF": {"color": "tomato", "marker": "H"},
-    # Mass from binary
-    "Bin-IM": {"color": "navy", "marker": "v"},
-    "Bin-Genoid": {"color": "mediumblue", "marker": "^"},
-    "Bin-PheMu": {"color": "slateblue", "marker": "<"},
-    "Bin-Radar": {"color": "cornflowerblue", "marker": ">"},
-    # Mass from deflection
-    "DEFLECT": {"color": "brown", "marker": "D"},
-    "EPHEM": {"color": "red", "marker": "o"},
-    # Taxonomy
-    "Phot": {"color": "red", "marker": "s"},
-    "Spec": {"color": "red", "marker": "s"},
-}
-
-
-# ------
-# Plotting definitions
-PLOTTING = {
-    "LABELS": {
-        "diameter": "Diameter (km)",
-        "mass": "Mass (kg)",
-        "albedo": "Albedo",
-    }
-}
-
+# Definitions
 DATACLOUD_META = {
     # datacloud key : rocks name
     #     attr_name : Rock.xyz
@@ -1005,12 +574,19 @@ DATACLOUD_META = {
     },
 }
 
-
-class TooManyRocksError(Exception):
-    pass
-
-path_template = os.path.join(PATH_CACHE, "ssoCard_template.json")
-
-if not os.path.isfile(path_template):
-    print("Missing ssoCard template, retrieving..")
-    create_ssocard_template()
+DONT_PRINT = [
+    "num",
+    "name",
+    "id",
+    "iddataset",
+    "title",
+    "url",
+    "doi",
+    "bibcode",
+    "link",
+    "datasetname",
+    "idcollection",
+    "selection",
+    "source",
+    "resourcename",
+]

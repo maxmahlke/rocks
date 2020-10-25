@@ -3,29 +3,13 @@
 """
 from functools import singledispatch
 import json
-import os
 from types import SimpleNamespace
 import warnings
 
 import numpy as np
 import pandas as pd
-from rich.progress import track
 
 import rocks
-
-# Read ssoCard template
-path_cache = os.path.join(os.path.expanduser("~"), ".cache/rocks")
-path_template = os.path.join(path_cache, "ssoCard_template.json")
-
-if os.path.isfile(path_template):
-    with open(path_template, "r") as file_:
-        TEMPLATE = json.load(file_)
-
-    META_MAPPING = {
-        v: v.replace(".uncertainty", "")
-        for v in pd.json_normalize(TEMPLATE).columns
-        if ".uncertainty" in v
-    }
 
 
 class Rock:
@@ -71,7 +55,7 @@ class Rock:
         # Identify minor body
         if not skip_id_check:
             self.name, self.number, self.id = rocks.resolver.identify(
-                identifier, return_id=True, progress=False
+                identifier, return_id=True
             )
         else:
             self.id = identifier
@@ -79,16 +63,14 @@ class Rock:
         if not isinstance(self.id, str):
             return
 
-        # Fill attributes from argument, cache, or query
         ssoCard = ssoCard if ssoCard is not None else rocks.utils.get_ssoCard(self.id)
-        # No ssoCard exists
+
         if ssoCard is None:
             return
 
-        # Initialize from template
-        attributes = TEMPLATE
-        attributes = rocks.utils.update_ssoCard(TEMPLATE, ssoCard)
-        attributes = rocks.utils.sanitize_keys(attributes)
+        # Fill attributes from argument, cache, or query
+        ssoCard = rocks.utils.sanitize_keys(ssoCard)
+        attributes = rocks.utils.update_ssoCard(rocks.TEMPLATE, ssoCard)
 
         # Add JSON keys as attributes, mapping to the appropriate type
         for attribute in attributes.keys():
@@ -144,8 +126,7 @@ class Rock:
 
     def __getattr__(self, name):
         """Implement attribute shortcuts.
-        Only gets called if getattribute fails.
-        """
+        Gets called if getattribute fails."""
         # Implements shortcuts: omission of parameters.physical/dynamical
         if hasattr(self.parameters.physical, name):
             return getattr(self.parameters.physical, name)
@@ -156,25 +137,27 @@ class Rock:
 
     def __add_metadata(self):
         """docstring for __add_metadata"""
-        for meta, target in META_MAPPING.items():
-            try:
-                setattr(
-                    rocks.utils.rgetattr(self, target),
-                    "uncertainty",
-                    rocks.utils.rgetattr(self, meta),
-                )
-            except AttributeError:
-                # some unit paths are currently ill-defined
-                pass
-            try:
-                setattr(
-                    rocks.utils.rgetattr(self, target),
-                    "unit",
-                    rocks.utils.rgetattr(self, meta.replace("uncertainty", "unit")),
-                )
-            except AttributeError:
-                # some unit paths are currently ill-defined
-                pass
+        for meta in pd.json_normalize(rocks.TEMPLATE).columns:
+            if ".uncertainty" in meta:
+                target = meta.replace(".uncertainty", "")
+                try:
+                    setattr(
+                        rocks.utils.rgetattr(self, target),
+                        "uncertainty",
+                        rocks.utils.rgetattr(self, meta),
+                    )
+                except AttributeError:
+                    # some unit paths are currently ill-defined
+                    pass
+                try:
+                    setattr(
+                        rocks.utils.rgetattr(self, target),
+                        "unit",
+                        rocks.utils.rgetattr(self, meta.replace("uncertainty", "unit")),
+                    )
+                except AttributeError:
+                    # some unit paths are currently ill-defined
+                    pass
 
     def __add_datacloud_catalogue(self, catalogue):
         """docstring for __add_datacloud_catalogue"""
@@ -352,15 +335,13 @@ def rocks_(identifier, datacloud=[]):
     ids = [
         id_ for name, number, id_ in rocks.resolver.identify(identifier, return_id=True)
     ]
-    # Sent POST request
-    ssoCards = rocks.utils.get_ssoCard(ids)
-    # Build rocks
-    rocks_ = []
-    for id_, ssoCard in track(
-        zip(ids, ssoCards), total=len(ids), description="Building rocks"
-    ):
-        rocks_.append(Rock(id_, ssoCard, datacloud, skip_id_check=True))
 
+    ssoCards = rocks.utils.get_ssoCards(ids)
+
+    rocks_ = [
+        Rock(id_, ssoCard, datacloud, skip_id_check=True)
+        for id_, ssoCard in zip(ids, ssoCards)
+    ]
     return rocks_
 
 
