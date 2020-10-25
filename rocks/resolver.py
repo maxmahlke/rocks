@@ -19,7 +19,7 @@ def identify(id_, return_id=False, verbose=True, progress=True):
 
     Parameters
     ==========
-    id_ : str, int, float, list, np.ndarray, pd.Series
+    id_ : str, int, float, list, set, np.ndarray, pd.Series
         One or more identifying names or numbers to resolve.
     return_id : bool
         Return asteroid SsODNet id as well. Default is False.
@@ -44,6 +44,8 @@ def identify(id_, return_id=False, verbose=True, progress=True):
         id_ = [id_]
     elif isinstance(id_, pd.Series):
         id_ = id_.values
+    elif isinstance(id_, set):
+        id_ = list(id_)
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected str, int, or list."
