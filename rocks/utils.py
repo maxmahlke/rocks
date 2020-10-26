@@ -185,9 +185,11 @@ def sanitize_keys(dict_):
     for key, value in dict_.copy().items():
         if isinstance(value, dict):
             dict_[key] = sanitize_keys(dict_[key])
-        else:
-            if keyword.iskeyword(key):
-                dict_[f"{key}_"] = dict_.pop(key)
+        elif isinstance(value, list):
+            if all([isinstance(v, dict) for v in value]):
+                dict_[key] = [sanitize_keys(v) for v in value]
+        if keyword.iskeyword(key):
+            dict_[f"{key}_"] = dict_.pop(key)
     return dict_
 
 
