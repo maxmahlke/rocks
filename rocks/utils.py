@@ -15,6 +15,7 @@ from iterfzf import iterfzf
 import numpy as np
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 import rocks
 
@@ -242,7 +243,7 @@ def get_ssoCard(id_, only_cache=False):
         return ssoCard
 
 
-def get_ssoCards(ids):
+def get_ssoCards(ids, progress=False):
     """Return target ssoCard. Use cache if existant, else, query SsODNet
     and cache results. Accepts multiple ids.
 
@@ -251,6 +252,8 @@ def get_ssoCards(ids):
     ids : str, list, np.array, pd.Series
         Single Minor body target id from SsODNet or list of several.
         Pass SsODNet ID for fast access.
+    progress : bool
+        Show progress of instantiation. Default is False.
 
     Returns
     =======
@@ -268,10 +271,18 @@ def get_ssoCards(ids):
     )
     missing = [id_ for id_, card in id_card.items() if card is None]
 
+    if not missing:
+        return id_card.values()
+
+    print(f"Retrieving {len(missing)} ssoCards..")
+
     # Perform POST query for missing cards in chunks
+    if progress:
+        progressbar = tqdm(desc="Retrieving ssoCards", total=len(missing))
+
     for subset in [missing[i : i + 500] for i in range(0, len(missing), 500)]:
 
-        ssoCards = __query_ssoCards(subset)
+        ssoCards = __query_ssoCards(subset, progressbar)
 
         for id_, ssoCard in zip(subset, ssoCards):
 
@@ -287,13 +298,15 @@ def get_ssoCards(ids):
     return id_card.values()
 
 
-def __query_ssoCards(ids):
+def __query_ssoCards(ids, progressbar=False):
     """Retrieve ssoCards for targets from SsODNet via POST request.
 
     Parameters
     ==========
     ids : str, list, np.array, pd.Series
         Single Minor body target id from SsODNet or list of several.
+    progressbar : tqdm.tqdm
+        A progress bar instance. Default is False, no progressbar.
 
     Returns
     =======
@@ -324,6 +337,9 @@ def __query_ssoCards(ids):
         return False
 
     ssoCards = [response[id_] for id_ in ids]
+
+    if progressbar:
+        progressbar.update(n=len(ids))
 
     if len(ids) == 1:
         return ssoCards[0]
@@ -593,5 +609,5 @@ DONT_PRINT = [
     "source",
     "resourcename",
     "preferred",
-    "_iter_index"
+    "_iter_index",
 ]

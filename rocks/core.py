@@ -2,8 +2,8 @@
 """Implement the Rock class and other core rocks functionality.
 """
 from functools import singledispatch
-import json
 from types import SimpleNamespace
+from tqdm import tqdm
 import warnings
 
 import numpy as np
@@ -66,7 +66,13 @@ class Rock:
         ssoCard = ssoCard if ssoCard is not None else rocks.utils.get_ssoCard(self.id)
 
         if ssoCard is None:
-            return
+            # Every object needs a name and a number
+            if not hasattr(self, "name"):
+                self.name, self.number = rocks.resolver.identify(
+                    self.id, return_id=False
+                )
+            # No data to update
+            ssoCard = {}
 
         # Fill attributes from argument, cache, or query
         ssoCard = rocks.utils.sanitize_keys(ssoCard)
@@ -84,7 +90,7 @@ class Rock:
             self.number = np.nan
 
         # Set uncertainties and values
-        self.__add_metadata()
+        #  self.__add_metadata()
 
         # Add datacloud list attributes
         for catalogue in datacloud:
@@ -136,36 +142,33 @@ class Rock:
         """Implement attribute shortcuts.
         Gets called if getattribute fails."""
         # Implements shortcuts: omission of parameters.physical/dynamical
-        if hasattr(self.parameters.physical, name):
+        if name in rocks.SHORTCUTS["physical"]:
             return getattr(self.parameters.physical, name)
-        elif hasattr(self.parameters.dynamical, name):
+        elif name in rocks.SHORTCUTS["dynamical"]:
             return getattr(self.parameters.dynamical, name)
-        else:
-            raise AttributeError(f"Unknown attribute {name}")
+        raise AttributeError(f"Unknown attribute {name}")
 
     def __add_metadata(self):
         """docstring for __add_metadata"""
-        for meta in pd.json_normalize(rocks.TEMPLATE).columns:
-            if ".uncertainty" in meta:
-                target = meta.replace(".uncertainty", "")
-                try:
-                    setattr(
-                        rocks.utils.rgetattr(self, target),
-                        "uncertainty",
-                        rocks.utils.rgetattr(self, meta),
-                    )
-                except AttributeError:
-                    # some unit paths are currently ill-defined
-                    pass
-                try:
-                    setattr(
-                        rocks.utils.rgetattr(self, target),
-                        "unit",
-                        rocks.utils.rgetattr(self, meta.replace("uncertainty", "unit")),
-                    )
-                except AttributeError:
-                    # some unit paths are currently ill-defined
-                    pass
+        for meta, target in rocks.META_MAPPING.items():
+            try:
+                setattr(
+                    rocks.utils.rgetattr(self, target),
+                    "uncertainty",
+                    rocks.utils.rgetattr(self, meta),
+                )
+            except AttributeError:
+                # some unit paths are currently ill-defined
+                pass
+            try:
+                setattr(
+                    rocks.utils.rgetattr(self, target),
+                    "unit",
+                    rocks.utils.rgetattr(self, meta.replace("uncertainty", "unit")),
+                )
+            except AttributeError:
+                # some unit paths are currently ill-defined
+                pass
 
     def __add_datacloud_catalogue(self, catalogue):
         """docstring for __add_datacloud_catalogue"""
@@ -237,11 +240,11 @@ class propertyCollection(SimpleNamespace):
     Collections of float properties have plotting and averaging methods.
     """
 
-    def __repr__(self):
-        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  def __repr__(self):
+        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
-    def __str__(self):
-        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  def __str__(self):
+        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
     def __len__(self):
 
@@ -370,7 +373,7 @@ class listSameTypeParameter(list):
         return rocks.utils.weighted_average(observable, errors)
 
 
-def rocks_(identifier, datacloud=[]):
+def rocks_(identifier, datacloud=[], progress=False):
     """Create multiple Rock instances via POST request.
 
     Parameters
@@ -380,6 +383,8 @@ def rocks_(identifier, datacloud=[]):
     datacloud : list of str
         List of additional catalogues to retrieve from datacloud. Default is
         [], no additional data.
+    progress : bool
+        Show progress of instantiation. Default is False.
 
     Returns
     =======
@@ -391,15 +396,22 @@ def rocks_(identifier, datacloud=[]):
 
     # Ensure we know these objects
     ids = [
-        id_ for name, number, id_ in rocks.resolver.identify(identifier, return_id=True)
+        id_
+        for _, _, id_ in rocks.resolver.identify(
+            identifier, return_id=True, progress=progress
+        )
     ]
 
-    ssoCards = rocks.utils.get_ssoCards(ids)
+    ssoCards = rocks.utils.get_ssoCards(ids, progress=progress)
 
-    rocks_ = [
-        Rock(id_, ssoCard, datacloud, skip_id_check=True)
-        for id_, ssoCard in zip(ids, ssoCards)
-    ]
+    if progress:
+        progressbar = tqdm(desc="Building rocks", total=len(ids))
+
+    rocks_ = []
+
+    for id_, ssoCard in zip(ids, ssoCards):
+        rocks_.append(Rock(id_, ssoCard, datacloud, skip_id_check=True))
+        progressbar.update()
     return rocks_
 
 
@@ -427,6 +439,7 @@ def _cast_list(li):
 
 
 __TYPES = {
+    type(None): lambda v: None,
     None: lambda v: None,
     int: intParameter,
     str: stringParameter,

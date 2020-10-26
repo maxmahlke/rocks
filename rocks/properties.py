@@ -219,6 +219,7 @@ CLASS_TO_COMPLEX = {
     "Ch": "Ch",
     "D": "D",
     "DCX": "U",
+    "DL": "D",
     "DP": "D",
     "DU": "D",
     "Ds": "D",
@@ -334,4 +335,5 @@ CLASS_TO_COMPLEX = {
     "Z": "U",
     np.nan: np.nan,
     None: np.nan,
+    float("nan"): np.nan
 }

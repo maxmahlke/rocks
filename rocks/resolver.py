@@ -86,17 +86,18 @@ def identify(id_, return_id=False, verbose=True, progress=False):
                         NAME_NUMBER_ID,
                         ID_NUMBER_NAME,
                         verbose,
-                        progressbar,
+                        progress,
                     )
                 )
                 for i in id_
             ]
 
             results = await asyncio.gather(*tasks)
+
             return results
 
     if progress:
-        progressbar = tqdm(desc="Identifying rocks", total=len(id_))
+        progress = tqdm(desc="Identifying rocks", total=len(id_))
 
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_))
@@ -111,15 +112,15 @@ def identify(id_, return_id=False, verbose=True, progress=False):
 
 
 async def _query_and_resolve(
-    id_, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose, progressbar
+    id_, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose, progress
 ):
     """Standardize id_, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
     id_ = standardize_id_(id_)
 
     # Bit early but saves repetition
-    if progressbar:
-        progressbar.update()
+    if progress:
+        progress.update()
 
     # Try local resolution
     if isinstance(id_, (int)):

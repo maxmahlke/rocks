@@ -25,3 +25,26 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 # Read ssoCard template
 with open(PATH_TEMPLATE, "r") as file_:
     TEMPLATE = json.load(file_)
+
+META_MAPPING = dict(
+    (meta, meta.replace(".uncertainty", ""))
+    for meta in pd.json_normalize(TEMPLATE)
+    if "uncertainty" in meta
+)
+
+SHORTCUTS = {
+    "physical": set(
+        [
+            attr.split(".")[2]
+            for attr in pd.json_normalize(TEMPLATE)
+            if "physical" in attr
+        ]
+    ),
+    "dynamical": set(
+        [
+            attr.split(".")[2]
+            for attr in pd.json_normalize(TEMPLATE)
+            if "dynamical" in attr
+        ]
+    ),
+}
