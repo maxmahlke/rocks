@@ -10,11 +10,12 @@ import aiohttp
 import numpy as np
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 import rocks
 
 
-def identify(id_, return_id=False, verbose=True, progress=True):
+def identify(id_, return_id=False, verbose=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
@@ -26,7 +27,7 @@ def identify(id_, return_id=False, verbose=True, progress=True):
     verbose : bool
         Print query diagnostics. Default is True.
     progress : bool
-        Display progress bar. Default is True.
+        Display progress bar. Default is False.
 
     Returns
     =======
@@ -85,6 +86,7 @@ def identify(id_, return_id=False, verbose=True, progress=True):
                         NAME_NUMBER_ID,
                         ID_NUMBER_NAME,
                         verbose,
+                        progressbar,
                     )
                 )
                 for i in id_
@@ -92,6 +94,9 @@ def identify(id_, return_id=False, verbose=True, progress=True):
 
             results = await asyncio.gather(*tasks)
             return results
+
+    if progress:
+        progressbar = tqdm(desc="Identifying rocks", total=len(id_))
 
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_))
@@ -106,11 +111,15 @@ def identify(id_, return_id=False, verbose=True, progress=True):
 
 
 async def _query_and_resolve(
-    id_, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose
+    id_, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose, progressbar
 ):
     """Standardize id_, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
     id_ = standardize_id_(id_)
+
+    # Bit early but saves repetition
+    if progressbar:
+        progressbar.update()
 
     # Try local resolution
     if isinstance(id_, (int)):

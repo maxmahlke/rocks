@@ -22,6 +22,7 @@ setup(
         "pandas",
         "rich>=8",
         "requests",
+        "tqdm",
     ],
     entry_points="""
         [console_scripts]
