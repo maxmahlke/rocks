@@ -80,6 +80,9 @@ class Rock:
                 cast_types(attributes[attribute]),
             )
 
+        if self.number == 0:
+            self.number = np.nan
+
         # Set uncertainties and values
         self.__add_metadata()
 
