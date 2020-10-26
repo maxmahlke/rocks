@@ -452,6 +452,7 @@ def _echo_propertyCollection(rock, prop, plot):
     prop
         The attribute to print.
     """
+    # TODO Add weighted average for floatParameters
     from rich import box
     from rich.table import Table
     from rich import print as rprint
@@ -465,17 +466,19 @@ def _echo_propertyCollection(rock, prop, plot):
 
     # Keys are table property names
     keys = [k for k in list(prop.__dict__.keys()) if k not in DONT_PRINT]
-    map(table.add_column, keys)
+
+    for key in keys:
+        table.add_column(key)
 
     # Values are entries for each field
-    values = list(prop.__dict__.values())
-    n = len(values[0]) if isinstance(values[0], list) else 1
+    for row in prop:
+        table.add_row(
+            *[str(getattr(row, key)) for key in keys],
+            style="bold green"
+            if hasattr(row, "preferred") and row.preferred
+            else "white",
+        )
 
-    if n > 1:
-        for i, entry in enumerate(range(n)):
-            table.add_row(*[str(prop.__dict__[key][i]) for key in keys], style="white")
-    else:
-        table.add_row(*[str(prop.__dict__[key]) for key in keys], style="white")
     rprint(table)
 
     if plot:
@@ -489,8 +492,6 @@ def _echo_propertyCollection(rock, prop, plot):
 
 def _echo_listSameTyeParameter(prop):
     print(prop)
-    # TODO Add weighted average for floatParameters
-    # TODO Plots
     prop.scatter()
 
 
@@ -589,4 +590,6 @@ DONT_PRINT = [
     "selection",
     "source",
     "resourcename",
+    "preferred",
+    "_iter_index"
 ]

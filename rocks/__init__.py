@@ -8,6 +8,7 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolver import identify
 from . import plots
+from . import properties
 from . import resolver
 from . import utils
 

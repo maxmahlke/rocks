@@ -87,6 +87,11 @@ class Rock:
         for catalogue in datacloud:
             self.__add_datacloud_catalogue(catalogue)
 
+            # Add preferred entries
+            getattr(
+                self, rocks.utils.DATACLOUD_META[catalogue]["attr_name"]
+            ).select_preferred(catalogue)
+
     def __hash__(self):
         return hash(self.name)
 
@@ -235,11 +240,54 @@ class propertyCollection(SimpleNamespace):
     def __str__(self):
         return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
+    def __len__(self):
+
+        _value_sample = list(self.__dict__.values())[0]
+
+        if isinstance(_value_sample, list):
+            return len(_value_sample)
+        else:
+            return 1
+
+    def __iter__(self):
+        self._iter_index = -1
+        return self
+
+    def __next__(self):
+        self._iter_index += 1
+
+        if len(self) == 1 and self._iter_index == 0:
+            return self
+        elif self._iter_index < len(self):
+            return SimpleNamespace(
+                **dict(
+                    (k, v[self._iter_index])
+                    for k, v in self.__dict__.items()
+                    if k != "_iter_index"
+                )
+            )
+        raise StopIteration
+
     def scatter(self, **kwargs):
         return rocks.plots.scatter(self, **kwargs)
 
     def hist(self, **kwargs):
         return rocks.plots.hist(self, **kwargs)
+
+    def select_preferred(self, prop_name):
+        """Select the preferred values based on the observation methods.
+
+        Parameters
+        ==========
+        prop_name : str
+            The property to rank.
+
+        Returns
+        =======
+        list of bool
+            Entry "preferred" in propertyCollection, True if preferred, else False
+        """
+        self.preferred = rocks.properties.rank_properties(prop_name, self)
 
 
 class listSameTypeParameter(list):
@@ -283,14 +331,16 @@ class listSameTypeParameter(list):
             except ValueError:
                 return str
 
-    def weighted_average(self, errors=False):
+    def weighted_average(self, errors=False, preferred=[]):
         """Compute weighted average of float-type parameters.
 
         Parameters
         ==========
         errors : list of floats, np.ndarraya of floats
-            Optional list of associated uncertainties.  Default is unit
+            Optional list of associated uncertainties. Default is unit
             unceratinty.
+        preferred : list of bools
+            Compute average only from values where preferred is True.
 
         Returns
         ======
@@ -309,6 +359,11 @@ class listSameTypeParameter(list):
         else:
             # Remove measurements where the error is zero
             errors = np.array(errors)
+
+        if preferred:
+            observable = observable[preferred]
+            errors = errors[preferred]
+
         return rocks.utils.weighted_average(observable, errors)
 
 

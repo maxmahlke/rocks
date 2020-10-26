@@ -45,7 +45,7 @@ def scatter(catalogue, nbins=10, show=False, savefig=""):
     ax = fig.add_subplot(gs[0])
     ax_histy = fig.add_subplot(gs[1], sharey=ax)
 
-    avg, std = prop.weighted_average(errors)
+    avg, std = prop.weighted_average(errors, catalogue.preferred)
     ax.axhline(avg, label="Average", color=METHODS["avg"]["color"])
     ax.axhline(
         avg + std,
@@ -58,23 +58,23 @@ def scatter(catalogue, nbins=10, show=False, savefig=""):
     x = np.linspace(1, len(prop), len(prop))
     for i, m in enumerate(np.unique(catalogue.method)):
         cur = np.where(np.asarray(catalogue.method) == m)
-    fcol = "none"
-    ax.scatter(
-        x[cur],
-        np.asarray(prop)[cur],
-        label=m,
-        marker=METHODS[m]["marker"],
-        s=80,
-        facecolors=fcol,
-        edgecolors=METHODS[m]["color"],
-    )
-    ax.errorbar(
-        x[cur],
-        np.asarray(prop)[cur],
-        yerr=np.asarray(errors)[cur],
-        c=METHODS[m]["color"],
-        linestyle="",
-    )
+        fcol = "none"
+        ax.scatter(
+            x[cur],
+            np.asarray(prop)[cur],
+            label=m,
+            marker=METHODS[m]["marker"],
+            s=80,
+            facecolors=fcol,
+            edgecolors=METHODS[m]["color"],
+        )
+        ax.errorbar(
+            x[cur],
+            np.asarray(prop)[cur],
+            yerr=np.asarray(errors)[cur],
+            c=METHODS[m]["color"],
+            linestyle="",
+        )
 
     ax.set_xticks(x)
     axtop = ax.twiny()
@@ -132,7 +132,7 @@ def hist(catalogue, nbins=10, show=False, save_to=""):
 
     plt.hist(prop, bins=nbins, label="Estimates")
 
-    avg, std = prop.weighted_average(errors)
+    avg, std = prop.weighted_average(errors, catalogue.preferred)
 
     plt.errorbar(avg, 0.5, xerr=std, label="Average", marker="o")
 
@@ -186,6 +186,7 @@ def _property_errors(catalogue):
         errors = getattr(catalogue, f"err_{prop_name}")
     else:
         errors = np.ones(np.array(prop).shape)
+
     return prop, errors, prop_name
 
 
@@ -308,6 +309,7 @@ METHODS = {
     "TPM": {"color": "darkgrey", "marker": "s"},
     # -triaxial ellipsoid
     "TE-IM": {"color": "blue", "marker": "o"},
+    "TE-Occ": {"color": "darkblue", "marker": "o"},
     # -2d on sky
     "OCC": {"color": "brown", "marker": "P"},
     "IM": {"color": "oranged", "marker": "p"},
