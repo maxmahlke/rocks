@@ -50,7 +50,7 @@ def create_index():
     )
 
     with open(rocks.PATH_INDEX, "wb") as ind:
-        pickle.dump(index, ind, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(index, ind, protocol=4)
 
 
 def read_index():
@@ -234,7 +234,7 @@ def get_ssoCard(id_, only_cache=False):
 
     if not os.path.isfile(PATH_CARD):
         if not only_cache:
-            return __query_ssoCards(id_)
+            return __query_ssoCards(id_)[0]
         else:
             return None
     else:
@@ -289,7 +289,7 @@ def get_ssoCards(ids, progress=False):
             if ssoCard is None:
                 continue
 
-            id_card[id_] = ssoCard
+            id_card[id_] = ssoCard  # if ssoCard is None, this value is already None
 
             with open(f"{rocks.PATH_CACHE}/{id_}.json", "w") as file_:
                 json.dump(ssoCard, file_)
@@ -310,8 +310,8 @@ def __query_ssoCards(ids, progressbar=False):
 
     Returns
     =======
-    dict, list of dict, None
-        Sinlgle or list of ssoCards in json format if successful.
+    list of dict, None
+        List of ssoCards in json format if successful.
         None if query failed.
 
     Notes
@@ -340,11 +340,7 @@ def __query_ssoCards(ids, progressbar=False):
 
     if progressbar:
         progressbar.update(n=len(ids))
-
-    if len(ids) == 1:
-        return ssoCards[0]
-    else:
-        return ssoCards
+    return ssoCards
 
 
 def retrieve_catalogue(url):
