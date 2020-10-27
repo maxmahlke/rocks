@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality.
 """
+import copy
 from functools import singledispatch
 from types import SimpleNamespace
 from tqdm import tqdm
@@ -76,7 +77,8 @@ class Rock:
 
         # Fill attributes from argument, cache, or query
         ssoCard = rocks.utils.sanitize_keys(ssoCard)
-        attributes = rocks.utils.update_ssoCard(rocks.TEMPLATE, ssoCard)
+        attributes = copy.deepcopy(rocks.TEMPLATE)
+        attributes = rocks.utils.update_ssoCard(attributes, ssoCard)
 
         # Add JSON keys as attributes, mapping to the appropriate type
         for attribute in attributes.keys():
