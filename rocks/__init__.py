@@ -6,10 +6,10 @@ import pandas as pd
 
 from .core import Rock
 from .core import rocks_ as rocks
-from .resolver import identify
+from .resolve import identify
 from . import plots
 from . import properties
-from . import resolver
+from . import resolve
 from . import utils
 
 # Metadata
