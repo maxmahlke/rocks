@@ -5,3 +5,5 @@ dependencies:
   - python
   - numpy
   - pandas
+  - pip:
+    - https://github.com/maxmahlke/rocks.git
