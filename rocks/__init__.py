@@ -26,9 +26,11 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 with open(PATH_TEMPLATE, "r") as file_:
     TEMPLATE = json.load(file_)
 
+TEMPLATE_KEYS = pd.json_normalize(TEMPLATE)
+
 META_MAPPING = dict(
     (meta, meta.replace(".uncertainty", ""))
-    for meta in pd.json_normalize(TEMPLATE)
+    for meta in TEMPLATE_KEYS
     if "uncertainty" in meta
 )
 
@@ -36,14 +38,14 @@ SHORTCUTS = {
     "physical": set(
         [
             attr.split(".")[2]
-            for attr in pd.json_normalize(TEMPLATE)
+            for attr in TEMPLATE_KEYS
             if "physical" in attr
         ]
     ),
     "dynamical": set(
         [
             attr.split(".")[2]
-            for attr in pd.json_normalize(TEMPLATE)
+            for attr in TEMPLATE_KEYS
             if "dynamical" in attr
         ]
     ),

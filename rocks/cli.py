@@ -34,7 +34,7 @@ class AliasedGroup(click.Group):
         # ssoCard properties
         valid_props = [
             p
-            for p in pd.json_normalize(rocks.TEMPLATE).columns
+            for p in rocks.TEMPLATE_KEYS.columns
             if not p.startswith("datacloud")
         ]
         # missing intermediate levels
