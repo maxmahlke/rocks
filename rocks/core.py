@@ -55,7 +55,7 @@ class Rock:
 
         # Identify minor body
         if not skip_id_check:
-            self.name, self.number, self.id = rocks.resolver.identify(
+            self.name, self.number, self.id = rocks.resolve.identify(
                 identifier, return_id=True
             )
         else:

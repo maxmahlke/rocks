@@ -134,7 +134,7 @@ def update():
     https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
     """
     rocks.utils.create_index()
-    rocks.utils.create_ssocard_template()
+    rocks.utils.create_ssoCard_template()
 
 
 @cli_rocks.command()

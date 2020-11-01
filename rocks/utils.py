@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
+
 import collections
 from functools import reduce
 import json
@@ -34,7 +35,7 @@ def create_index():
     index = read_index()
     missing = set(index.number) ^ set(numbered)
 
-    if not missing:  # up-to-date
+    if not missing:  # pragma: no cover
         return
 
     # Get ids of missing entries, append to index
@@ -69,13 +70,13 @@ def read_index():
     # Check age of index file
     days_since_mod = (time.time() - os.path.getmtime(rocks.PATH_INDEX)) / (3600 * 24)
 
-    if days_since_mod > 30:
+    if days_since_mod > 30:  # pragma: no cover
         click.echo(
             "The index file is more than 30 days old. "
             "Consider updating with 'rocks update' and removing cached "
-            "values under $HOME/.cache/rocks"
+            "values under $HOME/.cache/rocks."
         )
-        time.sleep(1)  # so user doesn't miss the message
+        time.sleep(1)
 
     with open(rocks.PATH_INDEX, "rb") as ind:
         index = pickle.load(ind)
@@ -83,13 +84,7 @@ def read_index():
     return index
 
 
-def _fuzzy_desig_selection(index):
-    """Generator for fuzzy search of asteroid index file. """
-    for number, name in zip(index.number, index["name"]):
-        yield f"{number} {name}"
-
-
-def select_sso_from_index():
+def select_sso_from_index():  # pragma: no cover
     """Select SSO numbers and designations from interactive fuzzy search.
 
     Returns
@@ -110,6 +105,11 @@ def select_sso_from_index():
     """
     index = read_index()
 
+    def _fuzzy_desig_selection(index):
+        """Generator for fuzzy search of asteroid index file. """
+        for number, name in zip(index.number, index["name"]):
+            yield f"{number} {name}"
+
     try:
         nunaid = iterfzf(_fuzzy_desig_selection(index), exact=True)
         number, *name = nunaid.split()
@@ -122,6 +122,21 @@ def select_sso_from_index():
 
 # ------
 # ssoCard utility functions
+def rsetattr(obj, attr, val):  # pragma: no cover
+    """Deep version of setattr."""
+    pre, _, post = attr.rpartition(".")
+    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+
+
+def rgetattr(obj, attr, *args):  # pragma: no cover
+    """Deep version of getattr."""
+
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
+
+    return reduce(_getattr, [obj] + attr.split("."))
+
+
 def update_ssoCard(dict_, update):
     """Recursively update ssoCard template with retrieved values.
 
@@ -142,29 +157,14 @@ def update_ssoCard(dict_, update):
             dict_[key] = update_ssoCard(dict_.get(key, {}), val)
         else:
             if isinstance(dict_, list):  # multiple pair members
-                dict_ = dict_[-1]
+                dict_ = dict_[-1]  # pragma: no cover
             if isinstance(val, list):  # multiple taxonomies
                 val = val[-1]
             dict_[key] = val
     return dict_
 
 
-def rsetattr(obj, attr, val):
-    """Deep version of setattr."""
-    pre, _, post = attr.rpartition(".")
-    return setattr(rgetattr(obj, pre) if pre else obj, post, val)
-
-
-def rgetattr(obj, attr, *args):
-    """Deep version of getattr."""
-
-    def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
-
-    return reduce(_getattr, [obj] + attr.split("."))
-
-
-def create_ssocard_template():
+def create_ssoCard_template():  # pragma: no cover
     """Retrieve current ssoCard template from SsODNet and save
     simplified version to file.
     """
