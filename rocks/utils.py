@@ -279,6 +279,8 @@ def get_ssoCards(ids, progress=False):
     # Perform POST query for missing cards in chunks
     if progress:
         progressbar = tqdm(desc="Retrieving ssoCards", total=len(missing))
+    else:
+        progressbar = False
 
     for subset in [missing[i : i + 500] for i in range(0, len(missing), 500)]:
 
