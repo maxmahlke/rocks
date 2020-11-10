@@ -15,7 +15,7 @@ from tqdm import tqdm
 import rocks
 
 
-def identify(id_, return_id=False, verbose=True, progress=False):
+def identify(id_, return_id=False, verbose=True, progress=False, rocks_=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
@@ -28,6 +28,8 @@ def identify(id_, return_id=False, verbose=True, progress=False):
         Print query diagnostics. Default is True.
     progress : bool
         Display progress bar. Default is False.
+    rocks_ : bool
+        Request comes from rocks.rocks_. Default is False.
 
     Returns
     =======
@@ -105,7 +107,7 @@ def identify(id_, return_id=False, verbose=True, progress=False):
     if not return_id:
         results = [r[:2] for r in results]
 
-    if len(results) == 1:
+    if len(results) == 1 and not rocks_:
         return results[0]
     else:
         return results
