@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 """ Plotting utilities for rocks."""
-import sys
-
 import numpy as np
 import matplotlib.pyplot as plt
 
-import rocks
 
-
-def scatter(catalogue, nbins=10, show=False, savefig=""):
+def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
     """Create scatter/histogram figure for float parameters.
 
     Parameters
     ==========
     catalogue : rocks.core.propertyCollection
         A datacloud catalogue ingested in Rock instance.
+    prop_name : str
+        The property name, referring to a column in the datacloud table.
     nbins : int
         Number of bins in histogram. Default is 10
     show : bool
@@ -26,7 +24,8 @@ def scatter(catalogue, nbins=10, show=False, savefig=""):
     =======
     matplotlib.figures.Figure instance, matplotib.axes.Axis instance
     """
-    prop, errors, prop_name = _property_errors(catalogue)
+
+    prop, errors = _property_errors(catalogue, prop_name)
 
     # ------
     # Build figure
@@ -105,13 +104,15 @@ def scatter(catalogue, nbins=10, show=False, savefig=""):
     return fig, ax
 
 
-def hist(catalogue, nbins=10, show=False, save_to=""):
+def hist(catalogue, prop_name, nbins=10, show=False, save_to=""):
     """Create histogram figure for float parameters.
 
     Parameters
     ==========
     catalogue : rocks.core.propertyCollection
         A datacloud catalogue ingested in Rock instance.
+    prop_name : str
+        The property name, referring to a column in the datacloud table.
     nbins : int
         Number of bins in histogram. Default is 10
     show : bool
@@ -123,8 +124,8 @@ def hist(catalogue, nbins=10, show=False, save_to=""):
     =======
     matplotlib.figures.Figure instance, matplotib.axes.Axis instance
     """
-    # inferred from propertyCollection
-    prop, errors, prop_name = _property_errors(catalogue)
+
+    prop, errors = _property_errors(catalogue, prop_name)
 
     # ------
     # Build figure
@@ -151,7 +152,7 @@ def hist(catalogue, nbins=10, show=False, save_to=""):
     return fig, plt.gca()
 
 
-def _property_errors(catalogue):
+def _property_errors(catalogue, prop_name):
     """Retrieve main property and its errors from a datacloud catalogue.
     masses -> mass, diamalbedo -> either albedos or diameters
 
@@ -159,35 +160,22 @@ def _property_errors(catalogue):
     ==========
     catalogue : rocks.core.propertyCollection
         Datacloud catalogue ingested into Rock instance.
+    prop_name : str
+        The property name, referring to a column in the datacloud table.
 
     Returns
     =======
     ndarray, ndarray
         The main property as defined in utils.DATACLOUD_META and its error.
-    str
-        The property name.
     """
-    # ------
-    # Data selection: if called from command line, get from arguments
-    # TODO Fails if user renames executable. Should be
-    if sys.argv[0].endswith("rocks"):
-        prop = sys.argv[1]  # eg masses, diameters, albedos
-
-        if prop in ["diameters", "albedos"]:
-            cat_name = "diamalbedo"
-        else:
-            cat_name = prop
-
-        # Actual attribute name is singular version
-        prop_name = rocks.utils.DATACLOUD_META[cat_name]["prop_name"][prop]
-        prop = getattr(catalogue, prop_name)  # listSameTypeParameter
+    prop = getattr(catalogue, prop_name)  # listSameTypeParameter
 
     if hasattr(catalogue, f"err_{prop_name}"):
         errors = getattr(catalogue, f"err_{prop_name}")
     else:
         errors = np.ones(np.array(prop).shape)
 
-    return prop, errors, prop_name
+    return prop, errors
 
 
 def show_scatter_hist(info, par, figname):

@@ -95,7 +95,9 @@ If the properties are of type ``float``, methods for :ref:`weighted averaging<ro
     [9.55e+20, 9.54e+20, 9.94e+20, 9.19e+20, ..., 9.39e+20]
     >> ceres.masses.mass.weighted_average(errors=ceres.masses.err_mass)
     (9.387431170184913e+20, 3.282260016750655e+17)
-    >> ceres.mass.plot()  # TODO
+    >> ceres.masses.scatter('mass', show=True)
+
+The last line above will open a ``matplotlib`` scatterplot of the ``mass`` values in the ``masses`` catalogue. For the ``diamalbedo`` catalogue, both ``albedo`` and ``diameters`` can be specified.
 
 .. Note::
 

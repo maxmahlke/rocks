@@ -3,12 +3,13 @@
 """
 import copy
 from functools import singledispatch
+import json
 from types import SimpleNamespace
-from tqdm import tqdm
 import warnings
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 import rocks
 
@@ -244,11 +245,11 @@ class propertyCollection(SimpleNamespace):
     Collections of float properties have plotting and averaging methods.
     """
 
-    #  def __repr__(self):
-    #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    def __repr__(self):
+        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
-    #  def __str__(self):
-    #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    def __str__(self):
+        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
     def __len__(self):
 
@@ -278,11 +279,11 @@ class propertyCollection(SimpleNamespace):
             )
         raise StopIteration
 
-    def scatter(self, **kwargs):
-        return rocks.plots.scatter(self, **kwargs)
+    def scatter(self, prop_name, **kwargs):
+        return rocks.plots.scatter(self, prop_name, **kwargs)
 
-    def hist(self, **kwargs):
-        return rocks.plots.hist(self, **kwargs)
+    def hist(self, prop_name, **kwargs):
+        return rocks.plots.hist(self, prop_name, **kwargs)
 
     def select_preferred(self, prop_name):
         """Select the preferred values based on the observation methods.
@@ -361,7 +362,7 @@ class listSameTypeParameter(list):
             except ValueError:
                 return str
 
-    def weighted_average(self, errors=False, preferred=[]):
+    def weighted_average(self, errors=None, preferred=[]):
         """Compute weighted average of float-type parameters.
 
         Parameters
@@ -383,7 +384,7 @@ class listSameTypeParameter(list):
         observable = np.array(self)
 
         # Make uniform weights in case no errors are provided
-        if not errors:
+        if errors is None:
             warnings.warn("No error provided, using uniform weights.")
             errors = np.ones(len(self))
         else:

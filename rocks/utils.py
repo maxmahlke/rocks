@@ -486,6 +486,15 @@ def _echo_propertyCollection(rock, prop, plot):
     for key in keys:
         table.add_column(key)
 
+    if "diameters" in sys.argv:
+        prop.preferred = prop.preferred_diameter
+        prop_name = "diameter"
+    elif "albedos" in sys.argv:
+        prop.preferred = prop.preferred_albedo
+        prop_name = "albedo"
+    elif "masses" in sys.argv:
+        prop_name = "mass"
+
     # Values are entries for each field
     for row in prop:
         table.add_row(
@@ -499,16 +508,15 @@ def _echo_propertyCollection(rock, prop, plot):
 
     if plot:
         if any([p in sys.argv for p in ["-h", "--hist"]]):
-            prop.hist(show=True)
+            prop.hist(prop_name, show=True)
         if any([p in sys.argv for p in ["-s", "--scatter"]]):
-            prop.scatter(show=True)
+            prop.scatter(prop_name, show=True)
 
     sys.exit()  # otherwise click prints Error
 
 
 def _echo_listSameTyeParameter(prop):
     print(prop)
-    prop.scatter()
 
 
 # ------
@@ -607,5 +615,7 @@ DONT_PRINT = [
     "source",
     "resourcename",
     "preferred",
+    "preferred_albedo",
+    "preferred_diameter",
     "_iter_index",
 ]
