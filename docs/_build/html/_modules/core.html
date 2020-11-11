@@ -108,28 +108,16 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="sd">&quot;&quot;&quot;Implement the Rock class and other core rocks functionality.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">rich.progress</span> <span class="kn">import</span> <span class="n">track</span>
 
 <span class="kn">import</span> <span class="nn">rocks</span>
-
-<span class="c1"># Read ssoCard template</span>
-<span class="n">path_cache</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">),</span> <span class="s2">&quot;.cache/rocks&quot;</span><span class="p">)</span>
-<span class="n">path_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_cache</span><span class="p">,</span> <span class="s2">&quot;ssoCard_template.json&quot;</span><span class="p">)</span>
-
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path_template</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Missing ssoCard template, retrieving..&quot;</span><span class="p">)</span>
-    <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">create_ssocard_template</span><span class="p">()</span>
-
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path_template</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_</span><span class="p">:</span>
-    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file_</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Rock"><a class="viewcode-back" href="../core.html#core.Rock">[docs]</a><span class="k">class</span> <span class="nc">Rock</span><span class="p">:</span>
@@ -171,11 +159,13 @@
 <span class="sd">        &gt;&gt;&gt; ceres.diameter.unit</span>
 <span class="sd">        &#39;km&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">datacloud</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">datacloud</span> <span class="o">=</span> <span class="p">[</span><span class="n">datacloud</span><span class="p">]</span>
 
         <span class="c1"># Identify minor body</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_id_check</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span>
-                <span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">resolve</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span>
+                <span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">identifier</span>
@@ -183,16 +173,21 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span>
 
-        <span class="c1"># Fill attributes from argument, cache, or query</span>
         <span class="n">ssoCard</span> <span class="o">=</span> <span class="n">ssoCard</span> <span class="k">if</span> <span class="n">ssoCard</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_ssoCard</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="c1"># No ssoCard exists</span>
-        <span class="k">if</span> <span class="n">ssoCard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
 
-        <span class="c1"># Initialize from template</span>
-        <span class="n">attributes</span> <span class="o">=</span> <span class="n">TEMPLATE</span>
-        <span class="n">attributes</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">update_ssoCard</span><span class="p">(</span><span class="n">TEMPLATE</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">)</span>
-        <span class="n">attributes</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">sanitize_keys</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ssoCard</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Every object needs a name and a number</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">resolve</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">False</span>
+                <span class="p">)</span>
+            <span class="c1"># No data to update</span>
+            <span class="n">ssoCard</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Fill attributes from argument, cache, or query</span>
+        <span class="n">ssoCard</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">sanitize_keys</span><span class="p">(</span><span class="n">ssoCard</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">rocks</span><span class="o">.</span><span class="n">TEMPLATE</span><span class="p">)</span>
+        <span class="n">attributes</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">update_ssoCard</span><span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">)</span>
 
         <span class="c1"># Add JSON keys as attributes, mapping to the appropriate type</span>
         <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -202,12 +197,20 @@
                 <span class="n">cast_types</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="n">attribute</span><span class="p">]),</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
         <span class="c1"># Set uncertainties and values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__add_metadata</span><span class="p">()</span>
+        <span class="c1">#  self.__add_metadata()</span>
 
         <span class="c1"># Add datacloud list attributes</span>
         <span class="k">for</span> <span class="n">catalogue</span> <span class="ow">in</span> <span class="n">datacloud</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__add_datacloud_catalogue</span><span class="p">(</span><span class="n">catalogue</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__add_datacloud_catalogue</span><span class="p">(</span><span class="n">catalogue</span><span class="p">)</span>
+
+            <span class="c1"># Add preferred entries</span>
+            <span class="nb">getattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">DATACLOUD_META</span><span class="p">[</span><span class="n">catalogue</span><span class="p">][</span><span class="s2">&quot;attr_name&quot;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">select_preferred</span><span class="p">(</span><span class="n">catalogue</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
@@ -248,19 +251,17 @@
 
     <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Implement attribute shortcuts.</span>
-<span class="sd">        Only gets called if getattribute fails.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Gets called if getattribute fails.&quot;&quot;&quot;</span>
         <span class="c1"># Implements shortcuts: omission of parameters.physical/dynamical</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">rocks</span><span class="o">.</span><span class="n">SHORTCUTS</span><span class="p">[</span><span class="s2">&quot;physical&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">physical</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dynamical</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">rocks</span><span class="o">.</span><span class="n">SHORTCUTS</span><span class="p">[</span><span class="s2">&quot;dynamical&quot;</span><span class="p">]:</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">dynamical</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown attribute </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown attribute </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__add_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;docstring for __add_metadata&quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">meta</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">META_MAPPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">meta</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">rocks</span><span class="o">.</span><span class="n">META_MAPPING</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">setattr</span><span class="p">(</span>
                     <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">rgetattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">),</span>
@@ -350,17 +351,60 @@
 <span class="sd">    Collections of float properties have plotting and averaging methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#  def __repr__(self):</span>
+    <span class="c1">#  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__qualname__</span> <span class="o">+</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#  def __str__(self):</span>
+    <span class="c1">#  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">_value_sample</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_value_sample</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">_value_sample</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">SimpleNamespace</span><span class="p">(</span>
+                <span class="o">**</span><span class="nb">dict</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_iter_index</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;_iter_index&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">StopIteration</span>
 
     <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rocks</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">rocks</span><span class="o">.</span><span class="n">plots</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">select_preferred</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Select the preferred values based on the observation methods.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ==========</span>
+<span class="sd">        prop_name : str</span>
+<span class="sd">            The property to rank.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        =======</span>
+<span class="sd">        list of bool</span>
+<span class="sd">            Entry &quot;preferred&quot; in propertyCollection, True if preferred, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferred</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">rank_properties</span><span class="p">(</span><span class="n">prop_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">listSameTypeParameter</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
@@ -376,36 +420,44 @@
 <span class="sd">        data : iterable</span>
 <span class="sd">            The minor body data from datacloud.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datatype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">datatype</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">list</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">__get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Infers type from str variable.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">string</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">values</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">var</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-                <span class="c1"># scientific notation is not understood by int</span>
-                <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;e&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span> <span class="ow">and</span> <span class="s2">&quot;E&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">string</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="nb">float</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">value</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span>
+                        <span class="ow">and</span> <span class="s2">&quot;e&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="ow">and</span> <span class="s2">&quot;E&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span>
+                    <span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="k">return</span> <span class="nb">int</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">return</span> <span class="nb">float</span>
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="k">return</span> <span class="nb">str</span>
 
-    <span class="k">def</span> <span class="nf">weighted_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">weighted_average</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preferred</span><span class="o">=</span><span class="p">[]):</span>
         <span class="sd">&quot;&quot;&quot;Compute weighted average of float-type parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ==========</span>
 <span class="sd">        errors : list of floats, np.ndarraya of floats</span>
-<span class="sd">            Optional list of associated uncertainties.  Default is unit</span>
+<span class="sd">            Optional list of associated uncertainties. Default is unit</span>
 <span class="sd">            unceratinty.</span>
+<span class="sd">        preferred : list of bools</span>
+<span class="sd">            Compute average only from values where preferred is True.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        ======</span>
@@ -424,10 +476,15 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Remove measurements where the error is zero</span>
             <span class="n">errors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">preferred</span><span class="p">:</span>
+            <span class="n">observable</span> <span class="o">=</span> <span class="n">observable</span><span class="p">[</span><span class="n">preferred</span><span class="p">]</span>
+            <span class="n">errors</span> <span class="o">=</span> <span class="n">errors</span><span class="p">[</span><span class="n">preferred</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">weighted_average</span><span class="p">(</span><span class="n">observable</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">rocks_</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[]):</span>
+<span class="k">def</span> <span class="nf">rocks_</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[],</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create multiple Rock instances via POST request.</span>
 
 <span class="sd">    Parameters</span>
@@ -437,6 +494,8 @@
 <span class="sd">    datacloud : list of str</span>
 <span class="sd">        List of additional catalogues to retrieve from datacloud. Default is</span>
 <span class="sd">        [], no additional data.</span>
+<span class="sd">    progress : bool</span>
+<span class="sd">        Show progress of instantiation. Default is False.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    =======</span>
@@ -448,17 +507,23 @@
 
     <span class="c1"># Ensure we know these objects</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">id_</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">rocks</span><span class="o">.</span><span class="n">resolver</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">id_</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">rocks</span><span class="o">.</span><span class="n">resolve</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span>
+            <span class="n">identifier</span><span class="p">,</span> <span class="n">return_id</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span> <span class="n">rocks_</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
     <span class="p">]</span>
-    <span class="c1"># Sent POST request</span>
-    <span class="n">ssoCards</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_ssoCard</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="c1"># Build rocks</span>
-    <span class="n">rocks_</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span> <span class="ow">in</span> <span class="n">track</span><span class="p">(</span>
-        <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">ssoCards</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Building rocks&quot;</span>
-    <span class="p">):</span>
-        <span class="n">rocks_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Rock</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">,</span> <span class="n">datacloud</span><span class="p">,</span> <span class="n">skip_id_check</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
 
+    <span class="n">ssoCards</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_ssoCards</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">progressbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Building rocks&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+
+    <span class="n">rocks_</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">ssoCards</span><span class="p">):</span>
+        <span class="n">rocks_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Rock</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">ssoCard</span><span class="p">,</span> <span class="n">datacloud</span><span class="p">,</span> <span class="n">skip_id_check</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">rocks_</span>
 
 
@@ -486,18 +551,13 @@
 
 
 <span class="n">__TYPES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">):</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="kc">None</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="nb">int</span><span class="p">:</span> <span class="n">intParameter</span><span class="p">,</span>
     <span class="nb">str</span><span class="p">:</span> <span class="n">stringParameter</span><span class="p">,</span>
     <span class="nb">float</span><span class="p">:</span> <span class="n">floatParameter</span><span class="p">,</span>
     <span class="nb">dict</span><span class="p">:</span> <span class="n">propertyCollection</span><span class="p">,</span>
     <span class="nb">list</span><span class="p">:</span> <span class="n">_cast_list</span><span class="p">,</span>
-<span class="p">}</span>
-
-<span class="n">META_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.uncertainty&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">json_normalize</span><span class="p">(</span><span class="n">TEMPLATE</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span>
-    <span class="k">if</span> <span class="s2">&quot;.uncertainty&quot;</span> <span class="ow">in</span> <span class="n">v</span>
 <span class="p">}</span>
 </pre></div>
 

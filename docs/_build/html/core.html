@@ -177,7 +177,11 @@
 </tr>
 </tbody>
 </table>
-<p>The properties in each table row entry are concatenated into lists, grouping properties of the same type together.</p>
+<p>Single tables can be requested by passing the table name to the <code class="docutils literal notranslate"><span class="pre">datacloud</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="s1">&#39;masses&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Multiple tables are retrieved by passing a list of table names.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;taxonomy&#39;</span><span class="p">,</span> <span class="s1">&#39;masses&#39;</span><span class="p">])</span>
 <span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">taxonomies</span><span class="o">.</span><span class="n">class_</span>
 <span class="p">[</span><span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">]</span>
@@ -274,17 +278,20 @@ and no further attributes are set.</p>
 <span class="target" id="rocks-rocks"></span><dl class="py function">
 <dt id="core.rocks">
 <code class="sig-prename descclassname">core.</code><code class="sig-name descname">rocks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.rocks" title="Permalink to this definition">¶</a></dt>
-<dd><p>For space rocks. Interface for SsODNet.</p>
+<dd><p>For space rocks.</p>
 </dd></dl>
 
 <span class="target" id="rocks-wa"></span><dl class="py function">
 <dt id="core.listSameTypeParameter.weighted_average">
-<code class="sig-prename descclassname">core.listSameTypeParameter.</code><code class="sig-name descname">weighted_average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.listSameTypeParameter.weighted_average" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">core.listSameTypeParameter.</code><code class="sig-name descname">weighted_average</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">errors</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">preferred</span><span class="o">=</span><span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.listSameTypeParameter.weighted_average" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute weighted average of float-type parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>errors</strong> (<em>list of floats</em><em>, </em><em>np.ndarraya of floats</em>) – Optional list of associated uncertainties.  Default is unit
-unceratinty.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>errors</strong> (<em>list of floats</em><em>, </em><em>np.ndarraya of floats</em>) – Optional list of associated uncertainties. Default is unit
+unceratinty.</p></li>
+<li><p><strong>preferred</strong> (<em>list of bools</em>) – Compute average only from values where preferred is True.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">

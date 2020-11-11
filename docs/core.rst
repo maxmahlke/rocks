@@ -70,7 +70,13 @@ SsODNet:datacloud contains tables of albedo, mass, taxonomic class estimations a
 | taxonomy        | ``taxonomies``             |
 +-----------------+----------------------------+
 
-The properties in each table row entry are concatenated into lists, grouping properties of the same type together.
+Single tables can be requested by passing the table name to the ``datacloud``.
+
+.. code-block:: python
+
+    >> ceres = Rock(1, datacloud='masses')
+
+Multiple tables are retrieved by passing a list of table names.
 
 .. code-block:: python
 

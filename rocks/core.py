@@ -52,6 +52,8 @@ class Rock:
         >>> ceres.diameter.unit
         'km'
         """
+        if isinstance(datacloud, str):
+            datacloud = [datacloud]
 
         # Identify minor body
         if not skip_id_check:

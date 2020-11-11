@@ -1,4 +1,4 @@
-"""For space rocks. Interface for SsODNet."""
+"""For space rocks."""
 import json
 import os
 
