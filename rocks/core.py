@@ -94,7 +94,7 @@ class Rock:
             self.number = np.nan
 
         # Set uncertainties and values
-        #  self.__add_metadata()
+        self.__add_metadata()
 
         # Add datacloud list attributes
         for catalogue in datacloud:
@@ -297,7 +297,27 @@ class propertyCollection(SimpleNamespace):
         list of bool
             Entry "preferred" in propertyCollection, True if preferred, else False
         """
-        self.preferred = rocks.properties.rank_properties(prop_name, self)
+        if prop_name == "diamalbedo":
+            setattr(
+                self,
+                "preferred_albedo",
+                rocks.properties.rank_properties("albedo", self),
+            )
+            setattr(
+                self,
+                "preferred_diameter",
+                rocks.properties.rank_properties("diameter", self),
+            )
+            setattr(
+                self,
+                "preferred",
+                [
+                    any([di, ai])
+                    for di, ai in zip(self.preferred_diameter, self.preferred_albedo)
+                ],
+            )
+        else:
+            self.preferred = rocks.properties.rank_properties(prop_name, self)
 
 
 class listSameTypeParameter(list):

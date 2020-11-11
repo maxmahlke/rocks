@@ -1,44 +1,104 @@
 Tutorials
 =========
 
-To do: Include code examples as jupyter notebooks and on webpage.
+.. Note::
 
-The code below retrieves the ssoCards and taxonomies for the first 1,000 numbered objects. To see the effect of caching the ssoCards, run it first after deleting the cache in ``$USER/.cache/rocks/ssoCards/``. The second time should be much faster.
+   ``rocks.identify`` runs asynchronously.  ``jupyter notebook`` s require the following two lines to support asynchronous operations::
 
+
+       import nest_asyncio
+       nest_asyncio.apply()
+
+
+Identify asteroids
+------------------
+
+.. highlight:: python
+
+- Identify asteroids using a list of names, numbers, or designations::
+
+    import rocks
+
+    names_numbers = rocks.identify(MY_LIST_OF_IDENTIFIERS)
+
+    NAMES = [name_number[0] for name_number in names_numbers]
+    NUMBERS = [name_number[1] for name_number in names_numbers]
+
+- Identify objects in the `SDSS MOC1 <https://faculty.washington.edu/ivezic/sdssmoc/sdssmoc1.html>`_ using ``rocks.identify``:
 
 .. code-block:: python
 
-    
-    #!/usr/bin/env python
-
-    """Retrieve taxonomies of first 1000 numbered minor planets with rocks.
-    """
-    import time
-
+    import numpy as np
     import pandas as pd
-    from rocks import rocks
+    import rocks
 
-    start = time.time()
+    # ------
+    # Download SDSS MOC1 (6.2MB)
+    data = pd.read_fwf(
+        "https://faculty.washington.edu/ivezic/sdssmoc/ADR1.dat.gz",
+        colspecs=[(244, 250), (250, 270)],
+        names=["numeration", "designation"],
+    )
 
-    # Create list of identifiers for first 1000 asteroids
-    N = 1000
-    ids = list(range(1, N + 1))
+    print(f"Number of observations in SDSS MOC1: {len(data)}")
 
-    # Create the rocks instances
-    asteroids = rocks(ids)
+    # Remove the unknown objects
+    data = data[data.designation.str.strip(" ") != "-"]
+    print(f"Observations of known objects: {len(set(data.designation))}")
 
-    # Create a dataframe containing the asteroid names, numbers,
-    # their taxonomic class.
-    data = [
-        {"number": ast.number, "name": ast.name, "class_": ast.taxonomy.class_} for ast in asteroids
-    ]
+    # ------
+    # Get current designations and numbers for objects
 
-    data = pd.DataFrame(data)
+    # Unnumbered objects should be NaN
+    data.loc[data.numeration == 0, "numeration"] = np.nan
 
-    # Print the distribution of taxonomic classes
-    print(data.class_.value_counts())
+    # Create list of identifiers by merging 'numeration' and 'designation' columns
+    ids = data.numeration.fillna(data.designation)
+    print("Identifying known objects in catalogue..")
+    names_numbers = rocks.identify(ids)
 
-    print(f"This took {time.time() - start:.3} seconds.")
+    # Add numbers and names to data
+    data["name"] = [name_number[0] for name_number in names_numbers]
+    data["number"] = [name_number[1] for name_number in names_numbers]
+
+    data.number = data.number.astype("Int64")  # Int64 supports integers and NaN
+    print(data.head())
+
+Download the file or run in a binder.
+
+.. .. code-block:: python
+
+    
+    .. #!/usr/bin/env python
+
+    .. """Retrieve taxonomies of first 1000 numbered minor planets with rocks.
+    .. """
+    .. import time
+
+    .. import pandas as pd
+    .. from rocks import rocks
+
+    .. start = time.time()
+
+    .. # Create list of identifiers for first 1000 asteroids
+    .. N = 1000
+    .. ids = list(range(1, N + 1))
+
+    .. # Create the rocks instances
+    .. asteroids = rocks(ids)
+
+    .. # Create a dataframe containing the asteroid names, numbers,
+    .. # their taxonomic class.
+    .. data = [
+        .. {"number": ast.number, "name": ast.name, "class_": ast.taxonomy.class_} for ast in asteroids
+    .. ]
+
+    .. data = pd.DataFrame(data)
+
+    .. # Print the distribution of taxonomic classes
+    .. print(data.class_.value_counts())
+
+    .. print(f"This took {time.time() - start:.3} seconds.")
 
 
 .. - Using the ``Rock`` class for asteroid parameter access

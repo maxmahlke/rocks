@@ -95,10 +95,27 @@ If the properties are of type ``float``, methods for :ref:`weighted averaging<ro
     [9.55e+20, 9.54e+20, 9.94e+20, 9.19e+20, ..., 9.39e+20]
     >> ceres.masses.mass.weighted_average(errors=ceres.masses.err_mass)
     (9.387431170184913e+20, 3.282260016750655e+17)
+    >> ceres.mass.plot()  # TODO
 
 .. Note::
 
    The units and uncertainties are not appended to properties in the datacloud catalgoues. This may be implemented in a later version.
+
+Some observations in the catalogues might be preferred to others. For example, a taxonomical classification using a visible-nearinfrared spectrum is more reliable than one based on visible colours. ``rocks`` includes **opinonated** selections of preferred observations based on the observation methods. Catalogues have ``preferred`` attributes, which are lists containing ``True`` if the corresponding observation is preferred, and ``False`` otherwise.
+
+.. code-block:: python
+
+    >> ceres = Rock(1, datacloud='masses')
+    >> len(ceres.masses.mass)  # 20 observations of Ceres' mass in database
+    20
+    >> for obs in ceres.masses:
+          if obs.preferred:
+              print(f"Mass: {obs.mass}, Method: {obs.method}, from {obs.shortbib}")
+    Mass: 9.384e+20, Method: SPACE, from Russell+2016
+
+.. Note::
+
+    As the ``diamalbedo`` catalogue contains both diameters and albedos, it contains the ``preferred_diameter`` and ``preferred_albedo`` attributes. The ``preferred`` attribute of the catalogue is True if either of the corresponding diameter or albedo observation is preferred.
 
 Creating many ``Rock``\ s
 -------------------------

@@ -195,11 +195,26 @@
 <span class="p">[</span><span class="mf">9.55e+20</span><span class="p">,</span> <span class="mf">9.54e+20</span><span class="p">,</span> <span class="mf">9.94e+20</span><span class="p">,</span> <span class="mf">9.19e+20</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="mf">9.39e+20</span><span class="p">]</span>
 <span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">weighted_average</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">err_mass</span><span class="p">)</span>
 <span class="p">(</span><span class="mf">9.387431170184913e+20</span><span class="p">,</span> <span class="mf">3.282260016750655e+17</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ceres</span><span class="o">.</span><span class="n">mass</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>  <span class="c1"># TODO</span>
 </pre></div>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The units and uncertainties are not appended to properties in the datacloud catalgoues. This may be implemented in a later version.</p>
+</div>
+<p>Some observations in the catalogues might be preferred to others. For example, a taxonomical classification using a visible-nearinfrared spectrum is more reliable than one based on visible colours. <code class="docutils literal notranslate"><span class="pre">rocks</span></code> includes <strong>opinonated</strong> selections of preferred observations based on the observation methods. Catalogues have <code class="docutils literal notranslate"><span class="pre">preferred</span></code> attributes, which are lists containing <code class="docutils literal notranslate"><span class="pre">True</span></code> if the corresponding observation is preferred, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ceres</span> <span class="o">=</span> <span class="n">Rock</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">datacloud</span><span class="o">=</span><span class="s1">&#39;masses&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>  <span class="c1"># 20 observations of Ceres&#39; mass in database</span>
+<span class="mi">20</span>
+<span class="o">&gt;&gt;</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">ceres</span><span class="o">.</span><span class="n">masses</span><span class="p">:</span>
+      <span class="k">if</span> <span class="n">obs</span><span class="o">.</span><span class="n">preferred</span><span class="p">:</span>
+          <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mass: </span><span class="si">{</span><span class="n">obs</span><span class="o">.</span><span class="n">mass</span><span class="si">}</span><span class="s2">, Method: </span><span class="si">{</span><span class="n">obs</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">, from </span><span class="si">{</span><span class="n">obs</span><span class="o">.</span><span class="n">shortbib</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">Mass</span><span class="p">:</span> <span class="mf">9.384e+20</span><span class="p">,</span> <span class="n">Method</span><span class="p">:</span> <span class="n">SPACE</span><span class="p">,</span> <span class="kn">from</span> <span class="nn">Russell</span><span class="o">+</span><span class="mi">2016</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As the <code class="docutils literal notranslate"><span class="pre">diamalbedo</span></code> catalogue contains both diameters and albedos, it contains the <code class="docutils literal notranslate"><span class="pre">preferred_diameter</span></code> and <code class="docutils literal notranslate"><span class="pre">preferred_albedo</span></code> attributes. The <code class="docutils literal notranslate"><span class="pre">preferred</span></code> attribute of the catalogue is True if either of the corresponding diameter or albedo observation is preferred.</p>
 </div>
 </div>
 <div class="section" id="creating-many-rocks">

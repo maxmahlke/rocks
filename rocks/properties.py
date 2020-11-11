@@ -22,14 +22,6 @@ def rank_properties(prop_name, obs):
     list of bool
         Entry "preferred" in propertyCollection, True if preferred, else False
     """
-    if prop_name == "diamalbedo":
-        if sys.argv[1] == "diameters":
-            prop_name = "diameter"
-        elif sys.argv[1] == "albedos":
-            prop_name = "albedo"
-        else:
-            prop_name = "diameter"
-
     if prop_name in ["taxonomy", "taxonomies"]:
         return select_taxonomy(obs)
     elif prop_name in ["mass", "masses"]:
@@ -43,7 +35,7 @@ def rank_properties(prop_name, obs):
             f"Selection of preferred observation not implemented "
             f"for property {prop_name}"
         )
-        return [False for i in obs]
+        return [True for i in obs]
 
 
 def select_taxonomy(taxonomies):

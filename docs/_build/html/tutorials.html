@@ -102,39 +102,67 @@
                 
   <div class="section" id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
-<p>To do: Include code examples as jupyter notebooks and on webpage.</p>
-<p>The code below retrieves the ssoCards and taxonomies for the first 1,000 numbered objects. To see the effect of caching the ssoCards, run it first after deleting the cache in <code class="docutils literal notranslate"><span class="pre">$USER/.cache/rocks/ssoCards/</span></code>. The second time should be much faster.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
-
-<span class="sd">&quot;&quot;&quot;Retrieve taxonomies of first 1000 numbered minor planets with rocks.</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">time</span>
-
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">rocks</span> <span class="kn">import</span> <span class="n">rocks</span>
-
-<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-
-<span class="c1"># Create list of identifiers for first 1000 asteroids</span>
-<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-
-<span class="c1"># Create the rocks instances</span>
-<span class="n">asteroids</span> <span class="o">=</span> <span class="n">rocks</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-
-<span class="c1"># Create a dataframe containing the asteroid names, numbers,</span>
-<span class="c1"># their taxonomic class.</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">number</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;class_&quot;</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">class_</span><span class="p">}</span> <span class="k">for</span> <span class="n">ast</span> <span class="ow">in</span> <span class="n">asteroids</span>
-<span class="p">]</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-<span class="c1"># Print the distribution of taxonomic classes</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">class_</span><span class="o">.</span><span class="n">value_counts</span><span class="p">())</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This took </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="si">:</span><span class="s2">.3</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">)</span>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">rocks.identify</span></code> runs asynchronously.  <code class="docutils literal notranslate"><span class="pre">jupyter</span> <span class="pre">notebook</span></code> s require the following two lines to support asynchronous operations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nest_asyncio</span>
+<span class="n">nest_asyncio</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="identify-asteroids">
+<h2>Identify asteroids<a class="headerlink" href="#identify-asteroids" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p>Identify asteroids using a list of names, numbers, or designations:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">rocks</span>
+
+<span class="n">names_numbers</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span><span class="n">MY_LIST_OF_IDENTIFIERS</span><span class="p">)</span>
+
+<span class="n">NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name_number</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+<span class="n">NUMBERS</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_number</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">name_number</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>Identify objects in the <a class="reference external" href="https://faculty.washington.edu/ivezic/sdssmoc/sdssmoc1.html">SDSS MOC1</a> using <code class="docutils literal notranslate"><span class="pre">rocks.identify</span></code>:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">rocks</span>
+
+<span class="c1"># ------</span>
+<span class="c1"># Download SDSS MOC1 (6.2MB)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span>
+    <span class="s2">&quot;https://faculty.washington.edu/ivezic/sdssmoc/ADR1.dat.gz&quot;</span><span class="p">,</span>
+    <span class="n">colspecs</span><span class="o">=</span><span class="p">[(</span><span class="mi">244</span><span class="p">,</span> <span class="mi">250</span><span class="p">),</span> <span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="mi">270</span><span class="p">)],</span>
+    <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;numeration&quot;</span><span class="p">,</span> <span class="s2">&quot;designation&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of observations in SDSS MOC1: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Remove the unknown objects</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">designation</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observations of known objects: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">designation</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># ------</span>
+<span class="c1"># Get current designations and numbers for objects</span>
+
+<span class="c1"># Unnumbered objects should be NaN</span>
+<span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">numeration</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;numeration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+<span class="c1"># Create list of identifiers by merging &#39;numeration&#39; and &#39;designation&#39; columns</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">numeration</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">designation</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Identifying known objects in catalogue..&quot;</span><span class="p">)</span>
+<span class="n">names_numbers</span> <span class="o">=</span> <span class="n">rocks</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+<span class="c1"># Add numbers and names to data</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_number</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name_number</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+<span class="n">data</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">name_number</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">name_number</span> <span class="ow">in</span> <span class="n">names_numbers</span><span class="p">]</span>
+
+<span class="n">data</span><span class="o">.</span><span class="n">number</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">number</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;Int64&quot;</span><span class="p">)</span>  <span class="c1"># Int64 supports integers and NaN</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Download the file or run in a binder.</p>
 </div>
 </div>
 
