@@ -75,6 +75,16 @@ def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
             linestyle="",
         )
 
+    rejected = np.where(np.asarray(catalogue.preferred) == False)
+    ax.scatter(
+        x[rejected],
+        np.asarray(prop)[rejected],
+        label='Discarded', 
+        marker='x',
+        s=260,
+        facecolors='gray',
+    )
+
     ax.set_xticks(x)
     axtop = ax.twiny()
     axtop.set_xticks(x)
@@ -96,6 +106,7 @@ def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
 
     if savefig:
         fig.savefig(savefig)
+        plt.close()
 
     if show:
         plt.show()
@@ -300,7 +311,7 @@ METHODS = {
     "TE-Occ": {"color": "darkblue", "marker": "o"},
     # -2d on sky
     "OCC": {"color": "brown", "marker": "P"},
-    "IM": {"color": "oranged", "marker": "p"},
+    "IM": {"color": "orange", "marker": "p"},
     "IM-PSF": {"color": "tomato", "marker": "H"},
     # -Mass from binary
     "Bin-IM": {"color": "navy", "marker": "v"},
