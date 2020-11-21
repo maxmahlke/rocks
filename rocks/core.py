@@ -3,7 +3,6 @@
 """
 import copy
 from functools import singledispatch
-import json
 from types import SimpleNamespace
 import warnings
 
@@ -245,11 +244,11 @@ class propertyCollection(SimpleNamespace):
     Collections of float properties have plotting and averaging methods.
     """
 
-    def __repr__(self):
-        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  def __repr__(self):
+        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
-    def __str__(self):
-        return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  def __str__(self):
+        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
     def __len__(self):
 
@@ -457,10 +456,13 @@ def _cast_dict(value):
 
 
 @cast_types.register(list)
-def _cast_list(li):
+def _cast_list(list_):
     """Turn lists of dicts into a dict of lists."""
+    #  breakpoint()
+    if len(list_) == 1:
+        return cast_types(list_[0])
     return propertyCollection(
-        **{k: listSameTypeParameter([dic[k] for dic in li]) for k in li[0]}
+        **{k: listSameTypeParameter([dic[k] for dic in list_]) for k in list_[0]}
     )
 
 
