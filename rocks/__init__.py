@@ -13,7 +13,7 @@ from . import resolve
 from . import utils
 
 # Metadata
-__version__ = "0.1.0"
+#  __version__ = "0.1.0"
 
 # Package auxilliary files
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")

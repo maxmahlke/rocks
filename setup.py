@@ -2,11 +2,9 @@ import os
 
 from setuptools import find_packages, setup
 
-import rocks
-
 setup(
     name="rocks",
-    version=rocks.__version__,
+    version="0.1.0",
     python_requires=">=3.4",
     data_files=[os.path.join(os.path.expanduser("~"), ".cache/rocks")],
     packages=find_packages("rocks"),
