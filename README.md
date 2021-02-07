@@ -1,4 +1,4 @@
-[![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) ![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # rocks
 
@@ -6,12 +6,13 @@
 
 ## Features
 
-Command-line exploration and scripted analysis of asteroid data.
+Command-line exploration and scripted retrieval of asteroid data.
+
 ## Install
 
 Install from PyPi using `pip`:
 
-     $ [sudo] pip install space-rocks
+     pip install space-rocks
 
 ## Documentation
 
