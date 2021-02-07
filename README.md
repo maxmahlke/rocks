@@ -4,18 +4,17 @@
 
 *Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
 
+## Features
+
+Command-line exploration and scripted analysis of asteroid data.
 ## Install
 
-  1. Clone repo
+Install from PyPi using `pip`:
+
      ```
-     $ git clone https://github.com/maxmahlke/rocks.git
+     $ [sudo] pip install space-rocks
      ```
-  2. Install `rocks` `python` package
-     ```
-     $ cd rocks
-     $ [sudo] pip install -e .
-     ```
-  3. Check out the documentation in your browser
-     ```
-     $ rocks docs
-     ```
+
+## Documentation
+
+See the [documentation at read-the-docs.io](https://rocks.readthedocs.io/en/latest/)
