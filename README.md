@@ -11,10 +11,8 @@ Command-line exploration and scripted analysis of asteroid data.
 
 Install from PyPi using `pip`:
 
-     ```
      $ [sudo] pip install space-rocks
-     ```
 
 ## Documentation
 
-See the [documentation at read-the-docs.io](https://rocks.readthedocs.io/en/latest/)
+Check out the documentation at [read-the-docs.io](https://rocks.readthedocs.io/en/latest/).
