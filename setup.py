@@ -21,6 +21,8 @@ setup(
     py_modules=["rocks"],
     install_requires=[
         "aiohttp[speedups]",
+        "aiodns",
+        "chardet<4.0",
         "cchardet",
         "click",
         "iterfzf",
