@@ -22,9 +22,11 @@ setup(
         "pandas",
         "rich>=8",
         "requests",
-        "sphinx_redactor_theme",
         "tqdm",
     ],
+    extras_require={
+        "docs": ["sphinx_redactor_theme"],
+    },
     entry_points="""
         [console_scripts]
         rocks=rocks.cli:cli_rocks
