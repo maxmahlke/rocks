@@ -21,6 +21,7 @@ setup(
     py_modules=["rocks"],
     install_requires=[
         "aiohttp[speedups]",
+        "cchardet",
         "click",
         "iterfzf",
         "matplotlib",
