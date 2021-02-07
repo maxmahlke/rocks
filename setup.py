@@ -17,10 +17,10 @@ setup(
     packages=find_packages("rocks"),
     include_package_data=include_package_data,
     data_files=data_files,
-    description="For space rocks.",
+    description="For space-rocks.",
     py_modules=["rocks"],
     install_requires=[
-        "aiohttp[speedups]",
+        "aiohttp",
         "aiodns",
         "chardet<4.0",
         "cchardet",
@@ -31,6 +31,7 @@ setup(
         "pandas",
         "rich>=8",
         "requests",
+        "sphinx_redactor_theme",
         "tqdm",
     ],
     extras_require={
