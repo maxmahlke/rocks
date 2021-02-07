@@ -20,7 +20,7 @@ setup(
     description="For space rocks.",
     py_modules=["rocks"],
     install_requires=[
-        "aiohttp>=3.7",
+        "aiohttp[speedups]",
         "click",
         "iterfzf",
         "matplotlib",
