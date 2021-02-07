@@ -32,10 +32,11 @@ setup(
         "rich>=8",
         "requests",
         "sphinx_redactor_theme",
+        "sphinx_click",
         "tqdm",
     ],
     extras_require={
-        "docs": ["sphinx_redactor_theme"],
+        "docs": ["sphinx_redactor_theme", "sphinx_click"],
     },
     entry_points="""
         [console_scripts]
