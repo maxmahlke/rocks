@@ -26,9 +26,11 @@ requests = "^2.25.1"
 tqdm = "^4.56.0"
 chardet = "<4.0"
 sphinx = {version = "^3", optional = true}
+sphinx-redactor-theme = {version = "^0.0.1", optional = true}
+sphinx-click = {version = "^2.5.0", optional = true}
 
 [tool.poetry.extras]
-docs = ["sphinx"]
+docs = ["sphinx", "sphinx-redactor-theme", "sphinx-click"]
 
 [tool.poetry.scripts]
 rocks = "rocks.cli:cli_rocks"
