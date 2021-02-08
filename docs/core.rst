@@ -179,8 +179,8 @@ API of ``Rock`` and ``rocks``
 
 .. _rocks-plots:
 
-.. autofunction:: core.listSameTypeParameter.hist
+.. autofunction:: core.propertyCollection.hist
 
-.. autofunction:: core.listSameTypeParameter.scatter
+.. autofunction:: core.propertyCollection.scatter
 
 

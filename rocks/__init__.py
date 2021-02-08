@@ -17,8 +17,8 @@ from . import utils
 
 # Package auxilliary files
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
-PATH_TEMPLATE = os.path.join(os.path.dirname(__file__), "../ssoCard_template.json")
-PATH_INDEX = os.path.join(os.path.dirname(__file__), "../index.pkl")
+PATH_TEMPLATE = os.path.join(os.path.dirname(__file__), "../data/ssoCard_template.json")
+PATH_INDEX = os.path.join(os.path.dirname(__file__), "../data/index.pkl")
 
 os.makedirs(PATH_CACHE, exist_ok=True)
 

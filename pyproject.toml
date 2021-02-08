@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-rocks"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python client for SsODNet data access."
 authors = ["Max Mahlke <max.mahlke@oca.eu>"]
 license = "MIT"
@@ -9,6 +9,7 @@ homepage = "https://rocks.readthedocs.io/en/latest/"
 documentation = "https://rocks.readthedocs.io/en/latest/"
 repository = "https://github.com/maxmahlke/rocks.git"
 packages = [{'include' = 'rocks'}]
+include = ['data/index.pkl', 'data/ssoCard_template.json']
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<4.0"
@@ -25,9 +26,15 @@ requests = "^2.25.1"
 tqdm = "^4.56.0"
 chardet = "<4.0"
 
+[tool.poetry.scripts]
+rocks = "rocks.cli:cli_rocks"
+
 [tool.poetry.dev-dependencies]
 sphinx-redactor-theme = "^0.0.1"
 sphinx-click = "^2.5.0"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=rocks --cov-report html"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

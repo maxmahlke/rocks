@@ -156,8 +156,9 @@ def standardize_id_(id_):
             return None
 
         # Asteroid name
-        elif re.match(r"^[A-Za-z]*$", id_):
-            id_ = id_.capitalize()  # guess correct capitalization
+        elif re.match(r"^[A-Za-z ]*$", id_):
+            # guess correct capitalization
+            id_ = " ".join([sub.capitalize() for sub in id_.split(" ")])  # type: ignore
 
         # Asteroid designation
         elif re.match(

@@ -54,7 +54,6 @@ def select_taxonomy(taxonomies):
     list of bool
         True if preferred, else False
     """
-
     POINTS = {
         "scheme": {"bus-demeo": 3, "bus": 2, "smass": 2, "tholen": 1, "sdss": 1},
         "waverange": {"vis": 1, "nir": 3, "visnir": 6, "mix": 4},

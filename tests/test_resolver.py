@@ -55,9 +55,9 @@ def test_parsing_quaero_query(id_):
         # str
         ("19", 19),
         ("19.0", 19),
-        ("Astraea", "ASTRAEA"),
-        ("eos", "EOS"),
-        ("SCHWARTZ", "SCHWARTZ"),
+        ("Astraea", "Astraea"),
+        ("eos", "Eos"),
+        ("SCHWARTZ", "Schwartz"),
         ("G!kun||'homdima", "G!kun||'homdima"),
         ("1290 T-1", "1290 T-1"),
         ("2010 OR", "2010 OR"),
@@ -88,6 +88,7 @@ IDS_RESULTS_LOCAL = [
     ["G!kun||'homdima", ("G!kun||'homdima", 229762), True],
     ["1290 T-1", ("1290 T-1", 12946), True],
     ["1290_T-1", ("1290 T-1", 12946), True],
+    ["New Hampshire", ("New Hampshire", 503033), True],
     # ["P/PANSTARRS", ("P/2014 M4", np.nan), False],  # not supporting comets
     # for now
     ["1950 RW", ("Gyldenkerne", 5030), False],
@@ -116,12 +117,16 @@ def test_query_and_resolve(id_, expected):
 
 @pytest.mark.parametrize(
     "identifier",
-    [SSO_IDS, np.array(SSO_IDS), pd.Series(SSO_IDS)],
-    ids=["list", "array", "series"],
+    [SSO_IDS, np.array(SSO_IDS), pd.Series(SSO_IDS), set(SSO_IDS), ("invalid")],
+    ids=["list", "array", "series", "set", "tuple"],
 )
 def test_many_identifiers(identifier):
     """Common-case lookups of many SSO ids, passed as list, array, Series"""
-    rocks.identify(identifier)
+    if isinstance(identifier, tuple):
+        with pytest.raises(ValueError):
+            rocks.identify(identifier)
+    else:
+        rocks.identify(identifier)
 
 
 @pytest.mark.parametrize("identifier, expected, local", IDS_RESULTS_LOCAL)

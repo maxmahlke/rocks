@@ -23,24 +23,47 @@ import rocks
 
 # ------
 # Index functions
+def read_index():
+    """Read local index of asteroid numbers, names, SsODNet IDs.
+
+    Returns
+    =======
+    pd.DataFrame
+        Asteroid index with three columns.
+    """
+    with open(rocks.PATH_INDEX, "rb") as ind:
+        return pickle.load(ind)
+
+
 def create_index():
     """Update index of numbered SSOs."""
+
+    # Get currently indexed objects
+    index = read_index()
 
     # Get list of numbered asteroids from MPC
     url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
     numbered = pd.read_fwf(url, colspecs=[(0, 7)], names=["number"])
-    numbered = set(int(n.strip(" (")) for n in numbered.number)
+    numbered = set(int(n.strip(" (")) for n in numbered.number)  # type: ignore
 
     # Compare list to index
-    index = read_index()
     missing = set(index.number) ^ set(numbered)
 
-    if not missing:  # pragma: no cover
+    if not missing:
         return
 
     # Get ids of missing entries, append to index
-    names, numbers, ids = zip(*rocks.identify(missing, return_id=True, verbose=False))
-    index = index.append(pd.DataFrame({"name": names, "number": numbers, "id_": ids}))
+    names, numbers, ids = zip(*rocks.identify(missing))
+
+    index = index.append(
+        pd.DataFrame(
+            {
+                "name": names,
+                "number": numbers,
+                "id_": ids,
+            }
+        )
+    )
 
     # Save index to file
     index = (
@@ -52,37 +75,6 @@ def create_index():
 
     with open(rocks.PATH_INDEX, "wb") as ind:
         pickle.dump(index, ind, protocol=4)
-
-
-def read_index():
-    """Read local index of asteroid numbers, names, SsODNet IDs.
-
-    Returns
-    =======
-    pd.DataFrame
-        Asteroid index with three columns.
-
-    Notes
-    =====
-    If the index file is older than 30 days, a reminder to update is
-    displayed.
-    """
-    # Check age of index file
-    # days_since_mod = (
-    #     time.time() - os.path.getmtime(rocks.PATH_INDEX)) / (3600 * 24)
-
-    # if days_since_mod > 30:  # pragma: no cover
-    #     click.echo(
-    #         "The index file is more than 30 days old. "
-    #         "Consider updating with 'rocks update' and removing cached "
-    #         "values under $HOME/.cache/rocks."
-    #     )
-    #     time.sleep(1)
-
-    with open(rocks.PATH_INDEX, "rb") as ind:
-        index = pickle.load(ind)
-
-    return index
 
 
 def select_sso_from_index():  # pragma: no cover
@@ -104,7 +96,7 @@ def select_sso_from_index():  # pragma: no cover
     >>> import rocks
     >>> name, number, id_ = rocks.utils.select_sso_from_index()
     """
-    index = read_index()
+    INDEX = read_index()
 
     def _fuzzy_desig_selection(index):
         """Generator for fuzzy search of asteroid index file. """
@@ -112,12 +104,14 @@ def select_sso_from_index():  # pragma: no cover
             yield f"{number} {name}"
 
     try:
-        nunaid = iterfzf(_fuzzy_desig_selection(index), exact=True)
+        nunaid = iterfzf(_fuzzy_desig_selection(INDEX), exact=True)
         number, *name = nunaid.split()
-    except AttributeError:  # no SSO selected
-        return None, None, None
 
-    id_ = index.loc[index.number == int(number), "id_"].values[0]
+    except AttributeError:  # no SSO selected
+        return None, np.nan, None
+
+    id_ = INDEX.loc[INDEX.number == int(number), "id_"].values[0]
+
     return " ".join(name), int(number), id_
 
 
@@ -154,7 +148,7 @@ def update_ssoCard(dict_, update):
         The updated ssoCard.
     """
     for key, val in update.items():
-        if isinstance(val, collections.abc.Mapping):
+        if isinstance(val, collections.abc.Mapping):  # type: ignore
             dict_[key] = update_ssoCard(dict_.get(key, {}), val)
         else:
             if isinstance(dict_, list):  # multiple pair members

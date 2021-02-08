@@ -1,3 +1,6 @@
-# 06.06
+# 0.1.1 - 2021-02-08
+- Speed-up of local name resolution by refactoring the resolution logic
+- Index file is no longer checked for date of last modification to reduce startup time
 
-- If datacloud is unavailable, rocks prints explicit error message.
+# 0.1 - 2021-02-07
+- Initial release on PyPI
