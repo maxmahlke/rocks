@@ -25,6 +25,10 @@ rich = "^9.10.0"
 requests = "^2.25.1"
 tqdm = "^4.56.0"
 chardet = "<4.0"
+sphinx = {version = "^3", optional = true}
+
+[tool.poetry.extras]
+docs = ["sphinx"]
 
 [tool.poetry.scripts]
 rocks = "rocks.cli:cli_rocks"
