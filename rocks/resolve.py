@@ -10,12 +10,11 @@ import aiohttp
 import numpy as np
 import pandas as pd
 import requests
-from tqdm import tqdm
 
 import rocks
 
 
-def identify(id_, return_id=False, verbose=True, progress=False, rocks_=False):
+def identify(id_, return_id=False, rocks_=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
@@ -24,10 +23,6 @@ def identify(id_, return_id=False, verbose=True, progress=False, rocks_=False):
         One or more identifying names or numbers to resolve.
     return_id : bool
         Return asteroid SsODNet id as well. Default is False.
-    verbose : bool
-        Print query diagnostics. Default is True.
-    progress : bool
-        Display progress bar. Default is False.
     rocks_ : bool
         Request comes from rocks.rocks_. Default is False.
 
@@ -54,53 +49,6 @@ def identify(id_, return_id=False, verbose=True, progress=False, rocks_=False):
             f"Received id_ of type {type(id_)}, expected str, int, or list."
         )
 
-    async def _identify(id_):
-
-        index = rocks.utils.read_index()
-
-        NUMBER_NAME_ID = dict(
-            (number, (name, id_))
-            for number, name, id_ in zip(
-                index.number.values, index["name"].values, index.id_.values
-            )
-        )
-        NAME_NUMBER_ID = dict(
-            (name.upper(), (number, id_))
-            for number, name, id_ in zip(
-                index.number.values, index["name"].values, index.id_.values
-            )
-        )
-        ID_NUMBER_NAME = dict(
-            (id_, (number, name))
-            for number, name, id_ in zip(
-                index.number.values, index["name"].values, index.id_.values
-            )
-        )
-
-        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
-
-            tasks = [
-                asyncio.ensure_future(
-                    _query_and_resolve(
-                        i,
-                        session,
-                        NUMBER_NAME_ID,
-                        NAME_NUMBER_ID,
-                        ID_NUMBER_NAME,
-                        verbose,
-                        progress,
-                    )
-                )
-                for i in id_
-            ]
-
-            results = await asyncio.gather(*tasks)
-
-            return results
-
-    if progress:
-        progress = tqdm(desc="Identifying rocks", total=len(id_))
-
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_))
 
@@ -113,16 +61,59 @@ def identify(id_, return_id=False, verbose=True, progress=False, rocks_=False):
         return results
 
 
+async def _identify(id_):
+
+    index = rocks.utils.read_index()
+
+    NUMBER_NAME_ID = dict(
+        (number, (name, id_))
+        for number, name, id_ in zip(
+            index.number.values, index["name"].values, index.id_.values
+        )
+    )
+    NAME_NUMBER_ID = dict(
+        (name.upper(), (number, id_))
+        for number, name, id_ in zip(
+            index.number.values, index["name"].values, index.id_.values
+        )
+    )
+    ID_NUMBER_NAME = dict(
+        (id_, (number, name))
+        for number, name, id_ in zip(
+            index.number.values, index["name"].values, index.id_.values
+        )
+    )
+
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
+
+        tasks = [
+            asyncio.ensure_future(
+                _query_and_resolve(
+                    i,
+                    session,
+                    NUMBER_NAME_ID,
+                    NAME_NUMBER_ID,
+                    ID_NUMBER_NAME,
+                )
+            )
+            for i in id_
+        ]
+
+        results = await asyncio.gather(*tasks)
+
+        return results
+
+
 async def _query_and_resolve(
-    id_, session, NUMBER_NAME_ID, NAME_NUMBER_ID, ID_NUMBER_NAME, verbose, progress
+    id_,
+    session,
+    NUMBER_NAME_ID,
+    NAME_NUMBER_ID,
+    ID_NUMBER_NAME,
 ):
-    """Standardize id_, do local look-up, else query quaero and parser
+    """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
     id_ = standardize_id_(id_)
-
-    # Bit early but saves repetition
-    if progress:
-        progress.update()
 
     # Try local resolution
     if isinstance(id_, (int)):
@@ -141,12 +132,10 @@ async def _query_and_resolve(
         return (np.nan, np.nan, np.nan)
 
     # Local resolution failed, do remote query
-    response = await _query_quaero(id_, session, verbose)
+    response = await _query_quaero(id_, session)
 
     if response:
-        name, number, ssodnet_id = _parse_quaero_response(
-            response["data"], str(id_), verbose
-        )
+        name, number, ssodnet_id = _parse_quaero_response(response["data"], str(id_))
         if isinstance(ssodnet_id, str):
             return (name, number, ssodnet_id)
     return (np.nan, np.nan, np.nan)
@@ -232,7 +221,7 @@ def standardize_id_(id_):
 
 # ------
 # Quaero query methods
-async def _query_quaero(id_, session, verbose):
+async def _query_quaero(id_, session):
     """Query quaero and parse result for a single object.
 
     Parameters
@@ -241,8 +230,6 @@ async def _query_quaero(id_, session, verbose):
         Asteroid name, number, or designation.
     session : aiohttp.ClientSession
         asyncio session
-    verbose : bool
-        Print query diagnostics. Default is True.
 
     Returns
     =======
@@ -263,25 +250,22 @@ async def _query_quaero(id_, session, verbose):
         response_json = await response.json()
 
     except (requests.exceptions.RequestException, asyncio.exceptions.TimeoutError) as e:
-        if verbose:
-            warnings.warn(f"An error occurred during the name resolution: {e}")
+        warnings.warn(f"An error occurred during the name resolution: {e}")
         return False
     else:
         # No match found
         if "data" not in response_json.keys():
-            if verbose:
-                warnings.warn(f"Could not find data for id {id_}.")
+            warnings.warn(f"Could not find data for id {id_}.")
             return False
         # Data is empty
         elif not response_json["data"]:
-            if verbose:
-                warnings.warn(f"Could not find match for id {id_}.")
+            warnings.warn(f"Could not find match for id {id_}.")
             return False
         else:
             return response_json
 
 
-def _parse_quaero_response(data_json, id_, verbose):
+def _parse_quaero_response(data_json, id_):
     """Parse JSON response3 from Quaero.
 
     Parameters
@@ -290,8 +274,6 @@ def _parse_quaero_response(data_json, id_, verbose):
         Quaero query response in json format.
     id_ : str, int, float
         Asteroid name, number, or designation.
-    verbose : bool
-        Print query diagnostics. Default is True.
 
     Returns
     =======
@@ -308,8 +290,7 @@ def _parse_quaero_response(data_json, id_, verbose):
             break
     else:
         # Unclear which match is correct.
-        if verbose:
-            warnings.warn(f"Could not find match for id {id_}.")
+        warnings.warn(f"Could not find match for id {id_}.")
         return (np.nan, np.nan, np.nan)
 
     # Found match

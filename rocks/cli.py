@@ -33,9 +33,7 @@ class AliasedGroup(click.Group):
 
         # ssoCard properties
         valid_props = [
-            p
-            for p in rocks.TEMPLATE_KEYS.columns
-            if not p.startswith("datacloud")
+            p for p in rocks.TEMPLATE_KEYS.columns if not p.startswith("datacloud")
         ]
         # missing intermediate levels
         valid_props = set(
@@ -47,7 +45,7 @@ class AliasedGroup(click.Group):
         # Check if valid ssoCard property
         for prop in valid_props:
 
-            if prop.endswith("class") or prop.endswith('complex'):
+            if prop.endswith("class") or prop.endswith("complex"):
                 prop += "_"
 
             if prop.endswith(cmd_name):
@@ -139,8 +137,7 @@ def update():
 
 @cli_rocks.command()
 @click.argument("this", required=1)
-@click.option("--verbose", "-v", is_flag=True, help="Print resolution diagnostic.")
-def identify(this, verbose):
+def identify(this):
     """Get asteroid name and number from string input.
 
     Parameters
@@ -148,7 +145,7 @@ def identify(this, verbose):
     this : str
         String to identify asteroid.
     """
-    name, number = rocks.identify(this, progress=False, verbose=verbose)
+    name, number = rocks.identify(this)
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -171,7 +168,7 @@ def info(this, minimal):
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this, return_id=True, progress=False)
+        _, _, this = rocks.identify(this, return_id=True)
 
     if not isinstance(this, str):
         sys.exit()
