@@ -108,20 +108,14 @@ class AliasedGroup(click.Group):
 
 @click.group(cls=AliasedGroup)
 def cli_rocks():
-    """CLI suite for minor body exploration.
-
-    For more information: rocks docs
-    """
+    """CLI suite for minor body exploration."""
     pass
 
 
 @cli_rocks.command()
 def docs():
     """Open rocks documentation in browser."""
-    path_docs = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../docs/_build/html/", "index.html")
-    )
-    webbrowser.open(path_docs, new=2)  # open docs in new tab
+    webbrowser.open("https://rocks.readthedocs.io/en/latest/", new=2)
 
 
 @cli_rocks.command()
