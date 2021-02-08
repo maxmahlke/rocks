@@ -14,29 +14,25 @@ import requests
 import rocks
 
 
-def identify(id_, return_id=False, rocks_=False):
+def identify(id_):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
     ==========
     id_ : str, int, float, list, set, np.ndarray, pd.Series
         One or more identifying names or numbers to resolve.
-    return_id : bool
-        Return asteroid SsODNet id as well. Default is False.
-    rocks_ : bool
-        Request comes from rocks.rocks_. Default is False.
 
     Returns
     =======
-    tuple, (str, int or float, str), (np.nan, np.nan, np.nan)
-        Tuple containing  asteroid name or designation and asteroid number, NaN
-        if not numbered, and optionally the asteroid SsODNet id. If input was
-        list of ids, returns a list of tuples. Tuple values are NaN if query
-        failed.
-    tuple, (str, str, int or float), (np.nan, np.nan, np.nan)
-        Tuple containing asteroid SsODNet id , asteroid name or designation,
-        and asteroid number, NaN if not numbered. If input was list of ids,
-        returns a list of tuples. Tuple values are NaN if query failed.
+    list of tuple : (str, int or float, str), (np.nan, np.nan, np.nan)
+        List containing len(id_) tuples. Each tuple contains the asteroid's
+        name, number, and SsODNet ID if the identifier was resolved. Otherwise,
+        the values are None for name and SsODNet and np.nan for the number.
+
+    Notes
+    =====
+    Name resolution is first attempted locally, then remotely via quaero. If
+    the asteroid is unnumbered, it's number is returned as np.nan.
     """
     if isinstance(id_, (str, int, float)):
         id_ = [id_]
@@ -46,57 +42,40 @@ def identify(id_, return_id=False, rocks_=False):
         id_ = list(id_)
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
-            f"Received id_ of type {type(id_)}, expected str, int, or list."
+            f"Received id_ of type {type(id_)}, expected one of: "
+            f"str, int, float, list, np.ndarray, pd.Series"
         )
 
+    # Run async loop to resolve names
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_))
 
-    if not return_id:
-        results = [r[:2] for r in results]
-
-    if len(results) == 1 and not rocks_:
-        return results[0]
-    else:
-        return results
+    return results
 
 
 async def _identify(id_):
+    """Resolve asteroid name asynchronously. First attempts local lookup, then
+    triest quaero.
 
-    index = rocks.utils.read_index()
+    Parameters
+    ==========
+    id_ : str, int, float, list, set, np.ndarray, pd.Series
+        One or more identifying names or numbers to resolve.
 
-    NUMBER_NAME_ID = dict(
-        (number, (name, id_))
-        for number, name, id_ in zip(
-            index.number.values, index["name"].values, index.id_.values
-        )
-    )
-    NAME_NUMBER_ID = dict(
-        (name.upper(), (number, id_))
-        for number, name, id_ in zip(
-            index.number.values, index["name"].values, index.id_.values
-        )
-    )
-    ID_NUMBER_NAME = dict(
-        (id_, (number, name))
-        for number, name, id_ in zip(
-            index.number.values, index["name"].values, index.id_.values
-        )
-    )
+    Returns
+    =======
+    tuple : (str, int or float, str), (np.nan, np.nan, np.nan)
+        Tuple containing the asteroid's name, number, and SsODNet ID if the
+        identifier was resolved. Otherwise, the values are None for name and
+        SsODNet and np.nan for the number.
+
+    """
+    INDEX = rocks.utils.read_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(
-                _query_and_resolve(
-                    i,
-                    session,
-                    NUMBER_NAME_ID,
-                    NAME_NUMBER_ID,
-                    ID_NUMBER_NAME,
-                )
-            )
-            for i in id_
+            asyncio.ensure_future(_query_and_resolve(i, session, INDEX)) for i in id_
         ]
 
         results = await asyncio.gather(*tasks)
@@ -104,31 +83,25 @@ async def _identify(id_):
         return results
 
 
-async def _query_and_resolve(
-    id_,
-    session,
-    NUMBER_NAME_ID,
-    NAME_NUMBER_ID,
-    ID_NUMBER_NAME,
-):
+async def _query_and_resolve(id_, session, INDEX):
     """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
+
     id_ = standardize_id_(id_)
 
     # Try local resolution
     if isinstance(id_, (int)):
-        if id_ in NUMBER_NAME_ID.keys():
-            name, ssodnet_id = NUMBER_NAME_ID[id_]
+        if id_ in INDEX.number:
+            name, ssodnet_id = INDEX.loc[INDEX.number == id_, ["name", "id_"]].iloc[0]
             return (name, id_, ssodnet_id)
     elif isinstance(id_, (str)):
-        if id_ in NAME_NUMBER_ID.keys():
-            number, ssodnet_id = NAME_NUMBER_ID[id_]
-            name, _ = NUMBER_NAME_ID[number]
-            return (name, number, ssodnet_id)
-        elif id_ in ID_NUMBER_NAME.keys():
-            number, name = ID_NUMBER_NAME[id_]
+        if id_ in INDEX.name:
+            number, ssodnet_id = INDEX.loc[INDEX.name == id_, ["number", "id_"]].iloc[0]
+            return (id_, number, ssodnet_id)
+        elif id_ in INDEX.id_:
+            name, number = INDEX.loc[INDEX.id_ == id_, ["name", "number"]].iloc[0]
             return (name, number, id_)
-    elif id_ is None:
+    elif id_ in [None, "", np.nan]:
         return (np.nan, np.nan, np.nan)
 
     # Local resolution failed, do remote query
