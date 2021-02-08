@@ -24,7 +24,7 @@ def identify(id_):
 
     Returns
     =======
-    list of tuple : (str, int or float, str), (np.nan, np.nan, np.nan)
+    list of tuple : (str, int, str), (None, np.nan, None)
         List containing len(id_) tuples. Each tuple contains the asteroid's
         name, number, and SsODNet ID if the identifier was resolved. Otherwise,
         the values are None for name and SsODNet and np.nan for the number.
@@ -40,6 +40,9 @@ def identify(id_):
         id_ = id_.values
     elif isinstance(id_, set):
         id_ = list(id_)
+    elif id_ is None:
+        warnings.warn(f"Received id_ of type {type(id_)}.")
+        return [(None, np.nan, None)]
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected one of: "
@@ -64,7 +67,7 @@ async def _identify(id_):
 
     Returns
     =======
-    tuple : (str, int or float, str), (np.nan, np.nan, np.nan)
+    tuple : (str, int or float, str), (None, np.nan, None)
         Tuple containing the asteroid's name, number, and SsODNet ID if the
         identifier was resolved. Otherwise, the values are None for name and
         SsODNet and np.nan for the number.
@@ -91,18 +94,19 @@ async def _query_and_resolve(id_, session, INDEX):
 
     # Try local resolution
     if isinstance(id_, (int)):
-        if id_ in INDEX.number:
+        if id_ in INDEX.number.values:
             name, ssodnet_id = INDEX.loc[INDEX.number == id_, ["name", "id_"]].iloc[0]
             return (name, id_, ssodnet_id)
     elif isinstance(id_, (str)):
-        if id_ in INDEX.name:
+        if id_ in INDEX.name.values:
             number, ssodnet_id = INDEX.loc[INDEX.name == id_, ["number", "id_"]].iloc[0]
             return (id_, number, ssodnet_id)
-        elif id_ in INDEX.id_:
+        elif id_ in INDEX.id_.values:
             name, number = INDEX.loc[INDEX.id_ == id_, ["name", "number"]].iloc[0]
             return (name, number, id_)
-    elif id_ in [None, "", np.nan]:
-        return (np.nan, np.nan, np.nan)
+
+    if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
+        return (None, np.nan, None)
 
     # Local resolution failed, do remote query
     response = await _query_quaero(id_, session)
@@ -111,7 +115,8 @@ async def _query_and_resolve(id_, session, INDEX):
         name, number, ssodnet_id = _parse_quaero_response(response["data"], str(id_))
         if isinstance(ssodnet_id, str):
             return (name, number, ssodnet_id)
-    return (np.nan, np.nan, np.nan)
+
+    return (None, np.nan, None)
 
 
 def standardize_id_(id_):
@@ -140,12 +145,19 @@ def standardize_id_(id_):
         # String id_. Perform some regex tests to make sure it's well formatted
 
         # Asteroid number
-        if id_.isnumeric():
-            id_ = int(id_)
+        try:
+            id_ = int(float(id_))
+            return id_
+        except ValueError:
+            pass
+
+        # Empty string
+        if not id_:
+            return None
 
         # Asteroid name
         elif re.match(r"^[A-Za-z]*$", id_):
-            id_ = id_.upper()  # get around capitalization issues
+            id_ = id_.capitalize()  # guess correct capitalization
 
         # Asteroid designation
         elif re.match(
@@ -239,32 +251,35 @@ async def _query_quaero(id_, session):
 
 
 def _parse_quaero_response(data_json, id_):
-    """Parse JSON response3 from Quaero.
+    """Parse JSON response from Quaero.
 
     Parameters
     ==========
-    data_json : dict
+    data_json : list of dict
         Quaero query response in json format.
     id_ : str, int, float
         Asteroid name, number, or designation.
 
     Returns
     =======
-    tuple, (str, int or float, str), (np.nan, np.nan, np.nan)
-        Tuple containing  asteroid name or designation and asteroid number, NaN
-        if not numbered, and optionally the asteroid SsODNet id. If input was
-        list of ids, returns a list of tuples. Tuple values are NaN if query
-        failed.
+    tuple : (str, int, str), (None, np.nan, None)
+        Tuple containing the asteroid's name, number, and SsODNet ID if the
+        identifier was resolved. Otherwise, the values are None for name and
+        SsODNet and np.nan for the number.
     """
+
+    # convert all ids to lowercase strings for capitals-agnostic comparison
+    id_ = str(id_).lower()
+
     for match in data_json:
-        if match["name"] == id_:
+        if match["name"].lower() == id_:
             break
-        if any([alias == id_ for alias in match["aliases"]]):
+        elif any([alias.lower() == id_ for alias in match["aliases"]]):
             break
     else:
         # Unclear which match is correct.
         warnings.warn(f"Could not find match for id {id_}.")
-        return (np.nan, np.nan, np.nan)
+        return (None, np.nan, None)
 
     # Found match
     numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]

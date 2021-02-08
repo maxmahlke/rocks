@@ -145,7 +145,7 @@ def identify(this):
     this : str
         String to identify asteroid.
     """
-    name, number = rocks.identify(this)
+    name, number, _ = rocks.identify(this)[0]
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
