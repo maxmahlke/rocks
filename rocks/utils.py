@@ -29,7 +29,7 @@ def create_index():
     # Get list of numbered asteroids from MPC
     url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
     numbered = pd.read_fwf(url, colspecs=[(0, 7)], names=["number"])
-    numbered = set([int(n.strip(" (")) for n in numbered.number])
+    numbered = set(int(n.strip(" (")) for n in numbered.number)
 
     # Compare list to index
     index = read_index()
@@ -68,15 +68,16 @@ def read_index():
     displayed.
     """
     # Check age of index file
-    days_since_mod = (time.time() - os.path.getmtime(rocks.PATH_INDEX)) / (3600 * 24)
+    # days_since_mod = (
+    #     time.time() - os.path.getmtime(rocks.PATH_INDEX)) / (3600 * 24)
 
-    if days_since_mod > 30:  # pragma: no cover
-        click.echo(
-            "The index file is more than 30 days old. "
-            "Consider updating with 'rocks update' and removing cached "
-            "values under $HOME/.cache/rocks."
-        )
-        time.sleep(1)
+    # if days_since_mod > 30:  # pragma: no cover
+    #     click.echo(
+    #         "The index file is more than 30 days old. "
+    #         "Consider updating with 'rocks update' and removing cached "
+    #         "values under $HOME/.cache/rocks."
+    #     )
+    #     time.sleep(1)
 
     with open(rocks.PATH_INDEX, "rb") as ind:
         index = pickle.load(ind)
@@ -291,7 +292,8 @@ def get_ssoCards(ids, progress=False):
             if ssoCard is None:
                 continue
 
-            id_card[id_] = ssoCard  # if ssoCard is None, this value is already None
+            # if ssoCard is None, this value is already None
+            id_card[id_] = ssoCard
 
             with open(f"{rocks.PATH_CACHE}/{id_}.json", "w") as file_:
                 json.dump(ssoCard, file_)
@@ -324,8 +326,23 @@ def __query_ssoCards(ids, progressbar=False):
         ids = [ids]
     elif isinstance(ids, pd.Series):
         ids = ids.values
+    if any(pd.isnull(ids)):
 
-    url = f"https://asterws2.imcce.fr/webservices/ssodnet/api/ssocard/"
+        warnings.warn(
+            f"There {'are' if sum(pd.isnull(ids)) > 1 else 'is a'} NaN"
+            f" {'values' if sum(pd.isnull(ids)) > 1 else 'value'} among the IDs,"
+            f" returning None in {'their' if sum(pd.isnull(ids)) > 1 else 'its'} place."
+        )
+
+        # Get indices of NaN values
+        ind_nan = np.where(pd.isnull(ids))[0]
+
+        for ind in ind_nan:
+            ids.pop(ind)
+    else:
+        ind_nan = []
+
+    url = "https://asterws2.imcce.fr/webservices/ssodnet/api/ssocard/"
 
     params = {"from": "rocks"}
     file_ = {"targets": ("\n".join([id_ for id_ in ids]))}
@@ -336,9 +353,13 @@ def __query_ssoCards(ids, progressbar=False):
         response = response.json()
     except requests.exceptions.RequestException as e:
         warnings.warn(f"An error occurred when retrieving the ssoCards: {e}")
-        return False
+        return None
 
     ssoCards = [response[id_] for id_ in ids]
+
+    # Add False for the NaN indices removed above
+    for ind in ind_nan:
+        ssoCards.insert(ind, False)
 
     if progressbar:
         progressbar.update(n=len(ids))
