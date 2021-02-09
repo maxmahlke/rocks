@@ -57,9 +57,7 @@ class Rock:
 
         # Identify minor body
         if not skip_id_check:
-            self.name, self.number, self.id = rocks.resolve.identify(
-                identifier, return_id=True
-            )
+            self.name, self.number, self.id = rocks.resolve.identify(identifier)[0]
         else:
             self.id = identifier
 
@@ -71,9 +69,7 @@ class Rock:
         if ssoCard is None:
             # Every object needs a name and a number
             if not hasattr(self, "name"):
-                self.name, self.number = rocks.resolve.identify(
-                    self.id, return_id=False
-                )
+                self.name, self.number = rocks.resolve.identify(self.id)
             # No data to update
             ssoCard = {}
 
@@ -245,10 +241,10 @@ class propertyCollection(SimpleNamespace):
     """
 
     #  def __repr__(self):
-        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
     #  def __str__(self):
-        #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
+    #  return self.__class__.__qualname__ + json.dumps(self.__dict__, indent=2)
 
     def __len__(self):
 
@@ -419,12 +415,7 @@ def rocks_(identifier, datacloud=[], progress=False):
         identifier = identifier.values
 
     # Ensure we know these objects
-    ids = [
-        id_
-        for _, _, id_ in rocks.resolve.identify(
-            identifier, return_id=True, progress=progress, rocks_=True
-        )
-    ]
+    ids = [id_ for _, _, id_ in rocks.resolve.identify(identifier)]
 
     ssoCards = rocks.utils.get_ssoCards(ids, progress=progress)
 
