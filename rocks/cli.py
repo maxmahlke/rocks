@@ -162,7 +162,7 @@ def info(this, minimal):
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this)
+        _, _, this = rocks.identify(this)[0]
 
     if not isinstance(this, str):
         sys.exit()
