@@ -9,7 +9,6 @@ import warnings
 import aiohttp
 import numpy as np
 import pandas as pd
-import requests
 from tqdm import tqdm
 
 import rocks
@@ -242,24 +241,19 @@ async def _query_quaero(id_, session):
         "limit": 10000,
     }
 
-    try:
-        response = await session.request(method="GET", url=url, params=params)
-        response_json = await response.json()
+    response = await session.request(method="GET", url=url, params=params)
+    response_json = await response.json()
 
-    except (requests.exceptions.RequestException, asyncio.exceptions.TimeoutError) as e:
-        warnings.warn(f"An error occurred during the name resolution: {e}")
+    # No match found
+    if "data" not in response_json.keys():
+        warnings.warn(f"Could not find data for id {id_}.")
+        return False
+    # Data is empty
+    elif not response_json["data"]:
+        warnings.warn(f"Could not find match for id {id_}.")
         return False
     else:
-        # No match found
-        if "data" not in response_json.keys():
-            warnings.warn(f"Could not find data for id {id_}.")
-            return False
-        # Data is empty
-        elif not response_json["data"]:
-            warnings.warn(f"Could not find match for id {id_}.")
-            return False
-        else:
-            return response_json
+        return response_json
 
 
 def _parse_quaero_response(data_json, id_):

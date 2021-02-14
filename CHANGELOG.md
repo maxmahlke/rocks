@@ -1,4 +1,4 @@
-# 0.1.3 - 2021-02-14
+# 0.2.0- - 2021-02-14
 - added progressbar to rocks.identify
 - bugfix in cli module
 
