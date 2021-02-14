@@ -10,17 +10,20 @@ import aiohttp
 import numpy as np
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 import rocks
 
 
-def identify(id_):
+def identify(id_, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
     ==========
     id_ : str, int, float, list, set, np.ndarray, pd.Series
         One or more identifying names or numbers to resolve.
+    progress : bool or tdqm.std.tqdm
+       If progress is True, this is a progress bar instance. Else, it's False.
 
     Returns
     =======
@@ -49,16 +52,19 @@ def identify(id_):
             f"str, int, float, list, np.ndarray, pd.Series"
         )
 
+    if progress:
+        progress = tqdm(desc="Identifying rocks : ", total=len(id_))
+
     # Run async loop to resolve names
     loop = asyncio.get_event_loop()
-    results = loop.run_until_complete(_identify(id_))
+    results = loop.run_until_complete(_identify(id_, progress))
 
     return results
 
 
-async def _identify(id_):
+async def _identify(id_, progress):
     """Resolve asteroid name asynchronously. First attempts local lookup, then
-    triest quaero.
+    queries quaero.
 
     Parameters
     ==========
@@ -71,14 +77,16 @@ async def _identify(id_):
         Tuple containing the asteroid's name, number, and SsODNet ID if the
         identifier was resolved. Otherwise, the values are None for name and
         SsODNet and np.nan for the number.
-
+    progress : bool or tdqm.std.tqdm
+       If progress is True, this is a progress bar instance. Else, it's False.
     """
     INDEX = rocks.utils.read_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(_query_and_resolve(i, session, INDEX)) for i in id_
+            asyncio.ensure_future(_query_and_resolve(i, session, INDEX, progress))
+            for i in id_
         ]
 
         results = await asyncio.gather(*tasks)
@@ -86,9 +94,12 @@ async def _identify(id_):
         return results
 
 
-async def _query_and_resolve(id_, session, INDEX):
+async def _query_and_resolve(id_, session, INDEX, progress):
     """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
+
+    if progress:
+        progress.update()
 
     id_ = standardize_id_(id_)
 

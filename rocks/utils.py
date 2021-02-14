@@ -73,6 +73,8 @@ def create_index():
         .astype({"number": np.int64, "name": str, "id_": str})
     )
 
+    index = index.reset_index()
+
     with open(rocks.PATH_INDEX, "wb") as ind:
         pickle.dump(index, ind, protocol=4)
 
