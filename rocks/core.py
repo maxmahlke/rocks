@@ -57,14 +57,16 @@ class Rock:
 
         # Identify minor body
         if not skip_id_check:
-            self.name, self.number, self.id = rocks.resolve.identify(identifier)[0]
+            self.name, self.number, self.id_ = rocks.identify(identifier)
         else:
-            self.id = identifier
+            self.id_ = identifier
 
         if not isinstance(self.id, str):
             return
 
-        ssoCard = ssoCard if ssoCard is not None else rocks.utils.get_ssoCard(self.id)
+        ssoCard = (
+            ssoCard if ssoCard is not None else rocks.ssodnet.get_ssocard(self.id_)
+        )
 
         if ssoCard is None:
             # Every object needs a name and a number
@@ -415,9 +417,9 @@ def rocks_(identifier, datacloud=[], progress=False):
         identifier = identifier.values
 
     # Ensure we know these objects
-    ids = [id_ for _, _, id_ in rocks.resolve.identify(identifier)]
+    ids = [id_ for _, _, id_ in rocks.identify(identifier, progress)]
 
-    ssoCards = rocks.utils.get_ssoCards(ids, progress=progress)
+    ssoCards = rocks.ssodnet.get_ssocard(ids, progress)
 
     if progress:
         progressbar = tqdm(desc="Building rocks", total=len(ids))
