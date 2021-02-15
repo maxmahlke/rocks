@@ -144,7 +144,7 @@ def test_local_vs_remote(identifier, expected, local, monkeypatch):
         async with aiohttp.ClientSession() as session:
             results = await asyncio.gather(
                 *[
-                    rocks.resolve._query_and_resolve(i, session, INDEX)
+                    rocks.resolve._query_and_resolve(i, session, INDEX, progress=False)
                     for i in identifier
                 ]
             )

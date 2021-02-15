@@ -26,10 +26,11 @@ def identify(id_, progress=False):
 
     Returns
     =======
-    list of tuple : (str, int, str), (None, np.nan, None)
+    tuple, list of tuple : (str, int, str), (None, np.nan, None)
         List containing len(id_) tuples. Each tuple contains the asteroid's
         name, number, and SsODNet ID if the identifier was resolved. Otherwise,
         the values are None for name and SsODNet and np.nan for the number.
+        If a single asteroid is identified, a tuple is returned.
 
     Notes
     =====
@@ -57,6 +58,9 @@ def identify(id_, progress=False):
     # Run async loop to resolve names
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_, progress))
+
+    if len(id_) == 1:
+        results = results[0]
 
     return results
 
@@ -90,7 +94,7 @@ async def _identify(id_, progress):
 
         results = await asyncio.gather(*tasks)
 
-        return results
+    return results
 
 
 async def _query_and_resolve(id_, session, INDEX, progress):

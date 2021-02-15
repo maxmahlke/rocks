@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 """rocks command line suite."""
+import json
 import os
 import sys
 import webbrowser
 
 import click
 import pandas as pd
+import rich
 
 import rocks
 
@@ -139,7 +141,7 @@ def identify(this):
     this : str
         String to identify asteroid.
     """
-    name, number, _ = rocks.identify(this)[0]
+    name, number, _ = rocks.identify(this)
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -162,7 +164,7 @@ def info(this, minimal):
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this)[0]
+        _, _, this = rocks.identify(this)
 
     if not isinstance(this, str):
         sys.exit()
@@ -175,11 +177,19 @@ def info(this, minimal):
 
 @cli_rocks.command()
 def properties():
-    """Prints the ssoCard JSON keys."""
-    keys = sorted(pd.json_normalize(rocks.TEMPLATE).columns, key=len)
-    import pprint
+    """Prints the ssoCard JSON keys and description using the template."""
 
-    pprint.pprint(keys)
+    if not os.path.isfile(rocks.PATH_TEMPLATE):
+        rocks.utils.retrieve_ssocard_template()
+
+    with open(rocks.PATH_TEMPLATE, "r") as file_:
+        TEMPLATE = json.load(file_)
+
+    rich.print(TEMPLATE)
+    # keys = sorted(pd.json_normalize(rocks.TEMPLATE).columns, key=len)
+    # import pprint
+
+    # pprint.pprint(keys)
 
 
 @cli_rocks.command()
@@ -189,11 +199,9 @@ def status():
 
     warnings.filterwarnings("ignore")
 
-    from rich import print
-
     Ceres = rocks.Rock(1)
 
     if hasattr(Ceres, "taxonomy"):
-        print(r"[bold green]Datacloud is available.")
+        rich.print(r"[bold green]Datacloud is available.")
     else:
         print(r"[bold red]Datacloud is not available.")
