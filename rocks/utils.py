@@ -21,6 +21,12 @@ from tqdm import tqdm
 import rocks
 
 
+def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
+    return f"rocks: {message}\n"
+
+
+warnings.formatwarning = warning_on_one_line
+
 # ------
 # Index functions
 def read_index():
