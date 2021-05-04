@@ -128,7 +128,15 @@ def update():
     https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
     """
     rocks.utils.create_index()
-    rocks.utils.create_ssoCard_template()
+    rocks.utils.retrieve_ssocard_template()
+
+
+@cli_rocks.command()
+def clear():
+    """Clear the cached ssoCards."""
+    for file_ in os.listdir(rocks.PATH_CACHE):
+        if file_.endswith(".json") and file_ != "ssoCard_template.json":
+            os.remove(os.path.join(rocks.PATH_CACHE, file_))
 
 
 @cli_rocks.command()
