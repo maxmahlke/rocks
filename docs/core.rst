@@ -36,10 +36,31 @@ To reduce wordiness, the ``parameters`` and ``physical``/``dynamical`` attribute
    >> vesta.diameter.unit
    'km'
 
+Differences between the ssoCard and the ``Rock`` instance
+---------------------------------------------------------
 
-.. Note::
+In general, the ``Rock`` attribute structure mimics the ssoCard structure as closely as possible.
 
-   The "class" property clashes with the python-protected ``class`` keyword. The property name is changed to "class\_".
+Most differences arise due to the ssoCard using keywords which are protected in ``python`` and as such cannot be assigned, such as the ``class`` keyword. These keywords have an underscore appended to them, see the table below.
+
+Another difference arises from keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
+
+A chosen difference is the structure of the "method" and "bibref" values: when ingested into the ``Rock`` attribute, they are always a ``python`` ``list`` instance filled with one or more ``dict``. This is to simplify the code and prevent if-clauses.
+
+Here is a list of ssoCard parameters and their corresponding names in the ``Rock`` instance if the names differ from one another.
+
++-----------------+----------------------------+
+| ssoCard Name    | ``Rock`` attribute         |
++-----------------+----------------------------+
+| class           | ``class_``                 |
++-----------------+----------------------------+
+| id              | ``id_``                    |
++-----------------+----------------------------+
+| min             | ``min_``                   |
++-----------------+----------------------------+
+| max             | ``max_``                   |
++-----------------+----------------------------+
+
 
 Access of ``datacloud`` tables
 ------------------------------

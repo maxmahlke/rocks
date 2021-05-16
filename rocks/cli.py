@@ -6,7 +6,6 @@ import sys
 import webbrowser
 
 import click
-import pandas as pd
 import rich
 
 import rocks
@@ -30,87 +29,13 @@ class AliasedGroup(click.Group):
             return identify
 
         # ------
-        # Unknown subcommand, check if it's a valid property
-        valid = False
-
-        # ssoCard properties
-        valid_props = [
-            p for p in rocks.TEMPLATE_KEYS.columns if not p.startswith("datacloud")
-        ]
-        # missing intermediate levels
-        valid_props = set(
-            valid_props + [".".join(v.split(".")[:-1]) for v in valid_props if "." in v]
-        )
-
-        valid_props = sorted(list(valid_props), key=len)
-
-        # Check if valid ssoCard property
-        for prop in valid_props:
-
-            if prop.endswith("class") or prop.endswith("complex"):
-                prop += "_"
-
-            if prop.endswith(cmd_name):
-                valid = True
-                datacloud = []
-                break
-
-        # datacloud properties
-        if not valid:
-            valid_catalogues = [
-                (datacloud, cat["attr_name"])
-                for datacloud, cat in rocks.utils.DATACLOUD_META.items()
-            ]
-
-            requested_catalogue = cmd_name.split(".")[0]
-
-            if requested_catalogue in ["diameters", "albedos"]:
-                requested_catalogue = "diamalbedo"
-
-            for datacloud, cat in valid_catalogues:
-
-                if cat == requested_catalogue:
-                    valid = True
-                    if len(cmd_name.split(".")) > 1:
-                        # single property
-                        prop = ".".join([cat, *cmd_name.split(".")[1:]])
-                    else:
-                        # catalogue overview
-                        prop = cat
-                    datacloud = [datacloud]
-                    break
-
-        if valid:
-
-            arguments = sys.argv.copy()
-
-            plot = False
-            for p in ["-h", "--hist", "-s", "--scatter"]:
-                if p in arguments:
-                    plot = True
-                    arguments.remove(p)
-
-            # Identify rock and check datacloud catalogue
-            if len(arguments) == 3:
-                id_ = arguments[-1]
-                skip_id_check = False
-            else:
-                _, _, id_ = rocks.utils.select_sso_from_index()
-                skip_id_check = True
-
-            rock = rocks.Rock(id_, datacloud=datacloud, skip_id_check=skip_id_check)
-            if not isinstance(rock.id, str):
-                sys.exit()
-
-            prop = rocks.utils.rgetattr(rock, prop)
-            return rocks.utils.pretty_print_property(rock, prop, plot=plot)
-        else:
-            return None
+        # Unknown subcommand -> echo asteroid property and optionally plot
+        return echo()
 
 
 @click.group(cls=AliasedGroup)
 def cli_rocks():
-    """CLI suite for minor body exploration."""
+    """CLI for minor body exploration."""
     pass
 
 
@@ -149,7 +74,7 @@ def identify(this):
     this : str
         String to identify asteroid.
     """
-    name, number, _ = rocks.identify(this)
+    name, number, _ = rocks.identify(this)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -172,12 +97,12 @@ def info(this, minimal):
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this)
+        _, _, this = rocks.identify(this)  # type: ignore
 
     if not isinstance(this, str):
         sys.exit()
 
-    ssoCard = rocks.utils.get_ssoCard(this)
+    ssoCard = rocks.ssodnet.get_ssocard(this)
 
     if ssoCard is not None:
         rocks.utils.pretty_print_card(ssoCard, minimal)
@@ -194,22 +119,43 @@ def properties():
         TEMPLATE = json.load(file_)
 
     rich.print(TEMPLATE)
-    # keys = sorted(pd.json_normalize(rocks.TEMPLATE).columns, key=len)
-    # import pprint
-
-    # pprint.pprint(keys)
 
 
 @cli_rocks.command()
 def status():
     """Prints the availability of SsODNet:datacloud. """
-    import warnings
+    ceres = rocks.Rock(1)
 
-    warnings.filterwarnings("ignore")
-
-    Ceres = rocks.Rock(1)
-
-    if hasattr(Ceres, "taxonomy"):
+    if hasattr(ceres, "taxonomy"):
         rich.print(r"[bold green]Datacloud is available.")
     else:
         print(r"[bold red]Datacloud is not available.")
+
+
+def echo():
+    """Echos asteroid property to command line. Optionally opens plot."""
+
+    # Check if we're plotting the property
+    plot = False
+
+    for arg in ["-p", "--plot"]:
+
+        if arg in sys.argv:
+            sys.argv.remove(arg)
+
+            plot = True
+
+    # Get data and echo
+    _, prop, *id_ = sys.argv
+    id_ = " ".join(id_)
+
+    if prop in rocks.properties.PROP_TO_DATACLOUD:
+        datacloud = [rocks.properties.PROP_TO_DATACLOUD[prop]]
+    else:
+        datacloud = []
+
+    rock = rocks.Rock(id_, datacloud=datacloud)
+
+    # Pretty-printing is implemented in the properties __str__
+    rich.print(rocks.utils.rgetattr(rock, prop))
+    sys.exit()

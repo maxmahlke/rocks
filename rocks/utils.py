@@ -22,10 +22,34 @@ import rocks
 
 
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
-    return f"rocks: {message}\n"
+    if "rocks/" in filename:
+        return f"rocks: {message}\n"
+    else:
+        return "%s:%s: %s: %s\n" % (filename, lineno, category.__name__, message)
 
 
 warnings.formatwarning = warning_on_one_line
+
+
+def get_valid_ssocard_properties():
+    if not os.path.isfile(rocks.PATH_TEMPLATE):
+        rocks.utils.retrieve_ssoCard_template()
+
+    with open(rocks.PATH_TEMPLATE, "r") as file_:
+        TEMPLATE = json.load(file_)
+
+    # ssoCard properties
+    valid_props = [
+        p for p in pd.json_normalize(TEMPLATE).columns if not p.startswith("datacloud")
+    ]
+    # missing intermediate levels
+    valid_props = set(
+        valid_props + [".".join(v.split(".")[:-1]) for v in valid_props if "." in v]
+    )
+
+    valid_props = sorted(list(valid_props), key=len)
+    return valid_props
+
 
 # ------
 # Index functions
@@ -129,15 +153,13 @@ def select_sso_from_index():  # pragma: no cover
 #     """Deep version of setattr."""
 #     pre, _, post = attr.rpartition(".")
 #     return setattr(rgetattr(obj, pre) if pre else obj, post, val)
+def rgetattr(obj, attr, *args):  # pragma: no cover
+    """Deep version of getattr."""
 
+    def _getattr(obj, attr):
+        return getattr(obj, attr, *args)
 
-# def rgetattr(obj, attr, *args):  # pragma: no cover
-#     """Deep version of getattr."""
-
-#     def _getattr(obj, attr):
-#         return getattr(obj, attr, *args)
-
-#     return reduce(_getattr, [obj] + attr.split("."))
+    return reduce(_getattr, [obj] + attr.split("."))
 
 
 # def update_ssoCard(dict_, update):
@@ -167,7 +189,7 @@ def select_sso_from_index():  # pragma: no cover
 #     return dict_
 
 
-def retrieve_ssoCard_template():
+def retrieve_ssocard_template():
     """Retrieve current ssoCard template from SsODNet."""
 
     URL = (
@@ -369,16 +391,6 @@ def retrieve_ssoCard_template():
 #     if progressbar:
 #         progressbar.update(n=len(ids))
 #     return ssoCards
-
-
-def retrieve_catalogue(url):
-    """Retrieve catalogue from datacloud."""
-    response = requests.get(url.replace("SsODNetSsoCard", "rocks"))
-
-    catalogue = response.json()["data"]
-    catalogue = sanitize_keys(catalogue)
-
-    return catalogue
 
 
 # ------
@@ -584,46 +596,6 @@ def weighted_average(observable, error):
     std_avg = np.sqrt(var_avg / len(observable))
     return (avg, std_avg)
 
-
-# ------
-# Definitions
-DATACLOUD_META = {
-    # datacloud key : rocks name
-    #     attr_name : Rock.xyz
-    #     prop_name : Name of property in catalogue
-    "aams": {
-        "attr_name": "aams",
-    },
-    "astdys": {
-        "attr_name": "astdys",
-    },
-    "astorb": {
-        "attr_name": "astorb",
-    },
-    "binarymp_tab": {
-        "attr_name": "binaries",
-    },
-    "diamalbedo": {
-        "attr_name": "diamalbedo",
-        "prop_name": {"diameters": "diameter", "albedos": "albedo"},
-    },
-    "families": {
-        "attr_name": "families",
-    },
-    "masses": {
-        "attr_name": "masses",
-        "prop_name": {"masses": "mass"},
-    },
-    "mpcatobs": {
-        "attr_name": "mpc",
-    },
-    "pairs": {
-        "attr_name": "pairs",
-    },
-    "taxonomy": {
-        "attr_name": "taxonomies",
-    },
-}
 
 DONT_PRINT = [
     "num",

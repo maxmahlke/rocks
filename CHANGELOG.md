@@ -1,4 +1,15 @@
-# 0.2.0- - 2021-02-14
+# 1.1 - 2021-03-18
+- updated pydantic model to reflect new ssoCard structure
+- the "Rock" class now takes a new "ssocard" parameter which can be
+  passed ssoCards in form of dictionaries
+- added nested async support for jupyter notebooks
+- Added cache clearing function
+
+# 1.0.0 - 2021-02-15
+- made ssoCard queries asynchronous
+- switched to pydantic implementation of ssoCard
+
+# 0.2.0 - 2021-02-14
 - added progressbar to rocks.identify
 - bugfix in cli module
 

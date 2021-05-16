@@ -5,6 +5,73 @@ import warnings
 
 import numpy as np
 
+DATACLOUD_CATALOGUES = [
+    "aams",
+    "astdys",
+    "astorb",
+    "binarymp_tab",
+    "binarymp_ref",
+    "diamalbedo",
+    "families",
+    "masses",
+    "mpcatobs",
+    "mpcorb",
+    "pairs",
+    "taxonomy",
+]
+
+# ------
+# Definitions
+DATACLOUD_META = {
+    # datacloud key : rocks name
+    #     attr_name : Rock.xyz
+    #     prop_name : Name of property in catalogue
+    "aams": {
+        "attr_name": "aams",
+    },
+    "astdys": {
+        "attr_name": "astdys",
+    },
+    "astorb": {
+        "attr_name": "astorb",
+    },
+    "binarymp_tab": {
+        "attr_name": "binaries",
+    },
+    "diamalbedo": {
+        "attr_name": "diamalbedo",
+        "prop_name": {"diameters": "diameter", "albedos": "albedo"},
+    },
+    "families": {
+        "attr_name": "families",
+    },
+    "masses": {
+        "attr_name": "masses",
+        "prop_name": {"masses": "mass"},
+    },
+    "mpcatobs": {
+        "attr_name": "mpcatobs",
+    },
+    "pairs": {
+        "attr_name": "pairs",
+    },
+    "taxonomy": {
+        "attr_name": "taxonomies",
+    },
+}
+
+PROP_TO_DATACLOUD = {
+    "aams": "aams",
+    "astdys": "astdys",
+    "astorb": "astorb",
+    "binaries": "binarymp_tab",
+    "diameters": "diamalbedo",
+    "albedos": "diamalbedo",
+    "families": "families",
+    "masses": "mass",
+    "taxonomies": "taxonomy",
+}
+
 
 def rank_properties(prop_name, obs):
     """Select ranking method based on property name.
@@ -13,7 +80,7 @@ def rank_properties(prop_name, obs):
     ==========
     prop_name : str
         The property to rank.
-    obs : rocks.core.propertyCollection
+    obs : dict
         The observations including metadata
 
 
@@ -46,7 +113,7 @@ def select_taxonomy(taxonomies):
 
     Parameters
     ----------
-    taxonomies: rocks.core.propertyCollection
+    taxonomies: dict
         Taxonomic classifications retrieved from SsODNet:datacloud.
 
     Returns
@@ -60,6 +127,8 @@ def select_taxonomy(taxonomies):
         "method": {"spec": 7, "phot": 3, "mix": 4},
     }
 
+    taxonomies = [dict(zip(taxonomies, t)) for t in zip(*taxonomies.values())]
+
     # Compute points of each classification
     points = []
 
@@ -67,7 +136,7 @@ def select_taxonomy(taxonomies):
         points.append(
             sum(
                 [
-                    POINTS[crit][getattr(row, crit).lower()]
+                    POINTS[crit][row[crit].lower()]
                     for crit in ["scheme", "waverange", "method"]
                 ]
             )
@@ -83,7 +152,7 @@ def select_numeric_property(obs, prop_name):
 
     Parameters
     ==========
-    obs : rocks.core.propertyCollection
+    obs : dict
         Property measurements and metadata retrieved from SsODNet:datacloud.
     prop_name : str
         Name of the asteroid property.
@@ -98,7 +167,7 @@ def select_numeric_property(obs, prop_name):
     The method ranking depends on the observable.
     """
     RANKING = PROPERTIES[prop_name]["ranking"]
-    methods = set(obs.method)
+    methods = set(obs["method"])
 
     for method in RANKING:
 
@@ -107,12 +176,14 @@ def select_numeric_property(obs, prop_name):
             # Ensure that rows do not contain all 0 values, as can be the case
             # for albedo in diamalbedo
             if all(
-                [getattr(row, prop_name) == 0 for row in obs if row.method in method]
+                [
+                    obs[prop_name][i] == 0
+                    for i, m in enumerate(obs["method"])
+                    if m in method
+                ]
             ):
-                #  print(method)
                 continue
-            #  print(method)
-            return [True if row.method in method else False for row in obs]
+            return [True if m in method else False for m in obs["method"]]
 
     return obs
 
@@ -326,5 +397,5 @@ CLASS_TO_COMPLEX = {
     "Z": "U",
     np.nan: np.nan,
     None: np.nan,
-    float("nan"): np.nan
+    float("nan"): np.nan,
 }

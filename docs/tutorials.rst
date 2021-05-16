@@ -150,7 +150,7 @@ Download the file or run in a binder.
   .. $ rocks
   .. Usage: rocks [OPTIONS] COMMAND [ARGS]...
 
-  .. CLI suite for minor body exploration.
+  .. CLI for minor body exploration.
 
   .. For more information: rocks docs
 

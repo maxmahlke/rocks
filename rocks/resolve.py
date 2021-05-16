@@ -7,11 +7,15 @@ import re
 import warnings
 
 import aiohttp
+import nest_asyncio
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 import rocks
+
+# Run asyncio nested for jupyter notebooks, GUIs, ...
+nest_asyncio.apply()
 
 
 def identify(id_, progress=False):
@@ -41,7 +45,7 @@ def identify(id_, progress=False):
         id_ = [id_]
     elif isinstance(id_, pd.Series):
         id_ = id_.values
-    elif isinstance(id_, set):
+    elif isinstance(id_, (set, range)):
         id_ = list(id_)
     elif id_ is None:
         warnings.warn(f"Received id_ of type {type(id_)}.")
@@ -58,6 +62,9 @@ def identify(id_, progress=False):
     # Run async loop to resolve names
     loop = asyncio.get_event_loop()
     results = loop.run_until_complete(_identify(id_, progress))
+
+    if progress:
+        progress.close()
 
     if len(id_) == 1:
         results = results[0]
