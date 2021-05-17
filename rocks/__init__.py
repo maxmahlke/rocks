@@ -1,6 +1,7 @@
 """For space rocks."""
 import json
 import os
+import sys
 
 import pandas as pd
 
@@ -20,6 +21,20 @@ PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
 
 os.makedirs(PATH_CACHE, exist_ok=True)
 
+# Check for existence of index file
+if not os.path.isfile(PATH_INDEX):
+    response = input(
+        "The index of numbered asteroids is not present on your "
+        "system.\nRetrieve it now from the rocks GitHub repository? [Yn] "
+    )
+
+    if response in ["", "Y", "y"]:
+        utils.retrieve_index_from_repository()
+
+    else:
+        print("The index file is required to run rocks. Exiting.")
+        sys.exit()
+
 # Read ssoCard template
 # with open(PATH_TEMPLATE, "r") as file_:
 #     TEMPLATE = json.load(file_)
@@ -32,7 +47,6 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 #     if "uncertainty" in meta
 # )
 
-# breakpoint()
 # SHORTCUTS = {
 #     "physical": set(
 #         [attr.split(".")[2] for attr in TEMPLATE_KEYS if "physical" in attr]

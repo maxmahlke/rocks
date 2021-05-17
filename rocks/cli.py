@@ -65,12 +65,12 @@ def clear():
 
 
 @cli_rocks.command()
-@click.argument("this", required=1)
+@click.argument("this")
 def identify(this):
     """Get asteroid name and number from string input.
 
     Parameters
-    ----------
+    ==========
     this : str
         String to identify asteroid.
     """

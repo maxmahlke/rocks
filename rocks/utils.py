@@ -9,6 +9,7 @@ import os
 import pickle
 import sys
 import time
+import urllib
 import warnings
 
 import click
@@ -104,6 +105,19 @@ def create_index():
     )
 
     index = index.reset_index()
+
+    with open(rocks.PATH_INDEX, "wb") as ind:
+        pickle.dump(index, ind, protocol=4)
+
+
+def retrieve_index_from_repository():
+    """Downloads the index of numbered asteroids from the rocks GitHub
+    repository and saves it to the cache directory."""
+
+    URL = "https://github.com/maxmahlke/rocks/blob/master/data/index.pkl?raw=True"
+
+    index = pickle.load(urllib.request.urlopen(URL))
+    index = index[["number", "name", "id_"]]
 
     with open(rocks.PATH_INDEX, "wb") as ind:
         pickle.dump(index, ind, protocol=4)
