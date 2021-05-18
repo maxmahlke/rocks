@@ -972,7 +972,7 @@ class Rock(pydantic.BaseModel):
             for catalogue in datacloud:
                 ssocard = self.__add_datacloud_catalogue(id_, catalogue, ssocard)
         else:
-            # Something failed. Instantiate minimal ssoCard for meaningful error outpu.
+            # Something failed. Instantiate minimal ssoCard for meaningful error output.
             ssocard = {"name": id_provided}
 
         # Deserialize the asteroid data
@@ -1008,8 +1008,16 @@ class Rock(pydantic.BaseModel):
 
     def __add_datacloud_catalogue(self, id_, catalogue, data):
         """Retrieve datacloud catalogue for asteroid and deserialize."""
-        catalogue_attribute = rocks.properties.DATACLOUD_META[catalogue]["attr_name"]
 
+        if catalogue not in rocks.properties.PROP_TO_DATACLOUD.keys():
+            raise ValueError(
+                f"Unknown datacloud catalogue name: '{catalogue}'"
+                f"\nChoose from {rocks.properties.PROP_TO_DATACLOUD.keys()}"
+            )
+
+        catalogue = rocks.properties.PROP_TO_DATACLOUD[catalogue]
+
+        catalogue_attribute = rocks.properties.DATACLOUD_META[catalogue]["attr_name"]
         cat = rocks.ssodnet.get_datacloud_catalogue(id_, catalogue)
 
         if cat is None:
