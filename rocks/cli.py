@@ -74,7 +74,7 @@ def identify(this):
     this : str
         String to identify asteroid.
     """
-    name, number, _ = rocks.identify(this)  # type: ignore
+    name, number = rocks.identify(this)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -97,7 +97,7 @@ def info(this, minimal):
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()
     else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this)  # type: ignore
+        _, _, this = rocks.identify(this, return_id=True)  # type: ignore
 
     if not isinstance(this, str):
         sys.exit()

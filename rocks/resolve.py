@@ -18,15 +18,18 @@ import rocks
 nest_asyncio.apply()
 
 
-def identify(id_, progress=False):
+def identify(id_, return_id=False, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
     ==========
     id_ : str, int, float, list, set, np.ndarray, pd.Series
         One or more identifying names or numbers to resolve.
+    return_id : bool
+        Return the SsODNet ID of the asteroid as third member of
+        the tuple. Default is False.
     progress : bool or tdqm.std.tqdm
-       If progress is True, this is a progress bar instance. Else, it's False.
+        If progress is True, this is a progress bar instance. Else, it's False.
 
     Returns
     =======
@@ -65,6 +68,9 @@ def identify(id_, progress=False):
 
     if progress:
         progress.close()
+
+    if not return_id:
+        results = [r[:2] for r in results]
 
     if len(id_) == 1:
         results = results[0]

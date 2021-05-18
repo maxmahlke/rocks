@@ -1,3 +1,8 @@
+# 1.1.2 - 2021-05-18
+- The 'albedos' and 'diameters' subsets of the 'diamalbedo' catalogue now have their
+  own attributes in the Rock class
+- Added return_id argument to 'identify'. By default, it now only returns name and number. To get the SsODNet ID, set return_id=True.
+
 # 1.1.1 - 2021-05-17
 - Added a prompt to download the index from the GitHub repo to the cache if not found at startup
 

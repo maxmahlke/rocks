@@ -962,7 +962,7 @@ class Rock(pydantic.BaseModel):
         id_provided = id_
 
         if not skip_id_check:
-            _, _, id_ = rocks.identify(id_)  # type: ignore
+            _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
 
         # Get ssoCard and datcloud catalogues
         if not pd.isnull(id_):
@@ -1092,10 +1092,10 @@ def rocks_(identifier, datacloud=[], progress=False):
     if isinstance(identifier, pd.Series):
         identifier = identifier.values
 
-    ids = [id_ for _, _, id_ in rocks.identify(identifier, datacloud, progress)]  # type: ignore
+    ids = [id_ for _, _, id_ in rocks.identify(identifier, return_id=True, progress=progress)]  # type: ignore
 
     rocks_ = [
-        Rock(id_, skip_id_check=True)
+        Rock(id_, skip_id_check=True, datacloud=datacloud)
         for id_ in tqdm(
             ids, desc="Building rocks : ", total=len(ids), disable=~progress
         )
