@@ -587,7 +587,6 @@ class Taxonomies(pydantic.BaseModel):
 
         table = rich.table.Table(
             header_style="bold blue",
-            # caption=f"({rock.number}) {rock.name}",
             box=rich.box.SQUARE,
             footer_style="dim",
         )
@@ -667,6 +666,144 @@ class Mpcatobs(pydantic.BaseModel):
     name: List[str] = [""]
 
 
+class Albedos(pydantic.BaseModel):
+
+    link: List[str] = [""]
+    datasetname: List[str] = [""]
+    resourcename: List[str] = [""]
+    doi: List[str] = [""]
+    bibcode: List[str] = [""]
+    url: List[str] = [""]
+    title: List[str] = [""]
+    name: List[str] = [""]
+    iddataset: List[Optional[int]] = [None]
+    method: List[str] = [""]
+    shortbib: List[str] = [""]
+    year: List[Optional[int]] = [None]
+    source: List[str] = [""]
+
+    idcollection: List[Optional[int]] = [None]
+    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
+    number: List[Optional[int]] = pydantic.Field([None], alias="num")
+    albedo: List[float] = [np.nan]
+    err_albedo: List[float] = [np.nan]
+    diameter: List[float] = [np.nan]
+    err_diameter: List[float] = [np.nan]
+    beaming: List[float] = [np.nan]
+    err_beaming: List[float] = [np.nan]
+    emissivity: List[float] = [np.nan]
+    err_emissivity: List[float] = [np.nan]
+
+    preferred_albedo: List[bool] = [False]
+    preferred_diameter: List[bool] = [False]
+
+    @pydantic.validator("preferred_albedo", pre=True)
+    def select_preferred_albedo(cls, v, values):
+        return rocks.properties.rank_properties("albedo", values)
+
+    @pydantic.validator("preferred_diameter", pre=True)
+    def select_preferred_diameter(cls, v, values):
+        return rocks.properties.rank_properties("diameter", values)
+
+    def __len__(self):
+        return len(self.albedo)
+
+    def __str__(self):
+
+        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
+            return "No albedos on record."
+
+        table = rich.table.Table(
+            header_style="bold blue",
+            box=rich.box.SQUARE,
+            footer_style="dim",
+        )
+
+        columns = ["albedo", "err_albedo", "method", "shortbib"]
+
+        for c in columns:
+            table.add_column(c)
+
+        # Values are entries for each field
+        for i, preferred in enumerate(self.preferred_albedo):
+
+            table.add_row(
+                *[str(getattr(self, c)[i]) for c in columns],
+                style="bold green" if preferred else "white",
+            )
+        rich.print(table)
+        return ""
+
+
+class Diameters(pydantic.BaseModel):
+
+    link: List[str] = [""]
+    datasetname: List[str] = [""]
+    resourcename: List[str] = [""]
+    doi: List[str] = [""]
+    bibcode: List[str] = [""]
+    url: List[str] = [""]
+    title: List[str] = [""]
+    name: List[str] = [""]
+    iddataset: List[Optional[int]] = [None]
+    method: List[str] = [""]
+    shortbib: List[str] = [""]
+    year: List[Optional[int]] = [None]
+    source: List[str] = [""]
+
+    idcollection: List[Optional[int]] = [None]
+    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
+    number: List[Optional[int]] = pydantic.Field([None], alias="num")
+    albedo: List[float] = [np.nan]
+    err_albedo: List[float] = [np.nan]
+    diameter: List[float] = [np.nan]
+    err_diameter: List[float] = [np.nan]
+    beaming: List[float] = [np.nan]
+    err_beaming: List[float] = [np.nan]
+    emissivity: List[float] = [np.nan]
+    err_emissivity: List[float] = [np.nan]
+
+    preferred_albedo: List[bool] = [False]
+    preferred_diameter: List[bool] = [False]
+
+    @pydantic.validator("preferred_albedo", pre=True)
+    def select_preferred_albedo(cls, v, values):
+        return rocks.properties.rank_properties("albedo", values)
+
+    @pydantic.validator("preferred_diameter", pre=True)
+    def select_preferred_diameter(cls, v, values):
+        return rocks.properties.rank_properties("diameter", values)
+
+    def __len__(self):
+        return len(self.albedo)
+
+    def __str__(self):
+
+        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
+            return "No diameters on record."
+
+        table = rich.table.Table(
+            header_style="bold blue",
+            box=rich.box.SQUARE,
+            footer_style="dim",
+        )
+
+        columns = ["diameter", "err_diameter", "method", "shortbib"]
+
+        for c in columns:
+            table.add_column(c)
+
+        # Values are entries for each field
+        for i, preferred in enumerate(self.preferred_diameter):
+
+            table.add_row(
+                *[str(getattr(self, c)[i]) for c in columns],
+                style="bold green" if preferred else "white",
+            )
+        rich.print(table)
+        return ""
+
+
 class Diamalbedo(pydantic.BaseModel):
 
     link: List[str] = [""]
@@ -706,6 +843,45 @@ class Diamalbedo(pydantic.BaseModel):
     def select_preferred_diameter(cls, v, values):
         return rocks.properties.rank_properties("diameter", values)
 
+    def __len__(self):
+        return len(self.albedo)
+
+    def __str__(self):
+
+        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
+            return "No diameters or albedos on record."
+
+        table = rich.table.Table(
+            header_style="bold blue",
+            box=rich.box.SQUARE,
+            footer_style="dim",
+        )
+
+        columns = [
+            "diameter",
+            "err_diameter",
+            "albedo",
+            "err_albedo",
+            "method",
+            "shortbib",
+        ]
+
+        for c in columns:
+            table.add_column(c)
+
+        # Make a joint preferred list for albedo and diameter
+        preferred = list(map(any, zip(self.preferred_diameter, self.preferred_albedo)))
+
+        # Values are entries for each field
+        for i, preferred in enumerate(preferred):
+
+            table.add_row(
+                *[str(getattr(self, c)[i]) for c in columns],
+                style="bold green" if preferred else "white",
+            )
+        rich.print(table)
+        return ""
+
 
 class Ssocard(pydantic.BaseModel):
     href: Optional[str] = ""
@@ -733,6 +909,8 @@ class Rock(pydantic.BaseModel):
     astdys: AstDyS = AstDyS(**{})
     astorb: Astorb = Astorb(**{})
     diamalbedo: Diamalbedo = Diamalbedo(**{})
+    diameters: Diameters = Diameters(**{})
+    albedos: Albedos = Albedos(**{})
     masses: Masses = Masses(**{})
     mpcatobs: Mpcatobs = Mpcatobs(**{})
     pairs: Pairs = Pairs(**{})
@@ -850,6 +1028,9 @@ class Rock(pydantic.BaseModel):
         elif catalogue in ["diamalbedo"]:
             cat["preferred_albedo"] = [False] * len(list(cat.values())[0])
             cat["preferred_diameter"] = [False] * len(list(cat.values())[0])
+
+            data["diameters"] = cat
+            data["albedos"] = cat
 
         data[catalogue_attribute] = cat
         return data

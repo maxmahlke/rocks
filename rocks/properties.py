@@ -66,6 +66,7 @@ PROP_TO_DATACLOUD = {
     "astorb": "astorb",
     "binaries": "binarymp_tab",
     "diameters": "diamalbedo",
+    "diamalbedo": "diamalbedo",
     "albedos": "diamalbedo",
     "families": "families",
     "masses": "mass",
