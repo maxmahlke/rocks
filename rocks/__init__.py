@@ -15,7 +15,6 @@ PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
 PATH_TEMPLATE = os.path.join(PATH_CACHE, "ssoCard_template.json")
 PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
 
-
 # Check for existence of index file and cache directory
 os.makedirs(PATH_CACHE, exist_ok=True)
 

@@ -31,11 +31,19 @@ def ensure_list(value):
 
 # ------
 # ssoCard as pydantic model
-class MinMax(pydantic.BaseModel):
+
+# The lowest level in the ssoCard tree is the Parameter
+class Error(pydantic.BaseModel):
     min_: Optional[float] = pydantic.Field(np.nan, alias="min")
     max_: Optional[float] = pydantic.Field(np.nan, alias="max")
 
 
+class Parameter(pydantic.BaseModel):
+    error: Error = Error(**{})
+    value: Union[int, float, None] = None
+
+
+# Other common branches are method and bibref
 class Method(pydantic.BaseModel):
     doi: Optional[str] = ""
     name: Optional[str] = ""
