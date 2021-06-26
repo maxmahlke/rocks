@@ -185,6 +185,109 @@ class DynamicalParameters(pydantic.BaseModel):
         arbitrary_types_allowed = True
 
 
+# ------
+# Physical Parameter
+class Albedo(pydantic.BaseModel):
+    albedo: Parameter = Parameter(**{})
+    bibref: List[Bibref] = []
+    method: List[Method] = []
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+
+class Color(pydantic.BaseModel):
+    color: Parameter = Parameter(**{})
+    epoch: Optional[float] = np.nan
+    from_: Optional[str] = pydantic.Field("", alias="from")
+    bibref: Bibref = Bibref(**{})
+    observer: Optional[str] = ""
+    phot_sys: Optional[str] = ""
+    delta_time: Optional[float] = np.nan
+    id_filter_1: Optional[str] = ""
+    id_filter_2: Optional[str] = ""
+
+
+class Colors(pydantic.BaseModel):
+    # Atlas
+    c_o: List[Color] = [pydantic.Field(Color(**{}), alias="c-o")]
+    # 2MASS / VISTA
+    J_H: List[Color] = [pydantic.Field(Color(**{}), alias="J-H")]
+    J_K: List[Color] = [pydantic.Field(Color(**{}), alias="J-K")]
+    H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
+
+    _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
+        ensure_list
+    )
+
+
+class Diameter(pydantic.BaseModel):
+    diameter: Parameter = Parameter(**{})
+    method: List[Method] = []
+    bibref: List[Bibref] = []
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+
+class Mass(pydantic.BaseModel):
+    mass: Parameter = Parameter(**{})
+    bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+
+class Phase(pydantic.BaseModel):
+    H: Parameter = Parameter(**{})
+    N: Optional[float] = np.nan
+    G1: Parameter = Parameter(**{})
+    G2: Parameter = Parameter(**{})
+    rms: Optional[float] = np.nan
+    phase: Error = Error(**{})
+    bibref: List[Bibref] = [Bibref(**{})]
+    facility: Optional[str] = ""
+    name_filter: Optional[str] = ""
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(ensure_list)
+
+    def __str__(self):
+        return self.json()
+
+
+class PhaseFunction(pydantic.BaseModel):
+    # Generic
+    generic_johnson_v: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
+    # ATLAS
+    misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
+    misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
+
+
+class Spin(pydantic.BaseModel):
+    period: Parameter = Parameter(**{})
+    t0: Optional[float] = np.nan
+    Wp: Optional[float] = np.nan
+    lat: Parameter = Parameter(**{})
+    RA0: Optional[float] = np.nan
+    DEC0: Optional[float] = np.nan
+    long_: Parameter(**{}) = pydantic.Field(Parameter(**{}), alias="long")
+    method: Optional[List[Method]] = [Method(**{})]
+    bibref: Optional[List[Bibref]] = [Bibref(**{})]
+
+    def __str__(self):
+        return self.json()
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+
 class Taxonomy(pydantic.BaseModel):
     class_: Optional[str] = pydantic.Field("", alias="class")
     scheme: Optional[str] = ""
@@ -200,125 +303,10 @@ class Taxonomy(pydantic.BaseModel):
         return self.json()
 
 
-class Phase(pydantic.BaseModel):
-    """Superclass for all phase function measurements."""
-
-    H: Optional[float] = np.nan
-    N: Optional[float] = np.nan
-    G1: Optional[float] = np.nan
-    G2: Optional[float] = np.nan
-    err_H: MinMax = MinMax(**{})
-    phase: MinMax = MinMax(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
-    err_G1: MinMax = MinMax(**{})
-    err_G2: MinMax = MinMax(**{})
-    name_filter: Optional[str] = ""
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
-
-    def __str__(self):
-        return self.json()
-
-
-class PhaseFunction(pydantic.BaseModel):
-
-    # ATLAS
-    misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
-    misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
-
-
-class Spin(pydantic.BaseModel):
-    period: Optional[float] = np.nan
-    err_period: MinMax = MinMax(**{})
-    t0: Optional[float] = np.nan
-    RA0: Optional[float] = np.nan
-    DEC0: Optional[float] = np.nan
-    Wp: Optional[float] = np.nan
-    long_: Optional[float] = pydantic.Field(np.nan, alias="long")
-    lat: Optional[float] = np.nan
-    method: Optional[List[Method]] = [Method(**{})]
-    bibref: Optional[List[Bibref]] = [Bibref(**{})]
-
-    def __str__(self):
-        return self.json()
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
-class Diameter(pydantic.BaseModel):
-    diameter: Optional[float] = np.nan
-    err_diameter: MinMax = MinMax(**{})
-    method: List[Method] = []
-    bibref: List[Bibref] = []
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
-class Albedo(pydantic.BaseModel):
-    albedo: Optional[float] = np.nan
-    bibref: List[Bibref] = []
-    method: List[Method] = []
-    err_albedo: MinMax = MinMax(**{})
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
-class Mass(pydantic.BaseModel):
-    mass: Optional[float] = np.nan
-    bibref: List[Bibref] = [Bibref(**{})]
-    method: List[Method] = [Method(**{})]
-    err_mass: MinMax = MinMax(**{})
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
-class Color(pydantic.BaseModel):
-    """Superclass for all colours."""
-
-    color: Optional[float] = np.nan
-    epoch: Optional[float] = np.nan
-    from_: Optional[str] = pydantic.Field("", alias="from")
-    bibref: Bibref = Bibref(**{})
-    observer: Optional[str] = ""
-    phot_sys: Optional[str] = ""
-    err_color: MinMax = MinMax(**{})
-    delta_time: Optional[float] = np.nan
-    id_filter_1: Optional[str] = ""
-    id_filter_2: Optional[str] = ""
-
-
-class Colors(pydantic.BaseModel):
-
-    # Atlas
-    c_o: List[Color] = [pydantic.Field(Color(**{}), alias="c-o")]
-
-    # 2MASS / VISTA
-    J_H: List[Color] = [pydantic.Field(Color(**{}), alias="J-H")]
-    J_K: List[Color] = [pydantic.Field(Color(**{}), alias="J-K")]
-    H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
-
-    # SDSS
-
-    _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
-        ensure_list
-    )
-
-
 class ThermalProperties(pydantic.BaseModel):
-    TI: Optional[float] = np.nan
+    TI: Parameter = Parameter(**{})
     dsun: Optional[float] = np.nan
     bibref: List[Bibref] = []
-    err_TI: MinMax = MinMax(**{})
     method: List[Method] = []
 
     _ensure_list: classmethod = pydantic.validator(
@@ -329,11 +317,11 @@ class ThermalProperties(pydantic.BaseModel):
 class PhysicalParameters(pydantic.BaseModel):
     mass: Mass = Mass(**{})
     spin: List[Spin] = [Spin(**{})]
-    phase_function: PhaseFunction = PhaseFunction(**{})
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     diameter: Diameter = Diameter(**{})
     taxonomy: List[Taxonomy] = [Taxonomy(**{})]
+    phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_properties: ThermalProperties = ThermalProperties(**{})
 
     def __str__(self):
@@ -347,23 +335,19 @@ class PhysicalParameters(pydantic.BaseModel):
         arbitrary_types_allowed = True
 
 
+# ------
+# Equation of state
 class EqStateVector(pydantic.BaseModel):
     ref_epoch: Optional[float] = np.nan
-    px: Optional[float] = np.nan
-    py: Optional[float] = np.nan
-    pz: Optional[float] = np.nan
-    vx: Optional[float] = np.nan
-    vy: Optional[float] = np.nan
-    vz: Optional[float] = np.nan
-
-    def __str__(self):
-        return self.json()
+    position: List[float] = [np.nan, np.nan, np.nan]
+    velocity: List[float] = [np.nan, np.nan, np.nan]
 
 
+# ------
+# Highest level branches
 class Parameters(pydantic.BaseModel):
-
-    dynamical: DynamicalParameters = DynamicalParameters(**{})
     physical: PhysicalParameters = PhysicalParameters(**{})
+    dynamical: DynamicalParameters = DynamicalParameters(**{})
     eq_state_vector: EqStateVector = EqStateVector(**{})
 
     def __str__(self):
