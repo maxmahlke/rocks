@@ -61,31 +61,24 @@ class Bibref(pydantic.BaseModel):
     shortbib: Optional[str] = ""
 
 
+# ------
+# Dynamical parameters
 class OrbitalElements(pydantic.BaseModel):
-    ceu: Optional[float] = np.nan
+    ceu: Parameter = Parameter(**{})
     author: Optional[str] = ""
     bibref: List[Bibref] = [Bibref(**{})]
-    err_ceu: MinMax = MinMax(**{})
-    ceu_rate: Optional[float] = np.nan
+    ceu_rate: Parameter = Parameter(**{})
     ref_epoch: Optional[float] = np.nan
-    inclination: Optional[float] = np.nan
-    mean_motion: Optional[float] = np.nan
-    orbital_arc: Optional[int] = None
-    eccentricity: Optional[float] = np.nan
-    err_ceu_rate: MinMax = MinMax(**{})
-    mean_anomaly: Optional[float] = np.nan
-    node_longitude: Optional[float] = np.nan
-    orbital_period: Optional[float] = np.nan
-    semi_major_axis: Optional[float] = np.nan
-    err_inclination: MinMax = MinMax(**{})
-    err_mean_motion: MinMax = MinMax(**{})
-    err_eccentricity: MinMax = MinMax(**{})
-    err_mean_anomaly: MinMax = MinMax(**{})
-    err_node_longitude: MinMax = MinMax(**{})
-    err_orbital_period: MinMax = MinMax(**{})
-    err_semi_major_axis: MinMax = MinMax(**{})
-    perihelion_argument: Optional[float] = np.nan
-    err_perihelion_argument: MinMax = MinMax(**{})
+    inclination: Parameter = Parameter(**{})
+    mean_motion: Parameter = Parameter(**{})
+    orbital_arc: Optional[int] = np.nan
+    eccentricity: Parameter = Parameter(**{})
+    mean_anomaly: Parameter = Parameter(**{})
+    node_longitude: Parameter = Parameter(**{})
+    orbital_period: Parameter = Parameter(**{})
+    semi_major_axis: Parameter = Parameter(**{})
+    number_observation: Optional[int] = np.nan
+    perihelion_argument: Parameter = Parameter(**{})
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
@@ -97,17 +90,12 @@ class OrbitalElements(pydantic.BaseModel):
 
 class ProperElements(pydantic.BaseModel):
     bibref: List[Bibref] = [Bibref(**{})]
-    proper_g: Optional[float] = np.nan
-    proper_s: Optional[float] = np.nan
-    err_proper_g: MinMax = MinMax(**{})
-    err_proper_s: MinMax = MinMax(**{})
-    proper_eccentricity: Optional[float] = np.nan
-    proper_inclination: Optional[float] = np.nan
-    err_proper_inclination: MinMax = MinMax(**{})
-    proper_semi_major_axis: Optional[float] = np.nan
-    err_proper_eccentricity: MinMax = MinMax(**{})
-    proper_sine_inclination: Optional[float] = np.nan
-    err_proper_semi_major_axis: MinMax = MinMax(**{})
+    proper_g: Parameter = Parameter(**{})
+    proper_s: Parameter = Parameter(**{})
+    proper_eccentricity: Parameter = Parameter(**{})
+    proper_inclination: Parameter = Parameter(**{})
+    proper_semi_major_axis: Parameter = Parameter(**{})
+    proper_sine_inclination: Parameter = Parameter(**{})
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
@@ -122,24 +110,6 @@ class Family(pydantic.BaseModel):
     family_name: Optional[str] = ""
     family_number: Optional[int] = None
     family_status: Optional[str] = ""
-    family_membership: Optional[int] = None
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
-
-    def __str__(self):
-        return self.json()
-
-
-class Yarkovsky(pydantic.BaseModel):
-    S: Optional[float] = np.nan
-    A2: Optional[float] = np.nan
-    snr: Optional[float] = np.nan
-    dadt: Optional[float] = np.nan
-    bibref: List[Bibref] = [Bibref(**{})]
-    err_A2: MinMax = MinMax(**{})
-    err_dadt: MinMax = MinMax(**{})
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
@@ -159,11 +129,26 @@ class PairMembers(pydantic.BaseModel):
 
 
 class Pair(pydantic.BaseModel):
-    pair_members: List[PairMembers] = [PairMembers(**{})]
-    pair_membership: Optional[int] = None
+    members: List[PairMembers] = [PairMembers(**{})]
+    bibref: List[Bibref] = [Bibref(**{})]
 
     _ensure_list: classmethod = pydantic.validator(
-        "pair_members", allow_reuse=True, pre=True
+        "members", "bibref", allow_reuse=True, pre=True
+    )(ensure_list)
+
+    def __str__(self):
+        return self.json()
+
+
+class Yarkovsky(pydantic.BaseModel):
+    S: Optional[float] = np.nan
+    A2: Parameter = Parameter(**{})
+    snr: Optional[float] = np.nan
+    dadt: Parameter = Parameter(**{})
+    bibref: List[Bibref] = [Bibref(**{})]
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
     )(ensure_list)
 
     def __str__(self):
@@ -171,7 +156,6 @@ class Pair(pydantic.BaseModel):
 
 
 class DynamicalParameters(pydantic.BaseModel):
-
     pair: Pair = Pair(**{})
     family: Family = Family(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
