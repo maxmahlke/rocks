@@ -40,14 +40,14 @@ class Error(pydantic.BaseModel):
 
 class Parameter(pydantic.BaseModel):
     error: Error = Error(**{})
-    value: Union[int, float, None] = None
+    value: Union[int, float, None] = np.nan
 
 
 # Other common branches are method and bibref
 class Method(pydantic.BaseModel):
     doi: Optional[str] = ""
     name: Optional[str] = ""
-    year: Optional[int] = None
+    year: Optional[int] = np.nan
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
@@ -55,7 +55,7 @@ class Method(pydantic.BaseModel):
 
 class Bibref(pydantic.BaseModel):
     doi: Optional[str] = ""
-    year: Optional[int] = None
+    year: Optional[int] = np.nan
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
@@ -108,7 +108,7 @@ class ProperElements(pydantic.BaseModel):
 class Family(pydantic.BaseModel):
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
-    family_number: Optional[int] = None
+    family_number: Optional[int] = np.nan
     family_status: Optional[str] = ""
 
     _ensure_list: classmethod = pydantic.validator(
@@ -125,7 +125,7 @@ class PairMembers(pydantic.BaseModel):
     pair_delta_a: Optional[float] = np.nan
     pair_delta_e: Optional[float] = np.nan
     pair_delta_i: Optional[float] = np.nan
-    sibling_number: Optional[int] = None
+    sibling_number: Optional[int] = np.nan
 
 
 class Pair(pydantic.BaseModel):
