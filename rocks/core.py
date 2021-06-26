@@ -891,13 +891,20 @@ class Diamalbedo(pydantic.BaseModel):
         return ""
 
 
+class Link(pydantic.BaseModel):
+    unit: Optional[str] = ""
+    self_: Optional[str] = pydantic.Field("", alias="self")
+    quaero: Optional[str] = ""
+    description: Optional[str] = ""
+
+
 class Ssocard(pydantic.BaseModel):
-    href: Optional[str] = ""
     version: Optional[str] = ""
-    datetime: Optional[str] = ""
+    datetime: datetime = None
 
 
 class Rock(pydantic.BaseModel):
+    """Instantiate a specific asteroid with data from its ssoCard."""
 
     id_: Optional[str] = pydantic.Field("", alias="id")
     name: Optional[str] = ""
@@ -906,12 +913,11 @@ class Rock(pydantic.BaseModel):
     number: Optional[int] = np.nan
     parent: Optional[str] = ""
     system: Optional[str] = ""
-    aliases: List[str] = []
-    quaero_link: Optional[str] = ""
 
-    parameters: Parameters = Parameters(**{})
-    datacloud: Datacloud = Datacloud(**{})
+    link: Link = Link(**{})
     ssocard: Ssocard = Ssocard(**{})
+    datacloud: Datacloud = Datacloud(**{})
+    parameters: Parameters = Parameters(**{})
 
     aams: AAMS = AAMS(**{})
     astdys: AstDyS = AstDyS(**{})
