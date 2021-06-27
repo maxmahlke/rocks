@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality."""
-from datetime import datetime
+import datetime as dt
 from typing import List, Optional, Union
 
 import numpy as np
@@ -29,21 +29,16 @@ def ensure_list(value):
     return value
 
 
+def bump_value(value, values, config, field):
+    """Replace the '$parameter' key by promoting the 'value' key."""
+    for key in ["error", "value"]:
+        value[key] = value[field.name][key]
+    del value[field.name]
+    return value
+
+
 # ------
 # ssoCard as pydantic model
-
-# The lowest level in the ssoCard tree is the Parameter
-class Error(pydantic.BaseModel):
-    min_: Optional[float] = pydantic.Field(np.nan, alias="min")
-    max_: Optional[float] = pydantic.Field(np.nan, alias="max")
-
-
-class Parameter(pydantic.BaseModel):
-    error: Error = Error(**{})
-    value: Union[int, float, None] = np.nan
-
-
-# Other common branches are method and bibref
 class Method(pydantic.BaseModel):
     doi: Optional[str] = ""
     name: Optional[str] = ""
@@ -59,6 +54,34 @@ class Bibref(pydantic.BaseModel):
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
+
+
+class Error(pydantic.BaseModel):
+    min_: Optional[float] = pydantic.Field(np.nan, alias="min")
+    max_: Optional[float] = pydantic.Field(np.nan, alias="max")
+
+
+class Parameter(pydantic.BaseModel):
+    error: Error = Error(**{})
+    value: Union[int, float, None] = np.nan
+    bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+    def __str__(self):
+
+        # Get unit
+
+        # Print value +- error
+        if self.error.min_ == -self.error.max_:
+            return f"{self.value:.2f} +- {self.error.max_:.2f}"
+        else:
+            return (
+                f"{self.value:.2f} +- ({self.error.max_:.2f}, {-self.error.min_:.2f})"
+            )
 
 
 # ------
@@ -171,16 +194,6 @@ class DynamicalParameters(pydantic.BaseModel):
 
 # ------
 # Physical Parameter
-class Albedo(pydantic.BaseModel):
-    albedo: Parameter = Parameter(**{})
-    bibref: List[Bibref] = []
-    method: List[Method] = []
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
 class Color(pydantic.BaseModel):
     color: Parameter = Parameter(**{})
     epoch: Optional[float] = np.nan
@@ -204,26 +217,6 @@ class Colors(pydantic.BaseModel):
     _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
         ensure_list
     )
-
-
-class Diameter(pydantic.BaseModel):
-    diameter: Parameter = Parameter(**{})
-    method: List[Method] = []
-    bibref: List[Bibref] = []
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
-
-class Mass(pydantic.BaseModel):
-    mass: Parameter = Parameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
-    method: List[Method] = [Method(**{})]
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
 
 
 class Phase(pydantic.BaseModel):
@@ -299,11 +292,11 @@ class ThermalProperties(pydantic.BaseModel):
 
 
 class PhysicalParameters(pydantic.BaseModel):
-    mass: Mass = Mass(**{})
+    mass: Parameter = Parameter(**{})
     spin: List[Spin] = [Spin(**{})]
     colors: Colors = Colors(**{})
-    albedo: Albedo = Albedo(**{})
-    diameter: Diameter = Diameter(**{})
+    albedo: Parameter = Parameter(**{})
+    diameter: Parameter = Parameter(**{})
     taxonomy: List[Taxonomy] = [Taxonomy(**{})]
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_properties: ThermalProperties = ThermalProperties(**{})
@@ -314,6 +307,10 @@ class PhysicalParameters(pydantic.BaseModel):
     _ensure_list: classmethod = pydantic.validator(
         "spin", "taxonomy", allow_reuse=True, pre=True
     )(ensure_list)
+
+    _bump_value: classmethod = pydantic.validator(
+        "mass", "albedo", "diameter", allow_reuse=True, pre=True
+    )(bump_value)
 
     class Config:
         arbitrary_types_allowed = True
@@ -350,7 +347,7 @@ class Link(pydantic.BaseModel):
 
 class Ssocard(pydantic.BaseModel):
     version: Optional[str] = ""
-    datetime: datetime = None
+    datetime: Optional[dt.datetime] = None
 
 
 class Rock(pydantic.BaseModel):
@@ -368,17 +365,6 @@ class Rock(pydantic.BaseModel):
     ssocard: Ssocard = Ssocard(**{})
     datacloud: rocks.datacloud.Datacloud = rocks.datacloud.Datacloud(**{})
     parameters: Parameters = Parameters(**{})
-
-    aams: AAMS = AAMS(**{})
-    astdys: AstDyS = AstDyS(**{})
-    astorb: Astorb = Astorb(**{})
-    diamalbedo: Diamalbedo = Diamalbedo(**{})
-    diameters: Diameters = Diameters(**{})
-    albedos: Albedos = Albedos(**{})
-    masses: Masses = Masses(**{})
-    mpcatobs: Mpcatobs = Mpcatobs(**{})
-    pairs: Pairs = Pairs(**{})
-    taxonomies: Taxonomies = Taxonomies(**{})
 
     def __init__(self, id_, ssocard={}, datacloud=[], skip_id_check=False):
         """Identify a minor body  and retrieve its properties from SsODNet.
