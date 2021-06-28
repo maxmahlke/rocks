@@ -91,9 +91,11 @@ def info(this, minimal):
 
     Parameters
     ==========
-    this : str, optional
+    this : str
         Minor body name, designation, or number.
         If empty, a selection is prompted.
+    minimal : str
+        Print a minimal overview of SSO properties. Default is False.
     """
     if not this:
         _, _, this = rocks.utils.select_sso_from_index()

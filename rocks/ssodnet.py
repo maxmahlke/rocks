@@ -57,6 +57,18 @@ def get_ssocard(id_ssodnet, progress=False):
     if progress:
         progress = tqdm(desc="Getting ssoCards : ", total=len(id_ssodnet))
 
+    # TODO
+    # Temporary patch to only load the template card
+    # ---
+    PATH_DATA = os.path.join(
+        os.path.expanduser("~"), "astro/rocks/", f"data/ssoCard_sample.json"
+    )
+
+    with open(PATH_DATA, "r") as file_:
+        data = json.load(file_)
+    return data
+
+    # ---
     # Run async loop to get ssoCard
     loop = asyncio.get_event_loop()
     cards = loop.run_until_complete(_get_ssocard(id_ssodnet, progress))
@@ -213,22 +225,6 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False):
     catalogues = loop.run_until_complete(
         _get_datacloud_catalogue(id_catalogue, progress)
     )[0]
-
-    # Return to input format
-    # reordered_catalogues = []
-
-    # for i, _ in enumerate(id_ssodnet):
-    #     catalogues_asteroid = []
-    #     for j, _ in enumerate(catalogue):
-    #         catalogues_asteroid.append(catalogues[i + j])
-    #     reordered_catalogues.append(catalogues_asteroid)
-
-    # if len(id_ssodnet) == 1:
-    #     reordered_catalogues = reordered_catalogues[0]
-    # return reordered_catalogues
-
-    # if len(id_ssodnet) == 1:
-    #     catalogues = catalogues[0]
 
     return catalogues
 

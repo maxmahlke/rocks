@@ -145,7 +145,7 @@ def select_sso_from_index():  # pragma: no cover
     INDEX = read_index()
 
     def _fuzzy_desig_selection(index):
-        """Generator for fuzzy search of asteroid index file. """
+        """Generator for fuzzy search of asteroid index file."""
         for number, name in zip(index.number, index["name"]):
             yield f"{number} {name}"
 
@@ -167,11 +167,24 @@ def select_sso_from_index():  # pragma: no cover
 #     """Deep version of setattr."""
 #     pre, _, post = attr.rpartition(".")
 #     return setattr(rgetattr(obj, pre) if pre else obj, post, val)
-def rgetattr(obj, attr, *args):  # pragma: no cover
-    """Deep version of getattr."""
+def rgetattr(obj, attr):
+    """Deep version of getattr. Retrieve nested attributes.
+
+    Parameters
+    ==========
+    obj
+        Any python object with attributes.
+    attr : str
+        Attribut of obj. Nested attributes can be referrenced with '.'
+
+    Returns
+    =======
+    _
+        The requested attribute.
+    """
 
     def _getattr(obj, attr):
-        return getattr(obj, attr, *args)
+        return getattr(obj, attr)
 
     return reduce(_getattr, [obj] + attr.split("."))
 
@@ -405,6 +418,45 @@ def retrieve_ssocard_template():
 #     if progressbar:
 #         progressbar.update(n=len(ids))
 #     return ssoCards
+
+
+def get_unit(path_unit):
+    """Get unit from units JSON file.
+
+    Parameters
+    ==========
+    path_unit : str
+        Path to the parameter in the JSON tree, starting at unit and
+        separating the levels with periods.
+
+    Returns
+    =======
+    str
+        The unit of the requested parameter.
+    """
+    PATH_UNITS = os.path.join(
+        os.path.expanduser("~"), "astro/rocks/data/unit-template_aster-astorb.json"
+    )
+
+    with open(PATH_UNITS, "r") as units:
+        units = json.load(units)
+
+    for key in path_unit.split("."):
+        if key == "unit":
+            unit = units[key]
+        else:
+            unit = unit[key]
+    return unit
+
+
+def get_description(name):
+    PATH_UNITS = os.path.join(
+        os.path.expanduser("~"), "astro/rocks/data/unit-template_aster-astorb.json"
+    )
+
+    breakpoint()
+
+    print(pd.json_normalize(PATH_UNITS).columns)
 
 
 # ------

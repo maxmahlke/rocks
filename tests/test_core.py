@@ -13,7 +13,7 @@ import pytest
 import rocks
 from rocks import Rock
 
-# Asteroids who's ssocard is cached in the test data directory
+# Asteroids with cached ssoCards for testing
 TEST_CASES = [
     (1, "Ceres", "Ceres"),
     (4, "Vesta", "Vesta"),
@@ -50,7 +50,7 @@ def get_ssocard_from_test_data(id_):
     with open(PATH_DATA, "r") as file_:
         data = json.load(file_)
 
-    return data
+    return data[id_]
 
 
 def get_datacloud_catalogue_from_test_data(id_, datacloud):
@@ -64,7 +64,7 @@ def get_datacloud_catalogue_from_test_data(id_, datacloud):
 
     Returns
     =======
-    dict
+    list of dict
         The datacloud catalogue of the object.
     """
     PATH_DATA = os.path.join(
@@ -74,7 +74,7 @@ def get_datacloud_catalogue_from_test_data(id_, datacloud):
     with open(PATH_DATA, "r") as file_:
         data = json.load(file_)
 
-    return data
+    return [data]
 
 
 # ------
@@ -149,11 +149,7 @@ def test_parameter_access(number, name, id_, monkeypatch):
     sso = Rock(id_, skip_id_check=True)
 
     # Read JSON file
-    with open(
-        os.path.join(os.path.dirname(__file__), f"data/ssocards/{id_}.json"),
-        "r",
-    ) as file_:
-        data = json.load(file_)
+    data = get_ssocard_from_test_data(id_)
 
     # Flatten the json into a single-level dictionary for easy dereferencing
     flattened_json = pd.json_normalize(data).to_dict(orient="records")[0]
@@ -162,11 +158,28 @@ def test_parameter_access(number, name, id_, monkeypatch):
     # value in the Rock instance
     for key, value_json in flattened_json.items():
 
-        if keyword.iskeyword(key.split(".")[-1]) or key.split(".")[-1] in ["id"]:
+        if len(key.split(".")) >= 2:
+            attr_parent = key.split(".")[-2]
+        else:
+            attr_parent = ""
+
+        attr_name = key.split(".")[-1]
+
+        if keyword.iskeyword(attr_name) or attr_name in ["id", "type", "min", "max"]:
             key = key + "_"
 
+        # Some attributes are stored in lists. Since we check equality for
+        # the parents as well, we skip them.
+        if attr_parent in ["bibref", "method"]:
+            continue
+        if attr_name in ["bibref", "method"]:
+            continue
+
+        # units do not have to be checked
+        if ".unit." in key:
+            continue
+
         value_rock = rocks.utils.rgetattr(sso, key)
-        print(key)
         assert value_rock == value_json
 
 

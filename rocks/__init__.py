@@ -3,6 +3,8 @@ from importlib.metadata import version
 import os
 import sys
 
+from . import datacloud, properties, ssodnet, utils
+
 # Expose API to user
 from .core import Rock
 from .core import rocks_ as rocks

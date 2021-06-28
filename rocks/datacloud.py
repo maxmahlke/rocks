@@ -1,19 +1,7 @@
-class Datacloud(pydantic.BaseModel):
-    aams: Optional[str] = ""
-    astdys: Optional[str] = ""
-    astorb: Optional[str] = ""
-    binarymp_tab: Optional[str] = ""
-    binarymp_ref: Optional[str] = ""
-    diamalbedo: Optional[str] = ""
-    families: Optional[str] = ""
-    masses: Optional[str] = ""
-    mpcatobs: Optional[str] = ""
-    mpcorb: Optional[str] = ""
-    pairs: Optional[str] = ""
-    taxonomy: Optional[str] = ""
+from typing import List, Optional
 
-    def __str__(self):
-        return self.json()
+import numpy as np
+import pydantic
 
 
 class Pairs(pydantic.BaseModel):
@@ -514,3 +502,31 @@ class Diamalbedo(pydantic.BaseModel):
             )
         rich.print(table)
         return ""
+
+
+class Datacloud(pydantic.BaseModel):
+    aams: Optional[str] = ""
+    astdys: Optional[str] = ""
+    astorb: Optional[str] = ""
+    binarymp_tab: Optional[str] = ""
+    binarymp_ref: Optional[str] = ""
+    diamalbedo: Optional[str] = ""
+    families: Optional[str] = ""
+    masses: Optional[str] = ""
+    mpcatobs: Optional[str] = ""
+    mpcorb: Optional[str] = ""
+    pairs: Optional[str] = ""
+    taxonomy: Optional[str] = ""
+    # aams: AAMS = AAMS(**{})
+    # astdys: AstDyS = AstDyS(**{})
+    # astorb: Astorb = Astorb(**{})
+    # diamalbedo: Diamalbedo = Diamalbedo(**{})
+    # diameters: Diameters = Diameters(**{})
+    # albedos: Albedos = Albedos(**{})
+    # masses: Masses = Masses(**{})
+    # mpcatobs: Mpcatobs = Mpcatobs(**{})
+    # pairs: Pairs = Pairs(**{})
+    # taxonomies: Taxonomies = Taxonomies(**{})
+
+    def __str__(self):
+        return self.json()
