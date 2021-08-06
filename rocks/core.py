@@ -47,10 +47,21 @@ def print_parameter(param, path_unit):
     else:
         unit = ""
 
-    if param.error.min_ == -param.error.max_:
-        return f"{param.value:.2f} +- {param.error.max_:.2f} {unit}"
+    # use scientific notation if parameter is larger than 1e3 or smaller 1e-3
+    if 1e-3 <= abs(param.value) <= 1e3 or param.value == 0:
+        value = f"{param.value:.2f}"
+        error_min = f"{param.error.min_:.2f}"
+        error_max = f"{param.error.max_:.2f}"
+
     else:
-        return f"{param.value:.2f} +- ({param.error.max_:.2f}, {-param.error.min_:.2f}) {unit}"
+        value = f"{param.value:.2E}"
+        error_min = f"{param.error.min_:.2E}"
+        error_max = f"{param.error.max_:.2E}"
+
+    if abs(param.error.min_) == abs(param.error.max_):
+        return f"{value} +- {error_max} {unit}"
+    else:
+        return f"{value} +- ({error_max}, {error_min}) {unit}"
 
 
 # ------
