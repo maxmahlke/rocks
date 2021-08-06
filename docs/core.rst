@@ -31,6 +31,20 @@ in the :ref:`Tutorials<Tutorials>`.
 
     >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
 
+The user can further provide their own ssoCard to populate the ``Rock`` attributes.
+The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
+original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
+and load it via the ``json`` module.
+
+.. code-block:: python
+
+    >> import json
+    >> import os
+    >> with open("my_ssocard.json", "r") as file_:
+    >>    data = json.load(file_)
+    >>
+    >> mars_crosser_2016fj = Rock("2016_FJ", ssocard=data["2016_FJ"])
+
 Access of ssoCard parameters
 ---------------------------------------------------------
 
