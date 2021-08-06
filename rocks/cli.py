@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """rocks command line suite."""
 import json
+import keyword
 import os
 import sys
 import webbrowser
@@ -148,6 +149,10 @@ def echo():
     # Get data and echo
     _, prop, *id_ = sys.argv
     id_ = " ".join(id_)
+
+    # Check if the property might be missing an underscore
+    if keyword.iskeyword(prop):
+        prop = f"{prop}_"
 
     if prop in rocks.properties.PROP_TO_DATACLOUD:
         datacloud = [rocks.properties.PROP_TO_DATACLOUD[prop]]

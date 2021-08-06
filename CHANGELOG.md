@@ -1,5 +1,6 @@
 # 1.1.3 -
 - The 'datacloud' argument of the Rock class now accepts the property name aliases of the catalogue names, eg: "albedos", "diameters" instead of "diamalbedo"
+- Querying asteroid properties from the command line which coincide with python keywords no longer results in an error (e.g. "rocks class Hebe")
 
 # 1.1.2 - 2021-05-18
 - The 'albedos' and 'diameters' subsets of the 'diamalbedo' catalogue now have their
