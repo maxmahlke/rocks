@@ -13,7 +13,7 @@ import rocks
 
 
 class AliasedGroup(click.Group):
-    """Click group with custom default mode implementation. """
+    """Click group with custom default mode implementation."""
 
     def get_command(self, ctx, cmd_name):
 
@@ -124,7 +124,7 @@ def properties():
 
 @cli_rocks.command()
 def status():
-    """Prints the availability of SsODNet:datacloud. """
+    """Prints the availability of SsODNet:datacloud."""
     ceres = rocks.Rock(1)
 
     if hasattr(ceres, "taxonomy"):
@@ -146,7 +146,7 @@ def echo():
 
             plot = True
 
-    # Get data and echo
+    # Get property and asteroid id
     _, prop, *id_ = sys.argv
     id_ = " ".join(id_)
 

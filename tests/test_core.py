@@ -23,12 +23,14 @@ TEST_CASES = [
     (1002, "Olbersia", "Olbersia"),
     (101955, "Bennu", "Bennu"),
     (385186, "1994 AW1", "1994_AW1"),
+    (np.nan, "2016 FJ", "2016_FJ"),
 ]
 
 # Asteroids with datacloud catalogues in the test data directory
 TEST_DATACLOUD = [("aams", "Massalia"), ("families", "Themis")]
 
-
+# ------
+# Monkeypatches for local data access
 def get_ssocard_from_test_data(id_):
     """Monkeypatch function to read cached ssoCards from test files rather than
     query SsODNet.
@@ -77,27 +79,36 @@ def get_datacloud_catalogue_from_test_data(id_, datacloud):
 
 # ------
 # Test instantiation
+@pytest.mark.parametrize("number_name_id", TEST_CASES, ids=str)
+def test_instantiation_with_types_local(number_name_id, monkeypatch):
+    """Verify class instantiation with str, int, float with local ssoCards.
 
-
-@pytest.mark.parametrize("nunaid", TEST_CASES, ids=str)
-def test_instantiation_with_types(nunaid, monkeypatch):
-    """Verify class instantiation with str, int, float."""
-
+    Parameters
+    ==========
+    number_name_id : list
+        List containing the asteroid's name, number, and SsODNet ID.
+    """
     monkeypatch.setattr(rocks.ssodnet, "get_ssocard", get_ssocard_from_test_data)
 
-    number, name, id_ = nunaid
+    number, name, id_ = number_name_id
 
     for identifier in [number, name, id_, float(number), str(number)]:
         _ = Rock(identifier)
 
 
-@pytest.mark.parametrize("nunaid", TEST_CASES, ids=str)
-def test_skip_id_check(nunaid, monkeypatch):
-    """Verify class instantiation when providing SsODNet ID."""
+@pytest.mark.parametrize("number_name_id", TEST_CASES, ids=str)
+def test_skip_id_check(number_name_id, monkeypatch):
+    """Verify class instantiation when providing SsODNet ID.
+
+    Parameters
+    ==========
+    number_name_id : list
+        List containing the asteroid's name, number, and SsODNet ID.
+    """
 
     monkeypatch.setattr(rocks.ssodnet, "get_ssocard", get_ssocard_from_test_data)
 
-    _, _, id_ = nunaid
+    _, _, id_ = number_name_id
     _ = Rock(id_, skip_id_check=True)
 
 

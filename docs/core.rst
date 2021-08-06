@@ -5,6 +5,12 @@ The ``Rock`` class
 
 The :ref:`Rock<rocks-Rock>` class is used to inspect the properties of a single asteroid. The asteroid is specified by providing its number, name, or designation to the class.
 
+Creating a ``Rock`` instance
+----------------------------
+
+``Rocks`` are created by passing the name, number, or SsODNet ID of the asteroid that they
+should represent.
+
 .. code-block:: python
 
     >> from rocks import Rock
@@ -15,6 +21,19 @@ The :ref:`Rock<rocks-Rock>` class is used to inspect the properties of a single 
     >> vesta
     Rock(number=4, name='Vesta')
 
+When passing the name or number, the asteroid is identified using the
+``rocks.identify()`` ``quaero`` frontend. If the SsODNet ID of the asteroid is
+provided, this check can be skipped by setting the ``skip_id_check`` argument to
+``True``. This saves time when creating many ``Rock`` instances in a loop, as demonstrated
+in the :ref:`Tutorials<Tutorials>`.
+
+.. code-block:: python
+
+    >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
+
+Access of ssoCard parameters
+---------------------------------------------------------
+
 During instantiation, the asteroid properties are retrieved from `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_ and assigned to the attributes following the structure of the ``ssoCard``.
 
 .. code-block:: python
@@ -23,7 +42,6 @@ During instantiation, the asteroid properties are retrieved from `SsODNet <https
     C
     >> vesta.parameters.dynamical.proper_elements.proper_semi_major_aixs
     2.3615126
-
 
 To reduce wordiness, the ``parameters`` and ``physical``/``dynamical`` attributes can be skipped. Units and uncertainties can be appended to the property.
 
@@ -35,9 +53,6 @@ To reduce wordiness, the ``parameters`` and ``physical``/``dynamical`` attribute
    468.3
    >> vesta.diameter.unit
    'km'
-
-Differences between the ssoCard and the ``Rock`` instance
----------------------------------------------------------
 
 In general, the ``Rock`` attribute structure mimics the ssoCard structure as closely as possible.
 
