@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
+import json
 from typing import List, Optional, Union
 
 import numpy as np
@@ -30,56 +31,41 @@ def ensure_list(value):
 
 
 # ------
-def print_parameter(param, path_unit):
-    """Print the value of a numerical parameter including
-    its errors and its unit.
-
-    Parameters
-    ==========
-    param : rocks.core.Parameter
-        The Parameter instance containing the values to print.
-    path_unit : str
-        Path to the parameter in the JSON tree, starting at unit and
-        separating the levels with periods.
-    """
-    if path_unit is not None:
-        unit = rocks.utils.get_unit(path_unit)
-    else:
-        unit = ""
-
-    # use scientific notation if parameter is larger than 1e3 or smaller 1e-3
-    if 1e-3 <= abs(param.value) <= 1e3 or param.value == 0:
-        value = f"{param.value:.2f}"
-        error_min = f"{param.error.min_:.2f}"
-        error_max = f"{param.error.max_:.2f}"
-
-    else:
-        value = f"{param.value:.2E}"
-        error_min = f"{param.error.min_:.2E}"
-        error_max = f"{param.error.max_:.2E}"
-
-    if abs(param.error.min_) == abs(param.error.max_):
-        return f"{value} +- {error_max} {unit}"
-    else:
-        return f"{value} +- ({error_max}, {error_min}) {unit}"
-
-
-# ------
 # ssoCard as pydantic model
 
-# The lowest level in the ssoCard tree is the Parameter
+# The lowest level in the ssoCard tree is the Value
 class Error(pydantic.BaseModel):
     min_: Optional[float] = pydantic.Field(np.nan, alias="min")
     max_: Optional[float] = pydantic.Field(np.nan, alias="max")
 
 
-class Parameter(pydantic.BaseModel):
+class Value(pydantic.BaseModel):
     error: Error = Error(**{})
-    value: Union[int, float, None] = np.nan
+    value: Optional[float] = np.nan
+
+    def __str__(self):
+        """Print the value of a numerical parameter including
+        its errors and its unit if available.
+        """
+
+        unit = (
+            rocks.utils.get_unit(self.path_unit) if hasattr(self, "path_unit") else ""
+        )
+
+        if abs(self.error.min_) == abs(self.error.max_):
+            return f"{self.value} +- {self.error.max_} {unit}"
+        else:
+            return f"{self.value} +- ({self.error.max_}, {self.error.min_}) {unit}"
+
+
+# The second lowest level is the Property
+class Property(pydantic.BaseModel):
+    def __str__(self):
+        return json.dumps(json.loads(self.json()), indent=2, sort_keys=True)
 
 
 # Other common branches are method and bibref
-class Method(pydantic.BaseModel):
+class Method(Property):
     doi: Optional[str] = ""
     name: Optional[str] = ""
     year: Optional[int] = np.nan
@@ -88,7 +74,7 @@ class Method(pydantic.BaseModel):
     shortbib: Optional[str] = ""
 
 
-class Bibref(pydantic.BaseModel):
+class Bibref(Property):
     doi: Optional[str] = ""
     year: Optional[int] = np.nan
     title: Optional[str] = ""
@@ -98,39 +84,36 @@ class Bibref(pydantic.BaseModel):
 
 # ------
 # Dynamical parameters
-class OrbitalElements(pydantic.BaseModel):
-    ceu: Parameter = Parameter(**{})
+class OrbitalElements(Property):
+    ceu: Value = Value(**{})
     author: Optional[str] = ""
     bibref: List[Bibref] = [Bibref(**{})]
-    ceu_rate: Parameter = Parameter(**{})
+    ceu_rate: Value = Value(**{})
     ref_epoch: Optional[float] = np.nan
-    inclination: Parameter = Parameter(**{})
-    mean_motion: Parameter = Parameter(**{})
+    inclination: Value = Value(**{})
+    mean_motion: Value = Value(**{})
     orbital_arc: Optional[int] = np.nan
-    eccentricity: Parameter = Parameter(**{})
-    mean_anomaly: Parameter = Parameter(**{})
-    node_longitude: Parameter = Parameter(**{})
-    orbital_period: Parameter = Parameter(**{})
-    semi_major_axis: Parameter = Parameter(**{})
+    eccentricity: Value = Value(**{})
+    mean_anomaly: Value = Value(**{})
+    node_longitude: Value = Value(**{})
+    orbital_period: Value = Value(**{})
+    semi_major_axis: Value = Value(**{})
     number_observation: Optional[int] = np.nan
-    perihelion_argument: Parameter = Parameter(**{})
+    perihelion_argument: Value = Value(**{})
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
     )(ensure_list)
 
-    def __str__(self):
-        return self.json()
 
-
-class ProperElements(pydantic.BaseModel):
+class ProperElements(Property):
     bibref: List[Bibref] = [Bibref(**{})]
-    proper_g: Parameter = Parameter(**{})
-    proper_s: Parameter = Parameter(**{})
-    proper_eccentricity: Parameter = Parameter(**{})
-    proper_inclination: Parameter = Parameter(**{})
-    proper_semi_major_axis: Parameter = Parameter(**{})
-    proper_sine_inclination: Parameter = Parameter(**{})
+    proper_g: Value = Value(**{})
+    proper_s: Value = Value(**{})
+    proper_eccentricity: Value = Value(**{})
+    proper_inclination: Value = Value(**{})
+    proper_semi_major_axis: Value = Value(**{})
+    proper_sine_inclination: Value = Value(**{})
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
@@ -140,7 +123,7 @@ class ProperElements(pydantic.BaseModel):
         return self.json()
 
 
-class Family(pydantic.BaseModel):
+class Family(Property):
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
     family_number: Optional[int] = np.nan
@@ -154,7 +137,7 @@ class Family(pydantic.BaseModel):
         return self.json()
 
 
-class PairMembers(pydantic.BaseModel):
+class PairMembers(Property):
     sibling_name: Optional[str] = ""
     pair_delta_v: Optional[float] = np.nan
     pair_delta_a: Optional[float] = np.nan
@@ -163,7 +146,7 @@ class PairMembers(pydantic.BaseModel):
     sibling_number: Optional[int] = np.nan
 
 
-class Pair(pydantic.BaseModel):
+class Pair(Property):
     members: List[PairMembers] = [PairMembers(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
@@ -175,11 +158,11 @@ class Pair(pydantic.BaseModel):
         return self.json()
 
 
-class Yarkovsky(pydantic.BaseModel):
+class Yarkovsky(Property):
     S: Optional[float] = np.nan
-    A2: Parameter = Parameter(**{})
+    A2: Value = Value(**{})
     snr: Optional[float] = np.nan
-    dadt: Parameter = Parameter(**{})
+    dadt: Value = Value(**{})
     bibref: List[Bibref] = [Bibref(**{})]
 
     _ensure_list: classmethod = pydantic.validator(
@@ -192,7 +175,7 @@ class Yarkovsky(pydantic.BaseModel):
         return "\n".join([print_A2, print_dadt])
 
 
-class DynamicalParameters(pydantic.BaseModel):
+class DynamicalParameters(Property):
     pair: Pair = Pair(**{})
     family: Family = Family(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
@@ -204,9 +187,8 @@ class DynamicalParameters(pydantic.BaseModel):
 
 
 # ------
-# Physical Parameter
-class Albedo(pydantic.BaseModel):
-    albedo: Parameter = Parameter(**{})
+# Physical Value
+class Albedo(Value):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
@@ -214,12 +196,9 @@ class Albedo(pydantic.BaseModel):
         "bibref", "method", allow_reuse=True, pre=True
     )(ensure_list)
 
-    def __str__(self):
-        return print_parameter(self.albedo, path_unit=None)
 
-
-class Color(pydantic.BaseModel):
-    color: Parameter = Parameter(**{})
+class Color(Value):
+    color: Value = Value(**{})
     epoch: Optional[float] = np.nan
     from_: Optional[str] = pydantic.Field("", alias="from")
     bibref: Bibref = Bibref(**{})
@@ -230,7 +209,7 @@ class Color(pydantic.BaseModel):
     id_filter_2: Optional[str] = ""
 
 
-class Colors(pydantic.BaseModel):
+class Colors(Property):
     # Atlas
     c_o: List[Color] = [pydantic.Field(Color(**{}), alias="c-o")]
     # 2MASS / VISTA
@@ -243,37 +222,33 @@ class Colors(pydantic.BaseModel):
     )
 
 
-class Diameter(pydantic.BaseModel):
-    diameter: Parameter = Parameter(**{})
+class Diameter(Value):
     method: List[Method] = []
     bibref: List[Bibref] = []
 
+    path_unit: str = "unit.physical.diameter.diameter.value"
+
     _ensure_list: classmethod = pydantic.validator(
         "bibref", "method", allow_reuse=True, pre=True
     )(ensure_list)
 
-    def __str__(self):
-        return print_parameter(self.diameter, "unit.physical.diameter.diameter.value")
 
-
-class Mass(pydantic.BaseModel):
-    mass: Parameter = Parameter(**{})
+class Mass(Value):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
+    path_unit: str = "unit.physical.mass.mass.value"
+
     _ensure_list: classmethod = pydantic.validator(
         "bibref", "method", allow_reuse=True, pre=True
     )(ensure_list)
 
-    def __str__(self):
-        return print_parameter(self.mass, "unit.physical.mass.mass.value")
 
-
-class Phase(pydantic.BaseModel):
-    H: Parameter = Parameter(**{})
+class Phase(Property):
+    H: Value = Value(**{})
     N: Optional[float] = np.nan
-    G1: Parameter = Parameter(**{})
-    G2: Parameter = Parameter(**{})
+    G1: Value = Value(**{})
+    G2: Value = Value(**{})
     rms: Optional[float] = np.nan
     phase: Error = Error(**{})
     bibref: List[Bibref] = [Bibref(**{})]
@@ -288,7 +263,7 @@ class Phase(pydantic.BaseModel):
         return self.json()
 
 
-class PhaseFunction(pydantic.BaseModel):
+class PhaseFunction(Property):
     # Generic
     generic_johnson_v: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
     # ATLAS
@@ -296,14 +271,14 @@ class PhaseFunction(pydantic.BaseModel):
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
 
 
-class Spin(pydantic.BaseModel):
-    period: Parameter = Parameter(**{})
+class Spin(Property):
+    period: Value = Value(**{})
     t0: Optional[float] = np.nan
     Wp: Optional[float] = np.nan
-    lat: Parameter = Parameter(**{})
+    lat: Value = Value(**{})
     RA0: Optional[float] = np.nan
     DEC0: Optional[float] = np.nan
-    long_: Parameter(**{}) = pydantic.Field(Parameter(**{}), alias="long")
+    long_: Value(**{}) = pydantic.Field(Value(**{}), alias="long")
     method: Optional[List[Method]] = [Method(**{})]
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
 
@@ -315,7 +290,7 @@ class Spin(pydantic.BaseModel):
     )(ensure_list)
 
 
-class Taxonomy(pydantic.BaseModel):
+class Taxonomy(Property):
     class_: Optional[str] = pydantic.Field("", alias="class")
     scheme: Optional[str] = ""
     bibref: List[Bibref] = [Bibref(**{})]
@@ -332,8 +307,8 @@ class Taxonomy(pydantic.BaseModel):
         return self.class_
 
 
-class ThermalProperties(pydantic.BaseModel):
-    TI: Parameter = Parameter(**{})
+class ThermalInertia(Property):
+    TI: Value = Value(**{})
     dsun: Optional[float] = np.nan
     bibref: List[Bibref] = []
     method: List[Method] = []
@@ -343,7 +318,7 @@ class ThermalProperties(pydantic.BaseModel):
     )(ensure_list)
 
 
-class PhysicalParameters(pydantic.BaseModel):
+class PhysicalParameters(Property):
     mass: Mass = Mass(**{})
     spin: List[Spin] = [Spin(**{})]
     colors: Colors = Colors(**{})
@@ -351,7 +326,7 @@ class PhysicalParameters(pydantic.BaseModel):
     diameter: Diameter = Diameter(**{})
     taxonomy: Taxonomy = Taxonomy(**{})
     phase_function: PhaseFunction = PhaseFunction(**{})
-    thermal_properties: ThermalProperties = ThermalProperties(**{})
+    thermal_inertia: ThermalInertia = ThermalInertia(**{})
 
     def __str__(self):
         return self.json()
@@ -363,7 +338,7 @@ class PhysicalParameters(pydantic.BaseModel):
 
 # ------
 # Equation of state
-class EqStateVector(pydantic.BaseModel):
+class EqStateVector(Property):
     ref_epoch: Optional[float] = np.nan
     position: List[float] = [np.nan, np.nan, np.nan]
     velocity: List[float] = [np.nan, np.nan, np.nan]
@@ -371,7 +346,7 @@ class EqStateVector(pydantic.BaseModel):
 
 # ------
 # Highest level branches
-class Parameters(pydantic.BaseModel):
+class Parameters(Property):
     physical: PhysicalParameters = PhysicalParameters(**{})
     dynamical: DynamicalParameters = DynamicalParameters(**{})
     eq_state_vector: EqStateVector = EqStateVector(**{})
@@ -383,21 +358,39 @@ class Parameters(pydantic.BaseModel):
         arbitrary_types_allowed = True
 
 
-class Link(pydantic.BaseModel):
+class Link(Property):
     unit: Optional[str] = ""
     self_: Optional[str] = pydantic.Field("", alias="self")
     quaero: Optional[str] = ""
     description: Optional[str] = ""
 
 
-class Ssocard(pydantic.BaseModel):
+class Ssocard(Property):
     version: Optional[str] = ""
     datetime: Optional[dt.datetime] = None
+
+
+class Datacloud(Property):
+    """The collection of links to datacloud catalogue associated to this ssoCard."""
+
+    aams: Optional[str] = ""
+    astdys: Optional[str] = ""
+    astorb: Optional[str] = ""
+    binarymp_tab: Optional[str] = ""
+    binarymp_ref: Optional[str] = ""
+    diamalbedo: Optional[str] = ""
+    families: Optional[str] = ""
+    masses: Optional[str] = ""
+    mpcatobs: Optional[str] = ""
+    mpcorb: Optional[str] = ""
+    pairs: Optional[str] = ""
+    taxonomy: Optional[str] = ""
 
 
 class Rock(pydantic.BaseModel):
     """Instantiate a specific asteroid with data from its ssoCard."""
 
+    # the basics
     id_: Optional[str] = pydantic.Field("", alias="id")
     name: Optional[str] = ""
     type_: Optional[str] = pydantic.Field("", alias="type")
@@ -406,10 +399,24 @@ class Rock(pydantic.BaseModel):
     parent: Optional[str] = ""
     system: Optional[str] = ""
 
+    # the heart
+    parameters: Parameters = Parameters(**{})
+
+    # the meta
     link: Link = Link(**{})
     ssocard: Ssocard = Ssocard(**{})
-    datacloud: rocks.datacloud.Datacloud = rocks.datacloud.Datacloud(**{})
-    parameters: Parameters = Parameters(**{})
+    datacloud: Datacloud = Datacloud(**{})
+
+    # the catalogues
+    taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
+    aams: rocks.datacloud.AAMS = rocks.datacloud.AAMS(**{})
+    astdys: rocks.datacloud.AstDyS = rocks.datacloud.AstDyS(**{})
+    astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
+    diamalbedo: rocks.datacloud.Diamalbedo = rocks.datacloud.Diamalbedo(**{})
+    masses: rocks.datacloud.Masses = rocks.datacloud.Masses(**{})
+    mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
+    pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
+    taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
 
     def __init__(self, id_, ssocard={}, datacloud=[], skip_id_check=False):
         """Identify a minor body  and retrieve its properties from SsODNet.
@@ -470,6 +477,10 @@ class Rock(pydantic.BaseModel):
             # Something failed. Instantiate minimal ssoCard for meaningful error output.
             ssocard = {"name": id_provided}
 
+        if ssocard is None:
+            # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
+            ssocard = {"name": id_provided}
+
         # Deserialize the asteroid data
         try:
             super().__init__(**ssocard)  # type: ignore
@@ -481,11 +492,28 @@ class Rock(pydantic.BaseModel):
         """Implement attribute shortcuts: omission of parameters.physical/dynamical.
         Gets called if getattribute fails."""
 
+        # These are shortcuts
         if name in self.__aliases["physical"].values():
             return getattr(self.parameters.physical, name)
 
         if name in self.__aliases["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
+
+        # These are proper aliases
+        if name in self.__aliases["orbital_elements"].keys():
+            return getattr(
+                self.parameters.dynamical.orbital_elements,
+                self.__aliases["orbital_elements"][name],
+            )
+
+        if name in self.__aliases["proper_elements"].keys():
+            return getattr(
+                self.parameters.dynamical.proper_elements,
+                self.__aliases["proper_elements"][name],
+            )
+
+        if name in self.__aliases["diamalbedo"]:
+            return getattr(self, "diamalbedo")
 
         raise AttributeError(f"'Rock' object has no attribute '{name}'")
 
@@ -504,16 +532,18 @@ class Rock(pydantic.BaseModel):
     def __add_datacloud_catalogue(self, id_, catalogue, data):
         """Retrieve datacloud catalogue for asteroid and deserialize."""
 
-        if catalogue not in rocks.properties.PROP_TO_DATACLOUD.keys():
+        if catalogue not in rocks.datacloud.CATALOGUES.keys():
             raise ValueError(
                 f"Unknown datacloud catalogue name: '{catalogue}'"
-                f"\nChoose from {rocks.properties.PROP_TO_DATACLOUD.keys()}"
+                f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
             )
 
-        catalogue = rocks.properties.PROP_TO_DATACLOUD[catalogue]
+        # get the SsODNet catalogue and the Rock's attribute names
+        catalogue_attribute = rocks.datacloud.CATALOGUES[catalogue]["attr_name"]
+        catalogue_ssodnet = rocks.datacloud.CATALOGUES[catalogue]["ssodnet_name"]
 
-        catalogue_attribute = rocks.properties.DATACLOUD_META[catalogue]["attr_name"]
-        cat = rocks.ssodnet.get_datacloud_catalogue(id_, catalogue)
+        # retrieve the catalogue
+        cat = rocks.ssodnet.get_datacloud_catalogue(id_, catalogue_ssodnet)
 
         if cat is None:
             return data
@@ -524,18 +554,18 @@ class Rock(pydantic.BaseModel):
             if catalogue not in ["aams", "astdys", "astorb", "pairs", "families"]
             else cat[0][key]
             for key in cat[0].keys()
-        }  # type: ignore
+        }
 
-        if catalogue in ["taxonomy", "masses"]:
+        # add 'preferred' attribute where applicable
+        if catalogue in ["taxonomies", "masses"]:
             cat["preferred"] = [False] * len(list(cat.values())[0])
         elif catalogue in ["diamalbedo"]:
             cat["preferred_albedo"] = [False] * len(list(cat.values())[0])
             cat["preferred_diameter"] = [False] * len(list(cat.values())[0])
 
-            data["diameters"] = cat
-            data["albedos"] = cat
-
+        # add catalogue to Rock
         data[catalogue_attribute] = cat
+
         return data
 
     def __parse_error_message(self, message, id_, data):
@@ -571,6 +601,17 @@ class Rock(pydantic.BaseModel):
             "parameters.physical.taxonomy": "taxonomy",
             "parameters.physical.phase": "phase",
         },
+        "orbital_elements": {
+            "a": "semi_major_axis",
+            "e": "eccentricity",
+            "i": "inclination",
+        },
+        "proper_elements": {
+            "ap": "proper_semi_major_axis",
+            "ep": "proper_eccentricity",
+            "ip": "proper_inclination",
+        },
+        "diamalbedo": ["albedos", "diameters"],
     }
 
 

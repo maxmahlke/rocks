@@ -157,8 +157,8 @@ def echo():
     if keyword.iskeyword(prop):
         prop = f"{prop}_"
 
-    if prop in rocks.properties.PROP_TO_DATACLOUD:
-        datacloud = [rocks.properties.PROP_TO_DATACLOUD[prop]]
+    if prop in rocks.datacloud.CATALOGUES.keys():
+        datacloud = prop
     else:
         datacloud = []
 

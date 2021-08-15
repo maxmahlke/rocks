@@ -57,17 +57,6 @@ def get_ssocard(id_ssodnet, progress=False):
     if progress:
         progress = tqdm(desc="Getting ssoCards : ", total=len(id_ssodnet))
 
-    # TODO
-    # Temporary patch to only load the template card
-    # ---
-    PATH_DATA = os.path.join(
-        os.path.expanduser("~"), "astro/rocks/", f"data/ssoCard_sample.json"
-    )
-
-    with open(PATH_DATA, "r") as file_:
-        data = json.load(file_)
-    return data
-
     # ---
     # Run async loop to get ssoCard
     loop = asyncio.get_event_loop()
@@ -206,12 +195,6 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False):
         raise TypeError(
             f"Received catalogue of type {type(catalogue)}, expected one of: "
             f"str, list, np.ndarray"
-        )
-
-    if any([c not in rocks.properties.DATACLOUD_CATALOGUES for c in catalogue]):
-        raise ValueError(
-            f"Received invalid catalogue name: {catalogue}.\n"
-            f"Choose from {rocks.properties.DATACLOUD_CATALOGUES}."
         )
 
     # Flatten input for easier calling

@@ -52,7 +52,7 @@ def identify(id_, return_id=False, progress=False):
         id_ = list(id_)
     elif id_ is None:
         warnings.warn(f"Received id_ of type {type(id_)}.")
-        return [(None, np.nan, None)]
+        return (None, np.nan)
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected one of: "

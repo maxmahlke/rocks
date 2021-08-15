@@ -1,13 +1,48 @@
+#!/usr/bin/env python
+"""Implement the Datacloud catalogue pydantic models."""
 from typing import List, Optional
 
 import numpy as np
 import pydantic
+import rich
+
+import rocks
+
+# ------
+# Validators
+def ensure_list(value):
+    """Ensure that parameters are always a list.
+
+    Further replaces all None values by empty dictionaries.
+    """
+    if isinstance(value, (dict, int, float, str)):
+        value = [value]
+
+    return value
 
 
-class Pairs(pydantic.BaseModel):
-    id_: Optional[int] = pydantic.Field(None, alias="id")
-    number: Optional[int] = pydantic.Field(None, alias="num")
-    name: Optional[str] = ""
+def ensure_int(value):
+    return [int(v) for v in value]
+
+
+# ------
+# SsODNet catalogues as pydantic model
+class Catalogue(pydantic.BaseModel):
+    """The abstraction of a general datacloud catalogue on SsODNet."""
+
+    id_: List[int] = pydantic.Field([np.nan], alias="id")
+    number: List[int] = pydantic.Field([np.nan], alias="num")
+    name: List[str] = [""]
+
+    _ensure_int: classmethod = pydantic.validator(
+        "id_", "number", allow_reuse=True, pre=True
+    )(ensure_int)
+    _ensure_list: classmethod = pydantic.validator("name", allow_reuse=True, pre=True)(
+        ensure_list
+    )
+
+
+class Pairs(Catalogue):
     sibling_num: Optional[float] = np.nan
     sibling_name: Optional[str] = ""
     delta_v: Optional[float] = np.nan
@@ -25,11 +60,7 @@ class Pairs(pydantic.BaseModel):
     link: Optional[str] = ""
 
 
-class AAMS(pydantic.BaseModel):
-    id_: Optional[int] = pydantic.Field(None, alias="id")
-    number: Optional[int] = pydantic.Field(None, alias="num")
-    name: Optional[str] = ""
-
+class AAMS(Catalogue):
     HG_H: Optional[float] = np.nan
     HG_G: Optional[float] = np.nan
     HG_r_err_H: Optional[float] = np.nan
@@ -73,10 +104,7 @@ class AAMS(pydantic.BaseModel):
     link: Optional[str] = ""
 
 
-class Astorb(pydantic.BaseModel):
-    id_: Optional[int] = pydantic.Field(None, alias="id")
-    number: Optional[int] = pydantic.Field(None, alias="num")
-    name: Optional[str] = ""
+class Astorb(Catalogue):
     OrbComputer: Optional[str] = ""
     H: Optional[float] = np.nan
     G: Optional[float] = np.nan
@@ -138,10 +166,7 @@ class Astorb(pydantic.BaseModel):
     link: Optional[str] = ""
 
 
-class AstDyS(pydantic.BaseModel):
-    id_: Optional[int] = pydantic.Field(None, alias="id")
-    number: Optional[int] = pydantic.Field(None, alias="num")
-    name: Optional[str] = ""
+class AstDyS(Catalogue):
     H: Optional[float] = np.nan
     ProperSemimajorAxis: Optional[float] = np.nan
     err_ProperSemimajorAxis: Optional[float] = np.nan
@@ -169,7 +194,7 @@ class AstDyS(pydantic.BaseModel):
     link: Optional[str] = ""
 
 
-class Taxonomies(pydantic.BaseModel):
+class Taxonomies(Catalogue):
     link: List[str] = [""]
     datasetname: List[str] = [""]
     resourcename: List[str] = [""]
@@ -182,21 +207,18 @@ class Taxonomies(pydantic.BaseModel):
     waverange: List[str] = [""]
     method: List[str] = [""]
     scheme: List[str] = [""]
-    name: List[str] = [""]
     complex_: List[str] = pydantic.Field([""], alias="complex")
     class_: List[str] = pydantic.Field([""], alias="class")
 
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
     idcollection: List[Optional[int]] = [None]
     iddataset: List[Optional[int]] = [None]
     year: List[Optional[int]] = [None]
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
 
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
     def select_preferred_taxonomy(cls, v, values):
-        return rocks.properties.rank_properties("taxonomy", values)
+        return rank_properties("taxonomy", values)
 
     def __len__(self):
         return len(self.class_)
@@ -227,7 +249,7 @@ class Taxonomies(pydantic.BaseModel):
         return ""
 
 
-class Masses(pydantic.BaseModel):
+class Masses(Catalogue):
     link: List[str] = [""]
     datasetname: List[str] = [""]
     resourcename: List[str] = [""]
@@ -238,13 +260,10 @@ class Masses(pydantic.BaseModel):
     source: List[str] = [""]
     shortbib: List[str] = [""]
     method: List[str] = [""]
-    name: List[str] = [""]
 
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
     idcollection: List[Optional[int]] = [None]
     iddataset: List[Optional[int]] = [None]
     year: List[Optional[int]] = [None]
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
     mass: List[float] = [np.nan]
     err_mass: List[float] = [np.nan]
 
@@ -252,10 +271,38 @@ class Masses(pydantic.BaseModel):
 
     @pydantic.validator("preferred", pre=True)
     def select_preferred_mass(cls, v, values):
-        return rocks.properties.rank_properties("mass", values)
+        return rank_properties("mass", values)
+
+    def __len__(self):
+        return len(self.mass)
+
+    def __str__(self):
+
+        if len(self) == 1 and not self.mass[0]:
+            return "No masses on record."
+
+        table = rich.table.Table(
+            header_style="bold blue",
+            box=rich.box.SQUARE,
+            footer_style="dim",
+        )
+
+        columns = ["mass", "err_mass", "method", "shortbib"]
+
+        for c in columns:
+            table.add_column(c)
+
+        # Values are entries for each field
+        for i, preferred in enumerate(self.preferred):
+            table.add_row(
+                *[str(getattr(self, c)[i]) for c in columns],
+                style="bold green" if preferred else "white",
+            )
+        rich.print(table)
+        return ""
 
 
-class Mpcatobs(pydantic.BaseModel):
+class Mpcatobs(Catalogue):
     link: List[str] = [""]
     datasetname: List[str] = [""]
     resourcename: List[str] = [""]
@@ -281,13 +328,10 @@ class Mpcatobs(pydantic.BaseModel):
     iau_code: List[str] = [""]
     date_obs: List[str] = [""]
     filter_: List[str] = pydantic.Field([""], alias="type")
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
     type_: List[str] = pydantic.Field([""], alias="type")
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
-    name: List[str] = [""]
 
 
-class Albedos(pydantic.BaseModel):
+class Diamalbedo(Catalogue):
 
     link: List[str] = [""]
     datasetname: List[str] = [""]
@@ -296,7 +340,6 @@ class Albedos(pydantic.BaseModel):
     bibcode: List[str] = [""]
     url: List[str] = [""]
     title: List[str] = [""]
-    name: List[str] = [""]
     iddataset: List[Optional[int]] = [None]
     method: List[str] = [""]
     shortbib: List[str] = [""]
@@ -304,8 +347,6 @@ class Albedos(pydantic.BaseModel):
     source: List[str] = [""]
 
     idcollection: List[Optional[int]] = [None]
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
     albedo: List[float] = [np.nan]
     err_albedo: List[float] = [np.nan]
     diameter: List[float] = [np.nan]
@@ -320,80 +361,11 @@ class Albedos(pydantic.BaseModel):
 
     @pydantic.validator("preferred_albedo", pre=True)
     def select_preferred_albedo(cls, v, values):
-        return rocks.properties.rank_properties("albedo", values)
+        return rank_properties("albedo", values)
 
     @pydantic.validator("preferred_diameter", pre=True)
     def select_preferred_diameter(cls, v, values):
-        return rocks.properties.rank_properties("diameter", values)
-
-    def __len__(self):
-        return len(self.albedo)
-
-    def __str__(self):
-
-        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
-            return "No albedos on record."
-
-        table = rich.table.Table(
-            header_style="bold blue",
-            box=rich.box.SQUARE,
-            footer_style="dim",
-        )
-
-        columns = ["albedo", "err_albedo", "method", "shortbib"]
-
-        for c in columns:
-            table.add_column(c)
-
-        # Values are entries for each field
-        for i, preferred in enumerate(self.preferred_albedo):
-
-            table.add_row(
-                *[str(getattr(self, c)[i]) for c in columns],
-                style="bold green" if preferred else "white",
-            )
-        rich.print(table)
-        return ""
-
-
-class Diameters(pydantic.BaseModel):
-
-    link: List[str] = [""]
-    datasetname: List[str] = [""]
-    resourcename: List[str] = [""]
-    doi: List[str] = [""]
-    bibcode: List[str] = [""]
-    url: List[str] = [""]
-    title: List[str] = [""]
-    name: List[str] = [""]
-    iddataset: List[Optional[int]] = [None]
-    method: List[str] = [""]
-    shortbib: List[str] = [""]
-    year: List[Optional[int]] = [None]
-    source: List[str] = [""]
-
-    idcollection: List[Optional[int]] = [None]
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
-    albedo: List[float] = [np.nan]
-    err_albedo: List[float] = [np.nan]
-    diameter: List[float] = [np.nan]
-    err_diameter: List[float] = [np.nan]
-    beaming: List[float] = [np.nan]
-    err_beaming: List[float] = [np.nan]
-    emissivity: List[float] = [np.nan]
-    err_emissivity: List[float] = [np.nan]
-
-    preferred_albedo: List[bool] = [False]
-    preferred_diameter: List[bool] = [False]
-
-    @pydantic.validator("preferred_albedo", pre=True)
-    def select_preferred_albedo(cls, v, values):
-        return rocks.properties.rank_properties("albedo", values)
-
-    @pydantic.validator("preferred_diameter", pre=True)
-    def select_preferred_diameter(cls, v, values):
-        return rocks.properties.rank_properties("diameter", values)
+        return rank_properties("diameter", values)
 
     def __len__(self):
         return len(self.albedo)
@@ -409,80 +381,11 @@ class Diameters(pydantic.BaseModel):
             footer_style="dim",
         )
 
-        columns = ["diameter", "err_diameter", "method", "shortbib"]
-
-        for c in columns:
-            table.add_column(c)
-
-        # Values are entries for each field
-        for i, preferred in enumerate(self.preferred_diameter):
-
-            table.add_row(
-                *[str(getattr(self, c)[i]) for c in columns],
-                style="bold green" if preferred else "white",
-            )
-        rich.print(table)
-        return ""
-
-
-class Diamalbedo(pydantic.BaseModel):
-
-    link: List[str] = [""]
-    datasetname: List[str] = [""]
-    resourcename: List[str] = [""]
-    doi: List[str] = [""]
-    bibcode: List[str] = [""]
-    url: List[str] = [""]
-    title: List[str] = [""]
-    name: List[str] = [""]
-    iddataset: List[Optional[int]] = [None]
-    method: List[str] = [""]
-    shortbib: List[str] = [""]
-    year: List[Optional[int]] = [None]
-    source: List[str] = [""]
-
-    idcollection: List[Optional[int]] = [None]
-    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
-    number: List[Optional[int]] = pydantic.Field([None], alias="num")
-    albedo: List[float] = [np.nan]
-    err_albedo: List[float] = [np.nan]
-    diameter: List[float] = [np.nan]
-    err_diameter: List[float] = [np.nan]
-    beaming: List[float] = [np.nan]
-    err_beaming: List[float] = [np.nan]
-    emissivity: List[float] = [np.nan]
-    err_emissivity: List[float] = [np.nan]
-
-    preferred_albedo: List[bool] = [False]
-    preferred_diameter: List[bool] = [False]
-
-    @pydantic.validator("preferred_albedo", pre=True)
-    def select_preferred_albedo(cls, v, values):
-        return rocks.properties.rank_properties("albedo", values)
-
-    @pydantic.validator("preferred_diameter", pre=True)
-    def select_preferred_diameter(cls, v, values):
-        return rocks.properties.rank_properties("diameter", values)
-
-    def __len__(self):
-        return len(self.albedo)
-
-    def __str__(self):
-
-        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
-            return "No diameters or albedos on record."
-
-        table = rich.table.Table(
-            header_style="bold blue",
-            box=rich.box.SQUARE,
-            footer_style="dim",
-        )
-
         columns = [
-            "diameter",
-            "err_diameter",
             "albedo",
             "err_albedo",
+            "diameter",
+            "err_diameter",
             "method",
             "shortbib",
         ]
@@ -490,43 +393,406 @@ class Diamalbedo(pydantic.BaseModel):
         for c in columns:
             table.add_column(c)
 
-        # Make a joint preferred list for albedo and diameter
-        preferred = list(map(any, zip(self.preferred_diameter, self.preferred_albedo)))
-
         # Values are entries for each field
-        for i, preferred in enumerate(preferred):
+        for i, preferred in enumerate(self.preferred_diameter):
 
+            # blue for preferred diameter, yellow for preferred albedo, green for both,
+            # else white
+            if preferred:
+                style = "bold green" if self.preferred_albedo[i] else "bold blue"
+            elif self.preferred_albedo[i]:
+                style = "bold yellow"
+            else:
+                style = "white"
             table.add_row(
                 *[str(getattr(self, c)[i]) for c in columns],
-                style="bold green" if preferred else "white",
+                style=style,
             )
         rich.print(table)
         return ""
 
 
-class Datacloud(pydantic.BaseModel):
-    aams: Optional[str] = ""
-    astdys: Optional[str] = ""
-    astorb: Optional[str] = ""
-    binarymp_tab: Optional[str] = ""
-    binarymp_ref: Optional[str] = ""
-    diamalbedo: Optional[str] = ""
-    families: Optional[str] = ""
-    masses: Optional[str] = ""
-    mpcatobs: Optional[str] = ""
-    mpcorb: Optional[str] = ""
-    pairs: Optional[str] = ""
-    taxonomy: Optional[str] = ""
-    # aams: AAMS = AAMS(**{})
-    # astdys: AstDyS = AstDyS(**{})
-    # astorb: Astorb = Astorb(**{})
-    # diamalbedo: Diamalbedo = Diamalbedo(**{})
-    # diameters: Diameters = Diameters(**{})
-    # albedos: Albedos = Albedos(**{})
-    # masses: Masses = Masses(**{})
-    # mpcatobs: Mpcatobs = Mpcatobs(**{})
-    # pairs: Pairs = Pairs(**{})
-    # taxonomies: Taxonomies = Taxonomies(**{})
+# ------
+# Definitions
+CATALOGUES = {
+    # the catalogues as defined by rocks
+    # rocks name :
+    #     attr_name : Rock.xyz
+    #     ssodnet_name : Name of catalogue in SsODNet
+    "aams": {
+        "attr_name": "aams",
+        "ssodnet_name": "aams",
+    },
+    "albedos": {
+        "attr_name": "diamalbedo",
+        # "prop_name": {"diameters": "diameter", "albedos": "albedo"},
+        "ssodnet_name": "diamalbedo",
+    },
+    "astdys": {
+        "attr_name": "astdys",
+        "ssodnet_name": "astdys",
+    },
+    "astorb": {
+        "attr_name": "astorb",
+        "ssodnet_name": "astorn",
+    },
+    "binarymp_tab": {
+        "attr_name": "binaries",
+        "ssodnet_name": "binarymp_tab",
+    },
+    "diamalbedo": {
+        "attr_name": "diamalbedo",
+        # "prop_name": {"diameters": "diameter", "albedos": "albedo"},
+        "ssodnet_name": "diamalbedo",
+    },
+    "diameters": {
+        "attr_name": "diamalbedo",
+        # "prop_name": {"diameters": "diameter", "albedos": "albedo"},
+        "ssodnet_name": "diamalbedo",
+    },
+    "families": {
+        "attr_name": "families",
+        "ssodnet_name": "families",
+    },
+    "masses": {
+        "attr_name": "masses",
+        # "prop_name": {"masses": "mass"},
+        "ssodnet_name": "masses",
+    },
+    "mpcatobs": {
+        "attr_name": "mpcatobs",
+        "ssodnet_name": "mpcatons",
+    },
+    "pairs": {
+        "attr_name": "pairs",
+        "ssodnet_name": "pairs",
+    },
+    "taxonomies": {
+        "attr_name": "taxonomies",
+        "ssodnet_name": "taxonomy",
+    },
+}
 
-    def __str__(self):
-        return self.json()
+
+def rank_properties(prop_name, obs):
+    """Select ranking method based on property name.
+
+    Parameters
+    ==========
+    prop_name : str
+        The property to rank.
+    obs : dict
+        The observations including metadata
+
+
+    Returns
+    =======
+    list of bool
+        Entry "preferred" in propertyCollection, True if preferred, else False
+    """
+    if prop_name in ["taxonomy", "taxonomies"]:
+        return select_taxonomy(obs)
+    elif prop_name in ["mass", "masses"]:
+        return select_numeric_property(obs, "mass")
+    elif prop_name in ["albedo", "albedos"]:
+        return select_numeric_property(obs, "albedo")
+    elif prop_name in ["diameter", "diameters"]:
+        return select_numeric_property(obs, "diameter")
+    else:
+        return [True for i in obs]
+
+
+def select_taxonomy(taxonomies):
+    """Select a single taxonomic classification from multiple choices.
+
+    Evaluates the wavelength ranges, methods, schemes, and recency of
+    classification.
+
+    Parameters
+    ----------
+    taxonomies: dict
+        Taxonomic classifications retrieved from SsODNet:datacloud.
+
+    Returns
+    -------
+    list of bool
+        True if preferred, else False
+    """
+    POINTS = {
+        "scheme": {"bus-demeo": 3, "bus": 2, "smass": 2, "tholen": 1, "sdss": 1},
+        "waverange": {"vis": 1, "nir": 3, "visnir": 6, "mix": 4},
+        "method": {"spec": 7, "phot": 3, "mix": 4},
+    }
+
+    taxonomies = [dict(zip(taxonomies, t)) for t in zip(*taxonomies.values())]
+
+    # Compute points of each classification
+    points = []
+
+    for row in taxonomies:
+        points.append(
+            sum(
+                [
+                    POINTS[crit][row[crit].lower()]
+                    for crit in ["scheme", "waverange", "method"]
+                ]
+            )
+        )
+
+    # Convert points to boolean
+    preferred = [True if p == max(points) else False for p in points]
+    return preferred
+
+
+def select_numeric_property(obs, prop_name):
+    """Select preferred observations ranking methods.
+
+    Parameters
+    ==========
+    obs : dict
+        Property measurements and metadata retrieved from SsODNet:datacloud.
+    prop_name : str
+        Name of the asteroid property.
+
+    Returns
+    =======
+    list of bool
+        True if selected, else False.
+
+    Notes
+    =====
+    The method ranking depends on the observable.
+    """
+    RANKING = PROPERTIES[prop_name]["ranking"]
+    methods = set(obs["method"])
+
+    for method in RANKING:
+
+        if set(method) & methods:  # method used at least once
+
+            # Ensure that rows do not contain all 0 values, as can be the case
+            # for albedo in diamalbedo
+            if all(
+                [
+                    obs[prop_name][i] == 0
+                    for i, m in enumerate(obs["method"])
+                    if m in method
+                ]
+            ):
+                continue
+            return [True if m in method else False for m in obs["method"]]
+
+    return obs
+
+
+# In alphabetic order
+PROPERTIES = {
+    # TEMPLATE
+    # property_name: Rock instance attribute name
+    #   attribute: attribute key in datacloud
+    #   collection: Rock instance attribute name for collection of parameters
+    #               Use plural form
+    #   extra_columns: names of additional columns to output on CLI
+    #   ssodnet_path: json path to asteroid property
+    #                 (to be replaced by ssoCard
+    #   type: asteroid property type, float or str
+    "albedo": {
+        "ranking": [
+            ["SPACE"],
+            ["ADAM", "KOALA", "SAGE", "Radar"],
+            ["LC+TPM", "TPM", "LC+AO", "LC+Occ", "TE-IM", "TE-Occ"],
+            ["AO", "Occ", "IM"],
+            ["NEATM"],
+            ["STM"],
+        ],
+    },
+    "diameter": {
+        "ranking": [
+            ["SPACE"],
+            ["ADAM", "KOALA", "SAGE", "Radar"],
+            ["LC+TPM", "TPM", "LC+AO", "LC+Occ", "TE-IM", "TE-Occ"],
+            ["AO", "Occ", "IM"],
+            ["NEATM"],
+            ["STM"],
+        ],
+    },
+    "mass": {
+        "ranking": [
+            ["SPACE"],
+            ["Bin-Genoid"],
+            ["Bin-IM", "Bin-Radar", "Bin-PheMu"],
+            ["EPHEM", "DEFLECT"],
+        ],
+    },
+}
+
+
+# Classes to complexes mapping
+CLASS_TO_COMPLEX = {
+    "A": "A",
+    "Ad": "U",
+    "AQ": "U",
+    "AS": "U",
+    "AU": "U",
+    "AV": "U",
+    "B": "B",
+    "BC": "C",
+    "BCF": "C",
+    "BCU": "U",
+    "BFC": "C",
+    "BFU": "U",
+    "BFX": "U",
+    "Bk": "U",
+    "BU": "B",
+    "C": "C",
+    "Caa": "C",
+    "Cb": "C",
+    "CB": "C",
+    "CBU": "C",
+    "CD": "U",
+    "CDX": "U",
+    "CF": "C",
+    "CFB": "C",
+    "CFU": "U",
+    "CFXU": "U",
+    "Cg": "C",
+    "CG": "C",
+    "CGSU": "U",
+    "CGTP": "U",
+    "CGU": "U",
+    "Cgx": "C",
+    "CL": "U",
+    "CO": "U",
+    "CP": "U",
+    "CPF": "U",
+    "CPU": "U",
+    "CQ": "U",
+    "CS": "U",
+    "CSGU": "U",
+    "CSU": "U",
+    "CTGU": "U",
+    "CU": "U",
+    "CX": "U",
+    "CXF": "U",
+    "Cgh": "Ch",
+    "Ch": "Ch",
+    "D": "D",
+    "DCX": "U",
+    "DL": "D",
+    "DP": "D",
+    "DU": "D",
+    "Ds": "D",
+    "DS": "D",
+    "DSU": "D",
+    "DT": "D",
+    "DTU": "D",
+    "DU": "D",
+    "DX": "D",
+    "DXCU": "D",
+    "E": "E",
+    "EM": "X",
+    "EU": "U",
+    "F": "C",
+    "FBCU": "U",
+    "FC": "C",
+    "FCB": "C",
+    "FCU": "U",
+    "FCX": "U",
+    "FP": "U",
+    "FU": "U",
+    "FX": "U",
+    "FXU": "U",
+    "G": "C",
+    "GC": "C",
+    "GS": "U",
+    "G": "U",
+    "J": "V",
+    "K": "K",
+    "Kl": "U",
+    "L": "L",
+    "LA": "U",
+    "Ld": "L",
+    "LQ": "U",
+    "LS": "U",
+    "M": "M",
+    "MU": "U",
+    "O": "O",
+    "OV": "U",
+    "P": "P",
+    "PC": "U",
+    "PCD": "U",
+    "PD": "U",
+    "PDC": "U",
+    "PF": "U",
+    "PU": "U",
+    "Q": "Q",
+    "QO": "Q",
+    "QRS": "U",
+    "QSV": "U",
+    "QV": "U",
+    "Qw": "Q",
+    "R": "R",
+    "S": "S",
+    "SA": "S",
+    "Sa": "S",
+    "SC": "U",
+    "SCTU": "U",
+    "SD": "U",
+    "SDU": "U",
+    "SG": "U",
+    "Sk": "S",
+    "Sl": "S",
+    "SMU": "U",
+    "SO": "S",
+    "Sq": "S",
+    "SQ": "S",
+    "Sqw": "S",
+    "Sr": "S",
+    "SR": "S",
+    "Srw": "S",
+    "ST": "U",
+    "STD": "U",
+    "STGD": "U",
+    "STU": "U",
+    "SU": "U",
+    "SV": "S",
+    "Sv": "S",
+    "Svw": "S",
+    "Sw": "S",
+    "SX": "U",
+    "T": "T",
+    "TCG": "U",
+    "TD": "U",
+    "TDG": "U",
+    "TDS": "U",
+    "TS": "U",
+    "TSD": "U",
+    "TX": "U",
+    "V": "V",
+    "Vw": "V",
+    "X": "X",
+    "XB": "U",
+    "Xc": "X",
+    "XC": "U",
+    "XCU": "U",
+    "XD": "U",
+    "XDC": "U",
+    "Xe": "X",
+    "XF": "U",
+    "XFC": "U",
+    "XFCU": "U",
+    "XFU": "U",
+    "Xk": "X",
+    "XL": "U",
+    "Xn": "X",
+    "XS": "U",
+    "XSC": "U",
+    "XSCU": "U",
+    "XT": "U",
+    "Xt": "X",
+    "XU": "U",
+    "Z": "U",
+    np.nan: np.nan,
+    None: np.nan,
+    float("nan"): np.nan,
+}
