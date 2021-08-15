@@ -31,7 +31,7 @@ in the :ref:`Tutorials<Tutorials>`.
 
     >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
 
-The user can further provide their own ssoCard to populate the ``Rock`` attributes.
+The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
 The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
 original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
 and load it via the ``json`` module.
@@ -46,7 +46,7 @@ and load it via the ``json`` module.
     >> mars_crosser_2016fj = Rock("2016_FJ", ssocard=data["2016_FJ"])
 
 Access of ssoCard parameters
----------------------------------------------------------
+----------------------------
 
 During instantiation, the asteroid properties are retrieved from `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_ and assigned to the attributes following the structure of the ``ssoCard``.
 
@@ -94,7 +94,12 @@ Here is a list of ssoCard parameters and their corresponding names in the ``Rock
 Access of ``datacloud`` tables
 ------------------------------
 
-SsODNet:datacloud contains tables of albedo, mass, taxonomic class estimations and more for a large number of asteroids. By default, they are not loaded when creating a ``Rock`` instance, as each table requires an additional remote query. Tables can be requested using the ``datacloud`` argument, using the catalogues given in the left column of the table below. They are assigned to the attributes given in the right column.
+SsODNet:datacloud contains tables of albedos, masses, taxonomic classes and more
+for a large number of asteroids. By default, they are not loaded when creating a
+``Rock`` instance, as each table requires an additional remote query. Tables can
+be requested using the ``datacloud`` argument, using the catalogues given in the
+left column of the table below. They are assigned to the attributes given in the
+right column.
 
 +-----------------+----------------------------+
 | Datacloud Table | Attribute Name             |

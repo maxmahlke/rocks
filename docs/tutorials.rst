@@ -9,6 +9,23 @@ Tutorials
        import nest_asyncio
        nest_asyncio.apply()
 
+Identification - command line
+
+Which asteroid is this?
+What are the aliases (outdated designations) of this asteroid?
+
+Identification - scripted
+
+What are all these asteroids in the SDSS MOC4?
+
+Property exploration - command line
+
+What taxonomic classes have been assigned to Hygiea
+
+Property exploration - scripted
+
+What's the proper semi-major axis distribution of the Koronis family?
+
 
 Identify asteroids
 ------------------

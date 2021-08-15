@@ -9,6 +9,9 @@ A ``python`` package to query and explore asteroid data from
 under constant revision. The provided values and access methods may change
 without notice.**
 
+
+Latest version: 1.2.0  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
+
 via the Command Line
 --------------------
 
@@ -16,14 +19,14 @@ Quick exploration of asteroid parameters using the :ref:`rocks<Command-Line Inte
 
 .. code-block:: bash       
                            
-   $ rocks identify 221    
+   $ rocks identify 221    # you can also just use "id"
    (221) Eos               
 
-   $ rocks class_ Eos
+   $ rocks class Eos
    MB>Outer
 
-   $ rocks ceu Eos                   
-   0.027 +- 0.001 arcsec
+   $ rocks albedo Eos
+   0.136 +- 0.004
 
    $ rocks taxonomy.class_ Eos
    K
@@ -39,7 +42,6 @@ Quick exploration of asteroid parameters using the :ref:`rocks<Command-Line Inte
    | Bus-DeMeo | K       | Spec   | VISNIR    | Clark+2009       | 2009 | K      |
    | Bus-DeMeo | K       | Spec   | VISNIR    | DeMeo+2009       | 2009 | K      |
    +-----------+---------+--------+-----------+------------------+------+--------+
-                                       (221) Eos
 
    $ rocks masses Eos
     +----------+----------+---------+-------------+------+
@@ -47,7 +49,6 @@ Quick exploration of asteroid parameters using the :ref:`rocks<Command-Line Inte
     +----------+----------+---------+-------------+------+
     | 2.39e+18 | 5.97e+17 | DEFLECT | Goffin+2014 | 2014 |
     +----------+----------+---------+-------------+------+
-                          (221) Eos
 
 
 
