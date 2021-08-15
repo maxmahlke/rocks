@@ -1,5 +1,7 @@
-# 1.1.3 -
+# 1.2.0 - 2021-08-15
+- Updated the pydantic model to reflect the new ssoCard structure
 - The 'datacloud' argument of the Rock class now accepts the property name aliases of the catalogue names, eg: "albedos", "diameters" instead of "diamalbedo"
+- Added new shortcuts: a,e,i/ap,ep,ip for the orbital/proper elements: "$ rocks ap Ceres"
 - Querying asteroid properties from the command line which coincide with python keywords no longer results in an error (e.g. "rocks class Hebe")
 - Added --version command
 
