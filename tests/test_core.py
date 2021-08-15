@@ -26,9 +26,6 @@ TEST_CASES = [
     (np.nan, "2016 FJ", "2016_FJ"),
 ]
 
-# Asteroids with datacloud catalogues in the test data directory
-TEST_DATACLOUD = [("aams", "Massalia"), ("families", "Themis")]
-
 # ------
 # Monkeypatches for local data access
 def get_ssocard_from_test_data(id_):
@@ -53,34 +50,10 @@ def get_ssocard_from_test_data(id_):
     return data[id_]
 
 
-def get_datacloud_catalogue_from_test_data(id_, datacloud):
-    """Monkeypatch function to read cached datacloud catalogue from test files rather than
-    query SsODNet.
-
-    Parameter
-    =========
-    name : str
-        The SsODNet ID of the object.
-
-    Returns
-    =======
-    list of dict
-        The datacloud catalogue of the object.
-    """
-    PATH_DATA = os.path.join(
-        os.path.dirname(__file__), f"data/datacloud/{datacloud}_{id_}.json"
-    )
-
-    with open(PATH_DATA, "r") as file_:
-        data = json.load(file_)
-
-    return [data]
-
-
 # ------
 # Test instantiation
 @pytest.mark.parametrize("number_name_id", TEST_CASES, ids=str)
-def test_instantiation_with_types_local(number_name_id, monkeypatch):
+def test_instantiation_with_types(number_name_id, monkeypatch):
     """Verify class instantiation with str, int, float with local ssoCards.
 
     Parameters
@@ -112,33 +85,23 @@ def test_skip_id_check(number_name_id, monkeypatch):
     _ = Rock(id_, skip_id_check=True)
 
 
-@pytest.mark.parametrize("datacloud, id_", TEST_DATACLOUD, ids=str)
-def test_single_datacloud(datacloud, id_, monkeypatch):
-    """Test retrieval of single datacloud catalogues."""
-
-    monkeypatch.setattr(rocks.ssodnet, "get_ssocard", get_ssocard_from_test_data)
-    monkeypatch.setattr(
-        rocks.ssodnet, "get_datacloud_catalogue", get_datacloud_catalogue_from_test_data
-    )
-
-    # Test retrieval by passing string or list
-    _ = Rock(id_, skip_id_check=True, datacloud=datacloud)
-    _ = Rock(id_, skip_id_check=True, datacloud=[datacloud])
-
-
-@pytest.mark.parametrize("name, number, id_", TEST_CASES, ids=str)
-def test_provided_ssocard(name, number, id_, monkeypatch):
+@pytest.mark.parametrize("name, number, id_", TEST_CASES[:-1], ids=str)
+def test_custom_ssocard(name, number, id_, monkeypatch):
     """Test parsing ssoCards provided by user."""
 
     ssocard = get_ssocard_from_test_data(id_)
 
+    # Adapt the ssoCard to verify that the custom own is used
+    ssocard["parameters"]["physical"]["albedo"]["value"] = 44
+
     # Test retrieval by passing string or list
-    _ = Rock(id_, skip_id_check=True, ssocard=ssocard)
+    ast = Rock(id_, skip_id_check=True, ssocard=ssocard)
+    assert ast.albedo.value == 44
 
 
 # ------
 # Test parameter access
-@pytest.mark.parametrize("number, name, id_", TEST_CASES, ids=str)
+@pytest.mark.parametrize("number, name, id_", TEST_CASES[:-1], ids=str)
 def test_parameter_access(number, name, id_, monkeypatch):
     """Test retrieval of single datacloud catalogues."""
 
@@ -154,33 +117,27 @@ def test_parameter_access(number, name, id_, monkeypatch):
     # Flatten the json into a single-level dictionary for easy dereferencing
     flattened_json = pd.json_normalize(data).to_dict(orient="records")[0]
 
-    # For every object in the JSON card, ensure that the value corresponds to the
-    # value in the Rock instance
+    # For some chosen end-members in the JSON card, ensure that the value
+    # corresponds to the value in the Rock instance
     for key, value_json in flattened_json.items():
 
-        if len(key.split(".")) >= 2:
-            attr_parent = key.split(".")[-2]
-        else:
-            attr_parent = ""
-
-        attr_name = key.split(".")[-1]
-
-        if keyword.iskeyword(attr_name) or attr_name in ["id", "type", "min", "max"]:
-            key = key + "_"
-
-        # Some attributes are stored in lists. Since we check equality for
-        # the parents as well, we skip them.
-        if attr_parent in ["bibref", "method"]:
-            continue
-        if attr_name in ["bibref", "method"]:
+        # Phase and colour à la Generic/Johnson are annoying to parse
+        if "/" in key:
             continue
 
-        # units do not have to be checked
-        if ".unit." in key:
+        # these get unpacked into lists
+        if "spin" in key:
             continue
 
-        value_rock = rocks.utils.rgetattr(sso, key)
-        assert value_rock == value_json
+        # Only check the end-members as the other objects get de-serialized
+        if key.endswith("value"):
+
+            value_rock = rocks.utils.rgetattr(sso, key)
+
+            if isinstance(value_rock, float):
+                assert float(value_rock) == float(value_json)
+            else:
+                assert value_rock == value_json
 
 
 # @pytest.mark.parametrize("id_, nanu, tax", zip(IDs, NANUS, TAX), ids=str)

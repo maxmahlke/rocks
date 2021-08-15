@@ -29,7 +29,7 @@ def test_parsing_quaero_query(id_):
     Depends on Mette Quaero query in tests/data.
     """
     with open(
-        os.path.join(os.path.dirname(__file__), "data/quaero_mette.json"), "r"
+        os.path.join(os.path.dirname(__file__), "data/quaero/mette.json"), "r"
     ) as file_:
         data_json = json.load(file_)
 
@@ -111,7 +111,7 @@ LOCAL = [it[2] for it in IDS_RESULTS_LOCAL]
 def test_query_and_resolve(id_, expected):
     """Test response of quaero queries. These can be local or remote queries."""
 
-    name, number, _ = rocks.identify(id_)[0]
+    name, number = rocks.identify(id_)
     np.testing.assert_equal((name, number), expected)
 
 

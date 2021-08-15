@@ -35,7 +35,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(cls=AliasedGroup)
-@click.version_option(message="%(version)s")
+@click.version_option(version=rocks.__version__, message="%(version)s")
 def cli_rocks():
     """CLI for minor body exploration."""
     pass
