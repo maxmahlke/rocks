@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-rocks"
-version = "1.2.1"
+version = "1.2.2"
 description = "Python client for SsODNet data access."
 authors = ["Max Mahlke <max.mahlke@oca.eu>"]
 license = "MIT"
@@ -11,22 +11,23 @@ repository = "https://github.com/maxmahlke/rocks.git"
 packages = [{'include' = 'rocks'}]
 
 [tool.poetry.dependencies]
-python = ">=3.7.1,<4.0"
-pandas = "^1.2.1"
-aiohttp = "^3.7.3"
-aiodns = "^2.0.0"
-cchardet = "^2.1.7"
-click = "^7.1.2"
-iterfzf = "^0.5.0"
-matplotlib = "^3.3.4"
-numpy = "^1.20.0"
-rich = "^9.10.0"
-requests = "^2.25.1"
-tqdm = "^4.56.0"
-chardet = "<4.0"
+python = ">=3.7.1,<3.11"
 sphinx = {version = "^3", optional = true}
 sphinx-redactor-theme = {version = "^0.0.1", optional = true}
 sphinx-click = {version = "^2.5.0", optional = true}
+pydantic = "^1.8.2"
+numpy = "^1.21.2"
+matplotlib = "^3.4.3"
+aiohttp = "^3.7.4"
+cchardet = "^2.1.7"
+aiodns = "^3.0.0"
+pandas = "^1.3.2"
+tqdm = "^4.62.1"
+rich = "^10.7.0"
+click = "^8.0.1"
+nest-asyncio = "^1.5.1"
+iterfzf = "^0.5.0"
+requests = "^2.26.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-redactor-theme", "sphinx-click"]

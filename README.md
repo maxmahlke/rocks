@@ -1,5 +1,5 @@
-![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![python version](https://img.shields.io/pypi/pyversions/space-rocks)
+![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 # rocks
 
@@ -17,4 +17,4 @@ Install from PyPi using `pip`:
 
 ## Documentation
 
-Check out the documentation at [read-the-docs.io](https://rocks.readthedocs.io/en/latest/).
+Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.io/en/latest/).

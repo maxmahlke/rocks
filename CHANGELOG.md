@@ -1,3 +1,9 @@
+# 1.2.2 - 2021-08-16
+- Fixed unit lookup file
+- Merge taxonomy entries in ssoCard if there are more than one
+- Fixed missing dependencies and requirements
+- Added compatibility with python3.7 by dropping the metalib dependency
+
 # 1.2.1 - 2021-08-16
 - Fixed bug in output of diamalbedos
 

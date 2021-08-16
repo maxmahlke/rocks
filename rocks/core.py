@@ -240,7 +240,7 @@ class Diameter(Value):
     method: List[Method] = []
     bibref: List[Bibref] = []
 
-    path_unit: str = "unit.physical.diameter.diameter.value"
+    path_unit: str = "unit.physical.diameter.diameter"
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", "method", allow_reuse=True, pre=True
@@ -251,7 +251,7 @@ class Mass(Value):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
-    path_unit: str = "unit.physical.mass.mass.value"
+    path_unit: str = "unit.physical.mass.mass"
 
     _ensure_list: classmethod = pydantic.validator(
         "bibref", "method", allow_reuse=True, pre=True

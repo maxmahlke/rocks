@@ -434,29 +434,42 @@ def get_unit(path_unit):
     str
         The unit of the requested parameter.
     """
-    PATH_UNITS = os.path.join(
-        os.path.expanduser("~"), "astro/rocks/data/unit-template_aster-astorb.json"
-    )
+    PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit-template_aster-astorb.json")
+
+    if not os.path.isfile(PATH_UNITS):
+        print("Units not present in cache directory, retrieving them from SsODNet..")
+
+        # Retrieve unit list from SsODNet
+        URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/unit_aster-astorb.json"
+
+        response = requests.get(URL)
+
+        if response.ok:
+            units = response.json()
+
+            with open(PATH_UNITS, "w") as file_:
+                json.dump(units, file_)
+
+        else:
+            warnings.warn(f"Retrieving the units failed with url:\n{URL}")
 
     with open(PATH_UNITS, "r") as units:
         units = json.load(units)
 
     for key in path_unit.split("."):
-        if key == "unit":
-            unit = units[key]
-        else:
-            unit = unit[key]
-    return unit
+        units = units[key]
+
+    return units
 
 
-def get_description(name):
-    PATH_UNITS = os.path.join(
-        os.path.expanduser("~"), "astro/rocks/data/unit-template_aster-astorb.json"
-    )
+# def get_description(name):
+#     PATH_UNITS = os.path.join(
+#         os.path.expanduser("~"), "astro/rocks/data/unit-template_aster-astorb.json"
+#     )
 
-    breakpoint()
+#     breakpoint()
 
-    print(pd.json_normalize(PATH_UNITS).columns)
+#     print(pd.json_normalize(PATH_UNITS).columns)
 
 
 # ------

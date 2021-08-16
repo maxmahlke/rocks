@@ -1,5 +1,4 @@
 """For space rocks."""
-from importlib.metadata import version
 import os
 import sys
 
@@ -10,7 +9,7 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolve import identify
 
-__version__ = version("space-rocks")
+__version__ = "1.2.2"
 
 # Path to rocks auxilliary files
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
