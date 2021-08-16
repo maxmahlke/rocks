@@ -1,3 +1,6 @@
+# 1.2.1 - 2021-08-16
+- Fixed bug in output of diamalbedos
+
 # 1.2.0 - 2021-08-15
 - Updated the pydantic model to reflect the new ssoCard structure
 - The 'datacloud' argument of the Rock class now accepts the property name aliases of the catalogue names, eg: "albedos", "diameters" instead of "diamalbedo"

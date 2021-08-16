@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "space-rocks"
+version = "1.2.1"
+description = "Python client for SsODNet data access."
+authors = ["Max Mahlke <max.mahlke@oca.eu>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://rocks.readthedocs.io/en/latest/"
+documentation = "https://rocks.readthedocs.io/en/latest/"
+repository = "https://github.com/maxmahlke/rocks.git"
+packages = [{'include' = 'rocks'}]
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<4.0"
+pandas = "^1.2.1"
+aiohttp = "^3.7.3"
+aiodns = "^2.0.0"
+cchardet = "^2.1.7"
+click = "^7.1.2"
+iterfzf = "^0.5.0"
+matplotlib = "^3.3.4"
+numpy = "^1.20.0"
+rich = "^9.10.0"
+requests = "^2.25.1"
+tqdm = "^4.56.0"
+chardet = "<4.0"
+sphinx = {version = "^3", optional = true}
+sphinx-redactor-theme = {version = "^0.0.1", optional = true}
+sphinx-click = {version = "^2.5.0", optional = true}
+
+[tool.poetry.extras]
+docs = ["sphinx", "sphinx-redactor-theme", "sphinx-click"]
+
+[tool.poetry.scripts]
+rocks = "rocks.cli:cli_rocks"
+
+[tool.poetry.dev-dependencies]
+sphinx-redactor-theme = "^0.0.1"
+sphinx-click = "^2.5.0"
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=rocks --cov-report html"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

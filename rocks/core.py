@@ -559,7 +559,7 @@ class Rock(pydantic.BaseModel):
         # add 'preferred' attribute where applicable
         if catalogue in ["taxonomies", "masses"]:
             cat["preferred"] = [False] * len(list(cat.values())[0])
-        elif catalogue in ["diamalbedo"]:
+        elif catalogue_ssodnet in ["diamalbedo"]:
             cat["preferred_albedo"] = [False] * len(list(cat.values())[0])
             cat["preferred_diameter"] = [False] * len(list(cat.values())[0])
 

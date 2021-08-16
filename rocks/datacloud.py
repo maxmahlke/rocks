@@ -379,6 +379,7 @@ class Diamalbedo(Catalogue):
             header_style="bold blue",
             box=rich.box.SQUARE,
             footer_style="dim",
+            caption="Blue: preferred diameters, yellow: preferred albedos, green: both preferred"
         )
 
         columns = [
