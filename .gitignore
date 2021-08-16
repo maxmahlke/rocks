@@ -3,6 +3,13 @@ tmp/
 MANIFEST.in
 develop/
 _build/
+data/
+setup.py
+docs/tutorials/piazzia.py
+docs/tutorials/rocks_taxonomies.py
+docs/tutorials/rocks_vista_movis.py
+rocks.html
+rocks.org
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
