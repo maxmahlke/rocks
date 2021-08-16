@@ -30,6 +30,20 @@ def ensure_list(value):
     return value
 
 
+def ensure_unique_taxonomy(value):
+    """If there are several taxonomic classifications in the ssoCard, pick the most recent one."""
+    if isinstance(value, list):
+
+        value = {
+            "class": ", ".join(v["class"] for v in value),
+            "waverange": ", ".join(v["waverange"] for v in value),
+            "scheme": ", ".join(v["scheme"] for v in value),
+            "method": value[0]["method"],
+            "bibref": [v["bibref"] for v in value],
+        }
+    return value
+
+
 # ------
 # ssoCard as pydantic model
 
@@ -334,6 +348,10 @@ class PhysicalParameters(Property):
     _ensure_list: classmethod = pydantic.validator("spin", allow_reuse=True, pre=True)(
         ensure_list
     )
+
+    _ensure_unique_taxonomy: classmethod = pydantic.validator(
+        "taxonomy", allow_reuse=True, pre=True
+    )(ensure_unique_taxonomy)
 
 
 # ------
