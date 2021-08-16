@@ -3,7 +3,7 @@ from importlib.metadata import version
 import os
 import sys
 
-from . import datacloud, properties, ssodnet, utils
+from . import datacloud, ssodnet, utils
 
 # Expose API to user
 from .core import Rock
