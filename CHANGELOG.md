@@ -1,3 +1,6 @@
+# 1.2.3
+- Fail gracefully if no ssoCard is present for asteroid
+
 # 1.2.2 - 2021-08-16
 - Fixed unit lookup file
 - Merge taxonomy entries in ssoCard if there are more than one

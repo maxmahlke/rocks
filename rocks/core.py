@@ -489,14 +489,15 @@ class Rock(pydantic.BaseModel):
             if not ssocard:
                 ssocard = rocks.ssodnet.get_ssocard(id_)
 
-            for catalogue in datacloud:
-                ssocard = self.__add_datacloud_catalogue(id_, catalogue, ssocard)
+            if ssocard is None:
+                # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
+                ssocard = {"name": id_provided}
+
+            else:
+                for catalogue in datacloud:
+                    ssocard = self.__add_datacloud_catalogue(id_, catalogue, ssocard)
         else:
             # Something failed. Instantiate minimal ssoCard for meaningful error output.
-            ssocard = {"name": id_provided}
-
-        if ssocard is None:
-            # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
             ssocard = {"name": id_provided}
 
         # Deserialize the asteroid data
