@@ -13,7 +13,7 @@ Command-line exploration and scripted retrieval of asteroid data.
 
 Install from PyPi using `pip`:
 
-     pip install space-rocks
+     $ pip install space-rocks
 
 ## Documentation
 

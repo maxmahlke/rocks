@@ -9,6 +9,11 @@ docs/tutorials/rocks_taxonomies.py
 docs/tutorials/rocks_vista_movis.py
 rocks.html
 rocks.org
+poetry.lock
+data/description-template_aster-astorb.json
+data/ssoCard_sample.check
+data/ssoCard_sample.json
+data/unit-template_aster-astorb.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
