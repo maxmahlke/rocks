@@ -1,5 +1,7 @@
 # 1.2.3
-- Fail gracefully if no ssoCard is present for asteroid
+- Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue
+- Added weighted average output to some datacloud catalogue queries from the command line
+- Entries where both the property and its error are zero in datacloud catalogues are no longer preferred
 
 # 1.2.2 - 2021-08-16
 - Fixed unit lookup file

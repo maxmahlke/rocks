@@ -581,7 +581,16 @@ def select_numeric_property(obs, prop_name):
                 ]
             ):
                 continue
-            return [True if m in method else False for m in obs["method"]]
+
+            # All entries using this method are preferred
+            preferred = [True if m in method else False for m in obs["method"]]
+
+            # except if both error and value are zero
+            for i, (value, error) in enumerate(zip(obs[prop_name], obs[f"err_{prop_name}"])):
+                if value == error and error == 0:
+                    preferred[i] = False
+            return preferred
+
 
     return obs
 
