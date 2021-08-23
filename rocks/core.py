@@ -656,12 +656,21 @@ def rocks_(identifier, datacloud=[], progress=False):
     if isinstance(identifier, pd.Series):
         identifier = identifier.values
 
-    ids = [id_ for _, _, id_ in rocks.identify(identifier, return_id=True, progress=progress)]  # type: ignore
+    if len(identifier) == 1:
+        ids = [rocks.identify(identifier, return_id=True, progress=progress)[-1]]
+
+    else:
+        ids = [
+            id_
+            for _, _, id_ in rocks.identify(
+                identifier, return_id=True, progress=progress
+            )
+        ]
 
     rocks_ = [
         Rock(id_, skip_id_check=True, datacloud=datacloud)
         for id_ in tqdm(
-            ids, desc="Building rocks : ", total=len(ids), disable=~progress
+            ids, desc="Building rocks : ", total=len(ids), disable=not progress
         )
     ]
 
