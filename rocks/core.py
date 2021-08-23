@@ -492,6 +492,7 @@ class Rock(pydantic.BaseModel):
             if ssocard is None:
                 # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
+                print(f"Did not find ssoCard for asteroid '{id_provided}'.")
 
             else:
                 for catalogue in datacloud:
