@@ -219,8 +219,8 @@ def echo():
     if keyword.iskeyword(prop):
         prop = f"{prop}_"
 
-    if prop in rocks.datacloud.CATALOGUES.keys():
-        datacloud = prop
+    if prop.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
+        datacloud = prop.split(".")[0]
     else:
         datacloud = []
 

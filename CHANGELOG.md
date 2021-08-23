@@ -6,6 +6,7 @@
 - Added 'no_cache' keyword to 'rocks.ssodnet.get_ssocard'. If True, it forces the remote query of the ssoCard
 - Improved 'rocks status' command to echo the number of cached ssoCards and offer to update the out-of-date ones
 - Fixed typo in ssodnet name of astorb catalogue
+- Fixed output of datacloud parameters with CLI
 
 # 1.2.2 - 2021-08-16
 - Fixed unit lookup file
