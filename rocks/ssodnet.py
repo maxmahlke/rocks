@@ -16,7 +16,7 @@ from tqdm import tqdm
 import rocks
 
 
-def get_ssocard(id_ssodnet, progress=False):
+def get_ssocard(id_ssodnet, progress=False, no_cache=False):
     """Retrieve the ssoCard of one or many asteroids, using their SsODNet IDs.
 
     Parameters
@@ -25,6 +25,8 @@ def get_ssocard(id_ssodnet, progress=False):
         one or more ssodnet ids.
     progress : bool
         Show progressbar. Default is False.
+    no_cache : bool
+        If True, forces the remote query of the ssoCard. Default is False.
 
     Returns
     =======
@@ -32,10 +34,8 @@ def get_ssocard(id_ssodnet, progress=False):
         list containing len(id_) dictionaries corresponding to the ssocards of
         the passed identifiers. if the card is not available, the dict is empty.
         If a single card is retrieved, a dict is returned.
-    progress : bool or tdqm.std.tqdm
-       If progress is True, this is a progress bar instance. Else, it's False.
 
-    notes
+    Notes
     =====
     card retrieval is first attempted locally, then remotely via datacloud.
     """
@@ -60,7 +60,7 @@ def get_ssocard(id_ssodnet, progress=False):
     # ---
     # Run async loop to get ssoCard
     loop = asyncio.get_event_loop()
-    cards = loop.run_until_complete(_get_ssocard(id_ssodnet, progress))
+    cards = loop.run_until_complete(_get_ssocard(id_ssodnet, progress, no_cache))
 
     if len(id_ssodnet) == 1:
         cards = cards[0]
@@ -68,7 +68,7 @@ def get_ssocard(id_ssodnet, progress=False):
     return cards
 
 
-async def _get_ssocard(id_ssodnet, progress):
+async def _get_ssocard(id_ssodnet, progress, no_cache):
     """Get ssoCard asynchronously. First attempts local lookup, then
     queries SsODNet.
 
@@ -78,6 +78,8 @@ async def _get_ssocard(id_ssodnet, progress):
         one or more ssodnet ids.
     progress : bool or tdqm.std.tqdm
        If progress is True, this is a progress bar instance. Else, it's False.
+    no_cache : bool
+        If True, forces the remote query of the ssoCard.
 
     Returns
     =======
@@ -88,7 +90,7 @@ async def _get_ssocard(id_ssodnet, progress):
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(_local_or_remote(i, session, progress))
+            asyncio.ensure_future(_local_or_remote(i, session, progress, no_cache))
             for i in id_ssodnet
         ]
 
@@ -97,7 +99,7 @@ async def _get_ssocard(id_ssodnet, progress):
     return results
 
 
-async def _local_or_remote(id_ssodnet, session, progress):
+async def _local_or_remote(id_ssodnet, session, progress, no_cache):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
     if progress:
@@ -105,7 +107,7 @@ async def _local_or_remote(id_ssodnet, session, progress):
 
     PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{id_ssodnet}.json")
 
-    if os.path.isfile(PATH_CARD):
+    if os.path.isfile(PATH_CARD) and not no_cache:
         with open(PATH_CARD, "r") as file_card:
             return json.load(file_card)[id_ssodnet]
 
