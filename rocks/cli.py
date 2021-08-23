@@ -194,10 +194,8 @@ def status():
         else:
             print("Exiting without updating.")
 
-    if hasattr(ceres, "taxonomy"):
-        rich.print(r"[bold green]Datacloud is available.")
     else:
-        print(r"[bold red]Datacloud is not available.")
+        print("All cards are up-to-date.")
 
 
 def echo():

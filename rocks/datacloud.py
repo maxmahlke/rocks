@@ -435,7 +435,7 @@ CATALOGUES = {
     },
     "astorb": {
         "attr_name": "astorb",
-        "ssodnet_name": "astorn",
+        "ssodnet_name": "astorb",
     },
     "binarymp_tab": {
         "attr_name": "binaries",
