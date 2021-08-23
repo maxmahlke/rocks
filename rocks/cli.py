@@ -127,8 +127,72 @@ def properties():
 
 @cli_rocks.command()
 def status():
-    """Prints the availability of SsODNet:datacloud."""
-    ceres = rocks.Rock(1)
+    """Echo the number of ssoCards in the cache directory. Offer to update the out-of-date ones."""
+
+    # Get set of ssoCards and datacloud catalogues in cache
+    cached_jsons = set(
+        file_ for file_ in os.listdir(rocks.PATH_CACHE) if file_.endswith(".json")
+    )
+
+    datacloud_catalogues = set(
+        c["ssodnet_name"] for c in rocks.datacloud.CATALOGUES.values()
+    )
+    cached_catalogues = set(
+        file_
+        for file_ in cached_jsons
+        if any([cat in file_ for cat in datacloud_catalogues])
+    )
+
+    cached_ssocards = cached_jsons - cached_catalogues
+
+    print(
+        f"There are {len(cached_ssocards)} ssoCards cached locally in {rocks.PATH_CACHE}"
+    )
+
+    # Read the versions of the cached ssoCards
+    card_version = {}
+
+    for card in cached_ssocards:
+
+        ssodnet_id = os.path.splitext(card)[0]
+
+        with open(os.path.join(rocks.PATH_CACHE, card), "r") as ssocard:
+            card = json.load(ssocard)
+            card_version[ssodnet_id] = card[ssodnet_id]["ssocard"]["version"]
+
+    # Get the current SsODNet version
+    # TODO There will soon be a stub card online to check this
+    # For now, we just check the version of Ceres
+    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/Ceres"
+    response = requests.get(URL)
+
+    if response.ok:
+        card_ceres = response.json()
+    else:
+        warnings.warn(f"Retrieving the current ssoCard version failed.")
+        sys.exit()
+
+    current_version = card_ceres["Ceres"]["ssocard"]["version"]
+
+    out_of_date = [
+        card for card, version in card_version.items() if version != current_version
+    ]
+
+    if out_of_date:
+
+        if len(out_of_date) == 1:
+            print(f"1 ssoCard is out-of-date.", end=" ")
+        else:
+            print(f"{len(out_of_date)} cards are out-of-date.", end=" ")
+
+        response = input("Update the out-of-date cards? [Y/n]")
+
+        if response in ["", "Y", "y"]:
+            print(f"Updating the ssoCards...", end=" ")
+            rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
+            print("Done.")
+        else:
+            print("Exiting without updating.")
 
     if hasattr(ceres, "taxonomy"):
         rich.print(r"[bold green]Datacloud is available.")
