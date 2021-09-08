@@ -1,14 +1,6 @@
 Tutorials
 =========
 
-.. Note::
-
-   ``rocks.identify`` runs asynchronously.  ``jupyter notebook`` s require the following two lines to support asynchronous operations::
-
-
-       import nest_asyncio
-       nest_asyncio.apply()
-
 Identification - command line
 
 Which asteroid is this?
@@ -22,9 +14,22 @@ Property exploration - command line
 
 What taxonomic classes have been assigned to Hygiea
 
+What's the weighted average albedo of Ceres?
+
 Property exploration - scripted
 
 What's the proper semi-major axis distribution of the Koronis family?
+
+:ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
+
+.. _weighted_average_scripted:
+
+What's the weighted average albedo of (6) Hebe?
+-----------------------------------------------
+
+.. code-block:: python
+
+    >>> alb_diam, err_alb_diam = rocks.utils.weighted_average(np.array(self.diameter)[self.preferred_diameter], np.array(self.err_diameter)[self.preferred_diameter])
 
 
 Identify asteroids

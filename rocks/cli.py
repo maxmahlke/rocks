@@ -7,6 +7,7 @@ import sys
 import webbrowser
 
 import click
+import requests
 import rich
 
 import rocks
@@ -131,7 +132,9 @@ def status():
 
     # Get set of ssoCards and datacloud catalogues in cache
     cached_jsons = set(
-        file_ for file_ in os.listdir(rocks.PATH_CACHE) if file_.endswith(".json")
+        file_
+        for file_ in os.listdir(rocks.PATH_CACHE)
+        if file_.endswith(".json") and file_ not in ["ssoCard_template.json"]
     )
 
     datacloud_catalogues = set(
@@ -158,7 +161,12 @@ def status():
 
         with open(os.path.join(rocks.PATH_CACHE, card), "r") as ssocard:
             card = json.load(ssocard)
-            card_version[ssodnet_id] = card[ssodnet_id]["ssocard"]["version"]
+
+            # TODO Currently, some ssoCards are None. This should be fixed on SsODNet side soon.
+            if card[ssodnet_id] is None:
+                card_version[ssodnet_id] = "Failed"
+            else:
+                card_version[ssodnet_id] = card[ssodnet_id]["ssocard"]["version"]
 
     # Get the current SsODNet version
     # TODO There will soon be a stub card online to check this
@@ -185,7 +193,7 @@ def status():
         else:
             print(f"{len(out_of_date)} cards are out-of-date.", end=" ")
 
-        response = input("Update the out-of-date cards? [Y/n]")
+        response = input("Update the out-of-date cards? [Y/n] ")
 
         if response in ["", "Y", "y"]:
             print(f"Updating the ssoCards...", end=" ")
@@ -228,4 +236,10 @@ def echo():
 
     # Pretty-printing is implemented in the properties __str__
     rich.print(rocks.utils.rgetattr(rock, prop))
+
+    if rock.name == "Benoitcarry" and os.getenv("USER") == "bcarry":
+        print(
+            '\n"This [minor] planet has - or rather had - a problem, which was this: most of the people [it was named after] were [looking up their rock at work] for pretty much all of the time."\n'
+        )
+
     sys.exit()

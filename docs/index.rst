@@ -10,7 +10,7 @@ under constant revision. The provided values and access methods may change
 without notice.**
 
 
-Latest version: 1.2.1  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
+Latest version: 1.2.3  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
 
 via the Command Line
 --------------------
@@ -77,8 +77,9 @@ See more use cases in the :ref:`Tutorials<Tutorials>`.
    :caption: Contents
    :hidden:
 
-   Intro to rocks<index>
-   core
-   rocks CLI<cli>
+   Introduction<index>
+   Getting Started<getting_started>
+   Available Data<ssodnet>
+   Command Line Interface<cli>
+   The Rock Class<core>
    tutorials
-

@@ -189,33 +189,6 @@ def rgetattr(obj, attr):
     return reduce(_getattr, [obj] + attr.split("."))
 
 
-# def update_ssoCard(dict_, update):
-#     """Recursively update ssoCard template with retrieved values.
-
-#     Parameters
-#     ==========
-#     dict_ : dict, list
-#         The values in the template or retrieved ssoCard.
-#     update : dict, list
-#         The values in the retrieved ssoCard.
-
-#     Returns
-#     =======
-#     dict
-#         The updated ssoCard.
-#     """
-#     for key, val in update.items():
-#         if isinstance(val, collections.abc.Mapping):  # type: ignore
-#             dict_[key] = update_ssoCard(dict_.get(key, {}), val)
-#         else:
-#             if isinstance(dict_, list):  # multiple pair members
-#                 dict_ = dict_[-1]  # pragma: no cover
-#             if isinstance(val, list):  # multiple taxonomies
-#                 val = val[-1]
-#             dict_[key] = val
-#     return dict_
-
-
 def retrieve_ssocard_template():
     """Retrieve current ssoCard template from SsODNet."""
 
@@ -234,190 +207,6 @@ def retrieve_ssocard_template():
 
     else:
         warnings.warn(f"Retrieving the template failed with url:\n{URL}")
-
-
-# def sanitize_keys(dict_):
-#     """Recursively ensure that dict keys are not python keywords."""
-#     for key, value in dict_.copy().items():
-#         if isinstance(value, dict):
-#             dict_[key] = sanitize_keys(dict_[key])
-#         elif isinstance(value, list):
-#             if all([isinstance(v, dict) for v in value]):
-#                 dict_[key] = [sanitize_keys(v) for v in value]
-#         if keyword.iskeyword(key):
-#             dict_[f"{key}_"] = dict_.pop(key)
-#     return dict_
-
-
-# def set_endpoints_to_nan(dict_):
-#     """Recursively sets dict values to NaN if they are not of type dict or unit."""
-#     for key, value in dict_.copy().items():
-#         if isinstance(value, dict):
-#             dict_[key] = set_endpoints_to_nan(dict_[key])
-#         else:
-#             if key == "unit":
-#                 continue
-#             else:
-#                 dict_[key] = np.nan
-#     return dict_
-
-
-# ------
-# SsODNet functions
-# def get_ssoCard(id_, only_cache=False):
-#     """Retrieve single ssoCard either from cache or SsODNet.
-
-#     Parameters
-#     ==========
-#     id_ : str
-#         Single Minor body target id from SsODNet.
-#     only_cache : bool
-#         Do not query SsODNet, return None instead.
-
-#     Returns
-#     =======
-#     dict, None
-#         Single ssoCard in json format if successful.
-#         None if query failed or not queried.
-#     """
-#     if not isinstance(id_, str):
-#         warnings.warn(f"Expected string identifier, got {type(id_)}.")
-#         return None
-
-#     # Check presence in cache
-#     PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{id_}.json")
-
-#     if not os.path.isfile(PATH_CARD):
-#         if not only_cache:
-#             return __query_ssoCards(id_)[0]
-#         else:
-#             return None
-#     else:
-#         with open(PATH_CARD, "r") as file_:
-#             ssoCard = json.load(file_)
-#         return ssoCard
-
-
-# def get_ssoCards(ids, progress=False):
-#     """Return target ssoCard. Use cache if existant, else, query SsODNet
-#     and cache results. Accepts multiple ids.
-
-#     Parameters
-#     ==========
-#     ids : str, list, np.array, pd.Series
-#         Single Minor body target id from SsODNet or list of several.
-#         Pass SsODNet ID for fast access.
-#     progress : bool
-#         Show progress of instantiation. Default is False.
-
-#     Returns
-#     =======
-#     dict, list of dict, None
-#         Single or list of ssoCards in json format if successful.
-#         None if query failed.
-#     """
-#     if isinstance(ids, str):
-#         ids = [ids]
-#     elif isinstance(ids, pd.Series):
-#         ids = ids.values
-
-#     id_card = collections.OrderedDict(
-#         (id_, get_ssoCard(id_, only_cache=True)) for id_ in ids
-#     )
-#     missing = [id_ for id_, card in id_card.items() if card is None]
-
-#     if not missing:
-#         return id_card.values()
-
-#     print(f"Retrieving {len(missing)} ssoCards..")
-
-#     # Perform POST query for missing cards in chunks
-#     if progress:
-#         progressbar = tqdm(desc="Retrieving ssoCards", total=len(missing))
-#     else:
-#         progressbar = False
-
-#     for subset in [missing[i : i + 500] for i in range(0, len(missing), 500)]:
-
-#         ssoCards = __query_ssoCards(subset, progressbar)
-
-#         for id_, ssoCard in zip(subset, ssoCards):
-
-#             if ssoCard is None:
-#                 continue
-
-#             # if ssoCard is None, this value is already None
-#             id_card[id_] = ssoCard
-
-#             with open(f"{rocks.PATH_CACHE}/{id_}.json", "w") as file_:
-#                 json.dump(ssoCard, file_)
-
-#     # Return requested ssoCards
-#     return id_card.values()
-
-
-# def __query_ssoCards(ids, progressbar=False):
-#     """Retrieve ssoCards for targets from SsODNet via POST request.
-
-#     Parameters
-#     ==========
-#     ids : str, list, np.array, pd.Series
-#         Single Minor body target id from SsODNet or list of several.
-#     progressbar : tqdm.tqdm
-#         A progress bar instance. Default is False, no progressbar.
-
-#     Returns
-#     =======
-#     list of dict, None
-#         List of ssoCards in json format if successful.
-#         None if query failed.
-
-#     Notes
-#     =====
-#     Performs output check and tries to infer correct target string if query failed.
-#     """
-#     if isinstance(ids, str):
-#         ids = [ids]
-#     elif isinstance(ids, pd.Series):
-#         ids = ids.values
-#     if any(pd.isnull(ids)):
-
-#         warnings.warn(
-#             f"There {'are' if sum(pd.isnull(ids)) > 1 else 'is a'} NaN"
-#             f" {'values' if sum(pd.isnull(ids)) > 1 else 'value'} among the IDs,"
-#             f" returning None in {'their' if sum(pd.isnull(ids)) > 1 else 'its'} place."
-#         )
-
-#         # Get indices of NaN values
-#         ind_nan = np.where(pd.isnull(ids))[0]
-
-#         for ind in ind_nan:
-#             ids.pop(ind)
-#     else:
-#         ind_nan = []
-
-#     url = "https://asterws2.imcce.fr/webservices/ssodnet/api/ssocard/"
-
-#     params = {"from": "rocks"}
-#     file_ = {"targets": ("\n".join([id_ for id_ in ids]))}
-
-#     try:
-#         response = requests.post(url=f"{url}mytargets", params=params, files=file_)
-#         response.encoding = "UTF-8"
-#         response = response.json()
-#     except requests.exceptions.RequestException as e:
-#         warnings.warn(f"An error occurred when retrieving the ssoCards: {e}")
-#         return None
-
-#     ssoCards = [response[id_] for id_ in ids]
-
-#     # Add False for the NaN indices removed above
-#     for ind in ind_nan:
-#         ssoCards.insert(ind, False)
-
-#     if progressbar:
-#         progressbar.update(n=len(ids))
-#     return ssoCards
 
 
 def get_unit(path_unit):
@@ -642,22 +431,31 @@ def weighted_average(observable, error):
     """Computes weighted average of observable.
 
     Parameters
-    ----------
+    ==========
     observable : np.ndarray
         Float values of observable
     error : np.ndarray
         Corresponding errors of observable.
 
     Returns
-    -------
+    =======
     (float, float)
         Weighted average and its standard error.
     """
+
+    # If no data was passed (happens when no preferred entry in table)
+    if not observable:
+        return (np.nan, np.nan)
+
     if len(observable) == 1:
         return (observable[0], error[0])
 
-    # Compute normalized weights
-    weights = 1 / np.array(error) ** 2
+    if any([e == 0 for e in error]):
+        weights = np.ones(observable.shape)
+        warnings.warn("Encountered zero in errors array. Setting all weights to 1.")
+    else:
+        # Compute normalized weights
+        weights = 1 / np.array(error) ** 2
 
     # Compute weighted average and uncertainty
     avg = np.average(observable, weights=weights)

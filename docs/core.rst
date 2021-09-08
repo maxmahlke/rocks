@@ -172,7 +172,9 @@ Some observations in the catalogues might be preferred to others. For example, a
 
 .. Note::
 
-    As the ``diamalbedo`` catalogue contains both diameters and albedos, it contains the ``preferred_diameter`` and ``preferred_albedo`` attributes. The ``preferred`` attribute of the catalogue is True if either of the corresponding diameter or albedo observation is preferred.
+    As the ``diamalbedo`` catalogue contains both diameters and albedos, it contains the ``preferred_diameter`` and ``preferred_albedo`` attributes.
+
+``rocks`` offers an easy way to compute the weighted averages of the preferred property measurements, see for example: :ref:`what's the weighted average albedo of (6) Hebe?<weighted_average_scripted>`
 
 Creating many ``Rock``\ s
 -------------------------

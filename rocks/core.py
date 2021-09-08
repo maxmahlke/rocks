@@ -535,7 +535,10 @@ class Rock(pydantic.BaseModel):
         if name in self.__aliases["diamalbedo"]:
             return getattr(self, "diamalbedo")
 
-        raise AttributeError(f"'Rock' object has no attribute '{name}'")
+        raise AttributeError(
+            f"'Rock' object has no attribute '{name}'. Run "
+            f"'rocks properties' to get a list of accepted properties."
+        )
 
     def __repr__(self):
         return (

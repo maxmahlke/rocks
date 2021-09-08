@@ -1,12 +1,14 @@
 # 1.2.3
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue
 - Added weighted average output to some datacloud catalogue queries from the command line
-- Entries where both the property and its error are zero in datacloud catalogues are no longer preferred
+- Added weigted_average method to Datacloud catalogue class
 - Print warning when no ssoCard could be retrieved for an asteroid.
 - Added 'no_cache' keyword to 'rocks.ssodnet.get_ssocard'. If True, it forces the remote query of the ssoCard
 - Improved 'rocks status' command to echo the number of cached ssoCards and offer to update the out-of-date ones
 - Fixed typo in ssodnet name of astorb catalogue
 - Fixed output of datacloud parameters with CLI
+- rocks.rocks now supports passing a single id (though you should use rocks.Rock instead)
+- Correct handling of all-zero numerical properties in datacloud catalogues
 
 # 1.2.2 - 2021-08-16
 - Fixed unit lookup file
