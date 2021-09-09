@@ -10,6 +10,8 @@ Install from PyPI
 
    $ pip install space-rocks
 
+.. cache-directory::
+
 Cache directory
 ---------------
 
