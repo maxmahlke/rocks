@@ -70,13 +70,7 @@ def clear():
 @cli_rocks.command()
 @click.argument("this")
 def identify(this):
-    """Get asteroid name and number from string input.
-
-    Parameters
-    ==========
-    this : str
-        String to identify asteroid.
-    """
+    """Get asteroid name and number from string input."""
     name, number = rocks.identify(this)  # type: ignore
 
     if isinstance(name, (str)):
@@ -88,21 +82,9 @@ def identify(this):
 @click.option(
     "-m", "--minimal", is_flag=True, help="Reduce output to basic information."
 )
-def info(this, minimal):
-    """Print ssoCard of minor body.
-
-    Parameters
-    ==========
-    this : str
-        Minor body name, designation, or number.
-        If empty, a selection is prompted.
-    minimal : str
-        Print a minimal overview of SSO properties. Default is False.
-    """
-    if not this:
-        _, _, this = rocks.utils.select_sso_from_index()
-    else:  # passed identified string, ensure that we know it
-        _, _, this = rocks.identify(this, return_id=True)  # type: ignore
+def info(id_, minimal):
+    """Print ssoCard of minor body."""
+    _, _, this = rocks.identify(id_, return_id=True)  # type: ignore
 
     if not isinstance(this, str):
         sys.exit()
