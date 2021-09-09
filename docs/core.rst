@@ -1,108 +1,115 @@
 .. _rock_class:
 
+``rocks`` provides object-oriented access to the data stored in ssoCards and
+datacloud. The implementation focuses on ease of access and speed: all
+attributes are accessible via the common dot notation, and queries to
+``SsODNet`` are run asynchronously.
+
+The public API only consists of two functions and one class:
+
+- ``rocks.identify()``: identify one or many asteroids based on user-provided identifiers
+
+- ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its ``ssoCard``
+
+- ``rocks.rocks()``: a wrapper around ``rocks.identify()`` and ``rocks.Rock`` to read in the data of many asteroids
+
+Identification of asteroids
+===========================
+
+It is quite straight-forward: providing a single identifier or a list of many identifiers returns a tuple of ``(asteroid name, asteroid number)`` for each
+identifier. Identifiers can be ``floats``, ``integers``, or ``strings`` and can describe the asteroid's name, number, designation, previous designations,
+packed designations, and more.
+
+.. code-block:: python
+
+    >>> from rocks.identify import identify
+    >>> rocks.identify(11334)
+    ('Rio de Janeiro', 11334)
+    >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
+    [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
+
 The ``Rock`` class
 ==================
 
-The :ref:`Rock<rocks-Rock>` class is used to inspect the properties of a single asteroid. The asteroid is specified by providing its number, name, or designation to the class.
+The :ref:`Rock<rocks-Rock>` class is used to inspect the parameters of a single
+asteroid. It is the (iron) core of the ``rocks`` package.
 
 Creating a ``Rock`` instance
 ----------------------------
 
-``Rocks`` are created by passing the name, number, or SsODNet ID of the asteroid that they
-should represent.
+``Rocks`` are created by passing the name, number, or SsODNet ID of the asteroid that they should represent.
 
 .. code-block:: python
 
-    >> from rocks import Rock
-    >> ceres = Rock(1)
-    >> ceres
+    >>> from rocks import Rock
+    >>> ceres = Rock(1)
+    >>> ceres
     Rock(number=1, name='Ceres')
-    >> vesta = Rock("1807 FA")
-    >> vesta
+    >>> vesta = Rock("1807 FA")
+    >>> vesta
     Rock(number=4, name='Vesta')
-
-When passing the name or number, the asteroid is identified using the
-``rocks.identify()`` ``quaero`` frontend. If the SsODNet ID of the asteroid is
-provided, this check can be skipped by setting the ``skip_id_check`` argument to
-``True``. This saves time when creating many ``Rock`` instances in a loop, as demonstrated
-in the :ref:`Tutorials<Tutorials>`.
-
-.. code-block:: python
-
-    >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
-
-The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
-The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
-original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
-and load it via the ``json`` module.
-
-.. code-block:: python
-
-    >> import json
-    >> import os
-    >> with open("my_ssocard.json", "r") as file_:
-    >>    data = json.load(file_)
-    >>
-    >> mars_crosser_2016fj = Rock("2016_FJ", ssocard=data["2016_FJ"])
 
 Access of ssoCard parameters
 ----------------------------
 
-During instantiation, the asteroid properties are retrieved from `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_ and assigned to the attributes following the structure of the ``ssoCard``.
+During instantiation, the asteroid properties are retrieved from ``SsODNet`` and assigned to the attributes following the structure of the ``ssoCard``.
 
 .. code-block:: python
 
-    >> ceres.parameters.physical.taxonomy.class_
+    >>> ceres.parameters.physical.taxonomy.class_
     C
-    >> vesta.parameters.dynamical.proper_elements.proper_semi_major_aixs
+    >>> vesta.parameters.dynamical.proper_elements.proper_semi_major_axis.value
     2.3615126
 
-To reduce wordiness, the ``parameters`` and ``physical``/``dynamical`` attributes can be skipped. Units and uncertainties can be appended to the property.
+Notice the ``.value`` suffix to retrieve the value of numerical parameters, just as in an ``ssoCard`` itself.
+
+To reduce the typing effort, the ``parameters`` and ``physical``/ ``dynamical``
+attributes can be skipped.
 
 .. code-block:: python
 
-   >> vesta.parameters.physical.diameter
-   468.3
-   >> vesta.diameter
-   468.3
-   >> vesta.diameter.unit
-   'km'
+   >>> vesta.parameters.physical.diameter
+   525.4
+   >>> vesta.diameter
+   525.4
 
-In general, the ``Rock`` attribute structure mimics the ssoCard structure as closely as possible.
+More shortcuts are :ref:`given below<attribute_shortcuts>`. Feel free to suggest new ones by opening an issue on the `GitHub page<https://github.com/maxmahlke/rocks`_.
 
-Most differences arise due to the ssoCard using keywords which are protected in ``python`` and as such cannot be assigned, such as the ``class`` keyword. These keywords have an underscore appended to them, see the table below.
+Differences to the ``ssoCard`` structure arise in two cases:
 
-Another difference arises from keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
+- the ``ssoCard`` uses keywords which are protected in ``python``, such as the ``class`` keyword. These keywords have an underscore appended to them: ``class``, ``id``, ``min``, ``max``
 
-A chosen difference is the structure of the "method" and "bibref" values: when ingested into the ``Rock`` attribute, they are always a ``python`` ``list`` instance filled with one or more ``dict``. This is to simplify the code and prevent if-clauses.
-
-Here is a list of ssoCard parameters and their corresponding names in the ``Rock`` instance if the names differ from one another.
-
-+-----------------+----------------------------+
-| ssoCard Name    | ``Rock`` attribute         |
-+-----------------+----------------------------+
-| class           | ``class_``                 |
-+-----------------+----------------------------+
-| id              | ``id_``                    |
-+-----------------+----------------------------+
-| min             | ``min_``                   |
-+-----------------+----------------------------+
-| max             | ``max_``                   |
-+-----------------+----------------------------+
+- the ``ssoCard`` uses keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
 
 
 Access of ``datacloud`` tables
 ------------------------------
 
-SsODNet:datacloud contains tables of albedos, masses, taxonomic classes and more
-for a large number of asteroids. By default, they are not loaded when creating a
+The ``datacloud`` catalogues of an asteroid are not loaded by default when creating a
 ``Rock`` instance, as each table requires an additional remote query. Tables can
-be requested using the ``datacloud`` argument, using the catalogues given in the
-left column of the table below. They are assigned to the attributes given in the
-right column.
+be requested using the ``datacloud`` argument instead.
+Single tables can be requested by passing the table name to the ``datacloud``.
+
+.. code-block:: python
+
+    >> ceres = Rock(1, datacloud='masses')
+
+Multiple tables are retrieved by passing a list of table names.
+
+.. code-block:: python
+
+    >> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
+    >> ceres.taxonomies.class_
+    ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+    >> ceres.taxonomies.shortbib
+    ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004',
+     'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
+
+
+The ``datacloud`` tables have slightly different names in ``rocks``.
 
 +-----------------+----------------------------+
-| Datacloud Table | Attribute Name             |
+| datacloud Table | Attribute Name             |
 +-----------------+----------------------------+
 | aams            | ``aams``                   |
 +-----------------+----------------------------+
@@ -125,40 +132,13 @@ right column.
 | taxonomy        | ``taxonomies``             |
 +-----------------+----------------------------+
 
-Single tables can be requested by passing the table name to the ``datacloud``.
-
-.. code-block:: python
-
-    >> ceres = Rock(1, datacloud='masses')
-
-Multiple tables are retrieved by passing a list of table names.
-
-.. code-block:: python
-
-    >> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
-    >> ceres.taxonomies.class_
-    ['G', 'C', 'C', 'C', 'C', 'G', 'C']
-    >> ceres.taxonomies.shortbib
-    ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004',
-     'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
-
-If the properties are of type ``float``, methods for :ref:`weighted averaging<rocks-wa>` and :ref:`plotting<rocks-plots>` are available.
-
-.. code-block:: python
-
-    >> ceres.masses.mass
-    [9.55e+20, 9.54e+20, 9.94e+20, 9.19e+20, ..., 9.39e+20]
-    >> ceres.masses.mass.weighted_average(errors=ceres.masses.err_mass)
-    (9.387431170184913e+20, 3.282260016750655e+17)
-    >> ceres.masses.scatter('mass', show=True)
-
-The last line above will open a ``matplotlib`` scatterplot of the ``mass`` values in the ``masses`` catalogue. For the ``diamalbedo`` catalogue, both ``albedo`` and ``diameters`` can be specified.
-
-.. Note::
-
-   The units and uncertainties are not appended to properties in the datacloud catalgoues. This may be implemented in a later version.
-
-Some observations in the catalogues might be preferred to others. For example, a taxonomical classification using a visible-nearinfrared spectrum is more reliable than one based on visible colours. ``rocks`` includes **opinonated** selections of preferred observations based on the observation methods. Catalogues have ``preferred`` attributes, which are lists containing ``True`` if the corresponding observation is preferred, and ``False`` otherwise.
+Some observations in the catalogues might be preferred to others. For example, a
+taxonomical classification using a visible-near-infrared spectrum is more
+reliable than one based on visible colours. ``rocks`` includes **opinonated**
+selections of preferred observations based on the observation methods, just as
+the ``ssoCard`` does.  Catalogues have ``preferred`` attributes, which are lists
+containing ``True`` if the corresponding observation is preferred, and ``False``
+otherwise.
 
 .. code-block:: python
 
@@ -176,16 +156,66 @@ Some observations in the catalogues might be preferred to others. For example, a
 
 ``rocks`` offers an easy way to compute the weighted averages of the preferred property measurements, see for example: :ref:`what's the weighted average albedo of (6) Hebe?<weighted_average_scripted>`
 
-Creating many ``Rock``\ s
--------------------------
+Special use-cases
+-----------------
 
-The :ref:`rocks.rocks()<rocks-rocks>` function quickly creates many ``Rock`` instances. It accepts a list of asteroid numbers, names, or designations and returns a list of ``Rock`` instances.
+When passing the name or number, the asteroid is identified using
+``rocks.identify()``. If the SsODNet ID of the asteroid is
+provided, this check can be skipped by setting the ``skip_id_check`` argument to
+``True``. This saves time when creating many ``Rock`` instances in a loop, as demonstrated in the :ref:`Tutorials<Tutorials>`.
+
+.. code-block:: python
+
+    >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
+
+The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
+The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
+original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
+and load it via the ``json`` module.
+
+.. code-block:: python
+
+    >>> import json
+    >>> import os
+    >>> with open("my_ssocard.json", "r") as file_:
+    >>>    data = json.load(file_)
+    >>> mars_crosser_2016fj = Rock("2016_FJ", ssocard=data["2016_FJ"])
+
+.. _attribute_shortcuts:
+
+List of attribute shortcuts
+---------------------------
+
++------------------------+-------------------------+
+| ssoCard attribute      | Shortcut                |
++------------------------+-------------------------+
+| parameters.dynamical   | ````                    |
++------------------------+-------------------------+
+| parameters.physical    | ````                    |
++------------------------+-------------------------+
+| semi_major_axis        | ``a``                   |
++------------------------+-------------------------+
+| eccentricity           | ``e``                   |
++------------------------+-------------------------+
+| inclination            | ``i``                   |
++------------------------+-------------------------+
+| proper_semi_major_axis | ``ap``                  |
++------------------------+-------------------------+
+| proper_eccentricity    | ``ep``                  |
++------------------------+-------------------------+
+| proper_inclination     | ``ip``                  |
++------------------------+-------------------------+
+
+Creating many ``Rock``\ s
+=========================
+
+The ``rocks.rocks()`` function serves as a one-line replacement for a frequent approach: get a list of asteroid identifiers from a catalogue and create ``Rock`` instances from them.
 
 .. code-block:: python
 
     >>> from rocks import rocks
     >>> themis_family = [24, 62, 90, 104, 171, 222, 223, 316, 379,
-            383, 468, 492, 515, 526, 767, 846]
+                         383, 468, 492, 515, 526, 767, 846]
     >>> themis_family = rocks(themis_family)
     >>> themis_family
     [Rock(number=316, name='Goberta'), Rock(number=492, name='Gismonda'),
@@ -199,45 +229,3 @@ Accessing the properties can now be done with a loop or list comprehension.
     Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
 
 Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail. 
-
-.. Note::
-
-  ssoCards are cached for shorter execution times. The cache directory is ``$HOME/.cache/rocks/``.
-
-In the :ref:`Tutorials<Tutorials>` we show how to utilise ``rocks()`` to investigate the taxonomic distribution of asteroids in large catalogues. 
-
-
--------------------
-
-API of ``Rock`` and ``rocks``
------------------------------
-
-.. _rocks-Rock:
-
-.. currentmodule:: core
-
-.. autoclass:: Rock
-
-.. automethod:: Rock.__init__
-
-
-.. _rocks-rocks:
-
-.. currentmodule:: core
-
-.. autofunction:: rocks
-
-
-.. _rocks-wa:
-
-.. currentmodule:: core
-
-.. autofunction:: core.listSameTypeParameter.weighted_average
-
-.. _rocks-plots:
-
-.. autofunction:: core.propertyCollection.hist
-
-.. autofunction:: core.propertyCollection.scatter
-
-
