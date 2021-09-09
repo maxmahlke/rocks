@@ -10,6 +10,25 @@ Install from PyPI
 
    $ pip install space-rocks
 
+After installation, you should have the ``rocks`` executable available system-wide.
+
+.. code-block:: bash
+
+   $ rocks
+
+   Usage: rocks [OPTIONS] COMMAND [ARGS]...
+
+   CLI for minor body exploration.
+
+   [...]
+
+Further, you can now import the ``rocks`` ``python`` package.
+
+.. code-block:: python
+
+   >>> import rocks
+
+
 .. _cache-directory:
 
 Cache directory
