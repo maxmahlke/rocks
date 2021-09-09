@@ -15,7 +15,8 @@ Furthermore, there are :ref:`subcommands<subcommands>` to identify asteroids, in
 
 .. code-block:: bash
 
-   $ rocks identify 9885                                                                                                                                                                                       (9885) Linux
+   $ rocks identify 9885
+   (9885) Linux
 
 Data exploration
 ----------------
@@ -30,7 +31,6 @@ The general structure is ``rocks [property] [id]``. ``property`` refers to the p
 
    $ rocks proper_semi_major_axis ceres
    2.767 +- 4.71e-06
-
 
 If the key ambiguous, the higher level attribute is preferred.
 
@@ -89,17 +89,6 @@ Providing the catalogue name and a property returns the property.
 
 The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 
-For the ``albedos``, ``diameters``, and ``masses`` catalogues, quick visualization can be triggered using optional arguments. Providing ``-h`` or ``--hist`` will plot a histogram of the respective property, while ``-s`` or ``--scatter`` open scatterplot.
-
-.. code-block:: bash       
-
-  $ rocks masses --scatter 3
-
-.. image:: gfx/masses_scatter_3.png
-   :scale: 70 %
-   :align: center
-
-
 .. _subcommands:
 
 rocks docs
@@ -133,18 +122,7 @@ The command is aliased to ``rocks id`` as well.
 rocks info
 ----------
 
-Echos the ssoCard of an asteroid in JSON format. Providing the ``-m | --minimal`` flag reduces the output to only the most basic information.
-
-.. code-block:: bash
-
-  $ rocks info -m Pallas
-
-  +--------- (2) Pallas ----------------------------------------+
-  |                                                             |
-  |        type: Asteroid     class: MB>Middle                  |
-  |        taxonomy: B            ap: 2.771                     |
-  |                                                             |
-  +-------------------------------------------------------------+
+Echos the ssoCard of an asteroid in JSON format.
 
 
 .. _rocks-props:
@@ -165,10 +143,15 @@ Echo the structure of the ssoCard. Can be used in combination with ``grep`` to f
 rocks status
 ------------
 
-Print if SsODNet:datacloud is currently available or not.
+Echos the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.
 
 rocks update
 ------------
 
 Update the cached index of asteroid numbers, names, and SsODNet IDs. Further, retrieve the current ssoCard structure template from SsODNet.
 
+
+rocks clear
+-----------
+
+Removes all ssoCards from the cache directory.
