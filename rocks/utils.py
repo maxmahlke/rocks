@@ -444,7 +444,7 @@ def weighted_average(observable, error):
     """
 
     # If no data was passed (happens when no preferred entry in table)
-    if not observable:
+    if not observable.size:
         return (np.nan, np.nan)
 
     if len(observable) == 1:
