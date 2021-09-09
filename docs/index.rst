@@ -80,6 +80,6 @@ See more use cases in the :ref:`Tutorials<Tutorials>`.
    Introduction<index>
    Getting Started<getting_started>
    Available Data<ssodnet>
+   The python package<core>
    Command Line Interface<cli>
-   The Rock Class<core>
    tutorials
