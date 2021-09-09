@@ -1,19 +1,27 @@
 .. _cli:
 
-Command-Line Interface
+Command Line Interface
 ======================
 
-The ``rocks`` command is used for quick exploration of asteroid data. It can be run with :ref:`subcommands<subcommands>` as arguments
-or providing an asteroid property and identifier to echo the data.
+The ``rocks`` executable is useful for quick exploration of asteroid data from the command line / terminal.
+The most general use case is to provide an asteroid property and an asteroid identifier to echo the value from the ``ssoCard``.
+
+.. code-block:: bash
+
+   $ rocks diameter Pallas
+   514.102 +- 3.475 km
+
+Furthermore, there are :ref:`subcommands<subcommands>` to identify asteroids, interact with the cached ``ssoCards``, look up available properties, and more.
+
+.. code-block:: bash
+
+   $ rocks identify 9885                                                                                                                                                                                       (9885) Linux
 
 Data exploration
 ----------------
 
-The general structure is ``rocks [Property Key] [Asteroid Identifier]``. Property keys refers to the property name in the ssoCard structure,
-see :ref:`rocks properties<rocks-props>`.
+The general structure is ``rocks [property] [id]``. ``property`` refers to the property name in the ssoCard structure, ``id`` refers to the asteroid name, designation, or number. Aliases such as packed designations are also recognized.
 
-Asteroid identifiers can be numbers, names, designations, and aliases such as packed designations.
-If no identifier is specified, a fuzzy-searchable selection is prompted.
 
 .. code-block:: bash       
                            
@@ -33,6 +41,8 @@ If the key ambiguous, the higher level attribute is preferred.
 
   $ rocks taxonomy.class_ 4
   V
+
+The names of the accepted properties are echoed with :ref:`rocks properties<rocks-props>`.
 
 Collections of properties from datacloud can also be printed. Giving only the name of the catalogue prints a general overview.
 
