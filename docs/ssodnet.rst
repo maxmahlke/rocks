@@ -45,13 +45,17 @@ to be specified explicitly (to avoid unnecessary data queries and retrievals).
 Updating the cached asteroid data
 ---------------------------------
 
-After some weeks / months, the data in the cached ``ssoCard``s may be outdated. The ``$ rocks status`` command echos the number of locally cached ``ssoCard``s and checks their version against the current SsODNet global ssoCard version. If any ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of these cards.
+After some weeks / months, the data in the cached ssoCards may be outdated. The
+``$ rocks status`` command echos the number of locally cached ssoCards  and
+checks their version against the current SsODNet global ssoCard version. If any
+ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of
+these cards.
 
 .. code-block:: bash
 
    $ rocks status
 
-You can delete all cached ``ssoCard``s by running
+You can delete all cached ssoCards by running
 
 .. code-block:: bash
 
