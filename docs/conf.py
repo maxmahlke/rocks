@@ -39,7 +39,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.napoleon",
-    "sphinx_click.ext",
     "sphinx.ext.graphviz",
 ]
 
