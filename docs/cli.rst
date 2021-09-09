@@ -77,7 +77,6 @@ Collections of properties from datacloud can also be printed. Giving only the na
   │ 7.78e+18  │ 7.93e+18  │ DEFLECT │ Siltala&Granvik2019 │ 2020 │
   │ 7.84e+18  │ 7.24e+17  │ EPHEM   │ Fienga+2020         │ 2020 │
   └───────────┴───────────┴─────────┴─────────────────────┴──────┘
-                            (19) Fortuna
 
 Providing the catalogue name and a property returns the property.
 
