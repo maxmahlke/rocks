@@ -1,4 +1,7 @@
-# 1.2.3
+# 1.2.4 - 2021-09
+- Bugfix in the weighted_average calculation
+
+# 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue
 - Added weighted average output to some datacloud catalogue queries from the command line
 - Added weigted_average method to Datacloud catalogue class
