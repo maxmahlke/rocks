@@ -35,3 +35,20 @@ In `rocks`, the parameter names are singular if they refer to the value in the `
 
 
 :ref:`ssoCards and datacloud catalogues are cached on your computer for quicker data access.<cache-directory>`
+
+.. _out-of-date:
+
+Updating the cached asteroid data
+---------------------------------
+
+After some weeks / months, the data in the cached ssoCards may be outdated. The ``$ rocks status`` command echos the number of locally cached ssoCards and checks their version against the current SsODNet global ssoCard version. If any ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of these cards.
+
+.. code-block:: bash
+
+   $ rocks status
+
+You can delete all cached ssoCards by running
+
+.. code-block:: bash
+
+   $ rocks clear

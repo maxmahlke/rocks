@@ -10,7 +10,7 @@ Install from PyPI
 
    $ pip install space-rocks
 
-.. cache-directory::
+.. _cache-directory:
 
 Cache directory
 ---------------
@@ -19,7 +19,12 @@ Cache directory
 again soon (e.g. when re-executing the analysis script), the data is stored in a cache directory located at ``~/.cache/rocks``, where the ``~`` character refers to the user's home directory.
 This directory is created if it does not exist when ``rocks`` is invoked.
 
-After some weeks / months, the data in the cached ssoCards may be outdated. You can update all outdated cards using
+.. _out-of-date:
+
+Updating out-of-date ssoCards
+-----------------------------
+
+After some weeks / months, the data in the cached ssoCards may be outdated. The ``$ rocks status`` command echos the number of locally cached ssoCards and checks their version against the current SsODNet global ssoCard version. If any ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of these cards.
 
 .. code-block:: bash
 
