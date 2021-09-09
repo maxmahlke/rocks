@@ -13,7 +13,6 @@ import urllib
 import warnings
 
 import click
-from iterfzf import iterfzf
 import numpy as np
 import pandas as pd
 import requests
@@ -121,44 +120,6 @@ def retrieve_index_from_repository():
 
     with open(rocks.PATH_INDEX, "wb") as ind:
         pickle.dump(index, ind, protocol=4)
-
-
-def select_sso_from_index():  # pragma: no cover
-    """Select SSO numbers and designations from interactive fuzzy search.
-
-    Returns
-    =======
-    str
-        asteroid name or designation
-    int
-        asteroid number
-
-    Notes
-    -----
-    If the selection is interrupted with ctrl-c, ``(None, None)`` is returned.
-
-    Examples
-    --------
-    >>> import rocks
-    >>> name, number, id_ = rocks.utils.select_sso_from_index()
-    """
-    INDEX = read_index()
-
-    def _fuzzy_desig_selection(index):
-        """Generator for fuzzy search of asteroid index file."""
-        for number, name in zip(index.number, index["name"]):
-            yield f"{number} {name}"
-
-    try:
-        nunaid = iterfzf(_fuzzy_desig_selection(INDEX), exact=True)
-        number, *name = nunaid.split()
-
-    except AttributeError:  # no SSO selected
-        return None, np.nan, None
-
-    id_ = INDEX.loc[INDEX.number == int(number), "id_"].values[0]
-
-    return " ".join(name), int(number), id_
 
 
 # ------

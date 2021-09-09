@@ -78,7 +78,7 @@ def identify(this):
 
 
 @cli_rocks.command()
-@click.argument("this", default="")
+@click.argument("id_")
 @click.option(
     "-m", "--minimal", is_flag=True, help="Reduce output to basic information."
 )
