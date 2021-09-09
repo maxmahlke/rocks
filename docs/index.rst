@@ -61,14 +61,12 @@ Easy access of asteroid properties using the :ref:`Rock<rock_class>` class.
                            
   >> from rocks import Rock
   >> ceres = Rock("ceres") 
-  >> ceres.diameter        
+  >> ceres.diameter.value
   848.4                    
-  >> ceres.mass            
+  >> ceres.mass.value
   9.384e+20                
-  >> ceres.mass.uncertainty  
-  6.711e+17         
-  >> ceres.mass.unit
-  'kg'             
+  >> ceres.mass.error
+  6.711e+17
 
 See more use cases in the :ref:`Tutorials<Tutorials>`.
 

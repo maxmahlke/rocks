@@ -22,7 +22,7 @@ After installation, you should have the ``rocks`` executable available system-wi
 
    [...]
 
-Further, you can now import the ``rocks`` ``python`` package.
+In addition, you can now import the ``rocks`` ``python`` package.
 
 .. code-block:: python
 

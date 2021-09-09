@@ -11,7 +11,7 @@ The most general use case is to provide an asteroid property and an asteroid ide
    $ rocks diameter Pallas
    514.102 +- 3.475 km
 
-Furthermore, there are :ref:`subcommands<subcommands>` to identify asteroids, interact with the cached ``ssoCards``, look up available properties, and more.
+Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact with the cached ``ssoCards``, look up available properties, and more.
 
 .. code-block:: bash
 
@@ -89,7 +89,7 @@ Providing the catalogue name and a property returns the property.
 
 The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 
-.. _subcommands:
+.. _commands:
 
 rocks docs
 ----------
