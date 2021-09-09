@@ -1,8 +1,9 @@
 ssoCard and datacloud
 =====================
 
-``rocks`` provides easy access to the asteroid data stored on `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>_`. There are two main data repositories, the `ssoCard https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/>_`
-and the `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>_`.
+``rocks`` provides easy access to the asteroid data stored on `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
+There are two main data repositories, the `ssoCard <https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/>`_
+and the `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
 
 Every known asteroid has an `ssoCard` and every `ssoCard` only refers to a
 single asteroid. It is meant to store the best single value for each parameter
@@ -33,4 +34,4 @@ In `rocks`, the parameter names are singular if they refer to the value in the `
    ['G', 'C', 'C', 'C', 'C', 'G', 'C']
 
 
-`ssoCards and datacloud catalogues are cached on your computer for quicker data access. <cache-directory>`_
+:ref:`ssoCards and datacloud catalogues are cached on your computer for quicker data access.<cache-directory>`
