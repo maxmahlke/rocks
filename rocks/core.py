@@ -30,20 +30,6 @@ def ensure_list(value):
     return value
 
 
-def ensure_unique_taxonomy(value):
-    """If there are several taxonomic classifications in the ssoCard, pick the most recent one."""
-    if isinstance(value, list):
-
-        value = {
-            "class": ", ".join(v["class"] for v in value),
-            "waverange": ", ".join(v["waverange"] for v in value),
-            "scheme": ", ".join(v["scheme"] for v in value),
-            "method": value[0]["method"],
-            "bibref": [v["bibref"] for v in value],
-        }
-    return value
-
-
 # ------
 # ssoCard as pydantic model
 
@@ -115,9 +101,9 @@ class OrbitalElements(Property):
     number_observation: Optional[int] = np.nan
     perihelion_argument: Value = Value(**{})
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class ProperElements(Property):
@@ -129,9 +115,9 @@ class ProperElements(Property):
     proper_semi_major_axis: Value = Value(**{})
     proper_sine_inclination: Value = Value(**{})
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -143,9 +129,9 @@ class Family(Property):
     family_number: Optional[int] = np.nan
     family_status: Optional[str] = ""
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -164,9 +150,9 @@ class Pair(Property):
     members: List[PairMembers] = [PairMembers(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
-    _ensure_list: classmethod = pydantic.validator(
-        "members", "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "members", "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -179,9 +165,9 @@ class Yarkovsky(Property):
     dadt: Value = Value(**{})
     bibref: List[Bibref] = [Bibref(**{})]
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         print_A2 = print_parameter(self.A2, "unit.dynamical.yarkovsky.A2.value")
@@ -206,9 +192,9 @@ class Albedo(Value):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class Color(Value):
@@ -231,9 +217,9 @@ class Colors(Property):
     J_K: List[Color] = [pydantic.Field(Color(**{}), alias="J-K")]
     H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
 
-    _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
-        ensure_list
-    )
+    # _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
+    #     ensure_list
+    # )
 
 
 class Diameter(Value):
@@ -242,9 +228,9 @@ class Diameter(Value):
 
     path_unit: str = "unit.physical.diameter.diameter"
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class Mass(Value):
@@ -253,9 +239,9 @@ class Mass(Value):
 
     path_unit: str = "unit.physical.mass.mass"
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class Phase(Property):
@@ -269,9 +255,9 @@ class Phase(Property):
     facility: Optional[str] = ""
     name_filter: Optional[str] = ""
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -299,9 +285,9 @@ class Spin(Property):
     def __str__(self):
         return self.json()
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class Taxonomy(Property):
@@ -311,9 +297,9 @@ class Taxonomy(Property):
     method: List[Method] = [Method(**{})]
     waverange: Optional[str] = ""
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
     def __str__(self):
         if not self.class_:
@@ -327,9 +313,9 @@ class ThermalInertia(Property):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
+    # _ensure_list: classmethod = pydantic.validator(
+    #     "bibref", "method", allow_reuse=True, pre=True
+    # )(ensure_list)
 
 
 class PhysicalParameters(Property):
@@ -338,7 +324,7 @@ class PhysicalParameters(Property):
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     diameter: Diameter = Diameter(**{})
-    taxonomy: Taxonomy = Taxonomy(**{})
+    taxonomy: List[Taxonomy] = [Taxonomy(**{})]
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
 
@@ -348,10 +334,6 @@ class PhysicalParameters(Property):
     _ensure_list: classmethod = pydantic.validator("spin", allow_reuse=True, pre=True)(
         ensure_list
     )
-
-    _ensure_unique_taxonomy: classmethod = pydantic.validator(
-        "taxonomy", allow_reuse=True, pre=True
-    )(ensure_unique_taxonomy)
 
 
 # ------
@@ -598,6 +580,7 @@ class Rock(pydantic.BaseModel):
         # Look up offending value in ssoCard
         for error in message.errors():
             value = data
+
             for loc in error["loc"]:
                 value = value[loc]
 

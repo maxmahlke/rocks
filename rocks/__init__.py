@@ -2,7 +2,7 @@
 import os
 import sys
 
-from . import datacloud, ssodnet, utils
+from . import datacloud, ssodnet, utils, plots
 
 # Expose API to user
 from .core import Rock

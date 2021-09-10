@@ -71,12 +71,30 @@ class Catalogue(pydantic.BaseModel):
         preferred_values = np.array(values)[preferred]
         preferred_errors = np.array(errors)[preferred]
 
-        if all([np.isnan(value) for value in preferred_values]) or all([np.isnan(error) for error in preferred_errors]):
-            warnings.warn(f"{self.name[0]}: The values or errors of property '{property_}' are all NaN. Average failed.")
+        if all([np.isnan(value) for value in preferred_values]) or all(
+            [np.isnan(error) for error in preferred_errors]
+        ):
+            warnings.warn(
+                f"{self.name[0]}: The values or errors of property '{property_}' are all NaN. Average failed."
+            )
             return np.nan, np.nan
 
-        average, error = rocks.utils.weighted_average(preferred_values, preferred_errors)
+        average, error = rocks.utils.weighted_average(
+            preferred_values, preferred_errors
+        )
         return average, error
+
+    def plot(self, property_=None):
+        """Open a histogram / scatter-plot of the property_.
+
+        Parameters
+        ==========
+        property_ : str
+            The name of the property to average. Default is None, where the name will be inferred
+            based on the parent catalogue. For diamalbedo, the property has to be specified.
+        """
+        rocks.plots.show_scatter_hist(self, "albedo")
+
 
 class Pairs(Catalogue):
     sibling_num: Optional[float] = np.nan
@@ -412,10 +430,14 @@ class Diamalbedo(Catalogue):
             return "No diameters on record."
 
         # Compute weighted averages of albedo and diameter
-        alb_avg, err_alb_avg = rocks.utils.weighted_average(np.array(self.albedo)[self.preferred_albedo],
-                                                            np.array(self.err_albedo)[self.preferred_albedo])
-        alb_diam, err_alb_diam = rocks.utils.weighted_average(np.array(self.diameter)[self.preferred_diameter],
-                                                            np.array(self.err_diameter)[self.preferred_diameter])
+        alb_avg, err_alb_avg = rocks.utils.weighted_average(
+            np.array(self.albedo)[self.preferred_albedo],
+            np.array(self.err_albedo)[self.preferred_albedo],
+        )
+        alb_diam, err_alb_diam = rocks.utils.weighted_average(
+            np.array(self.diameter)[self.preferred_diameter],
+            np.array(self.err_diameter)[self.preferred_diameter],
+        )
 
         table = rich.table.Table(
             header_style="bold blue",
@@ -425,7 +447,7 @@ class Diamalbedo(Catalogue):
 
             Albedo: {alb_avg:.2f} +- {err_alb_avg:.3f}
             Diameter: {alb_diam:.2f} +- {err_alb_diam:.2f}km
-            """
+            """,
         )
 
         columns = [
@@ -632,9 +654,8 @@ def select_numeric_property(obs, prop_name):
             preferred = [True if m in method else False for m in obs["method"]]
             return preferred
 
-
     # No property entry is preferred (likely all 0), return list of False
-    return [False for o in obs['number']]
+    return [False for o in obs["number"]]
 
 
 # In alphabetic order

@@ -79,10 +79,10 @@ def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
     ax.scatter(
         x[rejected],
         np.asarray(prop)[rejected],
-        label='Discarded', 
-        marker='x',
+        label="Discarded",
+        marker="x",
         s=260,
-        facecolors='gray',
+        facecolors="gray",
     )
 
     ax.set_xticks(x)
@@ -189,7 +189,7 @@ def _property_errors(catalogue, prop_name):
     return prop, errors
 
 
-def show_scatter_hist(info, par, figname):
+def show_scatter_hist(info, par):
 
     # translate input
     n = len(info[1])
@@ -281,8 +281,9 @@ def show_scatter_hist(info, par, figname):
 
     ax_histy.legend(loc="lower right")
 
-    plt.savefig(figname)
-    plt.close()
+    plt.show()
+    # plt.savefig(figname)
+    # plt.close()
 
 
 # Define colors/markers for all methods in ssodnet
