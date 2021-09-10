@@ -96,12 +96,14 @@ async def _identify(id_, progress):
     progress : bool or tdqm.std.tqdm
        If progress is True, this is a progress bar instance. Else, it's False.
     """
-    INDEX = rocks.utils.read_index()
+    NUMBERS, NAMES, IDS = rocks.utils.read_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(_query_and_resolve(i, session, INDEX, progress))
+            asyncio.ensure_future(
+                _query_and_resolve(i, session, NAMES, IDS, NUMBERS, progress)
+            )
             for i in id_
         ]
 
@@ -110,7 +112,7 @@ async def _identify(id_, progress):
     return results
 
 
-async def _query_and_resolve(id_, session, INDEX, progress):
+async def _query_and_resolve(id_, session, NAMES, IDS, NUMBERS, progress):
     """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
 
@@ -119,22 +121,24 @@ async def _query_and_resolve(id_, session, INDEX, progress):
 
     id_ = standardize_id_(id_)
 
+    # ------
     # Try local resolution
-    if isinstance(id_, (int)):
-        if id_ in INDEX.number.values:
-            name, ssodnet_id = INDEX.loc[INDEX.number == id_, ["name", "id_"]].iloc[0]
-            return (name, id_, ssodnet_id)
-    elif isinstance(id_, (str)):
-        if id_ in INDEX.name.values:
-            number, ssodnet_id = INDEX.loc[INDEX.name == id_, ["number", "id_"]].iloc[0]
-            return (id_, number, ssodnet_id)
-        elif id_ in INDEX.id_.values:
-            name, number = INDEX.loc[INDEX.id_ == id_, ["name", "number"]].iloc[0]
-            return (name, number, id_)
+    if id_ in NUMBERS:
+        name, ssodnet_id = NUMBERS[id_]
+        return (name, id_, ssodnet_id)
+
+    if id_ in NAMES:
+        number, ssodnet_id = NAMES[id_]
+        return (id_, number, ssodnet_id)
+
+    if id_ in IDS:
+        name, number = IDS[id_]
+        return (name, number, id_)
 
     if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
         return (None, np.nan, None)
 
+    # ------
     # Local resolution failed, do remote query
     response = await _query_quaero(id_, session)
 
