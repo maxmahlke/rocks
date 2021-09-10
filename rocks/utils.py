@@ -32,6 +32,18 @@ warnings.formatwarning = warning_on_one_line
 
 # ------
 # Functions for the asteroid name-number index
+def retrieve_index_from_repository():
+    """Download the index of numbered asteroids from the rocks GitHub
+    repository and saves it to the cache directory."""
+
+    URL = "https://github.com/maxmahlke/rocks/blob/master/data/index.pkl?raw=True"
+
+    index = pickle.load(urllib.request.urlopen(URL))
+
+    with open(rocks.PATH_INDEX, "wb") as ind:
+        pickle.dump(index, ind, protocol=4)
+
+
 def update_index():
     """Update index of numbered SSOs using the MPC database.
     The index file in the cache directory is changed in-place.
@@ -66,17 +78,26 @@ def update_index():
         pickle.dump([names, numbers, ids], ind, protocol=4)
 
 
-def retrieve_index_from_repository():
-    """Downloads the index of numbered asteroids from the rocks GitHub
-    repository and saves it to the cache directory."""
+def read_index():
+    """Read local index of asteroid numbers, names, SsODNet IDs.
 
-    URL = "https://github.com/maxmahlke/rocks/blob/master/data/index.pkl?raw=True"
+    Returns
+    =======
+    pd.DataFrame
+        Asteroid index with three columns.
+    """
+    with open(rocks.PATH_INDEX, "rb") as ind:
+        index = pickle.load(ind)
 
-    index = pickle.load(urllib.request.urlopen(URL))
-    index = index[["number", "name", "id_"]]
-
-    with open(rocks.PATH_INDEX, "wb") as ind:
-        pickle.dump(index, ind, protocol=4)
+    # TODO: Switched from pd.DataFrame to dicts. Can remove this check in 2022.
+    if isinstance(index, pd.DataFrame):
+        raise TypeError(
+            """The asteroid name-number index has been changed in version 1.3 to a
+        simple dictionary to speed up the name resolution. Please delete the
+        index file located at '$USER/.cache/rocks/index.pkl' and rerun your
+        command."""
+        )
+    return index
 
 
 # ------
