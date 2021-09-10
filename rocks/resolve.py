@@ -96,13 +96,13 @@ async def _identify(id_, progress):
     progress : bool or tdqm.std.tqdm
        If progress is True, this is a progress bar instance. Else, it's False.
     """
-    NUMBERS, NAMES, IDS = rocks.utils.read_index()
+    NAMES, NUMBERS, IDS = rocks.utils.read_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
             asyncio.ensure_future(
-                _query_and_resolve(i, session, NAMES, IDS, NUMBERS, progress)
+                _query_and_resolve(i, session, NAMES, NUMBERS, IDS, progress)
             )
             for i in id_
         ]
@@ -112,7 +112,7 @@ async def _identify(id_, progress):
     return results
 
 
-async def _query_and_resolve(id_, session, NAMES, IDS, NUMBERS, progress):
+async def _query_and_resolve(id_, session, NAMES, NUMBERS, IDS, progress):
     """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
 
