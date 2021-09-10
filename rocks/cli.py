@@ -49,17 +49,6 @@ def docs():
 
 
 @cli_rocks.command()
-def update():
-    """Update index of numbered SSOs and SsODNet metadata.
-
-    The list is retrieved from the Minor Planet Center, at
-    https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt
-    """
-    rocks.utils.create_index()
-    rocks.utils.retrieve_ssocard_template()
-
-
-@cli_rocks.command()
 def clear():
     """Clear the cached ssoCards."""
     for file_ in os.listdir(rocks.PATH_CACHE):
@@ -68,10 +57,10 @@ def clear():
 
 
 @cli_rocks.command()
-@click.argument("this")
-def id(this):
+@click.argument("id_")
+def id(id_):
     """Get asteroid name and number from string input."""
-    name, number = rocks.identify(this)  # type: ignore
+    name, number = rocks.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
@@ -81,12 +70,12 @@ def id(this):
 @click.argument("id_")
 def info(id_):
     """Print ssoCard of minor body."""
-    _, _, this = rocks.identify(id_, return_id=True)  # type: ignore
+    _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
 
-    if not isinstance(this, str):
+    if not isinstance(id_, str):
         sys.exit()
 
-    ssoCard = rocks.ssodnet.get_ssocard(this)
+    ssoCard = rocks.ssodnet.get_ssocard(id_)
     rich.print(ssoCard)
 
 
@@ -105,7 +94,10 @@ def properties():
 
 @cli_rocks.command()
 def status():
-    """Echo the number of ssoCards in the cache directory. Offer to update the out-of-date ones."""
+    """Echo the number of ssoCards and catalogues in the cache directory.
+    Offer to update the out-of-date ones. Offer to update the asteroid
+    name-number index.
+    """
 
     # Get set of ssoCards and datacloud catalogues in cache
     cached_jsons = set(
@@ -177,10 +169,19 @@ def status():
             rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
             print("Done.")
         else:
-            print("Exiting without updating.")
+            print("Not updating the ssoCards.")
 
     else:
         print("All cards are up-to-date.")
+
+    response = input("Update the asteroid name-number index? [Y/n] ")
+
+    if response in ["", "Y", "y"]:
+        print(f"Updating the index...", end=" ")
+        rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
+        rocks.utils.update_index()
+        rocks.utils.retrieve_json_from_ssodnet("template")
+        print("Done.")
 
 
 def echo():

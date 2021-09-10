@@ -44,7 +44,6 @@ def update_index():
     """Update index of numbered SSOs using the MPC database.
     The index file in the cache directory is changed in-place.
     """
-    print("Updating the asteroid name-number index..")
 
     # Get current index
     names, numbers, ids = read_index()
