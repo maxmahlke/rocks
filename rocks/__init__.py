@@ -9,7 +9,7 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolve import identify
 
-__version__ = "1.2.3"
+__version__ = "1.3.0"
 
 # Path to rocks auxilliary files
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
