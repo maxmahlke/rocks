@@ -13,13 +13,13 @@ without notice.**
 Latest version: 1.3.0  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
 
 via the Command Line
---------------------
+====================
 
 Quick exploration of asteroid parameters using the :ref:`rocks<Command Line Interface>` command-line interface.
 
 .. code-block:: bash       
                            
-   $ rocks identify 221    # you can also just use "id"
+   $ rocks id 221
    (221) Eos               
 
    $ rocks class Eos

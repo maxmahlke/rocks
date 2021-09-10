@@ -10,7 +10,7 @@
 Explore asteroid data on the command-line...
 
 ``` sh
-$ rocks identify 221
+$ rocks id 221
 (221) Eos
 
 $ rocks class Eos

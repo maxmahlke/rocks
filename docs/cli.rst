@@ -95,8 +95,8 @@ rocks docs
 
 Opens this documentation in browser tab.
 
-rocks identify
---------------
+rocks id
+--------
 
 Identify an asteroid using its number, name, or designation. Aliases and packed designations from the Minor Planet Centre are recognised as well.
 ``rocks`` uses SsODNet:quaero to resolve the identities.
@@ -104,16 +104,16 @@ Identify an asteroid using its number, name, or designation. Aliases and packed 
 
 .. code-block:: bash       
                            
-   $ rocks identify 221    
+   $ rocks id 221
    (221) Eos               
 
-   $ rocks identify Schwartz
+   $ rocks id Schwartz
    (13820) Schwartz
 
-   $ rocks identify "1902 UG"         
+   $ rocks id "1902 UG"
    (19) Fortuna
 
-   $ rocks identify J65B00A         
+   $ rocks id J65B00A
    (1727) Mette
 
 The command is aliased to ``rocks id`` as well.
