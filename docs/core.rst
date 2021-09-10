@@ -28,6 +28,8 @@ packed designations, and more.
     >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
     [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
 
+It can be difficult to remember if the first item in the tuple is the asteroid name or number. A donkey bridge: it is returned in alphabetical order, first name, then number.
+
 The ``Rock`` class
 ==================
 

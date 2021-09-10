@@ -30,46 +30,16 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
 
 warnings.formatwarning = warning_on_one_line
 
-
-def get_valid_ssocard_properties():
-    if not os.path.isfile(rocks.PATH_TEMPLATE):
-        rocks.utils.retrieve_ssoCard_template()
-
-    with open(rocks.PATH_TEMPLATE, "r") as file_:
-        TEMPLATE = json.load(file_)
-
-    # ssoCard properties
-    valid_props = [
-        p for p in pd.json_normalize(TEMPLATE).columns if not p.startswith("datacloud")
-    ]
-    # missing intermediate levels
-    valid_props = set(
-        valid_props + [".".join(v.split(".")[:-1]) for v in valid_props if "." in v]
-    )
-
-    valid_props = sorted(list(valid_props), key=len)
-    return valid_props
-
-
 # ------
-# Index functions
-def read_index():
-    """Read local index of asteroid numbers, names, SsODNet IDs.
-
-    Returns
-    =======
-    pd.DataFrame
-        Asteroid index with three columns.
+# Functions for the asteroid name-number index
+def update_index():
+    """Update index of numbered SSOs using the MPC database.
+    The index file in the cache directory is changed in-place.
     """
-    with open(rocks.PATH_INDEX, "rb") as ind:
-        return pickle.load(ind)
+    print("Updating the asteroid name-number index..")
 
-
-def create_index():
-    """Update index of numbered SSOs."""
-
-    # Get currently indexed objects
-    index = read_index()
+    # Get current index
+    names, numbers, ids = read_index()
 
     # Get list of numbered asteroids from MPC
     url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
@@ -77,36 +47,23 @@ def create_index():
     numbered = set(int(n.strip(" (")) for n in numbered.number)  # type: ignore
 
     # Compare list to index
-    missing = set(index.number) ^ set(numbered)
+    missing = set(numbers) ^ set(numbered)
 
     if not missing:
         return
 
     # Get ids of missing entries, append to index
-    names, numbers, ids = zip(*rocks.identify(missing, return_id=True))
+    miss_names, miss_numbers, miss_ids = zip(*rocks.identify(missing, return_id=True))
 
-    index = index.append(
-        pd.DataFrame(
-            {
-                "name": names,
-                "number": numbers,
-                "id_": ids,
-            }
-        )
-    )
+    # Add the missing items to the index
+    for name, number, id_ in zip(miss_names, miss_numbers, miss_ids):
+        numbers[number] = (name, id_)
+        names[name] = (number, id_)
+        ids[id_] = (name, number)
 
-    # Save index to file
-    index = (
-        index.dropna(how="any")
-        .drop_duplicates("number")
-        .sort_values("number", ascending=True)
-        .astype({"number": np.int64, "name": str, "id_": str})
-    )
-
-    index = index.reset_index()
-
+    # And save to file
     with open(rocks.PATH_INDEX, "wb") as ind:
-        pickle.dump(index, ind, protocol=4)
+        pickle.dump([names, numbers, ids], ind, protocol=4)
 
 
 def retrieve_index_from_repository():
