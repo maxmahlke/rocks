@@ -1,26 +1,22 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
 
-import collections
-from functools import reduce
 import json
-import keyword
 import os
 import pickle
-import sys
-import time
 import urllib
 import warnings
+from functools import reduce
 
-import click
 import numpy as np
 import pandas as pd
 import requests
-from tqdm import tqdm
 
 import rocks
 
 
+# ------
+# Simplify error messages
 def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
     if "rocks/" in filename:
         return f"rocks: {message}\n"
@@ -102,10 +98,6 @@ def read_index():
 
 # ------
 # ssoCard utility functions
-# def rsetattr(obj, attr, val):  # pragma: no cover
-#     """Deep version of setattr."""
-#     pre, _, post = attr.rpartition(".")
-#     return setattr(rgetattr(obj, pre) if pre else obj, post, val)
 def rgetattr(obj, attr):
     """Deep version of getattr. Retrieve nested attributes.
 
@@ -128,26 +120,6 @@ def rgetattr(obj, attr):
     return reduce(_getattr, [obj] + attr.split("."))
 
 
-def retrieve_ssocard_template():
-    """Retrieve current ssoCard template from SsODNet."""
-
-    URL = (
-        "https://ssp.imcce.fr/webservices/ssodnet/api/"
-        "ssocard/templates/catalogue-template_aster-astorb.json"
-    )
-
-    response = requests.get(URL)
-
-    if response.ok:
-        ssoCard = response.json()
-
-        with open(rocks.PATH_TEMPLATE, "w") as file_:
-            json.dump(ssoCard, file_)
-
-    else:
-        warnings.warn(f"Retrieving the template failed with url:\n{URL}")
-
-
 def get_unit(path_unit):
     """Get unit from units JSON file.
 
@@ -165,21 +137,10 @@ def get_unit(path_unit):
     PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit-template_aster-astorb.json")
 
     if not os.path.isfile(PATH_UNITS):
-        print("Units not present in cache directory, retrieving them from SsODNet..")
-
-        # Retrieve unit list from SsODNet
-        URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/unit_aster-astorb.json"
-
-        response = requests.get(URL)
-
-        if response.ok:
-            units = response.json()
-
-            with open(PATH_UNITS, "w") as file_:
-                json.dump(units, file_)
-
-        else:
-            warnings.warn(f"Retrieving the units failed with url:\n{URL}")
+        print(
+            "The ssoCard units not present in cache directory, retrieving them from SsODNet..\n"
+        )
+        retrieve_json_from_ssodnet("units")
 
     with open(PATH_UNITS, "r") as units:
         units = json.load(units)
@@ -413,23 +374,41 @@ def weighted_average(observable, error):
     return (avg, std_avg)
 
 
-DONT_PRINT = [
-    "num",
-    "name",
-    "id",
-    "iddataset",
-    "title",
-    "url",
-    "doi",
-    "bibcode",
-    "link",
-    "datasetname",
-    "idcollection",
-    "selection",
-    "source",
-    "resourcename",
-    "preferred",
-    "preferred_albedo",
-    "preferred_diameter",
-    "_iter_index",
-]
+# ------
+# Misc
+def retrieve_json_from_ssodnet(which):
+    """Retrieve the ssoCard template, units, or descriptions from SsODNet.
+
+    Parameters
+    ==========
+    which : str
+        The JSON file to download. Choose from ['template', 'units', 'description']
+
+    """
+
+    # Construct URL
+    URL_BASE = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/"
+
+    URL_JSON = {
+        "template": "templates/catalogue-template_aster-astorb.json",
+        "units": "unit_aster-astorb.json",
+        "description": "description_aster-astorb.json",
+    }
+
+    # Query and save to file
+    response = requests.get("".join([URL_BASE, URL_JSON[which]]))
+
+    PATH_JSON = {
+        "template": "catalogue-template_aster-astorb.json",
+        "units": "unit_aster-astorb.json",
+        "description": "description_aster-astorb.json",
+    }
+
+    if response.ok:
+        ssoCard = response.json()
+
+        with open("".join([rocks.PATH_CACHE, PATH_JSON[which]]), "w") as file_:
+            json.dump(ssoCard, file_)
+
+    else:
+        warnings.warn(f"Retrieving the ssoCard {which} failed with url:\n{URL}")

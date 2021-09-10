@@ -218,10 +218,4 @@ def echo():
 
     # Pretty-printing is implemented in the properties __str__
     rich.print(rocks.utils.rgetattr(rock, prop))
-
-    if rock.name == "Benoitcarry" and os.getenv("USER") == "bcarry":
-        print(
-            '\n"This [minor] planet has - or rather had - a problem, which was this: most of the people [it was named after] were [looking up their rock at work] for pretty much all of the time."\n'
-        )
-
     sys.exit()
