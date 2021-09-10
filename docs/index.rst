@@ -1,6 +1,6 @@
 ``rocks``
 =========
-*for space rocks*
+*for space-rocks*
 
 A ``python`` package to query and explore asteroid data from
 `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
@@ -15,7 +15,7 @@ Latest version: 1.3.0  - `What's new? <https://github.com/maxmahlke/rocks/blob/m
 via the Command Line
 --------------------
 
-Quick exploration of asteroid parameters using the :ref:`rocks<Command-Line Interface>` command-line interface.
+Quick exploration of asteroid parameters using the :ref:`rocks<Command Line Interface>` command-line interface.
 
 .. code-block:: bash       
                            
@@ -75,7 +75,6 @@ See more use cases in the :ref:`Tutorials<Tutorials>`.
    :caption: Contents
    :hidden:
 
-   Introduction<index>
    Getting Started<getting_started>
    Available Data<ssodnet>
    The python package<core>
