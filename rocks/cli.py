@@ -79,10 +79,7 @@ def identify(this):
 
 @cli_rocks.command()
 @click.argument("id_")
-@click.option(
-    "-m", "--minimal", is_flag=True, help="Reduce output to basic information."
-)
-def info(id_, minimal):
+def info(id_):
     """Print ssoCard of minor body."""
     _, _, this = rocks.identify(id_, return_id=True)  # type: ignore
 
@@ -90,9 +87,7 @@ def info(id_, minimal):
         sys.exit()
 
     ssoCard = rocks.ssodnet.get_ssocard(this)
-
-    if ssoCard is not None:
-        rocks.utils.pretty_print_card(ssoCard, minimal)
+    rich.print(ssoCard)
 
 
 @cli_rocks.command()
