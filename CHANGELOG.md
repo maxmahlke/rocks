@@ -1,7 +1,9 @@
-# 1.2.4 - 2021-09
+# 1.3.0 - 2021-09-10
 - Bugfix in the weighted_average calculation
-- Switched the local index from a pandas dataframe to sets
+- Switched the local index from a pandas dataframe to dictionaries
 - Local name resolution is now lightning fast
+- Removed outdated code and reformatted the utils module
+- Lots of documentation edits
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

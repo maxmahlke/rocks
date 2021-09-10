@@ -21,7 +21,7 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 
 if not os.path.isfile(PATH_INDEX):
     response = input(
-        "The index of numbered asteroids is not present on your "
+        "The asteroid name-number index is not present on your "
         "system.\nRetrieve it now from the rocks GitHub repository? [Yn] "
     )
 
