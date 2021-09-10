@@ -1,6 +1,12 @@
+##############
+Available Data
+##############
+
 ``rocks`` provides easy access to the asteroid data stored on `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
 There are two main data repositories, the `ssoCard <https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/>`_
 and the `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
+
+.. _ssocard-datacloud:
 
 ssoCard and datacloud
 =====================
@@ -55,7 +61,12 @@ these cards.
 
    $ rocks status
 
-You can delete all cached ssoCards by running
+.. _clear_cache:
+
+Removing the cached asteroid data
+---------------------------------
+
+You can delete all cached ssoCards and datacloud catalogues by running
 
 .. code-block:: bash
 

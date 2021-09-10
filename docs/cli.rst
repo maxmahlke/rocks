@@ -1,7 +1,8 @@
 .. _cli:
 
+######################
 Command Line Interface
-======================
+######################
 
 The ``rocks`` executable is useful for quick exploration of asteroid data from the command line / terminal.
 The most general use case is to provide an asteroid property and an asteroid identifier to echo the value from the ``ssoCard``.
@@ -19,7 +20,7 @@ Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact
    (9885) Linux
 
 Data exploration
-----------------
+================
 
 The general structure is ``rocks [property] [id]``. ``property`` refers to the property name in the ssoCard structure, ``id`` refers to the asteroid name, designation, or number. Aliases such as packed designations are also recognized.
 
@@ -90,6 +91,9 @@ The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 
 .. _commands:
 
+More commands
+=============
+
 rocks docs
 ----------
 
@@ -143,11 +147,7 @@ rocks status
 ------------
 
 Echos the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.
-
-rocks update
-------------
-
-Update the cached index of asteroid numbers, names, and SsODNet IDs. Further, retrieve the current ssoCard structure template from SsODNet.
+Offers to update the asteroid name-number index. Further, retrieves the current ssoCard structure template from SsODNet.
 
 
 rocks clear

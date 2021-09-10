@@ -4,6 +4,7 @@
 - Local name resolution is now lightning fast
 - Removed outdated code and reformatted the utils module
 - Lots of documentation edits
+- Merged the 'rocks update' command into the 'rocks status' command
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

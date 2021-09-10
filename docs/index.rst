@@ -1,6 +1,10 @@
+#########
 ``rocks``
-=========
+#########
+
 *for space-rocks*
+
+.. highlight:: python
 
 A ``python`` package to query and explore asteroid data from
 `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
@@ -53,7 +57,7 @@ Quick exploration of asteroid parameters using the :ref:`rocks<Command Line Inte
 
 
 via a ``python`` script
------------------------
+=======================
 
 Easy access of asteroid properties using the :ref:`Rock<rock_class>` class.
 
@@ -71,7 +75,7 @@ Easy access of asteroid properties using the :ref:`Rock<rock_class>` class.
 See more use cases in the :ref:`Tutorials<Tutorials>`.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents
    :hidden:
 

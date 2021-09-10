@@ -1,5 +1,9 @@
 .. _rock_class:
 
+######################
+The ``python`` package
+######################
+
 ``rocks`` provides object-oriented access to the data stored in ssoCards and
 datacloud. The implementation focuses on ease of access and speed: all
 attributes are accessible via the common dot notation, and queries to
@@ -33,7 +37,7 @@ It can be difficult to remember if the first item in the tuple is the asteroid n
 The ``Rock`` class
 ==================
 
-The :ref:`Rock<rocks-Rock>` class is used to inspect the parameters of a single
+The ``Rock`` class is used to inspect the parameters of a single
 asteroid. It is the (iron) core of the ``rocks`` package.
 
 Creating a ``Rock`` instance
@@ -75,7 +79,7 @@ attributes can be skipped.
    >>> vesta.diameter
    525.4
 
-More shortcuts are :ref:`given below<attribute_shortcuts>`. Feel free to suggest new ones by opening an issue on the `GitHub page<https://github.com/maxmahlke/rocks`_.
+More shortcuts are :ref:`given below<attribute_shortcuts>`. Feel free to suggest new ones by opening an issue on the `GitHub page <https://github.com/maxmahlke/rocks>`_.
 
 Differences to the ``ssoCard`` structure arise in two cases:
 

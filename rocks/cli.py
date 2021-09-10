@@ -95,8 +95,8 @@ def properties():
 @cli_rocks.command()
 def status():
     """Echo the number of ssoCards and catalogues in the cache directory.
-    Offer to update the out-of-date ones. Offer to update the asteroid
-    name-number index.
+    Optionally update the out-of-date ones.
+    Optionally update the asteroid name-number index.
     """
 
     # Get set of ssoCards and datacloud catalogues in cache
