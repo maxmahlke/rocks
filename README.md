@@ -7,7 +7,35 @@
 
 ## Features
 
-Command-line exploration and scripted retrieval of asteroid data.
+Explore asteroid data on the command-line...
+
+``` sh
+$ rocks identify 221
+(221) Eos
+
+$ rocks class Eos
+MB>Outer
+
+$ rocks albedo Eos
+0.136 +- 0.004
+
+$ rocks taxonomy.class_ Eos
+K
+```
+
+... and in a `python` script.
+
+``` python
+>>> from rocks import Rock
+>>> ceres = Rock("ceres")
+>>> ceres.diameter.value
+848.4
+>>> ceres.mass.value
+9.384e+20
+>>> ceres.mass.error
+6.711e+17
+```
+
 
 ## Install
 
