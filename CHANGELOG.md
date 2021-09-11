@@ -5,6 +5,8 @@
 - Removed outdated code and reformatted the utils module
 - Lots of documentation edits
 - Merged the 'rocks update' command into the 'rocks status' command
+- datacloud objects are now iterated over their entries rather than their columns
+- datacloud objects are now subscriptable, following the syntax of subscripting numpy arrays
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

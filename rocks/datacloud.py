@@ -42,6 +42,15 @@ class Catalogue(pydantic.BaseModel):
         ensure_list
     )
 
+    def __iter__(self):
+        for entry in range(len(self.id_)):
+            yield {key: value[entry] for key, value in self.dict().items()}
+
+    def __getitem__(self, idx):
+        return type(self)(
+            **{key: list(np.array(value)[idx]) for key, value in self.dict().items()}
+        )
+
     def weighted_average(self, property_=None):
         """Compute the weighted average of the preferred entries of a catalogued property.
 
