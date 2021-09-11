@@ -421,6 +421,7 @@ class Diamalbedo(Catalogue):
 
     preferred_albedo: List[bool] = [False]
     preferred_diameter: List[bool] = [False]
+    preferred: List[bool] = [False]
 
     @pydantic.validator("preferred_albedo", pre=True)
     def select_preferred_albedo(cls, v, values):
@@ -429,6 +430,15 @@ class Diamalbedo(Catalogue):
     @pydantic.validator("preferred_diameter", pre=True)
     def select_preferred_diameter(cls, v, values):
         return rank_properties("diameter", values)
+
+    @pydantic.validator("preferred", pre=True)
+    def preferred_albedo_or_diameter(cls, v, values):
+        return [
+            True if pref_alb or pref_diam else False
+            for pref_alb, pref_diam in zip(
+                values["preferred_albedo"], values["preferred_diameter"]
+            )
+        ]
 
     def __len__(self):
         return len(self.albedo)
