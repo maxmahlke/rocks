@@ -101,10 +101,6 @@ class OrbitalElements(Property):
     number_observation: Optional[int] = np.nan
     perihelion_argument: Value = Value(**{})
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
-
 
 class ProperElements(Property):
     bibref: List[Bibref] = [Bibref(**{})]
@@ -115,10 +111,6 @@ class ProperElements(Property):
     proper_semi_major_axis: Value = Value(**{})
     proper_sine_inclination: Value = Value(**{})
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
-
     def __str__(self):
         return self.json()
 
@@ -128,10 +120,6 @@ class Family(Property):
     family_name: Optional[str] = ""
     family_number: Optional[int] = np.nan
     family_status: Optional[str] = ""
-
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -150,10 +138,6 @@ class Pair(Property):
     members: List[PairMembers] = [PairMembers(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "members", "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
-
     def __str__(self):
         return self.json()
 
@@ -164,10 +148,6 @@ class Yarkovsky(Property):
     snr: Optional[float] = np.nan
     dadt: Value = Value(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
 
     def __str__(self):
         print_A2 = print_parameter(self.A2, "unit.dynamical.yarkovsky.A2.value")
@@ -192,10 +172,6 @@ class Albedo(Value):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
-
 
 class Color(Value):
     color: Value = Value(**{})
@@ -217,10 +193,6 @@ class Colors(Property):
     J_K: List[Color] = [pydantic.Field(Color(**{}), alias="J-K")]
     H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
 
-    # _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
-    #     ensure_list
-    # )
-
 
 class Diameter(Value):
     method: List[Method] = []
@@ -228,20 +200,12 @@ class Diameter(Value):
 
     path_unit: str = "unit.physical.diameter.diameter"
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
-
 
 class Mass(Value):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
     path_unit: str = "unit.physical.mass.mass"
-
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
 
 
 class Phase(Property):
@@ -254,10 +218,6 @@ class Phase(Property):
     bibref: List[Bibref] = [Bibref(**{})]
     facility: Optional[str] = ""
     name_filter: Optional[str] = ""
-
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", allow_reuse=True, pre=True
-    # )(ensure_list)
 
     def __str__(self):
         return self.json()
@@ -285,10 +245,6 @@ class Spin(Property):
     def __str__(self):
         return self.json()
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
-
 
 class Taxonomy(Property):
     class_: Optional[str] = pydantic.Field("", alias="class")
@@ -296,10 +252,6 @@ class Taxonomy(Property):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
     waverange: Optional[str] = ""
-
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
 
     def __str__(self):
         if not self.class_:
