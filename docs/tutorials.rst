@@ -38,6 +38,10 @@ Property exploration - scripted
 What's the proper semi-major axis distribution of the Koronis family?
 
 
+Datacloud Catalogues
+====================
+
+- :ref:`Is there a convenient way to get the entries of a catalogue one by one? <iterate_catalogues>`
 
 
 .. _weighted_average_scripted:
