@@ -3,11 +3,13 @@
 - Readded the --plot flag for datacloud CLI queries
 - Merged the 'rocks update' command into the 'rocks status' command
 - Switched the local index from a pandas dataframe to dictionaries
+- Included the absolute magnitude into the ssoCard following upstream development
 - Local name resolution is now lightning fast
 - Removed outdated code and reformatted the utils module
 - Lots of documentation edits
 - The diamalbedo catalogue once again has the preferred attribute
 - Bugfix in the weighted_average calculation
+- Made the wording more consistent: asteroid "property" -> asteroid "parameter"
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

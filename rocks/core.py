@@ -313,9 +313,10 @@ class ThermalInertia(Property):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
-    # _ensure_list: classmethod = pydantic.validator(
-    #     "bibref", "method", allow_reuse=True, pre=True
-    # )(ensure_list)
+
+class AbsoluteMagnitude(Value):
+    G: Optional[float] = np.nan
+    bibref: List[Bibref] = []
 
 
 class PhysicalParameters(Property):
@@ -327,6 +328,7 @@ class PhysicalParameters(Property):
     taxonomy: List[Taxonomy] = [Taxonomy(**{})]
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
+    absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
     def __str__(self):
         return self.json()
@@ -544,7 +546,8 @@ class Rock(pydantic.BaseModel):
         return hash(self.id_)
 
     def __add_datacloud_catalogue(self, id_, catalogue, data):
-        """Retrieve datacloud catalogue for asteroid and deserialize."""
+        """Retrieve datacloud catalogue for asteroid and deserialize into
+        pydantic model."""
 
         if catalogue not in rocks.datacloud.CATALOGUES.keys():
             raise ValueError(
@@ -579,7 +582,6 @@ class Rock(pydantic.BaseModel):
 
         # add catalogue to Rock
         data[catalogue_attribute] = cat
-
         return data
 
     def __parse_error_message(self, message, id_, data):
@@ -609,6 +611,8 @@ class Rock(pydantic.BaseModel):
         "physical": {
             "parameters.physical.diameter": "diameter",
             "parameters.physical.albedo": "albedo",
+            "parameters.physical.absolute_magnitude": "absolute_magnitude",
+            "parameters.physical.absolute_magnitude": "H",
             "parameters.physical.colors": "colors",
             "parameters.physical.mass": "mass",
             "parameters.physical.thermal_properties": "thermal_properties",
