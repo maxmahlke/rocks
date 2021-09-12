@@ -58,9 +58,9 @@ class Value(pydantic.BaseModel):
         )
 
         if abs(self.error.min_) == abs(self.error.max_):
-            return f"{self.value} +- {self.error.max_} {unit}"
+            return f"{self.value:.4} +- {self.error.max_:.4} {unit}"
         else:
-            return f"{self.value} +- ({self.error.max_}, {self.error.min_}) {unit}"
+            return f"{self.value:.4} +- ({self.error.max_:.4}, {self.error.min_:.4}) {unit}"
 
 
 # The second lowest level is the Parameter
