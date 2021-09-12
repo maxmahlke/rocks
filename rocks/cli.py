@@ -80,11 +80,11 @@ def info(id_):
 
 
 @cli_rocks.command()
-def properties():
+def parameters():
     """Prints the ssoCard JSON keys and description using the template."""
 
     if not os.path.isfile(rocks.PATH_TEMPLATE):
-        rocks.utils.retrieve_ssocard_template()
+        rocks.utils.retrieve_json_from_ssodnet("template")
 
     with open(rocks.PATH_TEMPLATE, "r") as file_:
         TEMPLATE = json.load(file_)

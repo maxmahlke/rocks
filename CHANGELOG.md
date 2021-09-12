@@ -1,12 +1,13 @@
 # 1.3.0 - 2021-09-10
-- Bugfix in the weighted_average calculation
+- datacloud catalogues are now pd.DataFrame objects
+- Readded the --plot flag for datacloud CLI queries
+- Merged the 'rocks update' command into the 'rocks status' command
 - Switched the local index from a pandas dataframe to dictionaries
 - Local name resolution is now lightning fast
 - Removed outdated code and reformatted the utils module
 - Lots of documentation edits
-- Merged the 'rocks update' command into the 'rocks status' command
-- datacloud catalogues are now DataCloudDataFrame objects, a pd.DataFrame subclass with extra capabilities (weighted average and plotting)
 - The diamalbedo catalogue once again has the preferred attribute
+- Bugfix in the weighted_average calculation
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

@@ -496,9 +496,7 @@ class Rock(pydantic.BaseModel):
             setattr(
                 self,
                 catalogue_ssodnet,
-                rocks.datacloud.DataCloudDataFrame(
-                    data=getattr(self, catalogue_ssodnet).dict()
-                ),
+                pd.DataFrame(data=getattr(self, catalogue_ssodnet).dict()),
             )
 
     def __getattr__(self, name):

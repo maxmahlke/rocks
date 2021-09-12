@@ -224,7 +224,7 @@ def retrieve_json_from_ssodnet(which):
     response = requests.get("".join([URL_BASE, URL_JSON[which]]))
 
     PATH_JSON = {
-        "template": "catalogue-template_aster-astorb.json",
+        "template": "ssoCard_template.json",
         "units": "unit_aster-astorb.json",
         "description": "description_aster-astorb.json",
     }
@@ -232,7 +232,7 @@ def retrieve_json_from_ssodnet(which):
     if response.ok:
         ssoCard = response.json()
 
-        with open("".join([rocks.PATH_CACHE, PATH_JSON[which]]), "w") as file_:
+        with open("/".join([rocks.PATH_CACHE, PATH_JSON[which]]), "w") as file_:
             json.dump(ssoCard, file_)
 
     else:
