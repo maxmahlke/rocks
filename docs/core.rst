@@ -98,18 +98,40 @@ Single tables can be requested by passing the table name to the ``datacloud``.
 
 .. code-block:: python
 
-    >> ceres = Rock(1, datacloud='masses')
+    >>> ceres = Rock(1, datacloud='masses')
 
 Multiple tables are retrieved by passing a list of table names.
 
 .. code-block:: python
 
-    >> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
-    >> ceres.taxonomies.class_
+    >>> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
+    >>> ceres.taxonomies.class_
     ['G', 'C', 'C', 'C', 'C', 'G', 'C']
-    >> ceres.taxonomies.shortbib
+    >>> ceres.taxonomies.shortbib
     ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004',
      'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
+
+.. _iterate_catalogues:
+
+The catalogues are iterable and return a catalogue per entry in each iteration.
+
+.. code-block:: python
+
+    >>> vesta = Rock(4, datacloud="diamalbedo")
+    >>> for entry in vesta.diameters:
+            print(f"{entry.diameter:.1f}km, observed via {entry.method} by {entry.shortbib}")
+
+    507.3km, observed via TE-IM by Drummond+1998
+    530.0km, observed via STM by Morrison+2007
+    510.0km, observed via TE-IM by Drummond+2008
+    468.3km, observed via STM by Tedesco+2001
+    520.4km, observed via STM by Ryan+2010
+    515.9km, observed via NEATM by Ryan+2010
+    521.7km, observed via NEATM by Usui+2011
+    525.4km, observed via SPACE by Russell+2012
+    562.6km, observed via NEATM by Alí-Lagoa+2018
+    505.4km, observed via OCC by Herald+2019
+    522.0km, observed via OCC by Herald+2019
 
 
 The ``datacloud`` tables have slightly different names in ``rocks``.
@@ -148,10 +170,10 @@ otherwise.
 
 .. code-block:: python
 
-    >> ceres = Rock(1, datacloud='masses')
-    >> len(ceres.masses.mass)  # 20 observations of Ceres' mass in database
+    >>> ceres = Rock(1, datacloud='masses')
+    >>> len(ceres.masses.mass)  # 20 observations of Ceres' mass in database
     20
-    >> for obs in ceres.masses:
+    >>> for obs in ceres.masses:
           if obs.preferred:
               print(f"Mass: {obs.mass}, Method: {obs.method}, from {obs.shortbib}")
     Mass: 9.384e+20, Method: SPACE, from Russell+2016
@@ -172,7 +194,7 @@ provided, this check can be skipped by setting the ``skip_id_check`` argument to
 
 .. code-block:: python
 
-    >> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
+    >>> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
 
 The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
 The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
