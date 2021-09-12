@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 """ Plotting utilities for rocks."""
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+import rocks
 
 
-def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
-    """Create scatter/histogram figure for float parameters.
+def plot(catalogue, parameter, nbins=10, show=True, save_to=""):
+    """Create a scatter/histogram figure for asteroid parameters in datacloud
+    catalogues.
 
     Parameters
     ==========
-    catalogue : rocks.core.propertyCollection
+    catalogue : rocks.datacloud.Catalog
         A datacloud catalogue ingested in Rock instance.
-    prop_name : str
-        The property name, referring to a column in the datacloud table.
+    parameter : str
+        The parameter name, referring to a column in the datacloud catalogue.
     nbins : int
         Number of bins in histogram. Default is 10
     show : bool
@@ -25,269 +29,129 @@ def scatter(catalogue, prop_name, nbins=10, show=False, savefig=""):
     matplotlib.figures.Figure instance, matplotib.axes.Axis instance
     """
 
-    prop, errors = _property_errors(catalogue, prop_name)
+    # Look up the correct parameter name
+    parameter = PLOTTING["PARAMETERS"][parameter]
+
+    # Reduce the catalogue to the valid entries
+    _catalogue = catalogue.loc[
+        (catalogue[parameter] != 0) & (~pd.isna(catalogue[parameter]))
+    ].copy()
+
+    # Classic diamalbedo if-clause
+    if parameter in ["albedo", "diameter"]:
+        _catalogue.loc[:, "preferred"] = _catalogue.loc[:, f"preferred_{parameter}"]
+
+    # Reset the catalogue index for easier plotting
+    _catalogue = _catalogue.reset_index()
 
     # ------
-    # Build figure
-    fig = plt.figure(figsize=(12, 8))
-    gs = fig.add_gridspec(
-        1,
-        2,
-        width_ratios=(7, 2),
-        wspace=0.05,
-        left=0.07,
-        right=0.97,
-        bottom=0.05,
-        top=0.87,
+    # Define figure layout
+    fig, (ax_scatter, ax_hist) = plt.subplots(
+        ncols=2,
+        figsize=(12, 8),
+        sharey=True,
+        gridspec_kw={"width_ratios": [7, 2], "wspace": 0.01},
+        constrained_layout=True,
     )
 
-    ax = fig.add_subplot(gs[0])
-    ax_histy = fig.add_subplot(gs[1], sharey=ax)
+    # ------
+    # Create the scatter plot
 
-    avg, std = prop.weighted_average(errors, catalogue.preferred)
-    ax.axhline(avg, label="Average", color=METHODS["avg"]["color"])
-    ax.axhline(
-        avg + std,
-        label=fr"1$\sigma$ deviation",
-        linestyle="dashed",
-        color=METHODS["std"]["color"],
-    )
-    ax.axhline(avg - std, linestyle="dashed", color=METHODS["std"]["color"])
+    # Add the observations, coded per method
+    for method in set(_catalogue.method):
 
-    x = np.linspace(1, len(prop), len(prop))
-    for i, m in enumerate(np.unique(catalogue.method)):
-        cur = np.where(np.asarray(catalogue.method) == m)
-        fcol = "none"
-        ax.scatter(
-            x[cur],
-            np.asarray(prop)[cur],
-            label=m,
-            marker=METHODS[m]["marker"],
+        # Observations acquired with this method
+        obs_method = _catalogue[
+            [entry.method == method for _, entry in _catalogue.iterrows()]
+        ]
+
+        if obs_method.empty:
+            continue
+
+        facecolors = [
+            PLOTTING[method]["color"] if preferred else "none"
+            for preferred in obs_method["preferred"]
+        ]
+
+        ax_scatter.scatter(
+            obs_method.index,
+            obs_method[parameter],
+            marker=PLOTTING[method]["marker"],
+            edgecolors=PLOTTING[method]["color"],
+            facecolors=facecolors,
             s=80,
-            facecolors=fcol,
-            edgecolors=METHODS[m]["color"],
+            label=method,
         )
-        ax.errorbar(
-            x[cur],
-            np.asarray(prop)[cur],
-            yerr=np.asarray(errors)[cur],
-            c=METHODS[m]["color"],
+        ax_scatter.errorbar(
+            obs_method.index,
+            obs_method[parameter],
+            yerr=obs_method[f"err_{parameter}"],
+            color=PLOTTING[method]["color"],
             linestyle="",
         )
+    # Add weighted average and error
+    avg, err_avg = rocks.utils.weighted_average(_catalogue, parameter)
 
-    rejected = np.where(np.asarray(catalogue.preferred) == False)
-    ax.scatter(
-        x[rejected],
-        np.asarray(prop)[rejected],
-        label="Discarded",
-        marker="x",
-        s=260,
-        facecolors="gray",
+    ax_scatter.axhline(avg, color=PLOTTING["avg"]["color"], label="Average")
+    ax_scatter.axhline(
+        avg + err_avg,
+        ls="dashed",
+        color=PLOTTING["std"]["color"],
+        label="1$\sigma$ deviation",
     )
+    ax_scatter.axhline(avg - err_avg, ls="dashed", color=PLOTTING["std"]["color"])
 
-    ax.set_xticks(x)
-    axtop = ax.twiny()
-    axtop.set_xticks(x)
-    axtop.set_xticklabels(catalogue.shortbib, rotation=25, ha="left")
-    ax.set_ylabel(PLOTTING["LABELS"][prop_name])
-    ax.legend(loc="best", ncol=2)
-
-    range_ = ax.get_ylim()
-    ax_histy.tick_params(axis="y", labelleft=False)
-    ax_histy.hist(
-        prop,
-        bins=nbins,
-        range=range_,
-        orientation="horizontal",
-        color="grey",
-        label="All",
+    # Axes setup
+    ax_scatter.set(
+        ylabel=PLOTTING["LABELS"][parameter], xlim=(-0.5, len(_catalogue) - 0.5)
     )
-    ax_histy.legend(loc="lower right")
-
-    if savefig:
-        fig.savefig(savefig)
-        plt.close()
-
-    if show:
-        plt.show()
-        plt.close()
-
-    return fig, ax
-
-
-def hist(catalogue, prop_name, nbins=10, show=False, save_to=""):
-    """Create histogram figure for float parameters.
-
-    Parameters
-    ==========
-    catalogue : rocks.core.propertyCollection
-        A datacloud catalogue ingested in Rock instance.
-    prop_name : str
-        The property name, referring to a column in the datacloud table.
-    nbins : int
-        Number of bins in histogram. Default is 10
-    show : bool
-        Show plot. Default is False.
-    save_to : str
-        Save figure to path. Default is no saving.
-
-    Returns
-    =======
-    matplotlib.figures.Figure instance, matplotib.axes.Axis instance
-    """
-
-    prop, errors = _property_errors(catalogue, prop_name)
+    ax_scatter.set_xticks(_catalogue.index)
+    ax_scatter.legend(loc="best", ncol=2, title=f"{avg:.4} +- {err_avg:.4}")
 
     # ------
-    # Build figure
-    fig = plt.figure(figsize=(8, 6))
+    # Place shortbib on top for quick identification
+    ax_top = ax_scatter.twiny()
+    ax_top.set_xticks(_catalogue.index)
+    ax_top.set_xticklabels(_catalogue.shortbib, rotation=25, ha="left")
 
-    plt.hist(prop, bins=nbins, label="Estimates")
+    # ------
+    # Histogram plot
 
-    avg, std = prop.weighted_average(errors, catalogue.preferred)
-
-    plt.errorbar(avg, 0.5, xerr=std, label="Average", marker="o")
-
-    plt.legend(loc="upper right")
-
-    plt.xlabel(PLOTTING["LABELS"][prop_name])
-    plt.ylabel("Distribution")
-
-    if save_to:
-        fig.savefig(save_to)
-
-    if show:
-        plt.show()
-        plt.close()
-
-    return fig, plt.gca()
-
-
-def _property_errors(catalogue, prop_name):
-    """Retrieve main property and its errors from a datacloud catalogue.
-    masses -> mass, diamalbedo -> either albedos or diameters
-
-    Parameters
-    ==========
-    catalogue : rocks.core.propertyCollection
-        Datacloud catalogue ingested into Rock instance.
-    prop_name : str
-        The property name, referring to a column in the datacloud table.
-
-    Returns
-    =======
-    ndarray, ndarray
-        The main property as defined in utils.DATACLOUD_META and its error.
-    """
-    prop = getattr(catalogue, prop_name)  # listSameTypeParameter
-
-    if hasattr(catalogue, f"err_{prop_name}"):
-        errors = getattr(catalogue, f"err_{prop_name}")
-    else:
-        errors = np.ones(np.array(prop).shape)
-
-    return prop, errors
-
-
-def show_scatter_hist(info, par):
-
-    # translate input
-    n = len(info[1])
-    x = np.linspace(1, n, n)
-
-    val = info[1].get(par).values
-    unc = info[1].get("err_" + par).values
-    avg = info[0][0]
-    std = info[0][1]
-
-    # Define figure layout
-    fig = plt.figure(figsize=(12, 8))
-    gs = fig.add_gridspec(
-        1,
-        2,
-        width_ratios=(7, 2),
-        wspace=0.05,
-        left=0.07,
-        right=0.97,
-        bottom=0.05,
-        top=0.87,
-    )
-    ax = fig.add_subplot(gs[0])
-    ax_histy = fig.add_subplot(gs[1], sharey=ax)
-
-    # the scatter plot:
-    # mean and std
-    lavg = ax.axhline(avg, label="Average", color=s["avg"]["color"])
-    lstd = ax.axhline(
-        avg + std,
-        label="1$\sigma$ deviation",
-        color=s["std"]["color"],
-        linestyle="dashed",
-    )
-    lstd = ax.axhline(avg - std, color=s["std"]["color"], linestyle="dashed")
-
-    # all methods
-    for i in np.unique(info[1].method):
-        p = np.where(info[1].method == i)
-        if True in info[1].selected.values[p]:
-            fcol = s[i]["color"]
-        else:
-            fcol = "none"
-        ax.scatter(
-            x[p],
-            val[p],
-            marker=s[i]["marker"],
-            s=80,
-            label=i,
-            facecolors=fcol,
-            edgecolors=s[i]["color"],
-        )
-        ax.errorbar(x[p], val[p], yerr=unc[p], c=s[i]["color"], linestyle="")
-
-    # axes
-    ax.set_ylabel(PLOTTING["LABELS"][par])
-    ax.set_xticks(x)
-
-    # Legend
-    ax.legend(loc="best", ncol=2)
-
-    # place shortbib on top for quick identification
-    axtop = ax.twiny()
-    axtop.set_xticks(x)
-    axtop.set_xticklabels(info[1].shortbib, rotation=25, ha="left")
-
-    # Histogram
-    range_ = ax.get_ylim()
-    nbins = 10
-    ax_histy.tick_params(axis="y", labelleft=False)
-    sel = np.where(info[1].selected)
-
-    na, ba, pa = ax_histy.hist(
-        val,
+    # Add two histograms: all observations and preferred observations
+    ax_hist.hist(
+        [entry[parameter] for _, entry in _catalogue.iterrows() if entry["preferred"]],
         bins=nbins,
-        range=range_,
+        range=ax_scatter.get_ylim(),
+        orientation="horizontal",
+        color="gold",
+        label="Preferred",
+        histtype="step",
+    )
+    y, _, _ = ax_hist.hist(
+        _catalogue[parameter],
+        bins=nbins,
+        range=ax_scatter.get_ylim(),
         orientation="horizontal",
         color="grey",
         label="All",
-    )
-    ns, bs, ps = ax_histy.hist(
-        val[sel],
-        bins=nbins,
-        range_=range_,
-        orientation="horizontal",
-        color="gold",
-        label="Selected",
+        histtype="step",
+        ls="--",
     )
 
-    ax_histy.legend(loc="lower right")
+    # Axes setup
+    ax_hist.set(xlim=(0, max(y) + 1))
+    ax_hist.legend(loc="lower right")
+    ax_hist.tick_params(axis="y", labelleft=False)
 
-    plt.show()
-    # plt.savefig(figname)
-    # plt.close()
+    if show:
+        plt.show()
+
+    if save_to:
+        plt.savefig(save_to)
 
 
 # Define colors/markers for all methods in ssodnet
-METHODS = {
+PLOTTING = {
     "avg": {"color": "black"},
     "std": {"color": "darkgrey"},
     # -Space mission
@@ -325,13 +189,18 @@ METHODS = {
     # -Taxonomy
     "Phot": {"color": "red", "marker": "s"},
     "Spec": {"color": "red", "marker": "s"},
-}
-
-
-PLOTTING = {
+    # More setup
     "LABELS": {
         "diameter": "Diameter (km)",
         "mass": "Mass (kg)",
         "albedo": "Albedo",
-    }
+    },
+    "PARAMETERS": {
+        "albedos": "albedo",
+        "albedo": "albedo",
+        "diameters": "diameter",
+        "diameter": "diameter",
+        "masses": "mass",
+        "mass": "mass",
+    },
 }

@@ -488,7 +488,18 @@ class Rock(pydantic.BaseModel):
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
             self.__parse_error_message(message, id_, ssocard)
-            return super().__init__(**{"name": id_provided})
+            super().__init__(**{"name": id_provided})
+
+        # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
+        for catalogue in datacloud:
+            catalogue_ssodnet = rocks.datacloud.CATALOGUES[catalogue]["ssodnet_name"]
+            setattr(
+                self,
+                catalogue_ssodnet,
+                rocks.datacloud.DataCloudDataFrame(
+                    data=getattr(self, catalogue_ssodnet).dict()
+                ),
+            )
 
     def __getattr__(self, name):
         """Implement attribute shortcuts: omission of parameters.physical/dynamical.

@@ -4,6 +4,7 @@ from typing import List, Optional
 import warnings
 
 import numpy as np
+import pandas as pd
 import pydantic
 import rich
 
@@ -28,19 +29,8 @@ def ensure_int(value):
 
 # ------
 # SsODNet catalogues as pydantic model
-class Catalogue(pydantic.BaseModel):
-    """The abstraction of a general datacloud catalogue on SsODNet."""
-
-    id_: List[int] = pydantic.Field([np.nan], alias="id")
-    number: List[int] = pydantic.Field([np.nan], alias="num")
-    name: List[str] = [""]
-
-    _ensure_int: classmethod = pydantic.validator(
-        "id_", "number", allow_reuse=True, pre=True
-    )(ensure_int)
-    _ensure_list: classmethod = pydantic.validator("name", allow_reuse=True, pre=True)(
-        ensure_list
-    )
+class DataCloudDataFrame(pd.DataFrame):
+    """A datacloud catalogue ingested into a pd.DataFrame with some extra capabilities."""
 
     def weighted_average(self, property_=None):
         """Compute the weighted average of the preferred entries of a catalogued property.
