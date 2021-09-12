@@ -330,7 +330,6 @@ class Diamalbedo(Catalogue):
     url: List[str] = [""]
     title: List[str] = [""]
     method: List[str] = [""]
-    shortbib: List[str] = [""]
     year: List[Optional[int]] = [None]
     source: List[str] = [""]
 
@@ -364,71 +363,11 @@ class Diamalbedo(Catalogue):
             )
         ]
 
-    def __len__(self):
-        return len(self.albedo)
-
-    def __str__(self):
-
-        if len(self) == 1 and not self.albedo[0] and not self.diameter[0]:
-            return "No diameters on record."
-
-        # Compute weighted averages of albedo and diameter
-        alb_avg, err_alb_avg = rocks.utils.weighted_average(
-            np.array(self.albedo)[self.preferred_albedo],
-            np.array(self.err_albedo)[self.preferred_albedo],
-        )
-        alb_diam, err_alb_diam = rocks.utils.weighted_average(
-            np.array(self.diameter)[self.preferred_diameter],
-            np.array(self.err_diameter)[self.preferred_diameter],
-        )
-
-        table = rich.table.Table(
-            header_style="bold blue",
-            box=rich.box.SQUARE,
-            footer_style="dim",
-            caption=f"""Blue: preferred diameters, yellow: preferred albedos, green: both preferred
-
-            Albedo: {alb_avg:.2f} +- {err_alb_avg:.3f}
-            Diameter: {alb_diam:.2f} +- {err_alb_diam:.2f}km
-            """,
-        )
-
-        columns = [
-            "albedo",
-            "err_albedo",
-            "diameter",
-            "err_diameter",
-            "method",
-            "shortbib",
-        ]
-
-        for c in columns:
-            table.add_column(c)
-
-        # Values are entries for each field
-        for i, preferred in enumerate(self.preferred_diameter):
-
-            # blue for preferred diameter, yellow for preferred albedo, green for both,
-            # else white
-            if preferred:
-                style = "bold green" if self.preferred_albedo[i] else "bold blue"
-            elif self.preferred_albedo[i]:
-                style = "bold yellow"
-            else:
-                style = "white"
-            table.add_row(
-                *[str(getattr(self, c)[i]) for c in columns],
-                style=style,
-            )
-        rich.print(table)
-        return ""
-
 
 class Masses(Catalogue):
     doi: List[str] = [""]
     url: List[str] = [""]
     source: List[str] = [""]
-    shortbib: List[str] = [""]
     method: List[str] = [""]
 
     year: List[Optional[int]] = [None]
@@ -440,34 +379,6 @@ class Masses(Catalogue):
     @pydantic.validator("preferred", pre=True)
     def select_preferred_mass(cls, v, values):
         return rocks.definitions.rank_properties("mass", values)
-
-    def __len__(self):
-        return len(self.mass)
-
-    def __str__(self):
-
-        if len(self) == 1 and not self.mass[0]:
-            return "No masses on record."
-
-        table = rich.table.Table(
-            header_style="bold blue",
-            box=rich.box.SQUARE,
-            footer_style="dim",
-        )
-
-        columns = ["mass", "err_mass", "method", "shortbib"]
-
-        for c in columns:
-            table.add_column(c)
-
-        # Values are entries for each field
-        for i, preferred in enumerate(self.preferred):
-            table.add_row(
-                *[str(getattr(self, c)[i]) for c in columns],
-                style="bold green" if preferred else "white",
-            )
-        rich.print(table)
-        return ""
 
 
 class Mpcatobs(Catalogue):
@@ -525,31 +436,3 @@ class Taxonomies(Catalogue):
     @pydantic.validator("preferred", pre=True)
     def select_preferred_taxonomy(cls, v, values):
         return rocks.definitions.rank_properties("taxonomy", values)
-
-    def __len__(self):
-        return len(self.class_)
-
-    def __str__(self):
-
-        if len(self) == 1 and not self.class_[0]:
-            return "No taxonomies on record."
-
-        table = rich.table.Table(
-            header_style="bold blue",
-            box=rich.box.SQUARE,
-            footer_style="dim",
-        )
-
-        columns = ["class_", "complex_", "method", "waverange", "scheme", "shortbib"]
-
-        for c in columns:
-            table.add_column(c)
-
-        # Values are entries for each field
-        for i, preferred in enumerate(self.preferred):
-            table.add_row(
-                *[str(getattr(self, c)[i]) for c in columns],
-                style="bold green" if preferred else "white",
-            )
-        rich.print(table)
-        return ""

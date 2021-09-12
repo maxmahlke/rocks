@@ -31,8 +31,18 @@ class AliasedGroup(click.Group):
             return identify
 
         # ------
-        # Unknown subcommand -> echo asteroid property and optionally plot
-        return echo()
+        # Unknown subcommand -> echo asteroid parameter and optionally plot
+        for arg in ["-p", "--plot"]:
+
+            if arg in sys.argv:
+                sys.argv.remove(arg)
+
+                plot = True
+                break
+        else:
+            plot = False
+
+        return echo(plot)
 
 
 @click.group(cls=AliasedGroup)
@@ -184,34 +194,46 @@ def status():
         print("Done.")
 
 
-def echo():
-    """Echos asteroid property to command line. Optionally opens plot."""
+def echo(plot):
+    """Echos asteroid parameter to command line. Optionally opens plot.
 
-    # Check if we're plotting the property
-    plot = False
+    Parameters
+    ==========
+    plot : bool
+        If the paramter values should be plotted.
+    """
 
-    for arg in ["-p", "--plot"]:
-
-        if arg in sys.argv:
-            sys.argv.remove(arg)
-
-            plot = True
-
-    # Get property and asteroid id
-    _, prop, *id_ = sys.argv
+    # Get parameter and asteroid id
+    _, parameter, *id_ = sys.argv
     id_ = " ".join(id_)
 
-    # Check if the property might be missing an underscore
-    if keyword.iskeyword(prop):
-        prop = f"{prop}_"
+    # Check if the parameter might be missing an underscore
+    if keyword.iskeyword(parameter):
+        parameter = f"{parameter}_"
 
-    if prop.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
-        datacloud = prop.split(".")[0]
+    if parameter.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
+        datacloud = parameter.split(".")[0]
     else:
         datacloud = []
 
     rock = rocks.Rock(id_, datacloud=datacloud)
 
-    # Pretty-printing is implemented in the properties __str__
-    rich.print(rocks.utils.rgetattr(rock, prop))
+    # Pretty-print the paramter
+    if not datacloud:
+        rich.print(rocks.utils.rgetattr(rock, parameter))
+    else:
+        rocks.datacloud.pretty_print(
+            rock, rocks.utils.rgetattr(rock, parameter), parameter
+        )
+
+    if plot:
+        if not datacloud:
+            print(
+                f"Only datacloud collections can be plotted. "
+                f"Try the plural of {parameter}."
+            )
+            sys.exit()
+
+        rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
+
     sys.exit()

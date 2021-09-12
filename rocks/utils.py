@@ -152,7 +152,7 @@ def get_unit(path_unit):
 
 # ------
 # Numerical methods
-def weighted_average(observable, error):
+def weighted_average(catalogue, parameter):
     """Computes weighted average of observable.
 
     Parameters
@@ -164,9 +164,31 @@ def weighted_average(observable, error):
 
     Returns
     =======
-    (float, float)
-        Weighted average and its standard error.
+    float
+        The weighted average.
+
+    float
+        The standard error of the weighted average.
     """
+
+    if parameter in ["albedo", "diameter"]:
+        preferred = catalogue[f"preferred_{parameter}"]
+    else:
+        preferred = catalogue[f"preferred"]
+
+    values = catalogue[parameter]
+    errors = catalogue[f"err_{parameter}"]
+
+    observable = np.array(values)[preferred]
+    error = np.array(errors)[preferred]
+
+    if all([np.isnan(value) for value in values]) or all(
+        [np.isnan(error) for error in errors]
+    ):
+        warnings.warn(
+            f"{self.name[0]}: The values or errors of property '{property_}' are all NaN. Average failed."
+        )
+        return np.nan, np.nan
 
     # If no data was passed (happens when no preferred entry in table)
     if not observable.size:
@@ -196,7 +218,7 @@ def weighted_average(observable, error):
         )
     )
     std_avg = np.sqrt(var_avg / len(observable))
-    return (avg, std_avg)
+    return avg, std_avg
 
 
 # ------
