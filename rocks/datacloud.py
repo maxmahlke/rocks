@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pydantic
 import rich
+from rich.table import Table
 
 import rocks
 
@@ -24,6 +25,13 @@ CATALOGUES = {
     "albedos": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
+        "print_columns": [
+            "albedo",
+            "err_albedo",
+            "diameter",
+            "err_diameter",
+            "method",
+        ],
     },
     "astdys": {
         "attr_name": "astdys",
@@ -40,10 +48,24 @@ CATALOGUES = {
     "diamalbedo": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
+        "print_columns": [
+            "albedo",
+            "err_albedo",
+            "diameter",
+            "err_diameter",
+            "method",
+        ],
     },
     "diameters": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
+        "print_columns": [
+            "albedo",
+            "err_albedo",
+            "diameter",
+            "err_diameter",
+            "method",
+        ],
     },
     "families": {
         "attr_name": "families",
@@ -52,6 +74,7 @@ CATALOGUES = {
     "masses": {
         "attr_name": "masses",
         "ssodnet_name": "masses",
+        "print_columns": ["mass", "err_mass", "method", "year"],
     },
     "mpcatobs": {
         "attr_name": "mpcatobs",
@@ -64,8 +87,88 @@ CATALOGUES = {
     "taxonomies": {
         "attr_name": "taxonomies",
         "ssodnet_name": "taxonomy",
+        "print_columns": [
+            "class_",
+            "complex_",
+            "method",
+            "waverange",
+            "scheme",
+        ],
     },
 }
+
+# ------
+# Pretty-printing
+def pretty_print(rock, catalogue, parameter):
+    """Print datacloud catalogue using a nice table format.
+
+    Parameters
+    ==========
+    rock : rocks.Rock
+        The Rock instance the catalogue is associated to.
+    catalogue : pd.DataFrame
+        The datacloud catalogue to print.
+    parameter : str
+        The name of the user-requested parameter to echo.
+    """
+
+    if len(catalogue) == 1 and pd.isna(catalogue.id_[0]):
+        print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
+        return
+
+    # ------
+    # Create table to echo
+    if parameter in ["diamalbedo", "diameters", "albedos"]:
+        caption = (
+            "Blue: preferred diameter, yellow: preferred albedo, green: both preferred"
+        )
+    else:
+        caption = "Green: preferred entry"
+
+    table = Table(
+        header_style="bold blue",
+        box=rich.box.SQUARE,
+        footer_style="dim",
+        title=f"({rock.number}) {rock.name}",
+        caption=caption,
+    )
+
+    # The columns depend on the catalogue
+    columns = [*CATALOGUES[parameter]["print_columns"], "shortbib"]
+
+    for c in columns:
+        table.add_column(c)
+
+    print(catalogue[["diameter", "preferred_diameter", "shortbib"]])
+    # Add rows to table, styling by preferred-state of entry
+    for i, preferred in enumerate(catalogue.preferred):
+
+        if parameter in ["diamalbedo", "diameters", "albedos"]:
+            if preferred:
+                if (
+                    catalogue.preferred_albedo[i]
+                    and not catalogue.preferred_diameter[i]
+                ):
+                    style = "bold yellow"
+                elif (
+                    not catalogue.preferred_albedo[i]
+                    and catalogue.preferred_diameter[i]
+                ):
+                    style = "bold blue"
+                else:
+                    style = "bold green"
+            else:
+                style = "white"
+
+        else:
+            style = "bold green" if preferred else "white"
+
+        table.add_row(
+            *[str(getattr(catalogue, c)[i]) for c in columns],
+            style=style,
+        )
+
+    rich.print(table)
 
 
 # ------
@@ -95,7 +198,7 @@ class Catalogue(pydantic.BaseModel):
     name: List[str] = [""]
     title: List[str] = [""]
     number: List[int] = pydantic.Field([np.nan], alias="num")
-    bibcode: List[str] = [""]
+    shortbib: List[str] = [""]
     iddataset: List[str] = [""]
     datasetname: List[str] = [""]
     idcollection: List[int] = [None]
