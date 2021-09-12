@@ -139,7 +139,6 @@ def pretty_print(rock, catalogue, parameter):
     for c in columns:
         table.add_column(c)
 
-    print(catalogue[["diameter", "preferred_diameter", "shortbib"]])
     # Add rows to table, styling by preferred-state of entry
     for i, preferred in enumerate(catalogue.preferred):
 

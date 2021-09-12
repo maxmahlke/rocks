@@ -30,6 +30,11 @@ def ensure_list(value):
     return value
 
 
+def merge_entries(value):
+    """Turn list of dicts into dict of lists."""
+    return {key: [entry[key] for entry in value] for key in value[0]}
+
+
 # ------
 # ssoCard as pydantic model
 
@@ -58,14 +63,14 @@ class Value(pydantic.BaseModel):
             return f"{self.value} +- ({self.error.max_}, {self.error.min_}) {unit}"
 
 
-# The second lowest level is the Property
-class Property(pydantic.BaseModel):
+# The second lowest level is the Parameter
+class Parameter(pydantic.BaseModel):
     def __str__(self):
         return json.dumps(json.loads(self.json()), indent=2, sort_keys=True)
 
 
 # Other common branches are method and bibref
-class Method(Property):
+class Method(Parameter):
     doi: Optional[str] = ""
     name: Optional[str] = ""
     year: Optional[int] = np.nan
@@ -74,7 +79,7 @@ class Method(Property):
     shortbib: Optional[str] = ""
 
 
-class Bibref(Property):
+class Bibref(Parameter):
     doi: Optional[str] = ""
     year: Optional[int] = np.nan
     title: Optional[str] = ""
@@ -84,7 +89,7 @@ class Bibref(Property):
 
 # ------
 # Dynamical parameters
-class OrbitalElements(Property):
+class OrbitalElements(Parameter):
     ceu: Value = Value(**{})
     author: Optional[str] = ""
     bibref: List[Bibref] = [Bibref(**{})]
@@ -102,7 +107,7 @@ class OrbitalElements(Property):
     perihelion_argument: Value = Value(**{})
 
 
-class ProperElements(Property):
+class ProperElements(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
     proper_g: Value = Value(**{})
     proper_s: Value = Value(**{})
@@ -115,7 +120,7 @@ class ProperElements(Property):
         return self.json()
 
 
-class Family(Property):
+class Family(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
     family_number: Optional[int] = np.nan
@@ -125,7 +130,7 @@ class Family(Property):
         return self.json()
 
 
-class PairMembers(Property):
+class PairMembers(Parameter):
     sibling_name: Optional[str] = ""
     pair_delta_v: Optional[float] = np.nan
     pair_delta_a: Optional[float] = np.nan
@@ -134,7 +139,7 @@ class PairMembers(Property):
     sibling_number: Optional[int] = np.nan
 
 
-class Pair(Property):
+class Pair(Parameter):
     members: List[PairMembers] = [PairMembers(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
@@ -142,7 +147,7 @@ class Pair(Property):
         return self.json()
 
 
-class Yarkovsky(Property):
+class Yarkovsky(Parameter):
     S: Optional[float] = np.nan
     A2: Value = Value(**{})
     snr: Optional[float] = np.nan
@@ -155,7 +160,7 @@ class Yarkovsky(Property):
         return "\n".join([print_A2, print_dadt])
 
 
-class DynamicalParameters(Property):
+class DynamicalParameters(Parameter):
     pair: Pair = Pair(**{})
     family: Family = Family(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
@@ -185,7 +190,7 @@ class Color(Value):
     id_filter_2: Optional[str] = ""
 
 
-class Colors(Property):
+class Colors(Parameter):
     # Atlas
     c_o: List[Color] = [pydantic.Field(Color(**{}), alias="c-o")]
     # 2MASS / VISTA
@@ -208,7 +213,7 @@ class Mass(Value):
     path_unit: str = "unit.physical.mass.mass"
 
 
-class Phase(Property):
+class Phase(Parameter):
     H: Value = Value(**{})
     N: Optional[float] = np.nan
     G1: Value = Value(**{})
@@ -223,7 +228,7 @@ class Phase(Property):
         return self.json()
 
 
-class PhaseFunction(Property):
+class PhaseFunction(Parameter):
     # Generic
     generic_johnson_v: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
     # ATLAS
@@ -231,7 +236,7 @@ class PhaseFunction(Property):
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
 
 
-class Spin(Property):
+class Spin(Parameter):
     period: Value = Value(**{})
     t0: Optional[float] = np.nan
     Wp: Optional[float] = np.nan
@@ -246,20 +251,20 @@ class Spin(Property):
         return self.json()
 
 
-class Taxonomy(Property):
-    class_: Optional[str] = pydantic.Field("", alias="class")
-    scheme: Optional[str] = ""
-    bibref: List[Bibref] = [Bibref(**{})]
-    method: List[Method] = [Method(**{})]
-    waverange: Optional[str] = ""
+class Taxonomy(Parameter):
+    class_: List[str] = pydantic.Field([""], alias="class")
+    scheme: List[str] = [""]
+    bibref: List[List[Bibref]] = [[Bibref(**{})]]
+    method: List[List[Method]] = [[Method(**{})]]
+    waverange: List[str] = [""]
 
     def __str__(self):
         if not self.class_:
             return "No taxonomy on record."
-        return self.class_
+        return ", ".join(self.class_)
 
 
-class ThermalInertia(Property):
+class ThermalInertia(Parameter):
     TI: Value = Value(**{})
     dsun: Optional[float] = np.nan
     bibref: List[Bibref] = []
@@ -271,13 +276,13 @@ class AbsoluteMagnitude(Value):
     bibref: List[Bibref] = []
 
 
-class PhysicalParameters(Property):
+class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
     spin: List[Spin] = [Spin(**{})]
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     diameter: Diameter = Diameter(**{})
-    taxonomy: List[Taxonomy] = [Taxonomy(**{})]
+    taxonomy: Taxonomy = Taxonomy(**{})
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
@@ -285,14 +290,18 @@ class PhysicalParameters(Property):
     def __str__(self):
         return self.json()
 
-    _ensure_list: classmethod = pydantic.validator("spin", allow_reuse=True, pre=True)(
-        ensure_list
-    )
+    _ensure_list: classmethod = pydantic.validator(
+        "spin", "taxonomy", allow_reuse=True, pre=True
+    )(ensure_list)
+
+    _merge_entries: classmethod = pydantic.validator(
+        "taxonomy", allow_reuse=True, pre=True
+    )(merge_entries)
 
 
 # ------
 # Equation of state
-class EqStateVector(Property):
+class EqStateVector(Parameter):
     ref_epoch: Optional[float] = np.nan
     position: List[float] = [np.nan, np.nan, np.nan]
     velocity: List[float] = [np.nan, np.nan, np.nan]
@@ -300,7 +309,7 @@ class EqStateVector(Property):
 
 # ------
 # Highest level branches
-class Parameters(Property):
+class Parameters(Parameter):
     physical: PhysicalParameters = PhysicalParameters(**{})
     dynamical: DynamicalParameters = DynamicalParameters(**{})
     eq_state_vector: EqStateVector = EqStateVector(**{})
@@ -312,19 +321,19 @@ class Parameters(Property):
         arbitrary_types_allowed = True
 
 
-class Link(Property):
+class Link(Parameter):
     unit: Optional[str] = ""
     self_: Optional[str] = pydantic.Field("", alias="self")
     quaero: Optional[str] = ""
     description: Optional[str] = ""
 
 
-class Ssocard(Property):
+class Ssocard(Parameter):
     version: Optional[str] = ""
     datetime: Optional[dt.datetime] = None
 
 
-class Datacloud(Property):
+class Datacloud(Parameter):
     """The collection of links to datacloud catalogue associated to this ssoCard."""
 
     aams: Optional[str] = ""
@@ -446,12 +455,11 @@ class Rock(pydantic.BaseModel):
 
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
         for catalogue in datacloud:
-            catalogue_ssodnet = rocks.datacloud.CATALOGUES[catalogue]["ssodnet_name"]
-            setattr(
-                self,
-                catalogue_ssodnet,
-                pd.DataFrame(data=getattr(self, catalogue_ssodnet).dict()),
-            )
+
+            if catalogue in ["diameters", "albedos"]:
+                catalogue = "diamalbedo"
+
+            setattr(self, catalogue, pd.DataFrame(data=getattr(self, catalogue).dict()))
 
     def __getattr__(self, name):
         """Implement attribute shortcuts: omission of parameters.physical/dynamical.
@@ -526,7 +534,7 @@ class Rock(pydantic.BaseModel):
         }
 
         # add 'preferred' attribute where applicable
-        if catalogue_ssodnet in ["taxonomies", "masses", "diamalbedo"]:
+        if catalogue_ssodnet in ["taxonomy", "masses", "diamalbedo"]:
             cat["preferred"] = [False] * len(list(cat.values())[0])
         if catalogue_ssodnet in ["diamalbedo"]:
             cat["preferred_albedo"] = [False] * len(list(cat.values())[0])
