@@ -31,6 +31,7 @@ CATALOGUES = {
             "diameter",
             "err_diameter",
             "method",
+            "shortbib",
         ],
     },
     "astdys": {
@@ -40,6 +41,16 @@ CATALOGUES = {
     "astorb": {
         "attr_name": "astorb",
         "ssodnet_name": "astorb",
+        "print_columns": [
+            "H",
+            "G",
+            "B_V",
+            "IRAS_Diameter",
+            "IRAS_Class",
+            "SemimajorAxis",
+            "Eccentricity",
+            "Inclination",
+        ],
     },
     "binarymp_tab": {
         "attr_name": "binaries",
@@ -54,6 +65,7 @@ CATALOGUES = {
             "diameter",
             "err_diameter",
             "method",
+            "shortbib",
         ],
     },
     "diameters": {
@@ -65,6 +77,7 @@ CATALOGUES = {
             "diameter",
             "err_diameter",
             "method",
+            "shortbib",
         ],
     },
     "families": {
@@ -74,7 +87,7 @@ CATALOGUES = {
     "masses": {
         "attr_name": "masses",
         "ssodnet_name": "masses",
-        "print_columns": ["mass", "err_mass", "method", "year"],
+        "print_columns": ["mass", "err_mass", "method", "shortbib"],
     },
     "mpcatobs": {
         "attr_name": "mpcatobs",
@@ -93,6 +106,7 @@ CATALOGUES = {
             "method",
             "waverange",
             "scheme",
+            "shortbib",
         ],
     },
 }
@@ -134,16 +148,22 @@ def pretty_print(rock, catalogue, parameter):
     )
 
     # The columns depend on the catalogue
-    columns = [*CATALOGUES[parameter]["print_columns"], "shortbib"]
+    columns = CATALOGUES[parameter]["print_columns"]
 
     for c in columns:
         table.add_column(c)
 
+    # Some catalogues do not have a "preferred" attribute
+    if not hasattr(catalogue, "preferred"):
+        preferred = [False for i in range(len(catalogue))]
+    else:
+        preferred = catalogue.preferred
+
     # Add rows to table, styling by preferred-state of entry
-    for i, preferred in enumerate(catalogue.preferred):
+    for i, pref in enumerate(preferred):
 
         if parameter in ["diamalbedo", "diameters", "albedos"]:
-            if preferred:
+            if pref:
                 if (
                     catalogue.preferred_albedo[i]
                     and not catalogue.preferred_diameter[i]
@@ -160,7 +180,7 @@ def pretty_print(rock, catalogue, parameter):
                 style = "white"
 
         else:
-            style = "bold green" if preferred else "white"
+            style = "bold green" if pref else "white"
 
         table.add_row(
             *[str(getattr(catalogue, c)[i]) for c in columns],
@@ -203,12 +223,12 @@ class Catalogue(pydantic.BaseModel):
     idcollection: List[int] = [None]
     resourcename: List[str] = [""]
 
-    _ensure_int: classmethod = pydantic.validator(
-        "id_", "number", allow_reuse=True, pre=True
-    )(ensure_int)
-    _ensure_list: classmethod = pydantic.validator("name", allow_reuse=True, pre=True)(
+    _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
         ensure_list
     )
+    # _ensure_int: classmethod = pydantic.validator(
+    #     "id_", "number", allow_reuse=True, pre=True
+    # )(ensure_int)
 
 
 class AAMS(Catalogue):
@@ -270,58 +290,58 @@ class AstDyS(Catalogue):
 
 
 class Astorb(Catalogue):
-    OrbComputer: Optional[str] = ""
-    H: Optional[float] = np.nan
-    G: Optional[float] = np.nan
-    B_V: Optional[float] = np.nan
-    IRAS_Diameter: Optional[float] = np.nan
-    IRAS_Class: Optional[str] = ""
-    OrbArc: Optional[int] = None
-    NumberObs: Optional[int] = None
-    MeanAnomaly: Optional[float] = np.nan
-    ArgPerihelion: Optional[float] = np.nan
-    LongAscNode: Optional[float] = np.nan
-    Inclination: Optional[float] = np.nan
-    Eccentricity: Optional[float] = np.nan
-    SemimajorAxis: Optional[float] = np.nan
-    CEU_value: Optional[float] = np.nan
-    CEU_rate: Optional[float] = np.nan
-    PEU_value: Optional[float] = np.nan
-    GPEU_fromCEU: Optional[float] = np.nan
-    GPEU_fromPEU: Optional[float] = np.nan
-    Note_1: Optional[int] = None
-    Note_2: Optional[int] = None
-    Note_3: Optional[int] = None
-    Note_4: Optional[int] = None
-    Note_5: Optional[int] = None
-    Note_6: Optional[int] = None
-    YY_calulation: Optional[int] = None
-    MM_calulation: Optional[int] = None
-    DD_calulation: Optional[int] = None
-    YY_osc: Optional[int] = None
-    MM_osc: Optional[int] = None
-    DD_osc: Optional[int] = None
-    CEU_yy: Optional[int] = None
-    CEU_mm: Optional[int] = None
-    CEU_dd: Optional[int] = None
-    PEU_yy: Optional[int] = None
-    PEU_mm: Optional[int] = None
-    PEU_dd: Optional[int] = None
-    GPEU_yy: Optional[int] = None
-    GPEU_mm: Optional[int] = None
-    GPEU_dd: Optional[int] = None
-    GGPEU_yy: Optional[int] = None
-    GGPEU_mm: Optional[int] = None
-    GGPEU_dd: Optional[int] = None
-    JD_osc: Optional[float] = np.nan
-    px: Optional[float] = np.nan
-    py: Optional[float] = np.nan
-    pz: Optional[float] = np.nan
-    vx: Optional[float] = np.nan
-    vy: Optional[float] = np.nan
-    vz: Optional[float] = np.nan
-    MeanMotion: Optional[float] = np.nan
-    OrbPeriod: Optional[float] = np.nan
+    OrbComputer: List[str] = [""]
+    H: List[float] = [np.nan]
+    G: List[float] = [np.nan]
+    B_V: List[float] = [np.nan]
+    IRAS_Diameter: List[float] = [np.nan]
+    IRAS_Class: List[str] = [""]
+    OrbArc: List[int] = [None]
+    NumberObs: List[int] = [None]
+    MeanAnomaly: List[float] = [np.nan]
+    ArgPerihelion: List[float] = [np.nan]
+    LongAscNode: List[float] = [np.nan]
+    Inclination: List[float] = [np.nan]
+    Eccentricity: List[float] = [np.nan]
+    SemimajorAxis: List[float] = [np.nan]
+    CEU_value: List[float] = [np.nan]
+    CEU_rate: List[float] = [np.nan]
+    PEU_value: List[float] = [np.nan]
+    GPEU_fromCEU: List[float] = [np.nan]
+    GPEU_fromPEU: List[float] = [np.nan]
+    Note_1: List[int] = [None]
+    Note_2: List[int] = [None]
+    Note_3: List[int] = [None]
+    Note_4: List[int] = [None]
+    Note_5: List[int] = [None]
+    Note_6: List[int] = [None]
+    YY_calulation: List[int] = [None]
+    MM_calulation: List[int] = [None]
+    DD_calulation: List[int] = [None]
+    YY_osc: List[int] = [None]
+    MM_osc: List[int] = [None]
+    DD_osc: List[int] = [None]
+    CEU_yy: List[int] = [None]
+    CEU_mm: List[int] = [None]
+    CEU_dd: List[int] = [None]
+    PEU_yy: List[int] = [None]
+    PEU_mm: List[int] = [None]
+    PEU_dd: List[int] = [None]
+    GPEU_yy: List[int] = [None]
+    GPEU_mm: List[int] = [None]
+    GPEU_dd: List[int] = [None]
+    GGPEU_yy: List[int] = [None]
+    GGPEU_mm: List[int] = [None]
+    GGPEU_dd: List[int] = [None]
+    JD_osc: List[float] = [np.nan]
+    px: List[float] = [np.nan]
+    py: List[float] = [np.nan]
+    pz: List[float] = [np.nan]
+    vx: List[float] = [np.nan]
+    vy: List[float] = [np.nan]
+    vz: List[float] = [np.nan]
+    MeanMotion: List[float] = [np.nan]
+    OrbPeriod: List[float] = [np.nan]
 
 
 class Diamalbedo(Catalogue):
