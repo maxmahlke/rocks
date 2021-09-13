@@ -1,7 +1,8 @@
 # 1.3.0 - 2021-09-10
 - datacloud catalogues are now pd.DataFrame objects
 - Readded the --plot flag for datacloud CLI queries
-- Merged the 'rocks update' command into the 'rocks status' command
+- Merged the 'rocks status' command into the 'rocks update' command
+- The 'rocks update' command now updates all cached data if requested
 - Switched the local index from a pandas dataframe to dictionaries
 - Included the absolute magnitude into the ssoCard following upstream development
 - Local name resolution is now lightning fast

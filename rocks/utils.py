@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
 
+from functools import reduce
 import json
 import os
 import pickle
 import urllib
 import warnings
-from functools import reduce
 
 import numpy as np
 import pandas as pd
 import requests
+from tqdm import tqdm
 
 import rocks
 
@@ -40,33 +41,46 @@ def retrieve_index_from_repository():
         pickle.dump(index, ind, protocol=4)
 
 
-def update_index():
-    """Update index of numbered SSOs using the MPC database.
+def create_index():
+    """Create the asteroid name-number index using the list of numbered minor planets
+    from the MPC and quaero.
+
+    Notes
+    =====
     The index file in the cache directory is changed in-place.
     """
-
-    # Get current index
-    names, numbers, ids = read_index()
 
     # Get list of numbered asteroids from MPC
     url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
     numbered = pd.read_fwf(url, colspecs=[(0, 7)], names=["number"])
-    numbered = set(int(n.strip(" (")) for n in numbered.number)  # type: ignore
+    numbered = np.array([int(n.strip(" (")) for n in numbered.number])  # type: ignore
 
-    # Compare list to index
-    missing = set(numbers) ^ set(numbered)
+    # These are problem cases that we take care of by hand
+    numbered = np.setdiff1d(numbered, [1978, 1979, 1986, 1988, 1989, 1990])
 
-    if not missing:
-        return
+    # Instantiate the index with some information pre-filled
+    names = {
+        "Patrice": (1978, "Patrice"),
+        "Sakharov": (1979, "Sakharov"),
+        "Plaut": (1986, "Plaut"),
+        "Delores": (1988, "Delores"),
+        "Tatry": (1989, "Tatry"),
+        "Pilcher": (1990, "Pilcher"),
+    }
 
-    # Get ids of missing entries, append to index
-    miss_names, miss_numbers, miss_ids = zip(*rocks.identify(missing, return_id=True))
+    numbers = {number: (name, id_) for name, (number, id_) in names.items()}
+    ids = {id_: (name, number) for name, (number, id_) in names.items()}
 
-    # Add the missing items to the index
-    for name, number, id_ in zip(miss_names, miss_numbers, miss_ids):
-        numbers[number] = (name, id_)
-        names[name] = (number, id_)
-        ids[id_] = (name, number)
+    # Identify the asteroids by in parts
+    for subset in tqdm(np.array_split(numbered, 100), total=100, desc="Building Index"):
+
+        subset_identified = rocks.identify(
+            subset, return_id=True, progress=False, local=False
+        )
+
+        names.update({name: (number, id_) for name, number, id_ in subset_identified})
+        numbers.update({number: (name, id_) for name, number, id_ in subset_identified})
+        ids.update({id_: (name, number) for name, number, id_ in subset_identified})
 
     # And save to file
     with open(rocks.PATH_INDEX, "wb") as ind:
@@ -88,9 +102,8 @@ def read_index():
     if isinstance(index, pd.DataFrame):
         raise TypeError(
             """The asteroid name-number index has been changed in version 1.3 to a
-        simple dictionary to speed up the name resolution. Please delete the
-        index file located at '$USER/.cache/rocks/index.pkl' and rerun your
-        command."""
+        dictionary to speed up the name resolution. Please delete the index file
+        located at '$USER/.cache/rocks/index.pkl' and rerun your command."""
         )
     return index
 
@@ -174,7 +187,7 @@ def weighted_average(catalogue, parameter):
     if parameter in ["albedo", "diameter"]:
         preferred = catalogue[f"preferred_{parameter}"]
     else:
-        preferred = catalogue[f"preferred"]
+        preferred = catalogue["preferred"]
 
     values = catalogue[parameter]
     errors = catalogue[f"err_{parameter}"]
@@ -186,7 +199,7 @@ def weighted_average(catalogue, parameter):
         [np.isnan(error) for error in errors]
     ):
         warnings.warn(
-            f"{self.name[0]}: The values or errors of property '{property_}' are all NaN. Average failed."
+            f"{catalogue.name[0]}: The values or errors of property '{parameter}' are all NaN. Average failed."
         )
         return np.nan, np.nan
 
@@ -259,3 +272,60 @@ def retrieve_json_from_ssodnet(which):
 
     else:
         warnings.warn(f"Retrieving the ssoCard {which} failed with url:\n{URL}")
+
+
+def cache_inventory():
+    """Create lists of the cached ssoCards and datacloud catalogues.
+
+    Returns
+    =======
+    list of tuple
+        The SsODNet IDs and versions of the cached ssoCards.
+    list of tuple
+        The SsODNet IDs and names of the cached datacloud catalogues.
+    """
+    cached_cards = []
+    cached_catalogues = []
+
+    # Get all jsons in cache
+    cached_jsons = set(
+        file_ for file_ in os.listdir(rocks.PATH_CACHE) if file_.endswith(".json")
+    )
+
+    for file_ in cached_jsons:
+
+        if file_ in [
+            "ssoCard_template.json",
+            "unit_aster-astorb.json",
+            "description_aster-astorb.json",
+        ]:
+            continue
+
+        # Datacloud catalogue?
+        if any(
+            [
+                cat["ssodnet_name"] in file_
+                for cat in rocks.datacloud.CATALOGUES.values()
+            ]
+        ):
+
+            ssodnet_id = "_".join(file_.split("_")[:-1])
+            catalogue = os.path.splitext(file_)[0].split("_")[-1]
+
+            cached_catalogues.append((ssodnet_id, catalogue))
+            continue
+
+        # Likely an ssocard, check the version
+        ssodnet_id = os.path.splitext(file_)[0]
+
+        with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
+            card = json.load(ssocard)
+
+            if card[ssodnet_id] is None:
+                cached_cards.append((ssodnet_id, "Failed"))
+            else:
+                cached_cards.append(
+                    (ssodnet_id, card[ssodnet_id]["ssocard"]["version"])
+                )
+
+    return cached_cards, cached_catalogues

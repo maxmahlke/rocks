@@ -4,11 +4,13 @@ import json
 import keyword
 import os
 import sys
+import warnings
 import webbrowser
 
 import click
 import requests
 import rich
+from rich.prompt import Prompt
 
 import rocks
 
@@ -78,7 +80,7 @@ def info(id_):
 
 @cli_rocks.command()
 def parameters():
-    """Prints the ssoCard JSON keys and description using the template."""
+    """Print the ssoCard and its description."""
 
     if not os.path.isfile(rocks.PATH_TEMPLATE):
         rocks.utils.retrieve_json_from_ssodnet("template")
@@ -90,49 +92,18 @@ def parameters():
 
 
 @cli_rocks.command()
-def status():
-    """Echo the number of ssoCards and catalogues in the cache directory.
-    Optionally update the out-of-date ones.
-    Optionally update the asteroid name-number index.
-    """
+def update():
+    """Update the cached asteroid data."""
 
     # Get set of ssoCards and datacloud catalogues in cache
-    cached_jsons = set(
-        file_
-        for file_ in os.listdir(rocks.PATH_CACHE)
-        if file_.endswith(".json") and file_ not in ["ssoCard_template.json"]
+    cached_cards, cached_catalogues = rocks.utils.cache_inventory()
+
+    rich.print(
+        f"""\nContents of {rocks.PATH_CACHE}:
+
+        {len(cached_cards)} ssoCards
+        {len(cached_catalogues)} datacloud catalogues\n"""
     )
-
-    datacloud_catalogues = set(
-        c["ssodnet_name"] for c in rocks.datacloud.CATALOGUES.values()
-    )
-    cached_catalogues = set(
-        file_
-        for file_ in cached_jsons
-        if any([cat in file_ for cat in datacloud_catalogues])
-    )
-
-    cached_ssocards = cached_jsons - cached_catalogues
-
-    print(
-        f"There are {len(cached_ssocards)} ssoCards cached locally in {rocks.PATH_CACHE}"
-    )
-
-    # Read the versions of the cached ssoCards
-    card_version = {}
-
-    for card in cached_ssocards:
-
-        ssodnet_id = os.path.splitext(card)[0]
-
-        with open(os.path.join(rocks.PATH_CACHE, card), "r") as ssocard:
-            card = json.load(ssocard)
-
-            # TODO Currently, some ssoCards are None. This should be fixed on SsODNet side soon.
-            if card[ssodnet_id] is None:
-                card_version[ssodnet_id] = "Failed"
-            else:
-                card_version[ssodnet_id] = card[ssodnet_id]["ssocard"]["version"]
 
     # Get the current SsODNet version
     # TODO There will soon be a stub card online to check this
@@ -143,42 +114,102 @@ def status():
     if response.ok:
         card_ceres = response.json()
     else:
-        warnings.warn(f"Retrieving the current ssoCard version failed.")
+        warnings.warn("Retrieving the current ssoCard version failed.")
         sys.exit()
 
     current_version = card_ceres["Ceres"]["ssocard"]["version"]
 
-    out_of_date = [
-        card for card, version in card_version.items() if version != current_version
-    ]
+    # ------
+    # Update ssoCards
+    out_of_date = [card for card, version in cached_cards if version != current_version]
 
-    if out_of_date:
+    if cached_cards:
+        if out_of_date:
 
-        if len(out_of_date) == 1:
-            print(f"1 ssoCard is out-of-date.", end=" ")
+            # Ensure that the IDs are current
+            if len(out_of_date) == 1:
+                _, _, current_ids = rocks.identify(
+                    out_of_date, return_id=True, local=False
+                )
+                current_ids = [current_ids]
+
+            else:
+                _, _, current_ids = zip(
+                    *rocks.identify(out_of_date, return_id=True, local=False)
+                )
+
+            # Swap the renamed ones
+            updated = []
+
+            for old_id, current_id in zip(out_of_date, current_ids):
+
+                if old_id == current_id:
+                    continue
+
+                rich.print(
+                    f"{old_id} has been renamed to {current_id}. Swapping the ssoCards."
+                )
+
+                # Get new card and remove the old one
+                rocks.ssodnet.get_ssocard(current_id, no_cache=True)
+                os.remove(os.path.join(rocks.PATH_CACHE, f"{old_id}.json"))
+
+                # This is now up-to-date
+                updated.append(old_id)
+
+            for id_ in updated:
+                out_of_date.remove(id_)
+
+            # Update the outdated ones
+            rich.print(
+                f"\n{len(out_of_date)} ssoCards {'is' if len(out_of_date) == 1 else 'are'} out-of-date..",
+                end=" ",
+            )
+
+            for card in out_of_date:
+                rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
+
+            rich.print(" Done.")
+
         else:
-            print(f"{len(out_of_date)} cards are out-of-date.", end=" ")
+            rich.print("\nAll ssoCards are up-to-date.")
 
-        response = input("Update the out-of-date cards? [Y/n] ")
+    # ------
+    # Update datacloud catalogues
+    if cached_catalogues:
+        response = Prompt.ask(
+            "\nDatacloud catalogues do not have versions. Update all of them?",
+            choices=["y", "n"],
+            default="n",
+        )
 
-        if response in ["", "Y", "y"]:
-            print(f"Updating the ssoCards...", end=" ")
-            rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
-            print("Done.")
-        else:
-            print("Not updating the ssoCards.")
+        if response in ["Y", "y"]:
+            rich.print("Updating datacloud catalogues..", end=" ")
+            for ssodnet_id, catalogue in cached_catalogues:
+                rocks.ssodnet.get_datacloud_catalogue(
+                    ssodnet_id, catalogue, progress=False, no_cache=True
+                )
+            rich.print("Done.")
 
-    else:
-        print("All cards are up-to-date.")
+    # ------
+    # Update metadata
+    rich.print("\nUpdating the metadata files..", end=" ")
 
-    response = input("Update the asteroid name-number index? [Y/n] ")
+    for meta in ["template", "units", "description"]:
+        rocks.utils.retrieve_json_from_ssodnet(meta)
+
+    rich.print("Done.")
+
+    # ------
+    # Update asteroi name-number index
+    response = Prompt.ask(
+        "\nUpdate the asteroid name-number index? This can take 30min - 1h.",
+        choices=["y", "n"],
+        default="n",
+    )
 
     if response in ["", "Y", "y"]:
-        print(f"Updating the index...", end=" ")
-        rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
-        rocks.utils.update_index()
-        rocks.utils.retrieve_json_from_ssodnet("template")
-        print("Done.")
+        rocks.utils.create_index()
 
 
 def echo(plot):
@@ -221,6 +252,6 @@ def echo(plot):
             )
             sys.exit()
 
-        rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
+        rocks.plots.plot_parameter(rocks.utils.rgetattr(rock, parameter), parameter)
 
     sys.exit()
