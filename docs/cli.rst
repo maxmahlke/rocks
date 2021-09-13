@@ -140,7 +140,7 @@ Echo the structure of the ssoCard. Can be used in combination with ``grep`` to f
  'parameters.dynamical.uncertainty.osculating_elements.semi_major_axis',
  'parameters.dynamical.uncertainty.proper_elements.proper_semi_major_axis',
 
-rocks status
+rocks update
 ------------
 
 Echo the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.

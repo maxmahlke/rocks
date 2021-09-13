@@ -52,14 +52,18 @@ Updating the cached asteroid data
 ---------------------------------
 
 After some weeks / months, the data in the cached ssoCards may be outdated. The
-``$ rocks status`` command echos the number of locally cached ssoCards  and
+``$ rocks update`` command echos the number of locally cached ssoCards  and
 checks their version against the current SsODNet global ssoCard version. If any
 ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of
 these cards.
 
 .. code-block:: bash
 
-   $ rocks status
+   $ rocks update
+
+.. _still-out-of-date:
+
+If ``$ rocks update`` still lists outdated cards on a second run, they may belong to asteroids which have been named recently. These cards can be deleted.
 
 .. _clear_cache:
 
