@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 """Implement the Datacloud catalogue pydantic models."""
 from typing import List, Optional
-import warnings
 
 import numpy as np
-import pandas as pd
 import pydantic
 import rich
 from rich.table import Table
 
 import rocks
+
 
 # ------
 # Definitions
@@ -126,7 +125,7 @@ def pretty_print(rock, catalogue, parameter):
         The name of the user-requested parameter to echo.
     """
 
-    if len(catalogue) == 1 and pd.isna(catalogue.id_[0]):
+    if len(catalogue) == 1 and np.isnan(catalogue.id_[0]):
         print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
         return
 
