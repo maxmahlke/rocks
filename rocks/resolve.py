@@ -18,7 +18,7 @@ import rocks
 nest_asyncio.apply()
 
 
-def identify(id_, return_id=False, progress=False):
+def identify(id_, return_id=False, progress=False, local=True):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
@@ -28,8 +28,10 @@ def identify(id_, return_id=False, progress=False):
     return_id : bool
         Return the SsODNet ID of the asteroid as third member of
         the tuple. Default is False.
-    progress : bool or tdqm.std.tqdm
-        If progress is True, this is a progress bar instance. Else, it's False.
+    progress : bool
+        Show progress bar. Default is False.
+    local : bool
+        Try resolving the name locally first. Default is True.
 
     Returns
     =======
@@ -70,7 +72,7 @@ def identify(id_, return_id=False, progress=False):
 
     # Run async loop to resolve names
     loop = asyncio.get_event_loop()
-    results = loop.run_until_complete(_identify(id_, progress))
+    results = loop.run_until_complete(_identify(id_, progress, local))
 
     if progress:
         progress.close()
@@ -84,7 +86,7 @@ def identify(id_, return_id=False, progress=False):
     return results
 
 
-async def _identify(id_, progress):
+async def _identify(id_, progress, local):
     """Resolve asteroid name asynchronously. First attempts local lookup, then
     queries quaero.
 
@@ -92,6 +94,10 @@ async def _identify(id_, progress):
     ==========
     id_ : str, int, float, list, set, np.ndarray, pd.Series
         One or more identifying names or numbers to resolve.
+    progress : tqdm.tqdm.Progress or bool
+        Either False or a progress bar instance.
+    local : bool
+        Try resolving the name locally first. Default is True.
 
     Returns
     =======
@@ -108,7 +114,7 @@ async def _identify(id_, progress):
 
         tasks = [
             asyncio.ensure_future(
-                _query_and_resolve(i, session, NAMES, NUMBERS, IDS, progress)
+                _query_and_resolve(i, session, NAMES, NUMBERS, IDS, progress, local)
             )
             for i in id_
         ]
@@ -118,7 +124,15 @@ async def _identify(id_, progress):
     return results
 
 
-async def _query_and_resolve(id_, session, NAMES, NUMBERS, IDS, progress):
+async def _query_and_resolve(
+    id_,
+    session,
+    NAMES,
+    NUMBERS,
+    IDS,
+    progress,
+    local,
+):
     """Standardize identifier, do local look-up, else query quaero and parser
     methods asynchronously. Call with identify function."""
 
@@ -129,17 +143,18 @@ async def _query_and_resolve(id_, session, NAMES, NUMBERS, IDS, progress):
 
     # ------
     # Try local resolution
-    if id_ in NUMBERS:
-        name, ssodnet_id = NUMBERS[id_]
-        return (name, id_, ssodnet_id)
+    if local:
+        if id_ in NUMBERS:
+            name, ssodnet_id = NUMBERS[id_]
+            return (name, id_, ssodnet_id)
 
-    if id_ in NAMES:
-        number, ssodnet_id = NAMES[id_]
-        return (id_, number, ssodnet_id)
+        if id_ in NAMES:
+            number, ssodnet_id = NAMES[id_]
+            return (id_, number, ssodnet_id)
 
-    if id_ in IDS:
-        name, number = IDS[id_]
-        return (name, number, id_)
+        if id_ in IDS:
+            name, number = IDS[id_]
+            return (name, number, id_)
 
     if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
         return (None, np.nan, None)
