@@ -61,6 +61,10 @@ def identify(id_, return_id=False, progress=False):
             f"str, int, float, list, np.ndarray, pd.Series"
         )
 
+    if not id_:
+        warnings.warn("Received empty list of identifiers.")
+        return (None, np.nan, None)
+
     if progress:
         progress = tqdm(desc="Identifying rocks : ", total=len(id_))
 
