@@ -48,6 +48,8 @@ def identify(id_, return_id=False, progress=False):
         id_ = [id_]
     elif isinstance(id_, pd.Series):
         id_ = id_.values
+    elif isinstance(id_, np.ndarray):
+        id_ = id_.tolist()
     elif isinstance(id_, (set, range)):
         id_ = list(id_)
     elif id_ is None:
