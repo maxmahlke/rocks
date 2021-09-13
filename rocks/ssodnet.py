@@ -151,7 +151,7 @@ async def _query_ssodnet(id_ssodnet, session):
 
 
 # ------
-def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False):
+def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, no_cache=False):
     """Retrieve the datacloud catalogue of one or many asteroids, using their SsODNet IDs.
 
     Parameters
@@ -162,6 +162,8 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False):
         The name of the datacloud catalogue to retrieve.
     progress : bool
         Show progressbar. Default is False.
+    no_cache : bool
+        If True, forces the remote query of the ssoCard. Default is False.
 
     Returns
     =======
@@ -208,13 +210,13 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False):
     # Run async loop to get ssoCard
     loop = asyncio.get_event_loop()
     catalogues = loop.run_until_complete(
-        _get_datacloud_catalogue(id_catalogue, progress)
+        _get_datacloud_catalogue(id_catalogue, progress, no_cache)
     )[0]
 
     return catalogues
 
 
-async def _get_datacloud_catalogue(id_catalogue, progress):
+async def _get_datacloud_catalogue(id_catalogue, progress, no_cache):
     """Get catalogue asynchronously. First attempts local lookup, then
     queries SsODNet.
 
@@ -224,6 +226,8 @@ async def _get_datacloud_catalogue(id_catalogue, progress):
         Asteroid - catalogue combinations.
     progress : bool or tdqm.std.tqdm
         If progress is True, this is a progress bar instance. Else, it's False.
+    no_cache : bool
+        If True, forces the remote query of the ssoCard. Default is False.
 
     Returns
     =======
@@ -236,7 +240,7 @@ async def _get_datacloud_catalogue(id_catalogue, progress):
 
         tasks = [
             asyncio.ensure_future(
-                _local_or_remote_catalogue(i[0], i[1], session, progress)
+                _local_or_remote_catalogue(i[0], i[1], session, progress, no_cache)
             )
             for i in id_catalogue
         ]
@@ -246,7 +250,9 @@ async def _get_datacloud_catalogue(id_catalogue, progress):
     return results
 
 
-async def _local_or_remote_catalogue(id_ssodnet, catalogue, session, progress):
+async def _local_or_remote_catalogue(
+    id_ssodnet, catalogue, session, progress, no_cache
+):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
     if progress:
@@ -254,7 +260,7 @@ async def _local_or_remote_catalogue(id_ssodnet, catalogue, session, progress):
 
     PATH_CATALOGUE = os.path.join(rocks.PATH_CACHE, f"{id_ssodnet}_{catalogue}.json")
 
-    if os.path.isfile(PATH_CATALOGUE):
+    if os.path.isfile(PATH_CATALOGUE) and not no_cache:
         with open(PATH_CATALOGUE, "r") as file_card:
             return json.load(file_card)
 
