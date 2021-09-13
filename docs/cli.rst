@@ -94,12 +94,6 @@ The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 More commands
 =============
 
-
-rocks clear
------------
-
-Remove all ssoCards from the cache directory.
-
 rocks docs
 ----------
 
@@ -125,8 +119,6 @@ Identify an asteroid using its number, name, or designation. Aliases and packed 
 
    $ rocks id J65B00A
    (1727) Mette
-
-The command is aliased to ``rocks id`` as well.
 
 rocks info
 ----------
