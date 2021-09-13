@@ -26,11 +26,6 @@ class AliasedGroup(click.Group):
             return rv
 
         # ------
-        # Command aliases
-        if cmd_name == "id":
-            return identify
-
-        # ------
         # Unknown subcommand -> echo asteroid parameter and optionally plot
         for arg in ["-p", "--plot"]:
 
