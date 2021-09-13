@@ -94,10 +94,16 @@ The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 More commands
 =============
 
+
+rocks clear
+-----------
+
+Remove all ssoCards from the cache directory.
+
 rocks docs
 ----------
 
-Opens this documentation in browser tab.
+Open this documentation in browser tab.
 
 rocks id
 --------
@@ -125,12 +131,11 @@ The command is aliased to ``rocks id`` as well.
 rocks info
 ----------
 
-Echos the ssoCard of an asteroid in JSON format.
-
+Echo the ssoCard of an asteroid in JSON format.
 
 .. _rocks-props:
 
-rocks properties
+rocks parameters
 ----------------
 
 Echo the structure of the ssoCard. Can be used in combination with ``grep`` to find the right property name to provide to ``rocks``
@@ -146,11 +151,5 @@ Echo the structure of the ssoCard. Can be used in combination with ``grep`` to f
 rocks status
 ------------
 
-Echos the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.
+Echo the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.
 Offers to update the asteroid name-number index. Further, retrieves the current ssoCard structure template from SsODNet.
-
-
-rocks clear
------------
-
-Removes all ssoCards from the cache directory.

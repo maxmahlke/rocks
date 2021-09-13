@@ -472,6 +472,7 @@ class Rock(pydantic.BaseModel):
         if name in self.__aliases["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
 
+        # TODO This could be coded in a more abstract way
         # These are proper aliases
         if name in self.__aliases["orbital_elements"].keys():
             return getattr(
@@ -485,12 +486,18 @@ class Rock(pydantic.BaseModel):
                 self.__aliases["proper_elements"][name],
             )
 
+        if name in self.__aliases["physical"].keys():
+            return getattr(
+                self.parameters.physical,
+                self.__aliases["physical"][name],
+            )
+
         if name in self.__aliases["diamalbedo"]:
             return getattr(self, "diamalbedo")
 
         raise AttributeError(
             f"'Rock' object has no attribute '{name}'. Run "
-            f"'rocks properties' to get a list of accepted properties."
+            f"'rocks parameters' to get a list of accepted properties."
         )
 
     def __repr__(self):
@@ -553,7 +560,10 @@ class Rock(pydantic.BaseModel):
             value = data
 
             for loc in error["loc"]:
-                value = value[loc]
+                try:
+                    value = value[loc]
+                except TypeError:
+                    break
 
             rich.print(
                 f"Error: {' -> '.join([str(e) for e in error['loc']])} is invalid: {error['msg']}\n"
@@ -572,13 +582,13 @@ class Rock(pydantic.BaseModel):
             "parameters.physical.diameter": "diameter",
             "parameters.physical.albedo": "albedo",
             "parameters.physical.absolute_magnitude": "absolute_magnitude",
-            "parameters.physical.absolute_magnitude": "H",
             "parameters.physical.colors": "colors",
             "parameters.physical.mass": "mass",
             "parameters.physical.thermal_properties": "thermal_properties",
             "parameters.physical.spin": "spin",
             "parameters.physical.taxonomy": "taxonomy",
             "parameters.physical.phase": "phase",
+            "H": "absolute_magnitude",
         },
         "orbital_elements": {
             "a": "semi_major_axis",

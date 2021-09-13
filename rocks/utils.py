@@ -133,7 +133,7 @@ def get_unit(path_unit):
     str
         The unit of the requested parameter.
     """
-    PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit-template_aster-astorb.json")
+    PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit_aster-astorb.json")
 
     if not os.path.isfile(PATH_UNITS):
         print(
