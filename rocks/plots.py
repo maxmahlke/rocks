@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """ Plotting utilities for rocks."""
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 import rocks
