@@ -54,14 +54,6 @@ def docs():
 
 
 @cli_rocks.command()
-def clear():
-    """Clear the cached ssoCards."""
-    for file_ in os.listdir(rocks.PATH_CACHE):
-        if file_.endswith(".json") and file_ != "ssoCard_template.json":
-            os.remove(os.path.join(rocks.PATH_CACHE, file_))
-
-
-@cli_rocks.command()
 @click.argument("id_")
 def id(id_):
     """Get asteroid name and number from string input."""
