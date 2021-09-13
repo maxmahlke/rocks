@@ -2,7 +2,7 @@
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
 import json
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -155,9 +155,7 @@ class Yarkovsky(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
 
     def __str__(self):
-        print_A2 = print_parameter(self.A2, "unit.dynamical.yarkovsky.A2.value")
-        print_dadt = print_parameter(self.dadt, "unit.dynamical.yarkovsky.dadt.value")
-        return "\n".join([print_A2, print_dadt])
+        return "\n".join([self.A2.__str__(), self.dadt.__str__()])
 
 
 class DynamicalParameters(Parameter):
@@ -437,7 +435,11 @@ class Rock(pydantic.BaseModel):
             if ssocard is None:
                 # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
-                print(f"Did not find ssoCard for asteroid '{id_provided}'.")
+                print(
+                    f"Did not find ssoCard for asteroid '{id_provided}'. The "
+                    f"local asteroid name-number index may be outdated, run 'rocks "
+                    f"update' and repeat your command afterwards."
+                )
 
             else:
                 for catalogue in datacloud:
@@ -462,8 +464,7 @@ class Rock(pydantic.BaseModel):
             setattr(self, catalogue, pd.DataFrame(data=getattr(self, catalogue).dict()))
 
     def __getattr__(self, name):
-        """Implement attribute shortcuts: omission of parameters.physical/dynamical.
-        Gets called if getattribute fails."""
+        """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
         # These are shortcuts
         if name in self.__aliases["physical"].values():
