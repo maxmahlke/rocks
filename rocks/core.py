@@ -461,7 +461,13 @@ class Rock(pydantic.BaseModel):
             if catalogue in ["diameters", "albedos"]:
                 catalogue = "diamalbedo"
 
-            setattr(self, catalogue, pd.DataFrame(data=getattr(self, catalogue).dict()))
+            setattr(
+                self,
+                catalogue,
+                rocks.datacloud.DataCloudDataFrame(
+                    data=getattr(self, catalogue).dict()
+                ),
+            )
 
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""

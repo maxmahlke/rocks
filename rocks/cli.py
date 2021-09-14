@@ -252,6 +252,6 @@ def echo(plot):
             )
             sys.exit()
 
-        rocks.plots.plot_parameter(rocks.utils.rgetattr(rock, parameter), parameter)
+        rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
 
     sys.exit()

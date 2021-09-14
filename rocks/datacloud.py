@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 import numpy as np
+import pandas as pd
 import pydantic
 import rich
 from rich.table import Table
