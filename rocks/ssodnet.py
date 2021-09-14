@@ -157,9 +157,9 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, no_cache=Fals
     Parameters
     ==========
     id_ssodnet : str, list, np.ndarray, pd.series
-        The ssodnet id of the asteroid
-    catalogue : str
-        The name of the datacloud catalogue to retrieve.
+        The ssodnet id of the asteroid. Can be one or many.
+    catalogue : str, list of str
+        The name of the datacloud catalogue to retrieve. Can be one or many.
     progress : bool
         Show progressbar. Default is False.
     no_cache : bool

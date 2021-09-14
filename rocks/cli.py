@@ -8,9 +8,11 @@ import warnings
 import webbrowser
 
 import click
+import numpy as np
 import requests
 import rich
 from rich.prompt import Prompt
+from rich.progress import track
 
 import rocks
 
@@ -134,6 +136,7 @@ def update():
                 current_ids = [current_ids]
 
             else:
+
                 _, _, current_ids = zip(
                     *rocks.identify(out_of_date, return_id=True, local=False)
                 )
@@ -162,14 +165,25 @@ def update():
 
             # Update the outdated ones
             rich.print(
-                f"\n{len(out_of_date)} ssoCards {'is' if len(out_of_date) == 1 else 'are'} out-of-date..",
+                f"\n{len(out_of_date)} ssoCards {'is' if len(out_of_date) == 1 else 'are'} out-of-date.",
                 end=" ",
             )
 
-            for card in out_of_date:
-                rocks.ssodnet.get_ssocard(out_of_date, no_cache=True)
+            response = Prompt.ask(
+                "Update the ssoCards?",
+                choices=["y", "n"],
+                default="y",
+            )
 
-            rich.print(" Done.")
+            if response in ["Y", "y"]:
+
+                n_subsets = 20 if len(out_of_date) > 1000 else 1
+
+                for subset in track(
+                    np.array_split(np.array(out_of_date), n_subsets),
+                    description="Updating ssoCards : ",
+                ):
+                    rocks.ssodnet.get_ssocard(subset, progress=False, no_cache=True)
 
         else:
             rich.print("\nAll ssoCards are up-to-date.")
@@ -184,12 +198,18 @@ def update():
         )
 
         if response in ["Y", "y"]:
-            rich.print("Updating datacloud catalogues..", end=" ")
-            for ssodnet_id, catalogue in cached_catalogues:
-                rocks.ssodnet.get_datacloud_catalogue(
-                    ssodnet_id, catalogue, progress=False, no_cache=True
-                )
-            rich.print("Done.")
+            for catalogue in set([cat for _, cat in cached_catalogues]):
+                ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
+
+                n_subsets = 20 if len(ids) > 1000 else 1
+
+                for subset in track(
+                    np.array_split(np.array(ids), n_subsets),
+                    description=f"{catalogue:<12} : ",
+                ):
+                    rocks.ssodnet.get_datacloud_catalogue(
+                        subset, catalogue, progress=False, no_cache=True
+                    )
 
     # ------
     # Update metadata

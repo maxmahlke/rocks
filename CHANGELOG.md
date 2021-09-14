@@ -1,5 +1,11 @@
-# 1.3.0 - 2021-09-10
-- datacloud catalogues are now pd.DataFrame objects
+# 1.3.1 - 2021-09-14
+- datacloud catalogues and ssoCards are now updated asynchronously
+- identify now correctly checks the 'id' column of the returned json response
+- User has to confirm update of ssoCards
+- Overall nicer rocks update dialogue
+
+# 1.3.0 - 2021-09-14
+- datacloud catalogues are now DataCloudDataFrame objects: a pd.DataFrame subclass with added .plot() and .weighted_average()
 - Readded the --plot flag for datacloud CLI queries
 - Merged the 'rocks status' command into the 'rocks update' command
 - The 'rocks update' command now updates all cached data if requested
@@ -11,6 +17,7 @@
 - The diamalbedo catalogue once again has the preferred attribute
 - Bugfix in the weighted_average calculation
 - Made the wording more consistent: asteroid "property" -> asteroid "parameter"
+- Added no_cache keyword to datacloud catalogue queries
 
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue

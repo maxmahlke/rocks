@@ -139,11 +139,14 @@ async def _query_and_resolve(
     if progress:
         progress.update()
 
-    id_ = standardize_id_(id_)
-
     # ------
     # Try local resolution
     if local:
+
+        # Non-local resolution is only done for the index and ssoCard updates
+        # where we use numbers and the ssodnet id, so no standardization necessary
+        id_ = standardize_id_(id_)
+
         if id_ in NUMBERS:
             name, ssodnet_id = NUMBERS[id_]
             return (name, id_, ssodnet_id)
@@ -321,6 +324,8 @@ def _parse_quaero_response(data_json, id_):
 
     for match in data_json:
         if match["name"].lower() == id_:
+            break
+        elif match["id"].lower() == id_:
             break
         elif any([alias.lower() == id_ for alias in match["aliases"]]):
             break
