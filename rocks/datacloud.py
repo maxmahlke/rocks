@@ -190,6 +190,37 @@ def pretty_print(rock, catalogue, parameter):
 
 
 # ------
+# Subclass the pd.DataFrame to add rocks-specific functionality
+class DataCloudDataFrame(pd.DataFrame):
+    @property
+    def _constructor(self):
+        return DataCloudDataFrame
+
+    @property
+    def _constructor_sliced(self):
+        return DataCloudSeries
+
+    def plot(self, parameter, **kwargs):
+        """Plot the parameter of the catalogue."""
+        return rocks.plots.plot(self, parameter, **kwargs)
+
+    def weighted_average(self, parameter):
+        """Compute the weighted average of the parameter using the preferred
+        values only."""
+        return rocks.utils.weighted_average(self, parameter)
+
+
+class DataCloudSeries(pd.Series):
+    @property
+    def _constructor(self):
+        return DataCloudSeries
+
+    @property
+    def _constructor_expanddim(self):
+        return DataCloudDataFrame
+
+
+# ------
 # Validators
 def ensure_list(value):
     """Ensure that parameters are always a list.
