@@ -292,8 +292,8 @@ async def _query_quaero(id_, session):
         response_json = await response.json()
     except aiohttp.ContentTypeError:
         raise ValueError(
-            "It seems that you are requesting name resolution or data for a large number"
-            "of asteroids, which led to a failure in a query. Try requesting the"
+            "It seems that you are requesting name resolution or data for a large number "
+            "of asteroids, which led to a failure in a query. Try requesting the "
             "resolution / data in subsets of 5,000 - 10,000 per call."
         )
 

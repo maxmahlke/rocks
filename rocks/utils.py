@@ -71,8 +71,13 @@ def create_index():
     numbers = {number: (name, id_) for name, (number, id_) in names.items()}
     ids = {id_: (name, number) for name, (number, id_) in names.items()}
 
+    # Smaller steps are less likely to overload SsODNet
+    steps = 500
+
     # Identify the asteroids by in parts
-    for subset in tqdm(np.array_split(numbered, 100), total=100, desc="Building Index"):
+    for subset in tqdm(
+        np.array_split(numbered, steps), total=steps, desc="Building Index"
+    ):
 
         subset_identified = rocks.identify(
             subset, return_id=True, progress=False, local=False
