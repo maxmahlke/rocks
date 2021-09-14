@@ -49,7 +49,7 @@ def identify(id_, return_id=False, progress=False, local=True):
     if isinstance(id_, (str, int, float)):
         id_ = [id_]
     elif isinstance(id_, pd.Series):
-        id_ = id_.values
+        id_ = id_.to_list()
     elif isinstance(id_, np.ndarray):
         id_ = id_.tolist()
     elif isinstance(id_, (set, range)):
