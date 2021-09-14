@@ -334,11 +334,9 @@ class Ssocard(Parameter):
 class Datacloud(Parameter):
     """The collection of links to datacloud catalogue associated to this ssoCard."""
 
-    aams: Optional[str] = ""
     astdys: Optional[str] = ""
     astorb: Optional[str] = ""
-    binarymp_tab: Optional[str] = ""
-    binarymp_ref: Optional[str] = ""
+    binarymp: Optional[str] = ""
     diamalbedo: Optional[str] = ""
     families: Optional[str] = ""
     masses: Optional[str] = ""
@@ -369,15 +367,22 @@ class Rock(pydantic.BaseModel):
     datacloud: Datacloud = Datacloud(**{})
 
     # the catalogues
-    taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
-    aams: rocks.datacloud.AAMS = rocks.datacloud.AAMS(**{})
     astdys: rocks.datacloud.AstDyS = rocks.datacloud.AstDyS(**{})
     astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
+    binarymp: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
+    colors: rocks.datacloud.Colors = rocks.datacloud.Colors(**{})
     diamalbedo: rocks.datacloud.Diamalbedo = rocks.datacloud.Diamalbedo(**{})
+    families: rocks.datacloud.Families = rocks.datacloud.Families(**{})
     masses: rocks.datacloud.Masses = rocks.datacloud.Masses(**{})
     mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
+    mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
+    phase_function: rocks.datacloud.PhaseFunction = rocks.datacloud.PhaseFunction(**{})
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
+    thermal_properties: rocks.datacloud.PhaseFunction = (
+        rocks.datacloud.ThermalProperties(**{})
+    )
+    yarkovskies: rocks.datacloud.Yarkovskies = rocks.datacloud.Yarkovskies(**{})
 
     def __init__(self, id_, ssocard={}, datacloud=[], skip_id_check=False):
         """Identify a minor body  and retrieve its properties from SsODNet.

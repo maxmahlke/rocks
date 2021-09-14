@@ -18,10 +18,6 @@ CATALOGUES = {
     # rocks name :
     #     attr_name : Rock.xyz
     #     ssodnet_name : Name of catalogue in SsODNet
-    "aams": {
-        "attr_name": "aams",
-        "ssodnet_name": "aams",
-    },
     "albedos": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
@@ -37,6 +33,16 @@ CATALOGUES = {
     "astdys": {
         "attr_name": "astdys",
         "ssodnet_name": "astdys",
+        "print_columns": [
+            "H",
+            "ProperSemimajorAxis",
+            "ProperEccentricity",
+            "ProperInclination",
+            "ProperSinI",
+            "n",
+            "s",
+            "LCE",
+        ],
     },
     "astorb": {
         "attr_name": "astorb",
@@ -52,9 +58,15 @@ CATALOGUES = {
             "Inclination",
         ],
     },
-    "binarymp_tab": {
+    "binarymp": {
         "attr_name": "binaries",
-        "ssodnet_name": "binarymp_tab",
+        "ssodnet_name": "binarymp",
+        "print_columns": [""],
+    },
+    "colors": {
+        "attr_name": "colors",
+        "ssodnet_name": "colors",
+        "print_columns": [""],
     },
     "diamalbedo": {
         "attr_name": "diamalbedo",
@@ -83,6 +95,12 @@ CATALOGUES = {
     "families": {
         "attr_name": "families",
         "ssodnet_name": "families",
+        "print_columns": [
+            "family_number",
+            "family_name",
+            "family_status",
+            "membership",
+        ],
     },
     "masses": {
         "attr_name": "masses",
@@ -91,11 +109,32 @@ CATALOGUES = {
     },
     "mpcatobs": {
         "attr_name": "mpcatobs",
-        "ssodnet_name": "mpcatons",
+        "ssodnet_name": "mpcatobs",
+        "print_columns": [
+            "packed_name",
+            "discovery",
+            "date_obs",
+            "ra_obs",
+            "dec_obs",
+            "mag",
+            "filter_",
+            "iau_code",
+        ],
+    },
+    "mpcorb": {
+        "attr_name": "mpcorb",
+        "ssodnet_name": "mpcorb",
+        "print_columns": [],
     },
     "pairs": {
         "attr_name": "pairs",
         "ssodnet_name": "pairs",
+        "print_columns": [],
+    },
+    "phase_function": {
+        "attr_name": "phase_function",
+        "ssodnet_name": "phase_function",
+        "print_columns": [],
     },
     "taxonomies": {
         "attr_name": "taxonomies",
@@ -108,6 +147,16 @@ CATALOGUES = {
             "scheme",
             "shortbib",
         ],
+    },
+    "thermal_properties": {
+        "attr_name": "thermal_properties",
+        "ssodnet_name": "thermal_properties",
+        "print_columns": [],
+    },
+    "yarkovskies": {
+        "attr_name": "yarkovskies",
+        "ssodnet_name": "yarkovsky",
+        "print_columns": [],
     },
 }
 
@@ -126,7 +175,7 @@ def pretty_print(rock, catalogue, parameter):
         The name of the user-requested parameter to echo.
     """
 
-    if len(catalogue) == 1 and np.isnan(catalogue.id_[0]):
+    if len(catalogue) == 1 and pd.isna(catalogue.id_[0]):
         print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
         return
 
@@ -137,7 +186,7 @@ def pretty_print(rock, catalogue, parameter):
             "Blue: preferred diameter, yellow: preferred albedo, green: both preferred"
         )
     else:
-        caption = "Green: preferred entry"
+        caption = "Green: preferred entry" if hasattr(catalogue, "preferred") else ""
 
     table = Table(
         header_style="bold blue",
@@ -183,7 +232,7 @@ def pretty_print(rock, catalogue, parameter):
             style = "bold green" if pref else "white"
 
         table.add_row(
-            *[str(getattr(catalogue, c)[i]) for c in columns],
+            *[str(catalogue[c][i]) for c in columns],
             style=style,
         )
 
@@ -235,7 +284,7 @@ def ensure_list(value):
 
 
 def ensure_int(value):
-    return [int(v) for v in value]
+    return [int(v) if v else None for v in value]
 
 
 # ------
@@ -243,12 +292,11 @@ def ensure_int(value):
 class Catalogue(pydantic.BaseModel):
     """The abstraction of a general datacloud catalogue on SsODNet."""
 
-    id_: List[int] = pydantic.Field([np.nan], alias="id")
+    id_: List[int] = pydantic.Field([None], alias="id")
     link: List[str] = [""]
     name: List[str] = [""]
     title: List[str] = [""]
-    number: List[int] = pydantic.Field([np.nan], alias="num")
-    shortbib: List[str] = [""]
+    number: List[Optional[int]] = pydantic.Field([None], alias="num")
     iddataset: List[str] = [""]
     datasetname: List[str] = [""]
     idcollection: List[int] = [None]
@@ -257,67 +305,30 @@ class Catalogue(pydantic.BaseModel):
     _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
         ensure_list
     )
-    # _ensure_int: classmethod = pydantic.validator(
-    #     "id_", "number", allow_reuse=True, pre=True
-    # )(ensure_int)
-
-
-class AAMS(Catalogue):
-    HG_H: Optional[float] = np.nan
-    HG_G: Optional[float] = np.nan
-    HG_r_err_H: Optional[float] = np.nan
-    HG_l_err_H: Optional[float] = np.nan
-    HG_r_err_G: Optional[float] = np.nan
-    HG_l_err_G: Optional[float] = np.nan
-    HG_rms: Optional[float] = np.nan
-    HG_convergence: Optional[float] = np.nan
-    HG1G2_H: Optional[float] = np.nan
-    HG1G2_G1: Optional[float] = np.nan
-    HG1G2_G2: Optional[float] = np.nan
-    HG1G2_r_err_H: Optional[float] = np.nan
-    HG1G2_l_err_H: Optional[float] = np.nan
-    HG1G2_r_err_G1: Optional[float] = np.nan
-    HG1G2_l_err_G1: Optional[float] = np.nan
-    HG1G2_r_err_G2: Optional[float] = np.nan
-    HG1G2_l_err_G2: Optional[float] = np.nan
-    HG1G2_rms: Optional[float] = np.nan
-    HG1G2_convergence: Optional[float] = np.nan
-    HG12_H: Optional[float] = np.nan
-    HG12_G12: Optional[float] = np.nan
-    HG12_r_err_H: Optional[float] = np.nan
-    HG12_l_err_H: Optional[float] = np.nan
-    HG12_r_err_G12: Optional[float] = np.nan
-    HG12_l_err_G12: Optional[float] = np.nan
-    HG12_rms: Optional[float] = np.nan
-    HG12_convergence: Optional[float] = np.nan
-    HG_err_H: Optional[float] = np.nan
-    HG_err_G: Optional[float] = np.nan
-    HG1G2_err_H: Optional[float] = np.nan
-    HG1G2_err_G1: Optional[float] = np.nan
-    HG1G2_err_G2: Optional[float] = np.nan
-    HG12_err_H: Optional[float] = np.nan
-    HG12_err_G12: Optional[float] = np.nan
+    _ensure_int: classmethod = pydantic.validator(
+        "id_", "number", allow_reuse=True, pre=True
+    )(ensure_int)
 
 
 class AstDyS(Catalogue):
-    H: Optional[float] = np.nan
-    ProperSemimajorAxis: Optional[float] = np.nan
-    err_ProperSemimajorAxis: Optional[float] = np.nan
-    ProperEccentricity: Optional[float] = np.nan
-    err_ProperEccentricity: Optional[float] = np.nan
-    ProperSinI: Optional[float] = np.nan
-    err_ProperSinI: Optional[float] = np.nan
-    ProperInclination: Optional[float] = np.nan
-    err_ProperInclination: Optional[float] = np.nan
-    n: Optional[float] = np.nan
-    err_n: Optional[float] = np.nan
-    g: Optional[float] = np.nan
-    err_g: Optional[float] = np.nan
-    s: Optional[float] = np.nan
-    err_s: Optional[float] = np.nan
-    LCE: Optional[float] = np.nan
-    My: Optional[float] = np.nan
-    lam_fit: Optional[float] = pydantic.Field(np.nan, alias="lam-fit")
+    H: List[float] = [np.nan]
+    ProperSemimajorAxis: List[float] = [np.nan]
+    err_ProperSemimajorAxis: List[float] = [np.nan]
+    ProperEccentricity: List[float] = [np.nan]
+    err_ProperEccentricity: List[float] = [np.nan]
+    ProperSinI: List[float] = [np.nan]
+    err_ProperSinI: List[float] = [np.nan]
+    ProperInclination: List[float] = [np.nan]
+    err_ProperInclination: List[float] = [np.nan]
+    n: List[float] = [np.nan]
+    err_n: List[float] = [np.nan]
+    g: List[float] = [np.nan]
+    err_g: List[float] = [np.nan]
+    s: List[float] = [np.nan]
+    err_s: List[float] = [np.nan]
+    LCE: List[float] = [np.nan]
+    My: List[float] = [np.nan]
+    lam_fit: List[float] = pydantic.Field([np.nan], alias="lam-fit")
 
 
 class Astorb(Catalogue):
@@ -375,6 +386,14 @@ class Astorb(Catalogue):
     OrbPeriod: List[float] = [np.nan]
 
 
+class Binarymp(Catalogue):
+    pass
+
+
+class Colors(Catalogue):
+    pass
+
+
 class Diamalbedo(Catalogue):
 
     doi: List[str] = [""]
@@ -383,6 +402,7 @@ class Diamalbedo(Catalogue):
     method: List[str] = [""]
     year: List[Optional[int]] = [None]
     source: List[str] = [""]
+    shortbib: List[str] = [""]
 
     albedo: List[float] = [np.nan]
     err_albedo: List[float] = [np.nan]
@@ -415,11 +435,19 @@ class Diamalbedo(Catalogue):
         ]
 
 
+class Families(Catalogue):
+    membership: List[float] = [np.nan]
+    family_name: List[str] = [""]
+    family_number: List[float] = [np.nan]
+    family_status: List[str] = [""]
+
+
 class Masses(Catalogue):
     doi: List[str] = [""]
     url: List[str] = [""]
     source: List[str] = [""]
     method: List[str] = [""]
+    shortbib: List[str] = [""]
 
     year: List[Optional[int]] = [None]
     mass: List[float] = [np.nan]
@@ -436,7 +464,6 @@ class Mpcatobs(Catalogue):
     link: List[str] = [""]
     datasetname: List[str] = [""]
     resourcename: List[str] = [""]
-    doi: List[str] = [""]
     title: List[str] = [""]
     iddataset: List[str] = [""]
     idcollection: List[Optional[int]] = [None]
@@ -460,15 +487,23 @@ class Mpcatobs(Catalogue):
     type_: List[str] = pydantic.Field([""], alias="type")
 
 
+class Mpcorb(Catalogue):
+    pass
+
+
 class Pairs(Catalogue):
-    sibling_num: Optional[float] = np.nan
-    sibling_name: Optional[str] = ""
-    delta_v: Optional[float] = np.nan
-    delta_a: Optional[float] = np.nan
-    delta_e: Optional[float] = np.nan
-    delta_sini: Optional[float] = np.nan
-    delta_i: Optional[float] = np.nan
-    membership: Optional[int] = None
+    sibling_num: List[float] = [np.nan]
+    sibling_name: List[str] = [""]
+    delta_v: List[float] = [np.nan]
+    delta_a: List[float] = [np.nan]
+    delta_e: List[float] = [np.nan]
+    delta_sini: List[float] = [np.nan]
+    delta_i: List[float] = [np.nan]
+    membership: List[int] = [None]
+
+
+class PhaseFunction(Catalogue):
+    pass
 
 
 class Taxonomies(Catalogue):
@@ -479,6 +514,7 @@ class Taxonomies(Catalogue):
     scheme: List[str] = [""]
     complex_: List[str] = pydantic.Field([""], alias="complex")
     class_: List[str] = pydantic.Field([""], alias="class")
+    shortbib: List[str] = [""]
 
     year: List[Optional[int]] = [None]
 
@@ -487,3 +523,11 @@ class Taxonomies(Catalogue):
     @pydantic.validator("preferred", pre=True)
     def select_preferred_taxonomy(cls, v, values):
         return rocks.definitions.rank_properties("taxonomy", values)
+
+
+class ThermalProperties(Catalogue):
+    pass
+
+
+class Yarkovskies(Catalogue):
+    pass

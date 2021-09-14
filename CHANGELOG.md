@@ -1,3 +1,6 @@
+# 1.3.2 - 2021
+- Updated datacloud catalogue implementations
+
 # 1.3.1 - 2021-09-14
 - datacloud catalogues and ssoCards are now updated asynchronously
 - identify now correctly checks the 'id' column of the returned json response
