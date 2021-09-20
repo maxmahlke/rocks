@@ -28,13 +28,14 @@ nest-asyncio = "^1.5.1"
 requests = "^2.26.0"
 
 [tool.poetry.extras]
-docs = ["sphinx", "sphinx-redactor-theme"]
+docs = ["sphinx", "sphinx-redactor-theme", "sphinx-hoverxref"]
 
 [tool.poetry.scripts]
 rocks = "rocks.cli:cli_rocks"
 
 [tool.poetry.dev-dependencies]
 sphinx-redactor-theme = {version = "^0.0.1", optional = true}
+sphinx-hoverxref = {version = "^0.7", optional = true}
 
 [tool.pytest.ini_options]
 addopts = "-v --cov=rocks --cov-report html"
