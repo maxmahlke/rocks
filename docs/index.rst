@@ -4,6 +4,12 @@
 
 *for space-rocks*
 
+|ImageLink|_
+
+.. |ImageLink| image:: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+               :width: 50
+.. _ImageLink: http://github.com/maxmahlke/rocks
+
 .. highlight:: python
 
 A ``python`` package to query and explore asteroid data from
