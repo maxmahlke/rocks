@@ -4,15 +4,11 @@ import json
 import keyword
 import os
 import sys
-import warnings
 import webbrowser
 
 import click
-import numpy as np
-import requests
 import rich
 from rich import prompt
-from rich import progress
 
 import rocks
 
@@ -108,103 +104,36 @@ def update():
     )
 
     # Get the current SsODNet version
-    # TODO There will soon be a stub card online to check this
-    # For now, we just check the version of Ceres
-    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/Ceres"
-    response = requests.get(URL)
-
-    if response.ok:
-        card_ceres = response.json()
-    else:
-        warnings.warn("Retrieving the current ssoCard version failed.")
-        sys.exit()
-
-    current_version = card_ceres["Ceres"]["ssocard"]["version"]
+    current_version = rocks.utils.get_current_version()
 
     # ------
     # Update ssoCards
     out_of_date = [card for card, version in cached_cards if version != current_version]
 
-    if cached_cards:
-        if out_of_date:
+    if cached_cards and out_of_date:
 
-            # Ensure that the IDs are current
-            if len(out_of_date) == 1:
-                _, _, current_ids = rocks.identify(
-                    out_of_date, return_id=True, local=False
-                )
-                current_ids = [current_ids]
+        # Ensure that the IDs are current
+        rocks.utils.confirm_identify(out_of_date)
 
-            else:
+        # Optionally update the ssoCards
+        update_cards = prompt.Confirm.ask("Update the ssoCards?", default=True)
 
-                _, _, current_ids = zip(
-                    *rocks.identify(out_of_date, return_id=True, local=False)
-                )
+        if update_cards:
+            rocks.utils.update_cards(out_of_date)
 
-            # Swap the renamed ones
-            updated = []
-
-            for old_id, current_id in zip(out_of_date, current_ids):
-
-                if old_id == current_id:
-                    continue
-
-                rich.print(
-                    f"{old_id} has been renamed to {current_id}. Swapping the ssoCards."
-                )
-
-                # Get new card and remove the old one
-                rocks.ssodnet.get_ssocard(current_id, no_cache=True)
-                os.remove(os.path.join(rocks.PATH_CACHE, f"{old_id}.json"))
-
-                # This is now up-to-date
-                updated.append(old_id)
-
-            for id_ in updated:
-                out_of_date.remove(id_)
-
-            # Update the outdated ones
-            rich.print(
-                f"\n{len(out_of_date)} ssoCards {'is' if len(out_of_date) == 1 else 'are'} out-of-date.",
-                end=" ",
-            )
-
-            response = prompt.Confirm.ask("Update the ssoCards?", default=True)
-
-            if response in ["Y", "y"]:
-
-                n_subsets = 20 if len(out_of_date) > 1000 else 1
-
-                for subset in progress.track(
-                    np.array_split(np.array(out_of_date), n_subsets),
-                    description="Updating ssoCards : ",
-                ):
-                    rocks.ssodnet.get_ssocard(subset, progress=False, no_cache=True)
-
-        else:
-            rich.print("\nAll ssoCards are up-to-date.")
+    elif cached_cards and not out_of_date:
+        rich.print("\nAll ssoCards are up-to-date.")
 
     # ------
     # Update datacloud catalogues
     if cached_catalogues:
-        response = prompt.Confirm.ask(
+        update_datacloud = prompt.Confirm.ask(
             "\nDatacloud catalogues do not have versions. Update all of them?",
             default=False,
         )
 
-        if response in ["Y", "y"]:
-            for catalogue in set([cat for _, cat in cached_catalogues]):
-                ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
-
-                n_subsets = 20 if len(ids) > 1000 else 1
-
-                for subset in progress.track(
-                    np.array_split(np.array(ids), n_subsets),
-                    description=f"{catalogue:<12} : ",
-                ):
-                    rocks.ssodnet.get_datacloud_catalogue(
-                        subset, catalogue, progress=False, no_cache=True
-                    )
+        if update_datacloud:
+            rocks.utils.update_datacloud_catalogues(cached_catalogues)
 
     # ------
     # Update metadata
@@ -218,12 +147,19 @@ def update():
     # ------
     # Update asteroi name-number index
     response = prompt.Prompt.ask(
-        "\nUpdate the asteroid name-number index? This can take 30min - 1h.",
-        choices=["y", "n"],
-        default=False,
+        "\nUpdate the asteroid name-number index? "
+        "[blue][0][/blue] No "
+        "[blue][1][/blue] From GitHub (updated ~weekly) "
+        "[blue][2][/blue] Locally (takes 30min - 1h.)",
+        choices=["0", "1", "2"],
+        default="1",
     )
 
-    if response in ["", "Y", "y"]:
+    if response == "1":
+        rocks.utils.retrieve_index_from_repository()
+        rich.print("Retrieved index from repository.")
+
+    elif response == "2":
         rocks.utils.create_index()
 
 
