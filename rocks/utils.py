@@ -276,7 +276,9 @@ def retrieve_json_from_ssodnet(which):
             json.dump(ssoCard, file_)
 
     else:
-        warnings.warn(f"Retrieving the ssoCard {which} failed with url:\n{URL}")
+        warnings.warn(
+            f"Retrieving the ssoCard {which} failed with url:\n{URL_JSON[which]}"
+        )
 
 
 def cache_inventory():
