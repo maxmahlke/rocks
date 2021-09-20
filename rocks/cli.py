@@ -150,7 +150,7 @@ def update():
         "\nUpdate the asteroid name-number index? "
         "[blue][0][/blue] No "
         "[blue][1][/blue] From GitHub (updated ~weekly) "
-        "[blue][2][/blue] Locally (takes 30min - 1h.)",
+        "[blue][2][/blue] Locally (takes 30min - 1h)",
         choices=["0", "1", "2"],
         default="1",
     )
