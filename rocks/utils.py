@@ -7,11 +7,14 @@ import os
 import pickle
 import urllib
 import warnings
+import sys
 
 import numpy as np
 import pandas as pd
 import requests
 from tqdm import tqdm
+import rich
+from rich import progress
 
 import rocks
 
@@ -158,6 +161,23 @@ def get_unit(path_unit):
         units = units[key]
 
     return units
+
+
+def update_cards(ids):
+    """Update the cached ssoCards of the passed ids.
+
+    Parameters
+    ==========
+    ids : list
+        List of SsODNet IDs of ssoCards to update.
+    """
+    n_subsets = 20 if len(ids) > 1000 else 1
+
+    for subset in progress.track(
+        np.array_split(np.array(ids), n_subsets),
+        description="Updating ssoCards : ",
+    ):
+        rocks.ssodnet.get_ssocard(subset, progress=False, no_cache=True)
 
 
 # ------
@@ -328,3 +348,98 @@ def cache_inventory():
                 )
 
     return cached_cards, cached_catalogues
+
+
+def get_current_version():
+    """Get the current version of ssoCards.
+
+    Returns
+    =======
+    str
+        The current version of ssoCards.
+
+    Notes
+    =====
+    There will soon be a stub card online to check this. For now, we just check
+    the version of Ceres.
+
+    This function should be extended once datacoud catalogues have versions as well.
+    """
+
+    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/Ceres"
+    response = requests.get(URL)
+
+    if response.ok:
+        card_ceres = response.json()
+    else:
+        warnings.warn("Retrieving the current ssoCard version failed.")
+        print(response)
+        sys.exit()
+
+    return card_ceres["Ceres"]["ssocard"]["version"]
+
+
+def confirm_identify(ids):
+    """Confirm the SsODNet ID of the passed identifier. Retrieve the current
+    ssoCard and remove the former one if the ID has changed.
+
+    Parameters
+    ==========
+    ids : list
+        The list of SsODNet IDs to confirm.
+    """
+    if len(ids) == 1:
+        _, _, current_ids = rocks.identify(ids, return_id=True, local=False)
+        current_ids = [current_ids]
+
+    else:
+
+        _, _, current_ids = zip(*rocks.identify(ids, return_id=True, local=False))
+
+    # Swap the renamed ones
+    updated = []
+
+    for old_id, current_id in zip(ids, current_ids):
+
+        if old_id == current_id:
+            continue
+
+        rich.print(f"{old_id} has been renamed to {current_id}. Swapping the ssoCards.")
+
+        # Get new card and remove the old one
+        rocks.ssodnet.get_ssocard(current_id, no_cache=True)
+        os.remove(os.path.join(rocks.PATH_CACHE, f"{old_id}.json"))
+
+        # This is now up-to-date
+        updated.append(old_id)
+
+    for id_ in updated:
+        ids.remove(id_)
+
+    # Update the outdated ones
+    rich.print(
+        f"\n{len(ids)} ssoCards {'is' if len(ids) == 1 else 'are'} out-of-date.",
+        end=" ",
+    )
+
+
+def update_datacloud_catalogues(ids_catalogues):
+    """Update the datacloud catalogues in the cache directory.
+
+    Parameters
+    ==========
+    ids_catalogues : list of tuple
+        The SsODNet IDs and catalogue names to update.
+    """
+    for catalogue in set([cat for _, cat in ids_catalogues]):
+        ids = [id_ for id_, cat in ids_catalogues if cat == catalogue]
+
+        n_subsets = 20 if len(ids) > 1000 else 1
+
+        for subset in progress.track(
+            np.array_split(np.array(ids), n_subsets),
+            description=f"{catalogue:<12} : ",
+        ):
+            rocks.ssodnet.get_datacloud_catalogue(
+                subset, catalogue, progress=False, no_cache=True
+            )
