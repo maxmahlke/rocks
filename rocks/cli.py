@@ -11,8 +11,8 @@ import click
 import numpy as np
 import requests
 import rich
-from rich.prompt import Prompt
-from rich.progress import track
+from rich import prompt
+from rich import progress
 
 import rocks
 
@@ -169,17 +169,13 @@ def update():
                 end=" ",
             )
 
-            response = Prompt.ask(
-                "Update the ssoCards?",
-                choices=["y", "n"],
-                default="y",
-            )
+            response = prompt.Confirm.ask("Update the ssoCards?", default=True)
 
             if response in ["Y", "y"]:
 
                 n_subsets = 20 if len(out_of_date) > 1000 else 1
 
-                for subset in track(
+                for subset in progress.track(
                     np.array_split(np.array(out_of_date), n_subsets),
                     description="Updating ssoCards : ",
                 ):
@@ -191,10 +187,9 @@ def update():
     # ------
     # Update datacloud catalogues
     if cached_catalogues:
-        response = Prompt.ask(
+        response = prompt.Confirm.ask(
             "\nDatacloud catalogues do not have versions. Update all of them?",
-            choices=["y", "n"],
-            default="n",
+            default=False,
         )
 
         if response in ["Y", "y"]:
@@ -203,7 +198,7 @@ def update():
 
                 n_subsets = 20 if len(ids) > 1000 else 1
 
-                for subset in track(
+                for subset in progress.track(
                     np.array_split(np.array(ids), n_subsets),
                     description=f"{catalogue:<12} : ",
                 ):
@@ -222,10 +217,10 @@ def update():
 
     # ------
     # Update asteroi name-number index
-    response = Prompt.ask(
+    response = prompt.Prompt.ask(
         "\nUpdate the asteroid name-number index? This can take 30min - 1h.",
         choices=["y", "n"],
-        default="n",
+        default=False,
     )
 
     if response in ["", "Y", "y"]:
