@@ -14,6 +14,7 @@ data/description-template_aster-astorb.json
 data/ssoCard_sample.check
 data/ssoCard_sample.json
 data/unit-template_aster-astorb.json
+data/compute_index_and_publish.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
