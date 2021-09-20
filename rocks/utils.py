@@ -102,14 +102,6 @@ def read_index():
     """
     with open(rocks.PATH_INDEX, "rb") as ind:
         index = pickle.load(ind)
-
-    # TODO: Switched from pd.DataFrame to dicts. Can remove this check in 2022.
-    if isinstance(index, pd.DataFrame):
-        raise TypeError(
-            """The asteroid name-number index has been changed in version 1.3 to a
-        dictionary to speed up the name resolution. Please delete the index file
-        located at '$USER/.cache/rocks/index.pkl' and rerun your command."""
-        )
     return index
 
 
