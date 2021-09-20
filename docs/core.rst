@@ -4,20 +4,18 @@
 The ``python`` package
 ######################
 
-``rocks`` provides object-oriented access to the data stored in ssoCards and
+``rocks`` provides object-oriented access to the data stored in :term:`ssoCards <ssoCard>` and
 datacloud. The implementation focuses on ease-of-access and speed: all
 attributes are accessible via the common dot notation, and queries to
-``SsODNet`` are run asynchronously.
+:term:`SsODNet` are run asynchronously.
 
 The public API only consists of two functions and one class:
 
 - ``rocks.identify()``: identify one or many asteroids based on user-provided identifiers
 
-- ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its ``ssoCard``
+- ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its :term:`ssoCard`
 
 - ``rocks.rocks()``: a wrapper around ``rocks.identify()`` and ``rocks.Rock`` to read in the data of many asteroids
-
-This will :term:`show a tooltip <SsODNet>` in the linked words to ``hoverxref``.
 
 Identification of asteroids
 ===========================
@@ -45,7 +43,7 @@ asteroid. It is the (iron) core of the ``rocks`` package.
 Creating a ``Rock`` instance
 ----------------------------
 
-``Rocks`` are created by passing the name, number, or SsODNet ID of the asteroid that they should represent.
+``Rocks`` are created by passing the name, number, or :term:`SsODNet ID` of the asteroid that they should represent.
 
 .. code-block:: python
 

@@ -59,20 +59,21 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 graphviz_output_format = "svg"
 
+
 # ------
-hoverxref_role_types = {
-    "hoverxref": "modal",
-    "ref": "modal",  # for hoverxref_auto_ref config
-    "confval": "tooltip",  # for custom object
-    "mod": "tooltip",  # for Python Sphinx Domain
-    "class": "tooltip",  # for Python Sphinx Domain
-    "term": "tooltip",  # for Python Sphinx Domain
-}
+# hoverxref_role_types = {
+#     "hoverxref": "modal",
+#     "ref": "modal",  # for hoverxref_auto_ref config
+#     "confval": "tooltip",  # for custom object
+#     "mod": "tooltip",  # for Python Sphinx Domain
+#     "class": "tooltip",  # for Python Sphinx Domain
+#     "term": "tooltip",  # for Python Sphinx Domain
+# }
 
 hoverxref_roles = ["numref", "confval", "setting", "term"]
 
 hoverxref_project = "rocks"
-hoverxref_version = "0.1"
+hoverxref_version = "latest"
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -98,7 +99,15 @@ html_theme_options = {
     # "titles_only": False,
 }
 
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
+html_style = "css/custom.css"
 html_static_path = ["_static"]
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = [
+    "css/custom.css",
+]
