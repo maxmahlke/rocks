@@ -84,3 +84,4 @@ See more use cases in the :ref:`Tutorials<Tutorials>`.
    The python package<core>
    Command Line Interface<cli>
    tutorials
+   glossary

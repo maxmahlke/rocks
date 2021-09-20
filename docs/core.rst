@@ -5,7 +5,7 @@ The ``python`` package
 ######################
 
 ``rocks`` provides object-oriented access to the data stored in ssoCards and
-datacloud. The implementation focuses on ease of access and speed: all
+datacloud. The implementation focuses on ease-of-access and speed: all
 attributes are accessible via the common dot notation, and queries to
 ``SsODNet`` are run asynchronously.
 
@@ -16,6 +16,8 @@ The public API only consists of two functions and one class:
 - ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its ``ssoCard``
 
 - ``rocks.rocks()``: a wrapper around ``rocks.identify()`` and ``rocks.Rock`` to read in the data of many asteroids
+
+This will :term:`show a tooltip <SsODNet>` in the linked words to ``hoverxref``.
 
 Identification of asteroids
 ===========================
@@ -113,7 +115,8 @@ Multiple tables are retrieved by passing a list of table names.
 
 .. _iterate_catalogues:
 
-The catalogues are iterable and return a catalogue per entry in each iteration.
+From a ``python`` view, the catalogues are subclassed of the ``pandas.DataFrame``.
+As such, the catalogues are iterable and return a catalogue per entry in each iteration.
 
 .. code-block:: python
 
@@ -132,6 +135,8 @@ The catalogues are iterable and return a catalogue per entry in each iteration.
     562.6km, observed via NEATM by Alí-Lagoa+2018
     505.4km, observed via OCC by Herald+2019
     522.0km, observed via OCC by Herald+2019
+
+Other convenient ``DataFrame`` methods such as ``groupby`` are also available. The difference between the ``DataCloudDataFrame`` and the original ``DataFrame`` are two added methods for the former: ``weighted_average`` and ``plot``.
 
 
 The ``datacloud`` tables have slightly different names in ``rocks``.
@@ -162,7 +167,7 @@ The ``datacloud`` tables have slightly different names in ``rocks``.
 
 Some observations in the catalogues might be preferred to others. For example, a
 taxonomical classification using a visible-near-infrared spectrum is more
-reliable than one based on visible colours. ``rocks`` includes **opinonated**
+reliable than one based on visible colours. ``rocks`` includes **opinionated**
 selections of preferred observations based on the observation methods, just as
 the ``ssoCard`` does.  Catalogues have ``preferred`` attributes, which are lists
 containing ``True`` if the corresponding observation is preferred, and ``False``

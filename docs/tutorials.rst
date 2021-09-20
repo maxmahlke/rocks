@@ -2,8 +2,8 @@
 Tutorials
 #########
 
-General FAQ
-===========
+ssoCards and datacloud
+======================
 
 -  :ref:`What is the difference between data from the ssoCard and from the datacloud? <ssocard-datacloud>`
 
@@ -11,8 +11,6 @@ The Data Cache
 ==============
 
 -  :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
-
-- :ref:`After updating the cached ssoCards, they are still showing up as out-of-date. What's going on?<still-out-of-date>`
 
 -  :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
 

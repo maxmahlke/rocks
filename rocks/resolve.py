@@ -304,6 +304,7 @@ async def _query_quaero(id_, session):
     try:
         response_json = await response.json()
     except aiohttp.ContentTypeError:
+        # TODO This could also be caught silently as no user interference is required
         warnings.warn(
             f"\n{response.status} {response.reason}: It seems that you are "
             f"requesting name resolution or data for a large number "

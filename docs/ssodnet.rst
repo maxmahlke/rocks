@@ -61,17 +61,16 @@ these cards.
 
    $ rocks update
 
-.. _still-out-of-date:
-
-If ``$ rocks update`` still lists outdated cards on a second run, they may belong to asteroids which have been named recently. These cards can be deleted.
-
 .. _clear_cache:
 
 Removing the cached asteroid data
 ---------------------------------
 
-You can delete all cached ssoCards and datacloud catalogues by running
+You can delete all cached ssoCards and datacloud catalogues by deleting the cache directory.
 
 .. code-block:: bash
 
-   $ rocks clear
+   $ rm -r ~/.cache/rocks
+
+On the next run of ``rocks``, you will be asked to retrieve the asteroid
+name-number index from the GitHub repository again.

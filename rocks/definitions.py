@@ -237,7 +237,6 @@ CLASS_TO_COMPLEX = {
     "G": "C",
     "GC": "C",
     "GS": "U",
-    "G": "U",
     "J": "V",
     "K": "K",
     "Kl": "U",
