@@ -19,7 +19,7 @@ Latest version: 1.3.2  - `What's new? <https://github.com/maxmahlke/rocks/blob/m
 via the Command Line
 ====================
 
-Quick exploration of asteroid parameters using the ``rocks ``:ref:`command-line interface<Command Line Interface>`.
+Quick exploration of asteroid parameters using the ``rocks`` :ref:`command-line interface<Command Line Interface>`.
 
 .. code-block:: bash       
                            

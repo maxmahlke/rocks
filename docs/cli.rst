@@ -19,7 +19,7 @@ Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact
    $ rocks identify 9885
    (9885) Linux
 
-Data exploration
+Data Exploration
 ================
 
 The general structure is ``rocks [property] [id]``. ``property`` refers to the property name in the ssoCard structure, ``id`` refers to the asteroid name, designation, or number. Aliases such as packed designations are also recognized.
@@ -99,12 +99,12 @@ rocks docs
 
 Open this documentation in browser tab.
 
+.. _cli_id:
+
 rocks id
 --------
 
-Identify an asteroid using its number, name, or designation. Aliases and packed designations from the Minor Planet Centre are recognised as well.
-``rocks`` uses SsODNet:quaero to resolve the identities.
-
+Identify an asteroid using an :term:`identifier<Identifier>`.
 
 .. code-block:: bash       
                            

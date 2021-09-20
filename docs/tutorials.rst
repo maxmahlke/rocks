@@ -2,73 +2,58 @@
 Tutorials
 #########
 
-ssoCards and datacloud
-======================
+Asteroid Identification
+=======================
+
+- :ref:`How do I identify an asteroid from the command line?<cli_id>`
+
+- :ref:`How do I identify an asteroid in a python script?<Identification of asteroids>`
+
+- :ref:`Instead of a list of tuples, how can I get the list of resolved asteroid names from my identifiers? <>`
+
+- :ref:`How can I get the aliases (e.g. outdated designations, packed designation) of this asteroid?<find_aliases>`
+
+- :ref:`What asteroids are in the SDSS MOC1? <sdssmoc1>`
+
+Data Exploration
+================
+
+- :ref:`How do I get asteroid parameters on the command line? <Data Exploration>`
+
+- :ref:`How do I get all the taxonomic classes proposed for Ceres?<ceres_taxonomies>`
+
+- :ref:`How do I get the diameters of the first 100 numbered minor planets?<first_diameters>`
+
+- :ref:`What is the average weighted albedo of Hebe? <weighted_average_scripted>`
+
+- :ref:`What parameters can I open in a plot?`
+
+- :ref:`How do I access the entries in a catalogue one by one? <iterate_catalogues>`
+
+Putting It All Together
+=======================
+
+- :ref:`What's the proper semi-major axis distribution of the Koronis family?`
+
+
+Miscellaneous
+==============
 
 -  :ref:`What is the difference between data from the ssoCard and from the datacloud? <ssocard-datacloud>`
-
-The Data Cache
-==============
 
 -  :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
 
 -  :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
 
-Asteroid Identification
-=======================
+---
 
-Identification - command line
+.. _sdssmoc1:
 
-Which asteroid is this?
+*What asteroids are in the SDSS MOC1?*
 
-What are the aliases (outdated designations) of this asteroid?
+.
 
-Identification - scripted
-
-What are all these asteroids in the SDSS MOC4?
-
-Property exploration - command line
-
-What taxonomic classes have been assigned to Hygiea
-
-What's the weighted average albedo of Ceres?
-
-Property exploration - scripted
-
-What's the proper semi-major axis distribution of the Koronis family?
-
-
-Datacloud Catalogues
-====================
-
-- :ref:`Is there a convenient way to get the entries of a catalogue one by one? <iterate_catalogues>`
-
-
-.. _weighted_average_scripted:
-
-What's the weighted average albedo of (6) Hebe?
------------------------------------------------
-
-.. code-block:: python
-
-    >>> alb_diam, err_alb_diam = rocks.utils.weighted_average(np.array(self.diameter)[self.preferred_diameter], np.array(self.err_diameter)[self.preferred_diameter])
-
-
-Identify asteroids
-------------------
-
-.. highlight:: python
-
-- Identify asteroids using a list of names, numbers, or designations::
-
-    import rocks
-
-    names_numbers = rocks.identify(MY_LIST_OF_IDENTIFIERS)
-
-    NAMES = [name_number[0] for name_number in names_numbers]
-    NUMBERS = [name_number[1] for name_number in names_numbers]
-
-- Identify objects in the `SDSS MOC1 <https://faculty.washington.edu/ivezic/sdssmoc/sdssmoc1.html>`_ using ``rocks.identify``:
+`SDSS MOC1 <https://faculty.washington.edu/ivezic/sdssmoc/sdssmoc1.html>`_ using ``rocks.identify``:
 
 .. code-block:: python
 
@@ -108,9 +93,42 @@ Identify asteroids
     data.number = data.number.astype("Int64")  # Int64 supports integers and NaN
     print(data.head())
 
-Download the file or run in a binder.
+---
 
-.. .. code-block:: python
+.. _ceres_taxonomies:
+
+*How do I get all the taxonomic classes proposed for Ceres?*
+
+The taxonomic classes assigned to minor planets in public literature are available in the ``taxonomies`` :ref:`datacloud catalogues <Datacoud Catalogue>`. They can be retrieved via the command line
+
+.. code-block:: bash
+
+   $ rocks taxonomies Ceres
+
+and in a ``python`` script as :ref:`DataCloudDataFrame` instance
+
+.. code-block:: python
+
+   >>> import rocks
+   >>> ceres = rocks.Rock(1, datacloud="taxonomies")
+   >>> for index, classification in ceres.taxonomies.iterrows():
+           print(f"{classification.shortbib} assigned class {classification.class_} to Ceres")
+
+   Tholen+1989 assigned class G to Ceres
+   Bus&Binzel+2002 assigned class C to Ceres
+   Lazzaro+2004 assigned class C to Ceres
+   Lazzaro+2004 assigned class C to Ceres
+   DeMeo+2009 assigned class C to Ceres
+   Fornasier+2014 assigned class G to Ceres
+   Fornasier+2014 assigned class C to Ceres
+
+---
+
+.. _first_diameters:
+
+*How do I get the diameters of the first 100 numbered minor planets?*
+
+.. code-block:: python
 
     
     .. #!/usr/bin/env python
@@ -145,173 +163,67 @@ Download the file or run in a binder.
     .. print(f"This took {time.time() - start:.3} seconds.")
 
 
-.. - Using the ``Rock`` class for asteroid parameter access
-.. - Plotting asteroid albedo distributions for C-types
+.. _find_aliases:
 
+---
 
-.. ``Rock`` class for accessing asteroid parameters
-.. ------------------------------------------------
-.. jupyter notebooks with binder
+  *How can I get the aliases (e.g. outdated designations, packed designation) of this asteroid?*
 
-.. identify function
+  .
 
-.. - :ref:`resolve asteroid names from various identification formats<Asteroid name resolution>`
-.. - :ref:`explore available asteroid data via the command line<Exploration via the command line>`
-.. - :ref:`retrieve and compare measurements in a script<Retrieve and compare asteroid data in a script>`
-.. - :ref:`retrieve parameters for thousands of asteroids in a batch-job<Retrieve parameters for a large number of asteroids>`
+  Asteroid aliases are not stored in the :term:`ssoCard`. Instead, they are returned when querying the asteroid with `quaero <https://ssp.imcce.fr/webservices/ssodnet/api/quaero/>`_. A quick way to get the aliases of an asteroid is therefore to echo the ``link`` parameter in the asteroid's :term:`ssoCard`
 
-.. Asteroid name resolution
-.. """"""""""""""""""""""""
-.. ``rocks`` can identify asteroids based on a variety of identifying strings or
-.. numbers.
+  .. code-block:: bash
 
-.. .. code-block:: python
+     $ rocks link Hebe
 
-   .. from rocks import names
-   .. from rocks import properties
+  and open the link which is given under the ``quaero`` key in the printed dictionary.
 
-   .. # A collection of asteroid identifiers
-   .. ssos = [4, 'eos', '1992EA4', 'SCHWARTZ', '1950 RW', '2001je2']
+  .. code-block:: json
 
-   .. # Resolve their names and numbers
-   .. names_numbers = names.get_name_number(ssos)
-   .. names = [nn[0] for nn in names_numbers]
+    {
+    class: [
+      "MB",
+      "Inner"
+    ],
+    name: "Hebe",
+    id: "Hebe",
+    parent: "Sun",
+    physical-models: [
+      1,
+      2
+    ],
+    aliases: [
+      "00006",
+      "1847 NA",
+      "1947 JB",
+      "2000006",
+      "6",
+      "I47N00A",
+      "J47J00B"
+    ],
+    system: "Sun",
+    physical-ephemeris: true,
+    type: "Asteroid",
+    updated: "2020-05-27",
+    ephemeris: true
+    }
 
-   .. print(names_numbers)
-   .. # [('Vesta', 4), ('Eos', 221), ('1992 EA4', 30863), ('Schwartz', 13820),
-   .. #  ('Gyldenkerne', 5030), ('2001 JE2', 131353)]
+---
 
-.. The name resolution algorithm and different use cases are :ref:`documented here<Resolving names, numbers, designations>`.
+.. _weighted_average_scripted:
 
+*What's the weighted average albedo of (6) Hebe?*
 
-.. Exploration via the command line
-.. """"""""""""""""""""""""""""""""
-.. The ``rocks`` executable is installed system-wide upon installation of the
-.. package. It has a set of subcommands.
+.
 
-.. .. code-block:: bash
+The average albedo can be retrieved using the ``diamalbedo`` :ref:`datacloud catalogue<Datacloud Catalogue>`. The ``weighted_average()`` method of the :term:`DataCloudDataFrame` class is used to compute the average based on the best available observations of the parameter. The average is available in a ``python`` script via
 
-  .. $ rocks
-  .. Usage: rocks [OPTIONS] COMMAND [ARGS]...
+.. code-block:: python
 
-  .. CLI for minor body exploration.
+    >>> import rocks
+    >>> hebe = rocks.Rock(6, datacloud="albedos")
+    >>> hebe.albedos.weighted_average("albedo")
+    (0.23472026283829472, 0.005766951500463558)
 
-  .. For more information: rocks docs
-
-  .. Options:
-    .. --help  Show this message and exit.
-
-  .. Commands:
-    .. docs        Open rocks documentation in browser.
-    .. identify    Get asteroid name and number from string input.
-    .. index       Create or update index of numbered SSOs.
-    .. info        Print available data on asteroid.
-    .. properties  Print valid property names.
-
-  .. $ rocks identify 221
-  .. (221) Eos
-
-   .. $ rocks info Eos | grep ProperSemimajor
-          .. "ProperSemimajorAxis": "3.0123876",
-          .. "err_ProperSemimajorAxis": "0.00001553",
-
-.. When the subcommand is not recognized, ``rocks`` assumes that an asteroid
-.. property is requested.  The valid property names can be printed with ``rocks properties``.
-
-.. An asteroid identifier can be passes as second argument. Otherwise, an
-.. interactive selection from an asteroid index is started.
-
-.. .. code-block:: bash
-
-   .. $ rocks taxonomy Eos
-   .. ref                  class scheme     method  waverange
-   .. Tholen+1989          S     Tholen     Phot    VIS        [ ]
-   .. Bus&Binzel+2002      K     Bus        Spec    VIS        [ ]
-   .. MotheDiniz+2005      K     Bus        Spec    VIS        [ ]
-   .. MotheDiniz+2008a     K     Bus        Spec    VISNIR     [ ]
-   .. Clark+2009           K     Bus-DeMeo  Spec    VISNIR     [ ]
-   .. DeMeo+2009           K     Bus-DeMeo  Spec    VISNIR     [X]
-
-   .. $ rocks albedo Eos
-   .. ref                  albedo err   method
-   .. Morrison+2007        0.123  0.025 STM      [ ]
-   .. Tedesco+2001         0.140  0.010 STM      [ ]
-   .. Ryan+2010            0.150  0.012 STM      [ ]
-   .. Ryan+2010            0.121  0.019 NEATM    [X]
-   .. Usui+2011            0.131  0.014 NEATM    [X]
-   .. Masiero+2011         0.165  0.038 NEATM    [X]
-   .. Masiero+2012         0.166  0.021 NEATM    [X]
-   .. Masiero+2014         0.180  0.027 NEATM    [X]
-   .. Nugent+2016          0.140  0.091 NEATM    [X]
-   .. Nugent+2016          0.150  0.171 NEATM    [X]
-   
-         .. 0.147 +- 0.004
-
-
-.. See ``rocks --help`` and :ref:`the documentation<Command-Line Interface>` for the implemented functions.
-
-.. Retrieve and compare asteroid data in a script
-.. """"""""""""""""""""""""""""""""""""""""""""""
-.. At the core of the ``rocks`` package is the ``Rock`` class. A ``Rock`` instance represents an asteroid. Its properties are accessible via its attributes.
-
-.. .. code-block:: python
-
-  .. from rocks.core import Rock
-
-  .. Ceres = Rock(1)
-  .. print(Ceres)
-  .. # Rock(number=1, name='Ceres')
-
-  .. Vesta = Rock('vesta')
-  .. print(Vesta)
-  .. # Rock(number=4, name='Vesta') 
-
-  .. print(Ceres.taxonomy)  # singular form: from ssoCard
-  .. # 'C'
-  .. print(Ceres.taxonomies)  # plurar form: all datacloud entries
-  .. # ['G', 'C', 'C', 'C', 'C', 'G', 'C']
-
-  .. print(Vesta.albedo)
-  .. # 0.3447431141599281
-
-  .. print(Vesta.albedo > Ceres.albedo)
-  .. # True
-
-.. The properties metadata and uncertainties are again attributes of the property
-.. itself.
-
-.. .. code-block:: python
-
-  .. print(Ceres.taxonomies)
-  .. # ['G', 'C', 'C', 'C', 'C', 'G', 'C']
-  .. print(Ceres.taxonomies.shortbib)
-  .. # ['Tholen+1989', 'Bus&Binzel+2002', 'Lazzaro+2004', 'Lazzaro+2004', 'DeMeo+2009', 'Fornasier+2014', 'Fornasier+2014']
-  .. print(Ceres.taxonomies.method)
-  .. # ['Phot', 'Spec', 'Spec', 'Spec', 'Spec', 'Spec', 'Spec']
-
-.. See the ``Rock`` :ref:`class documentation<rock_class>` for details.
-
-.. Retrieve parameters for a large number of asteroids
-.. """""""""""""""""""""""""""""""""""""""""""""""""""
-
-.. It is possible to create many ``Rock`` instances in parallel by passing a list
-.. of asteroid identifiers. Selecting a subset of the property-space saves memory
-.. and computation time.
-
-.. .. code-block:: python
-
-   .. import numpy as np
-   .. from rocks.core import many_rocks
-
-   .. # List of asteroid identifiers
-   .. ssos = range(1, 1000)
-
-   .. # Get their taxonomies and albedos in 4 parallel jobs, display progress bar
-   .. rocks = many_rocks(ssos, ['taxonomy', 'albedo'], parallel=4, progress=True)
-
-   .. # many_rocks returns a list of Rock-instances
-   .. print(rocks[0])
-   .. # Rock(number=1, name='Ceres')
-
-   .. # Get the asteroid with the largest albedo
-
+---

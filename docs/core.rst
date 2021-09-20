@@ -1,12 +1,11 @@
 .. _rock_class:
 
 ######################
-The ``python`` package
+The ``python`` Package
 ######################
 
 ``rocks`` provides object-oriented access to the data stored in :term:`ssoCards <ssoCard>` and
-datacloud. The implementation focuses on ease-of-access and speed: all
-attributes are accessible via the common dot notation, and queries to
+:term:`datacloud catalogues<Datacloud Catalogue>`. The implementation focuses on ease-of-access and speed: all attributes are accessible via the common dot notation, and queries to
 :term:`SsODNet` are run asynchronously.
 
 The public API only consists of two functions and one class:
@@ -20,19 +19,18 @@ The public API only consists of two functions and one class:
 Identification of asteroids
 ===========================
 
-It is quite straight-forward: providing a single identifier or a list of many identifiers returns a tuple of ``(asteroid name, asteroid number)`` for each
-identifier. Identifiers can be ``floats``, ``integers``, or ``strings`` and can describe the asteroid's name, number, designation, previous designations,
-packed designations, and more.
+It is quite straight-forward: providing a single :term:`identifier <Identifier>`
+(or a list of many) returns a tuple containing the ``(asteroid name, asteroid number)`` (or a list of tuples).
 
 .. code-block:: python
 
-    >>> from rocks.identify import identify
+    >>> import rocks
     >>> rocks.identify(11334)
     ('Rio de Janeiro', 11334)
     >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
     [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
 
-It can be difficult to remember if the first item in the tuple is the asteroid name or number. A donkey bridge: it is returned in alphabetical order, first name, then number.
+Note the alphabetical order: first returned is the **na**\me, then the **nu**\mber.
 
 The ``Rock`` class
 ==================
