@@ -241,7 +241,7 @@ def echo(plot):
     id_ = " ".join(id_)
 
     # Check if the parameter might be missing an underscore
-    if keyword.iskeyword(parameter):
+    if keyword.iskeyword(parameter.split(".")[-1]):
         parameter = f"{parameter}_"
 
     if parameter.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
