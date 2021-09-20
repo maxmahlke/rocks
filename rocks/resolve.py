@@ -77,6 +77,16 @@ def identify(id_, return_id=False, progress=False, local=True):
     if progress:
         progress.close()
 
+    # Check if any failed due to 502 and rerun them
+    idx_failed = [i for i, result in enumerate(results) if result == (None, None, None)]
+
+    if idx_failed:
+        results = np.array(results)
+        results[idx_failed] = loop.run_until_complete(
+            _identify(np.array(id_)[idx_failed], progress=False, local=local)
+        )
+        results = results.tolist()
+
     if not return_id:
         results = [r[:2] for r in results]
 
@@ -166,6 +176,9 @@ async def _query_and_resolve(
     # Local resolution failed, do remote query
     response = await _query_quaero(id_, session)
 
+    if response is None:
+        return (None, None, None)  # query failed with 502. To be repeated
+
     if response:
         name, number, ssodnet_id = _parse_quaero_response(response["data"], str(id_))
         if isinstance(ssodnet_id, str):
@@ -193,7 +206,7 @@ def standardize_id_(id_):
             id_ = int(id_)
         except ValueError:  # np.nan
             if np.isnan(id_):
-                warnings.warn(f"Received id 'NaN'.")
+                warnings.warn("Received id 'NaN'.")
                 return None
 
     elif isinstance(id_, str):
@@ -250,7 +263,7 @@ def standardize_id_(id_):
             pass
     else:
         if id_ is None:
-            warnings.warn(f"Received id 'None'.")
+            warnings.warn("Received id 'None'.")
             return None
         else:
             warnings.warn(
@@ -291,11 +304,13 @@ async def _query_quaero(id_, session):
     try:
         response_json = await response.json()
     except aiohttp.ContentTypeError:
-        raise ValueError(
-            "It seems that you are requesting name resolution or data for a large number "
-            "of asteroids, which led to a failure in a query. Try requesting the "
-            "resolution / data in subsets of 5,000 - 10,000 per call."
+        warnings.warn(
+            f"\n{response.status} {response.reason}: It seems that you are "
+            f"requesting name resolution or data for a large number "
+            f"of asteroids, which led to a failure in a query. Try requesting the "
+            f"resolution / data in subsets of 5,000 - 10,000 per call."
         )
+        return None
 
     # No match found
     if "data" not in response_json.keys():

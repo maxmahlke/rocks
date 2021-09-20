@@ -1,5 +1,6 @@
 # 1.3.2 - 2021
 - Updated datacloud catalogue implementations
+- Catching the 502 server error with rocks identify
 
 # 1.3.1 - 2021-09-14
 - datacloud catalogues and ssoCards are now updated asynchronously
