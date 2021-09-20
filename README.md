@@ -19,7 +19,7 @@ MB>Outer
 $ rocks albedo Eos
 0.136 +- 0.004
 
-$ rocks taxonomy.class_ Eos
+$ rocks taxonomy Eos
 K
 ```
 
