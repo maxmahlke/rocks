@@ -5,14 +5,14 @@ Command Line Interface
 ######################
 
 The ``rocks`` executable is useful for quick exploration of asteroid data from the command line / terminal.
-The most general use case is to provide an asteroid property and an asteroid identifier to echo the value from the ``ssoCard``.
+The most general use case is to provide an asteroid property and an asteroid identifier to echo the value from the :term:`ssoCard`.
 
 .. code-block:: bash
 
    $ rocks diameter Pallas
    514.102 +- 3.475 km
 
-Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact with the cached ``ssoCards``, look up available properties, and more.
+Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact with the cached :term:`ssoCards<ssoCard>`, look up available properties, and more.
 
 .. code-block:: bash
 
@@ -22,8 +22,7 @@ Furthermore, there are :ref:`commands<commands>` to identify asteroids, interact
 Data Exploration
 ================
 
-The general structure is ``rocks [property] [id]``. ``property`` refers to the property name in the ssoCard structure, ``id`` refers to the asteroid name, designation, or number. Aliases such as packed designations are also recognized.
-
+The general structure is ``rocks [property] [id]``. ``property`` refers to the property name in the :term:`ssoCard` structure, ``id`` refers to any asteroid :term:`identifier<Identifier>`.
 
 .. code-block:: bash       
                            
@@ -43,9 +42,9 @@ If the key ambiguous, the higher level attribute is preferred.
   $ rocks taxonomy.class_ 4
   V
 
-The names of the accepted properties are echoed with :ref:`rocks properties<rocks-props>`.
+The names of the accepted parameters are echoed with :ref:`rocks parameters<rocks-props>`.
 
-Collections of properties from datacloud can also be printed. Giving only the name of the catalogue prints a general overview.
+Collections of parameters from :term:`datacloud catalogues<Datacloud Catalogue>` can also be printed. Giving only the name of the catalogue prints a general overview.
 
 .. code-block:: bash       
                            
@@ -79,7 +78,7 @@ Collections of properties from datacloud can also be printed. Giving only the na
   │ 7.84e+18  │ 7.24e+17  │ EPHEM   │ Fienga+2020         │ 2020 │
   └───────────┴───────────┴─────────┴─────────────────────┴──────┘
 
-Providing the catalogue name and a property returns the property.
+Providing the catalogue name and a parameter returns the parameter.
 
 .. code-block:: bash       
 
@@ -130,7 +129,7 @@ Echo the ssoCard of an asteroid in JSON format.
 rocks parameters
 ----------------
 
-Echo the structure of the ssoCard. Can be used in combination with ``grep`` to find the right property name to provide to ``rocks``
+Echo the structure of the :term:`ssoCard`. Can be used in combination with ``grep`` to find the right property name to provide to ``rocks``
 
 .. code-block:: bash
 
@@ -143,5 +142,6 @@ Echo the structure of the ssoCard. Can be used in combination with ``grep`` to f
 rocks update
 ------------
 
-Echo the number of cached ssoCards and checks if any are outdated. Offers to update outdated cards.
-Offers to update the asteroid name-number index. Further, retrieves the current ssoCard structure template from SsODNet.
+Echo the number of cached :term:`ssoCards<ssoCard>` and checks if any are
+outdated. Offers to update outdated cards.  Offers to update the :term:`asteroid name-number index<Asteroid name-number index>`. Further, retrieves the current
+:term:`ssoCard` structure template from :term:`SsODNet`.

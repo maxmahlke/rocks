@@ -72,5 +72,5 @@ You can delete all cached ssoCards and datacloud catalogues by deleting the cach
 
    $ rm -r ~/.cache/rocks
 
-On the next run of ``rocks``, you will be asked to retrieve the asteroid
-name-number index from the GitHub repository again.
+On the next run of ``rocks``, you will be asked to retrieve the :term:`asteroid
+name-number index<Asteroid name-number index>` from the GitHub repository again.
