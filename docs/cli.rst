@@ -134,11 +134,11 @@ Echo the structure of the ssoCard. Can be used in combination with ``grep`` to f
 
 .. code-block:: bash
 
- $ rocks properties | grep semi_major
- 'parameters.dynamical.osculating_elements.semi_major_axis',
- 'parameters.dynamical.proper_elements.proper_semi_major_axis',
- 'parameters.dynamical.uncertainty.osculating_elements.semi_major_axis',
- 'parameters.dynamical.uncertainty.proper_elements.proper_semi_major_axis',
+ $ rocks parameters | grep semi_major
+    'semi_major_axis': 'Semi-major axis (au)',
+    'err_semi_major_axis': {'min': 'Lower value of uncertainty of the semi-major axis (au)', 'max': 'Upper value of uncertainty of the semi-major axis (au)'},
+    'proper_semi_major_axis': 'Proper semi-major axis (au)',
+    'err_proper_semi_major_axis': {'min': 'Lower value of uncertainty of the proper semi-major axis (au)', 'max': 'Upper value of uncertainty of the proper semi-major axis (au)'},
 
 rocks update
 ------------

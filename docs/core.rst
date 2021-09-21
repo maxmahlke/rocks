@@ -198,7 +198,7 @@ provided, this check can be skipped by setting the ``skip_id_check`` argument to
     >>> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
 
 The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
-The ``ssocard`` argument accepts a ``dict``ionary structure following the one of the
+The ``ssocard`` argument accepts a ``dict``\ ionary structure following the one of the
 original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
 and load it via the ``json`` module.
 
