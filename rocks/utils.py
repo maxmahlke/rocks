@@ -2,7 +2,6 @@
 """Utility functions for rocks."""
 
 from functools import reduce
-import json
 import os
 import pickle
 import urllib
@@ -15,6 +14,8 @@ import requests
 from tqdm import tqdm
 import rich
 from rich import progress
+import ujson
+import json
 
 import rocks
 
@@ -42,6 +43,40 @@ def retrieve_index_from_repository():
 
     with open(rocks.PATH_INDEX, "wb") as ind:
         pickle.dump(index, ind, protocol=4)
+
+
+def __build_index():
+    """Build asteroid name-number index from ssoCard dump."""
+
+    # Get all cards in data dump
+    PATH_CARDS = os.path.join(os.path.dirname(__file__), "../data/ssocards/")
+
+    with open(os.path.join(PATH_CARDS, "ssocards.list"), "r") as file_:
+        CARDS = [
+            os.path.join(PATH_CARDS, path.split("store/")[-1])
+            for path in file_.read().split()
+        ]
+
+    ids, names, numbers, reduced = {}, {}, {}, {}
+
+    # Construct index from card content
+    for card in tqdm(CARDS, total=len(CARDS), desc="Building Index"):
+
+        with open(card, "r") as file_:
+            ssocard = json.load(file_)
+
+        id_ = ssocard["id"]
+        name = ssocard["name"]
+        number = ssocard["number"]
+        id_reduced = id_.replace("_", "").lower()
+
+        names[name] = (number, id_)
+        numbers[number] = (name, id_)
+        ids[id_] = (name, number)
+        reduced[id_reduced] = (name, number, id_)
+
+    with open("/tmp/new_index_cards.pkl", "wb") as ind:
+        pickle.dump([names, numbers, ids, reduced], ind, protocol=4)
 
 
 def create_index():
@@ -75,7 +110,7 @@ def create_index():
     ids = {id_: (name, number) for name, (number, id_) in names.items()}
 
     # Smaller steps are less likely to overload SsODNet
-    steps = 500
+    steps = 100
 
     # Identify the asteroids by in parts
     for subset in tqdm(
@@ -155,7 +190,7 @@ def get_unit(path_unit):
         retrieve_json_from_ssodnet("units")
 
     with open(PATH_UNITS, "r") as units:
-        units = json.load(units)
+        units = ujson.load(units)
 
     for key in path_unit.split("."):
         units = units[key]
@@ -285,7 +320,7 @@ def retrieve_json_from_ssodnet(which):
         ssoCard = response.json()
 
         with open("/".join([rocks.PATH_CACHE, PATH_JSON[which]]), "w") as file_:
-            json.dump(ssoCard, file_)
+            ujson.dump(ssoCard, file_)
 
     else:
         warnings.warn(
@@ -338,7 +373,7 @@ def cache_inventory():
         ssodnet_id = os.path.splitext(file_)[0]
 
         with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
-            card = json.load(ssocard)
+            card = ujson.load(ssocard)
 
             if card[ssodnet_id] is None:
                 cached_cards.append((ssodnet_id, "Failed"))
@@ -443,3 +478,7 @@ def update_datacloud_catalogues(ids_catalogues):
             rocks.ssodnet.get_datacloud_catalogue(
                 subset, catalogue, progress=False, no_cache=True
             )
+
+
+if __name__ == "__main__":
+    __build_index()

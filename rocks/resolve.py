@@ -11,6 +11,7 @@ import nest_asyncio
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+import ujson
 
 import rocks
 
@@ -212,6 +213,9 @@ def standardize_id_(id_):
     elif isinstance(id_, str):
         # String id_. Perform some regex tests to make sure it's well formatted
 
+        # Strip leading and trailing whitespace
+        id_ = id_.strip()
+
         # Asteroid number
         try:
             id_ = int(float(id_))
@@ -302,7 +306,7 @@ async def _query_quaero(id_, session):
     response = await session.request(method="GET", url=url, params=params)
 
     try:
-        response_json = await response.json()
+        response_json = await response.json(loads=ujson.loads, content_type=None)
     except aiohttp.ContentTypeError:
         # TODO This could also be caught silently as no user interference is required
         warnings.warn(
