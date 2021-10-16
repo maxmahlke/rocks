@@ -630,29 +630,37 @@ def rocks_(identifier, datacloud=[], progress=False):
         Show progress of instantiation. Default is False.
 
     Returns
-    =======
+    -------
     list of rocks.core.Rock
         A list of Rock instances
     """
-    if isinstance(identifier, pd.Series):
-        identifier = identifier.values
 
+    # Get IDs
     if len(identifier) == 1:
         ids = [rocks.identify(identifier, return_id=True, progress=progress)[-1]]
 
     else:
-        ids = [
-            id_
-            for _, _, id_ in rocks.identify(
-                identifier, return_id=True, progress=progress
-            )
-        ]
+        _, _, ids = zip(*rocks.identify(identifier, return_id=True, progress=progress))
 
-    rocks_ = [
-        Rock(id_, skip_id_check=True, datacloud=datacloud)
-        for id_ in tqdm(
-            ids, desc="Building rocks : ", total=len(ids), disable=not progress
-        )
-    ]
+    # Load ssoCards asynchronously
+    rocks.ssodnet.get_ssocard(ids, progress=progress)
+
+    if datacloud:
+
+        if isinstance(datacloud, str):
+            datacloud = [datacloud]
+
+        # Load datacloud catalogues asynchronously
+        for cat in datacloud:
+
+            if cat not in rocks.datacloud.CATALOGUES.keys():
+                raise ValueError(
+                    f"Unknown datacloud catalogue name: '{catalogue}'"
+                    f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
+                )
+
+            rocks.ssodnet.get_datacloud_catalogue(ids, cat, progress=progress)
+
+    rocks_ = [Rock(id_, skip_id_check=True, datacloud=datacloud) for id_ in ids]
 
     return rocks_
