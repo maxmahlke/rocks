@@ -15,6 +15,7 @@ data/ssoCard_sample.check
 data/ssoCard_sample.json
 data/unit-template_aster-astorb.json
 data/compute_index_and_publish.sh
+data/ssocards
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -151,3 +152,4 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /.projections.json
+/.rocks.org.archive
