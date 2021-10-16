@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import pydantic
 import rich
-from tqdm import tqdm
 
 import rocks
 
@@ -438,12 +437,15 @@ class Rock(pydantic.BaseModel):
                 ssocard = rocks.ssodnet.get_ssocard(id_)
 
             if ssocard is None:
-                # Asteroid does not have an ssoCard. Instantiate minimal ssoCard for meaningful error output.
+                # Asteroid does not have an ssoCard
+                # Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
-                print(
+
+                warnings.warn(
                     f"Did not find ssoCard for asteroid '{id_provided}'. The "
-                    f"local asteroid name-number index may be outdated, run 'rocks "
-                    f"update' and repeat your command afterwards."
+                    f"local asteroid name-number index or the ssoCard cache may "
+                    f"be outdated, run 'rocks update' and repeat your command "
+                    f"afterwards."
                 )
 
             else:
@@ -620,7 +622,7 @@ def rocks_(identifier, datacloud=[], progress=False):
     """Create multiple Rock instances.
 
     Parameters
-    ==========
+    ----------
     identifier : list of str, list of int, list of float, np.array, pd.Series
         An iterable containing minor body identifiers.
     datacloud : list of str
