@@ -1,4 +1,4 @@
-# 1.3.2 - 2021
+# 1.3.2 - 2021-10-17
 - Updated datacloud catalogue implementations
 - Catching the 502 server error with rocks identify
 - Stripping surrounding whitespace from passed asteroid identifiers
