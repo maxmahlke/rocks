@@ -172,6 +172,12 @@ def echo(plot):
         If the paramter values should be plotted.
     """
 
+    if len(sys.argv) == 2:
+        print(f"\nUnknown command '{sys.argv[-1]}'\n.")
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+        ctx.exit()
+
     # Get parameter and asteroid id
     _, parameter, *id_ = sys.argv
     id_ = " ".join(id_)
