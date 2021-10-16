@@ -2,6 +2,19 @@
 - Updated datacloud catalogue implementations
 - Catching the 502 server error with rocks identify
 - Stripping surrounding whitespace from passed asteroid identifiers
+- Added "reduced" identifier to index for more reliable local name resolution (e.g. "riodejaneiro")
+- Reformatted the resolver module
+- rocks update now offers to clear the cache
+- rocks update now correctly checks both the ssocard.version and ssocard.datetime to find outdated cards
+- rocks update now echos the last-modified date of the index and the cached metadata files
+- Added clear_cache function to utils module
+- More accurate estimation of remaining name resolution time
+- Unknown commands on the CLI are now recognized.
+- Renamed rocks update to rocks status
+- Made rocks status output more consistent
+- Removed tqdm dependency
+- Made rocks.rocks asynchronous
+- Renamed 'no_cache' keyword to 'local' for consistency
 
 # 1.3.1 - 2021-09-14
 - datacloud catalogues and ssoCards are now updated asynchronously
