@@ -2,13 +2,14 @@
 
 """Local and remote asteroid name resolution."""
 import asyncio
+import re
 import warnings
 
 import aiohttp
 import nest_asyncio
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
+from rich.progress import Progress
 
 import rocks
 
@@ -70,14 +71,11 @@ def identify(id_, return_id=False, local=True, progress=False):
 
     # ------
     # Run asynchronous event loop for name resolution
-    if progress:
-        progress = tqdm(desc="Identifying rocks", total=len(id_))
+    with Progress(disable=not progress) as progress_bar:
 
-    loop = asyncio.get_event_loop()
-    results = loop.run_until_complete(_identify(id_, local, progress))
-
-    if progress:
-        progress.close()
+        progress = progress_bar.add_task("Identifying rocks", total=len(id_))
+        loop = asyncio.get_event_loop()
+        results = loop.run_until_complete(_identify(id_, local, progress_bar, progress))
 
     # ------
     # Check if any failed due to 502 and rerun them
@@ -101,14 +99,16 @@ def identify(id_, return_id=False, local=True, progress=False):
     return results
 
 
-async def _identify(id_, local, progress):
+async def _identify(id_, local, progress_bar, progress):
     """Establish the asynchronous HTTP session and launch the name resolution."""
     INDEX = rocks.utils.load_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(_resolve(i, session, local, progress, INDEX))
+            asyncio.ensure_future(
+                _resolve(i, session, local, progress_bar, progress, INDEX)
+            )
             for i in id_
         ]
 
@@ -117,36 +117,39 @@ async def _identify(id_, local, progress):
     return results
 
 
-async def _resolve(id_, session, local, progress, INDEX):
+async def _resolve(id_, session, local, progress_bar, progress, INDEX):
     """Resolve the identifier locally or remotely."""
 
-    if progress:
-        progress.update()
+    if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
+        warnings.warn("Received empty or NaN identifier.")
+        progress_bar.update(progress, advance=1)
+        return (None, np.nan, None)
 
     if local:
         success, (name, number, ssodnet_id) = _local_lookup(id_, INDEX)
 
         if success:
+            progress_bar.update(progress, advance=1)
             return (name, number, ssodnet_id)
 
     # Local resolution failed, do remote query
+    id_ = _standardize_id(id_)
     response = await _query_quaero(id_, session)
 
     if response is None:  # query failed with 502
+        progress_bar.update(progress, advance=1)
         return (None, None, None)
 
     if not response:  # remote resolution failed
+        progress_bar.update(progress, advance=1)
         return (None, np.nan, None)
 
+    progress_bar.update(progress, advance=1)
     return _parse_quaero_response(response["data"], str(id_))
 
 
 def _local_lookup(id_, INDEX):
     """Perform local index resolution."""
-
-    if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
-        warnings.warn("Received empty or NaN identifier.")
-        return True, (None, np.nan, None)
 
     # Check for int, float, numeric str
     if isinstance(id_, (int, float)) or (isinstance(id_, str) and id_.isnumeric()):
@@ -159,13 +162,86 @@ def _local_lookup(id_, INDEX):
             return False, (None, np.nan, None)
 
     # It's a name or SsODNet ID - reduce the identifier
-    reduced = rocks.utils._reduce_id(id_)
+    reduced = rocks.utils.reduce_id(id_)
 
     if reduced in INDEX["reduced"]:
         name, number, id_ = INDEX["reduced"][reduced]
         return True, (name, number, id_)
     else:
         return False, (None, np.nan, None)
+
+
+def _standardize_id(id_):
+    """Try to infer id_ type and re-format if necessary to ensure
+    successful remote lookup.
+
+    Parameters
+    ----------
+    id_ : str, int, float
+        The minor body's name, designation, or number.
+
+    Returns
+    -------
+    str, int, float, None
+        The standardized name, designation, or number. None if id_ is NaN or None.
+    """
+    if isinstance(id_, (int, float)):
+        return id_
+
+    elif isinstance(id_, str):
+        # String id_. Perform some regex tests to make sure it's well formatted
+
+        # Asteroid number
+        try:
+            id_ = int(float(id_))
+            return id_
+        except ValueError:
+            pass
+
+        # Asteroid name
+        if re.match(r"^[A-Za-z ]*$", id_):
+            # guess correct capitalization
+            id_ = " ".join([sub.capitalize() for sub in id_.split(" ")])
+
+        # Asteroid designation
+        elif re.match(
+            r"(^([1A][8-9][0-9]{2}[ _]?[A-Za-z]{2}[0-9]{0,3}$)|"
+            r"(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))",
+            id_,
+        ):
+
+            # Ensure whitespace between year and id_
+            id_ = re.sub(r"[\W_]+", "", id_)
+            ind = re.search(r"[A18920]{1,2}[0-9]{2}", id_).end()
+            id_ = f"{id_[:ind]} {id_[ind:]}"
+
+            # Replace A by 1
+            id_ = re.sub(r"^A", "1", id_)
+
+            # Ensure uppercase
+            id_ = id_.upper()
+
+        # Palomar-Leiden / Transit
+        elif re.match(r"^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$", id_):
+
+            # Ensure whitespace
+            id_ = re.sub(r"[ _]+", "", id_)
+            id_ = f"{id_[:4]} {id_[4:]}"
+
+        # Comet
+        elif re.match(r"(^[PDCXAI]/[- 0-9A-Za-z]*)", id_):
+            pass
+
+        # Remaining should be unconventional asteroid names like
+        # "G!kun||'homdima" or packed designations
+        else:
+            pass
+    else:
+        warnings.warn(
+            f"Did not understand type of id: {type(id_)}"
+            f"\nShould be integer, float, or string."
+        )
+    return id_
 
 
 async def _query_quaero(id_, session):
