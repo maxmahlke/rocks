@@ -2,20 +2,18 @@
 """Utility functions for rocks."""
 
 from functools import reduce
+import json
 import os
 import pickle
+import re
+import sys
 import urllib
 import warnings
-import sys
 
 import numpy as np
-import pandas as pd
 import requests
-from tqdm import tqdm
 import rich
 from rich import progress
-import ujson
-import json
 
 import rocks
 
@@ -31,9 +29,89 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
 
 warnings.formatwarning = warning_on_one_line
 
+
 # ------
 # Functions for the asteroid name-number index
-def retrieve_index_from_repository():
+def _build_index():
+    """Build asteroid name-number index from ssoCard dump."""
+
+    # Get all cards in data dump
+    PATH_CARDS = os.path.join("/tmp/ssocards/")
+
+    with open(os.path.join(PATH_CARDS, "ssocards.list"), "r") as file_:
+        CARDS = [
+            os.path.join(PATH_CARDS, path.split("store/")[-1])
+            for path in file_.read().split()
+        ]
+
+    # Construct index from card content
+    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}}
+
+    for card in progress.track(CARDS, total=len(CARDS), description="Building Index"):
+
+        with open(card, "r") as file_:
+            ssocard = json.load(file_)
+
+        id_ = ssocard["id"]
+        name = ssocard["name"]
+        number = ssocard["number"] if ssocard["number"] else np.nan
+        reduced = reduce_id(id_)
+
+        INDEX["name"][name] = (number, id_)
+        INDEX["number"][number] = (name, id_)
+        INDEX["id"][id_] = (name, number)
+        INDEX["reduced"][reduced] = (name, number, id_)
+
+    with open(rocks.PATH_INDEX, "wb") as file_:
+        pickle.dump(INDEX, file_, protocol=4)
+
+
+def load_index():
+    """Load local index of asteroid numbers, names, SsODNet IDs."""
+    with open(rocks.PATH_INDEX, "rb") as ind:
+        return pickle.load(ind)
+
+
+def update_index():
+    """Verify the names and numbers of asteroids in the name-number index."""
+
+    INDEX = load_index()
+
+    OLD_IDS = list(INDEX["id"].keys())
+    OLD_IDS = set(id_ for id_ in OLD_IDS if not re.match(r"^[A-Za-z \(\)\_]*$", id_))
+    NEW_IDS = rocks.identify(OLD_IDS, return_id=True, local=False, progress=True)
+
+    for old_id, new_ids in zip(OLD_IDS, NEW_IDS):
+
+        new_name, new_number, new_id = new_ids
+
+        if old_id == new_id:
+            continue
+
+        # ------
+        # Add new entry
+        new_reduced = reduce_id(new_id)
+
+        INDEX["name"][new_name] = (new_number, new_id)
+        INDEX["number"][new_number] = (new_name, new_id)
+        INDEX["id"][new_id] = (new_name, new_number)
+        INDEX["reduced"][new_reduced] = (new_name, new_number, new_id)
+
+        # ------
+        # Remove old entry
+        old_name, old_number = INDEX["id"][old_id]
+        old_reduced = reduce_id(old_id)
+
+        del INDEX["name"][old_name]
+        del INDEX["number"][old_number]
+        del INDEX["id"][old_id]
+        del INDEX["reduced"][old_reduced]
+
+    with open(rocks.PATH_INDEX, "wb") as file_:
+        pickle.dump(INDEX, file_, protocol=4)
+
+
+def retrieve_index():
     """Download the index of numbered asteroids from the rocks GitHub
     repository and saves it to the cache directory."""
 
@@ -45,121 +123,10 @@ def retrieve_index_from_repository():
         pickle.dump(index, ind, protocol=4)
 
 
-def __build_index():
-    """Build asteroid name-number index from ssoCard dump."""
-
-    # Get all cards in data dump
-    PATH_CARDS = os.path.join(os.path.dirname(__file__), "../data/ssocards/")
-
-    with open(os.path.join(PATH_CARDS, "ssocards.list"), "r") as file_:
-        CARDS = [
-            os.path.join(PATH_CARDS, path.split("store/")[-1])
-            for path in file_.read().split()
-        ]
-
-    ids, names, numbers, reduced = {}, {}, {}, {}
-
-    # Construct index from card content
-    for card in tqdm(CARDS, total=len(CARDS), desc="Building Index"):
-
-        with open(card, "r") as file_:
-            ssocard = json.load(file_)
-
-        id_ = ssocard["id"]
-        name = ssocard["name"]
-        number = ssocard["number"]
-        id_reduced = id_.replace("_", "").lower()
-
-        names[name] = (number, id_)
-        numbers[number] = (name, id_)
-        ids[id_] = (name, number)
-        reduced[id_reduced] = (name, number, id_)
-
-    with open("/tmp/new_index_cards.pkl", "wb") as ind:
-        pickle.dump([names, numbers, ids, reduced], ind, protocol=4)
-
-
-def create_index():
-    """Create the asteroid name-number index using the list of numbered minor planets
-    from the MPC and quaero.
-
-    Notes
-    =====
-    The index file in the cache directory is changed in-place.
-    """
-
-    # Get list of numbered asteroids from MPC
-    url = "https://www.minorplanetcenter.net/iau/lists/NumberedMPs.txt"
-    numbered = pd.read_fwf(url, colspecs=[(0, 7)], names=["number"])
-    numbered = np.array([int(n.strip(" (")) for n in numbered.number])  # type: ignore
-
-    # These are problem cases that we take care of by hand
-    numbered = np.setdiff1d(numbered, [1978, 1979, 1986, 1988, 1989, 1990])
-
-    # Instantiate the index with some information pre-filled
-    names = {
-        "Patrice": (1978, "Patrice"),
-        "Sakharov": (1979, "Sakharov"),
-        "Plaut": (1986, "Plaut"),
-        "Delores": (1988, "Delores"),
-        "Tatry": (1989, "Tatry"),
-        "Pilcher": (1990, "Pilcher"),
-    }
-
-    numbers = {number: (name, id_) for name, (number, id_) in names.items()}
-    ids = {id_: (name, number) for name, (number, id_) in names.items()}
-
-    # Smaller steps are less likely to overload SsODNet
-    steps = 100
-
-    # Identify the asteroids by in parts
-    for subset in tqdm(
-        np.array_split(numbered, steps), total=steps, desc="Building Index"
-    ):
-
-        subset_identified = rocks.identify(
-            subset, return_id=True, progress=False, local=False
-        )
-
-        names.update({name: (number, id_) for name, number, id_ in subset_identified})
-        numbers.update({number: (name, id_) for name, number, id_ in subset_identified})
-        ids.update({id_: (name, number) for name, number, id_ in subset_identified})
-
-    # And save to file
-    with open(rocks.PATH_INDEX, "wb") as ind:
-        pickle.dump([names, numbers, ids], ind, protocol=4)
-
-
-def read_index():
-    """Read local index of asteroid numbers, names, SsODNet IDs.
-
-    Returns
-    =======
-    pd.DataFrame
-        Asteroid index with three columns.
-    """
-    with open(rocks.PATH_INDEX, "rb") as ind:
-        index = pickle.load(ind)
-    return index
-
-
 # ------
 # ssoCard utility functions
 def rgetattr(obj, attr):
-    """Deep version of getattr. Retrieve nested attributes.
-
-    Parameters
-    ==========
-    obj
-        Any python object with attributes.
-    attr : str
-        Attribut of obj. Nested attributes can be referrenced with '.'
-
-    Returns
-    =======
-    _
-        The requested attribute.
-    """
+    """Deep version of getattr. Retrieve nested attributes."""
 
     def _getattr(obj, attr):
         return getattr(obj, attr)
@@ -184,35 +151,18 @@ def get_unit(path_unit):
     PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit_aster-astorb.json")
 
     if not os.path.isfile(PATH_UNITS):
-        print(
-            "The ssoCard units not present in cache directory, retrieving them from SsODNet..\n"
-        )
         retrieve_json_from_ssodnet("units")
 
     with open(PATH_UNITS, "r") as units:
-        units = ujson.load(units)
+        units = json.load(units)
 
-    for key in path_unit.split("."):
-        units = units[key]
+    try:
+        for key in path_unit.split("."):
+            units = units[key]
+    except KeyError:
+        unit = ""
 
     return units
-
-
-def update_cards(ids):
-    """Update the cached ssoCards of the passed ids.
-
-    Parameters
-    ==========
-    ids : list
-        List of SsODNet IDs of ssoCards to update.
-    """
-    n_subsets = 20 if len(ids) > 1000 else 1
-
-    for subset in progress.track(
-        np.array_split(np.array(ids), n_subsets),
-        description="Updating ssoCards : ",
-    ):
-        rocks.ssodnet.get_ssocard(subset, progress=False, no_cache=True)
 
 
 # ------
@@ -288,14 +238,18 @@ def weighted_average(catalogue, parameter):
 
 # ------
 # Misc
+def reduce_id(id_):
+    """Reduce the SsODNet ID to a string with fewer free parameters."""
+    return id_.replace("_(Asteroid)", "").replace("_", "").replace(" ", "").lower()
+
+
 def retrieve_json_from_ssodnet(which):
     """Retrieve the ssoCard template, units, or descriptions from SsODNet.
 
     Parameters
-    ==========
+    ----------
     which : str
         The JSON file to download. Choose from ['template', 'units', 'description']
-
     """
 
     # Construct URL
@@ -310,21 +264,16 @@ def retrieve_json_from_ssodnet(which):
     # Query and save to file
     response = requests.get("".join([URL_BASE, URL_JSON[which]]))
 
-    PATH_JSON = {
-        "template": "ssoCard_template.json",
-        "units": "unit_aster-astorb.json",
-        "description": "description_aster-astorb.json",
-    }
-
     if response.ok:
         ssoCard = response.json()
 
-        with open("/".join([rocks.PATH_CACHE, PATH_JSON[which]]), "w") as file_:
-            ujson.dump(ssoCard, file_)
+        with open(rocks.PATH_META[which], "w") as file_:
+            json.dump(ssoCard, file_)
 
     else:
         warnings.warn(
-            f"Retrieving the ssoCard {which} failed with url:\n{URL_JSON[which]}"
+            f"Retrieving metadata file '{which}' failed with url:\n"
+            f"{URL_JSON[which]}"
         )
 
 
@@ -332,27 +281,24 @@ def cache_inventory():
     """Create lists of the cached ssoCards and datacloud catalogues.
 
     Returns
-    =======
+    -------
     list of tuple
         The SsODNet IDs and versions of the cached ssoCards.
     list of tuple
         The SsODNet IDs and names of the cached datacloud catalogues.
     """
-    cached_cards = []
-    cached_catalogues = []
 
-    # Get all jsons in cache
+    # Get all JSONs in cache
     cached_jsons = set(
         file_ for file_ in os.listdir(rocks.PATH_CACHE) if file_.endswith(".json")
     )
 
+    cached_cards = []
+    cached_catalogues = []
+
     for file_ in cached_jsons:
 
-        if file_ in [
-            "ssoCard_template.json",
-            "unit_aster-astorb.json",
-            "description_aster-astorb.json",
-        ]:
+        if file_ in [os.path.basename(f) for f in rocks.PATH_META.values()]:
             continue
 
         # Datacloud catalogue?
@@ -369,52 +315,70 @@ def cache_inventory():
             cached_catalogues.append((ssodnet_id, catalogue))
             continue
 
-        # Likely an ssocard, check the version
+        # Likely an ssoCard, check the version
         ssodnet_id = os.path.splitext(file_)[0]
 
         with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
-            card = ujson.load(ssocard)
+            card = json.load(ssocard)
 
             if card[ssodnet_id] is None:
-                cached_cards.append((ssodnet_id, "Failed"))
+                # Faulty card, remove it
+                print(ssodnet_id)
+                os.remove(os.path.join(rocks.PATH_CACHE, file_))
             else:
                 cached_cards.append(
-                    (ssodnet_id, card[ssodnet_id]["ssocard"]["version"])
+                    (
+                        ssodnet_id,
+                        card[ssodnet_id]["ssocard"]["version"],
+                    )
                 )
-
     return cached_cards, cached_catalogues
+
+
+def clear_cache():
+    """Remove the cached ssoCards, datacloud catalogues, and metadata files."""
+    cards, catalogues = cache_inventory()
+
+    for card in cards:
+        PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{card[0]}.json")
+        os.remove(PATH_CARD)
+
+    for catalogue in catalogues:
+        PATH_CATALOGUE = os.path.join(rocks.PATH_CACHE, f"{'_'.join(catalogue)}.json")
+        os.remove(PATH_CATALOGUE)
+
+    for file_ in rocks.PATH_META.values():
+        if os.path.isfile(file_):
+            os.remove(file_)
 
 
 def get_current_version():
     """Get the current version of ssoCards.
 
     Returns
-    =======
+    -------
     str
         The current version of ssoCards.
 
     Notes
-    =====
+    -----
     There will soon be a stub card online to check this. For now, we just check
     the version of Ceres.
-
-    This function should be extended once datacoud catalogues have versions as well.
     """
 
     URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/Ceres"
     response = requests.get(URL)
 
     if response.ok:
-        card_ceres = response.json()
+        card = response.json()
     else:
         warnings.warn("Retrieving the current ssoCard version failed.")
-        print(response)
         sys.exit()
 
-    return card_ceres["Ceres"]["ssocard"]["version"]
+    return card["Ceres"]["ssocard"]["version"]
 
 
-def confirm_identify(ids):
+def confirm_identity(ids):
     """Confirm the SsODNet ID of the passed identifier. Retrieve the current
     ssoCard and remove the former one if the ID has changed.
 
@@ -423,13 +387,19 @@ def confirm_identify(ids):
     ids : list
         The list of SsODNet IDs to confirm.
     """
+
+    # Drop the named asteroids - their identity won't change
+    ids = set(id_ for id_ in ids if not re.match(r"^[A-Za-z \(\)\_]*$", id_))
+
     if len(ids) == 1:
         _, _, current_ids = rocks.identify(ids, return_id=True, local=False)
         current_ids = [current_ids]
 
     else:
 
-        _, _, current_ids = zip(*rocks.identify(ids, return_id=True, local=False))
+        _, _, current_ids = zip(
+            *rocks.identify(ids, return_id=True, local=False, progress=True)
+        )
 
     # Swap the renamed ones
     updated = []
@@ -442,7 +412,7 @@ def confirm_identify(ids):
         rich.print(f"{old_id} has been renamed to {current_id}. Swapping the ssoCards.")
 
         # Get new card and remove the old one
-        rocks.ssodnet.get_ssocard(current_id, no_cache=True)
+        rocks.ssodnet.get_ssocard(current_id, local=False)
         os.remove(os.path.join(rocks.PATH_CACHE, f"{old_id}.json"))
 
         # This is now up-to-date
@@ -451,34 +421,17 @@ def confirm_identify(ids):
     for id_ in updated:
         ids.remove(id_)
 
-    # Update the outdated ones
-    rich.print(
-        f"\n{len(ids)} ssoCards {'is' if len(ids) == 1 else 'are'} out-of-date.",
-        end=" ",
-    )
 
+def retrieve_rocks_version():
+    """Retrieve the current rocks version from the GitHub repository."""
 
-def update_datacloud_catalogues(ids_catalogues):
-    """Update the datacloud catalogues in the cache directory.
+    URL = "https://github.com/maxmahlke/rocks/blob/master/pyproject.toml?raw=True"
 
-    Parameters
-    ==========
-    ids_catalogues : list of tuple
-        The SsODNet IDs and catalogue names to update.
-    """
-    for catalogue in set([cat for _, cat in ids_catalogues]):
-        ids = [id_ for id_, cat in ids_catalogues if cat == catalogue]
+    response = urllib.request.urlopen(URL).read().decode("utf-8")
+    version = response.split("\n")[2].split('"')[1]
 
-        n_subsets = 20 if len(ids) > 1000 else 1
-
-        for subset in progress.track(
-            np.array_split(np.array(ids), n_subsets),
-            description=f"{catalogue:<12} : ",
-        ):
-            rocks.ssodnet.get_datacloud_catalogue(
-                subset, catalogue, progress=False, no_cache=True
-            )
+    return version
 
 
 if __name__ == "__main__":
-    __build_index()
+    _build_index()
