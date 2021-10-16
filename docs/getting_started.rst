@@ -12,7 +12,8 @@ Install from PyPI
 
    $ pip install space-rocks
 
-After installation, you should have the ``rocks`` executable available system-wide.
+Note that the minimum version requirement for `python` is `3.7`. After
+installation, you should have the ``rocks`` executable available system-wide.
 
 .. code-block:: bash
 
