@@ -107,7 +107,7 @@ def status():
 
     # Get the modification date of the index
     date_index = os.path.getmtime(rocks.PATH_INDEX)
-    date_index = time.ctime(date_index)
+    date_index = time.strftime("%d %b %Y", time.localtime(date_index))
 
     # Print the findings
     rich.print(
