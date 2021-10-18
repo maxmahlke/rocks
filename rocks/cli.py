@@ -214,7 +214,7 @@ def echo(plot):
     """
 
     if len(sys.argv) == 2:
-        print(f"\nUnknown command '{sys.argv[-1]}'\n.")
+        print(f"\nUnknown command '{sys.argv[-1]}'.\n")
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
         ctx.exit()
