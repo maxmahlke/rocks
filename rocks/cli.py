@@ -98,12 +98,7 @@ def status():
     # Echo inventory
 
     # Get set of ssoCards and datacloud catalogues in cache
-    cached_cards, cached_catalogues = rocks.utils.cache_inventory()
-
-    # Get cached metadata files
-    cached_meta = [
-        os.path.basename(f) for f in rocks.PATH_META.values() if os.path.isfile(f)
-    ]
+    cached_cards, cached_catalogues, cached_meta = rocks.utils.cache_inventory()
 
     # Get the modification date of the index
     date_index = os.path.getmtime(rocks.PATH_INDEX)
@@ -124,25 +119,24 @@ def status():
     latest_rocks = rocks.utils.retrieve_rocks_version()
     latest_card = rocks.utils.get_current_version()
 
-
     if latest_rocks != rocks.__version__ and False:
         rich.print(
-            f"[red]The running 'rocks' version ({rocks.__version__}) is behind the latest version ({latest_rocks}). "
-            f"The ssoCard structure might have changed. You should update 'rocks' and clear the cache directory.[/red]\n"
+            f"[red]The running 'rocks' version ({rocks.__version__}) is behind the "
+            f"latest version ({latest_rocks}). The ssoCard structure might have changed. "
+            f"You should update 'rocks' and clear the cache directory.[/red]\n"
         )
-    else:
-
-        if cached_cards:
-            oldest_card = min([version[1] for version in cached_cards])
-
-            if latest_card != oldest_card:
-                rich.print(
-                    f"[red]The ssoCard version ({oldest_card}) is behind the latest version ({latest_card}). "
-                    f"The ssoCard structure might have changed. You should clear the cache directory.[/red]\n"
-                )
 
     # Update or clear
     if cached_cards:
+        oldest_card = min([version[1] for version in cached_cards])
+
+        if latest_card != oldest_card:
+            rich.print(
+                f"[red]The ssoCard version ({oldest_card}) is behind the latest version "
+                f"({latest_card}). The ssoCard structure might have changed. You should clear "
+                f"the cache directory.[/red]\n"
+            )
+
         decision = prompt.Prompt.ask(
             "\nUpdate or clear the cached ssoCards and datacloud catalogues?\n"
             "[blue][0][/blue] Do nothing "
@@ -157,7 +151,6 @@ def status():
             rocks.utils.clear_cache()
 
         elif decision == "2":
-
             # Update the cached data
             ids = [ssodnet_id[0] for ssodnet_id in cached_cards]
 
@@ -172,14 +165,7 @@ def status():
             # ------
             # Update datacloud catalogues
             rich.print("\n(3/3) Updating the cached datacloud catalogues..")
-
-            for catalogue in set(catalogues[1] for catalogues in cached_catalogues):
-
-                ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
-
-                rocks.ssodnet.get_datacloud_catalogue(
-                    ids, catalogue, local=False, progress=True
-                )
+            rocks.utils.update_datacloud_catalogues()
 
             # Update metadata
             for meta in ["template", "units", "description"]:
@@ -191,14 +177,13 @@ def status():
         "\nUpdate the asteroid name-number index?\n"
         "[blue][0][/blue] Do nothing "
         "[blue][1][/blue] From GitHub (updated ~weekly) "
-        "[blue][2][/blue] Locally (takes >1h)",
+        "[blue][2][/blue] Locally (not recommended)",
         choices=["0", "1", "2"],
         default="1",
     )
 
     if response == "1":
         rocks.utils.retrieve_index()
-        rich.print("Retrieved index from repository.")
 
     elif response == "2":
         rocks.utils.update_index()

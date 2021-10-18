@@ -332,7 +332,12 @@ def cache_inventory():
                         card[ssodnet_id]["ssocard"]["version"],
                     )
                 )
-    return cached_cards, cached_catalogues
+
+    # Get cached metadata files
+    cached_meta = [
+        os.path.basename(f) for f in rocks.PATH_META.values() if os.path.isfile(f)
+    ]
+    return cached_cards, cached_catalogues, cached_meta
 
 
 def clear_cache():
