@@ -1,5 +1,6 @@
-# 1.3.3 - 2021
+# 1.3.3 - 2021-10-22
 - Better display of index modification time in rocks status command
+- Ensuring that method and bibref are always lists in albedo
 
 # 1.3.2 - 2021-10-17
 - Updated datacloud catalogue implementations

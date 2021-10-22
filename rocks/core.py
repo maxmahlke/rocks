@@ -174,6 +174,10 @@ class Albedo(Value):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
 
 class Color(Value):
     color: Value = Value(**{})
@@ -459,8 +463,21 @@ class Rock(pydantic.BaseModel):
         try:
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
+
             self.__parse_error_message(message, id_, ssocard)
-            super().__init__(**{"name": id_provided})
+
+            # TODO
+            # Set the offending properties to NaN to allow for instantiation anyway
+            # for error in message.errors():
+
+            #     prop = ssocard[error["loc"][0]]
+
+            #     for l in error["loc"][1:]:
+            #         prop = prop[l]
+            #     else:
+            #         prop = [None]
+
+            super().__init__(**{"name": id_provide})
 
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
         for catalogue in datacloud:

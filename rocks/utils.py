@@ -148,12 +148,10 @@ def get_unit(path_unit):
     str
         The unit of the requested parameter.
     """
-    PATH_UNITS = os.path.join(rocks.PATH_CACHE, "unit_aster-astorb.json")
-
-    if not os.path.isfile(PATH_UNITS):
+    if not os.path.isfile(rocks.PATH_META["units"]):
         retrieve_json_from_ssodnet("units")
 
-    with open(PATH_UNITS, "r") as units:
+    with open(rocks.PATH_META["units"], "r") as units:
         units = json.load(units)
 
     try:
@@ -381,6 +379,16 @@ def get_current_version():
         sys.exit()
 
     return card["Ceres"]["ssocard"]["version"]
+
+
+def update_datacloud_catalogues(cached_catalogues):
+    for catalogue in set(catalogues[1] for catalogues in cached_catalogues):
+
+        ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
+
+        rocks.ssodnet.get_datacloud_catalogue(
+            ids, catalogue, local=False, progress=True
+        )
 
 
 def confirm_identity(ids):
