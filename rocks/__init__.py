@@ -9,7 +9,7 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolve import identify
 
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 
 # Path to rocks auxilliary files
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
@@ -26,4 +26,4 @@ PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
 os.makedirs(PATH_CACHE, exist_ok=True)
 
 if not os.path.isfile(PATH_INDEX):
-    utils.retrieve_index_from_repository()
+    utils.retrieve_index()
