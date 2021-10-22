@@ -165,7 +165,7 @@ def status():
             # ------
             # Update datacloud catalogues
             rich.print("\n(3/3) Updating the cached datacloud catalogues..")
-            rocks.utils.update_datacloud_catalogues()
+            rocks.utils.update_datacloud_catalogues(cached_catalogues)
 
             # Update metadata
             for meta in ["template", "units", "description"]:

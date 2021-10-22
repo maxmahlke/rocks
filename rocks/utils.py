@@ -284,6 +284,8 @@ def cache_inventory():
         The SsODNet IDs and versions of the cached ssoCards.
     list of tuple
         The SsODNet IDs and names of the cached datacloud catalogues.
+    list of str
+        The cached metadata files.
     """
 
     # Get all JSONs in cache
@@ -339,7 +341,7 @@ def cache_inventory():
 
 def clear_cache():
     """Remove the cached ssoCards, datacloud catalogues, and metadata files."""
-    cards, catalogues = cache_inventory()
+    cards, catalogues, _ = cache_inventory()
 
     for card in cards:
         PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{card[0]}.json")
