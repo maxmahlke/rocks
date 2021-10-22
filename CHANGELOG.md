@@ -1,3 +1,6 @@
+# 1.3.5 - 2021-10-22
+- Fixed issue with rocks.rocks looking for ssoCards which do not exist
+
 # 1.3.4 - 2021-10-22
 - Bugfix in index retrieval function
 

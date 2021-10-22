@@ -655,14 +655,16 @@ def rocks_(identifier, datacloud=[], progress=False):
     """
 
     # Get IDs
-    if len(identifier) == 1:
+    if len(identifier) == 1 or isinstance(identifier, str):
         ids = [rocks.identify(identifier, return_id=True, progress=progress)[-1]]
 
     else:
         _, _, ids = zip(*rocks.identify(identifier, return_id=True, progress=progress))
 
     # Load ssoCards asynchronously
-    rocks.ssodnet.get_ssocard(ids, progress=progress)
+    rocks.ssodnet.get_ssocard(
+        [id_ for id_ in ids if not id_ is None], progress=progress
+    )
 
     if datacloud:
 
@@ -678,8 +680,13 @@ def rocks_(identifier, datacloud=[], progress=False):
                     f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
                 )
 
-            rocks.ssodnet.get_datacloud_catalogue(ids, cat, progress=progress)
+            rocks.ssodnet.get_datacloud_catalogue(
+                [id_ for id_ in ids if not id_ is None], cat, progress=progress
+            )
 
-    rocks_ = [Rock(id_, skip_id_check=True, datacloud=datacloud) for id_ in ids]
+    rocks_ = [
+        Rock(id_, skip_id_check=True, datacloud=datacloud) if not id_ is None else None
+        for id_ in ids
+    ]
 
     return rocks_

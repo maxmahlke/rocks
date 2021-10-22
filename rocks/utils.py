@@ -321,7 +321,6 @@ def cache_inventory():
 
             if card[ssodnet_id] is None:
                 # Faulty card, remove it
-                print(ssodnet_id)
                 os.remove(os.path.join(rocks.PATH_CACHE, file_))
             else:
                 cached_cards.append(
