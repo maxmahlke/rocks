@@ -1,3 +1,6 @@
+# 1.3.6 - 2021
+- Fixed bugs in rocks status
+
 # 1.3.5 - 2021-10-22
 - Fixed issue with rocks.rocks looking for ssoCards which do not exist
 
