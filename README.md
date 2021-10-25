@@ -45,13 +45,6 @@ $ rocks density Eos
 6.711e+17
 ```
 
-
-## Install
-
-Install from PyPi using `pip`:
-
-     $ pip install space-rocks
-
 ## Documentation
 
 Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.io/en/latest/).
