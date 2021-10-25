@@ -11,6 +11,7 @@ import urllib
 import warnings
 
 import numpy as np
+import pandas as pd
 import requests
 import rich
 from rich import progress
@@ -33,34 +34,50 @@ warnings.formatwarning = warning_on_one_line
 # ------
 # Functions for the asteroid name-number index
 def _build_index():
-    """Build asteroid name-number index from ssoCard dump."""
+    """Build asteroid name-number index from SsODNet sso_index."""
 
-    # Get all cards in data dump
-    PATH_CARDS = os.path.join("/tmp/ssocards/")
+    # The gzipped index is exposed under this address
+    URL_INDEX = "https://asterm.imcce.fr/public/ssodnet/sso_index.csv.gz"
+    index_ssodnet = pd.read_csv(URL_INDEX)
 
-    with open(os.path.join(PATH_CARDS, "ssocards.list"), "r") as file_:
-        CARDS = [
-            os.path.join(PATH_CARDS, path.split("store/")[-1])
-            for path in file_.read().split()
-        ]
+    # There are some spurious spaces in the column headers
+    index_ssodnet = index_ssodnet.rename(
+        columns={c: c.replace(" ", "") for c in index_ssodnet.columns}
+    )
 
-    # Construct index from card content
-    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}}
+    # We use NaNs instead of 0 for unnumbered objects
+    index_ssodnet.loc[index_ssodnet["Number"] == 0, "Number"] = np.nan
 
-    for card in progress.track(CARDS, total=len(CARDS), description="Building Index"):
+    # Reformat the index to a dictionary
+    index_ssodnet = index_ssodnet.drop(columns="Type")
+    index_ssodnet = index_ssodnet.set_index("SsODNetID")
+    index_ssodnet = index_ssodnet.to_dict(orient="index")
 
-        with open(card, "r") as file_:
-            ssocard = json.load(file_)
+    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}, "aliases": {}}
 
-        id_ = ssocard["id"]
-        name = ssocard["name"]
-        number = ssocard["number"] if ssocard["number"] else np.nan
+    for id_, values in progress.track(
+        index_ssodnet.items(),
+        total=len(index_ssodnet),
+        description="Building Index",
+        transient=True,
+    ):
+
+        name = values["Name"]
+        number = values["Number"]
         reduced = reduce_id(id_)
 
+        if not np.isnan(number):
+            number = int(number)
+
         INDEX["name"][name] = (number, id_)
-        INDEX["number"][number] = (name, id_)
         INDEX["id"][id_] = (name, number)
         INDEX["reduced"][reduced] = (name, number, id_)
+
+        if not np.isnan(number):
+            INDEX["number"][number] = (name, id_)
+
+        for alias in values["Aliases"].split(";"):
+            INDEX["aliases"][alias] = (name, number, id_)
 
     with open(rocks.PATH_INDEX, "wb") as file_:
         pickle.dump(INDEX, file_, protocol=4)
