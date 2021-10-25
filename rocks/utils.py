@@ -334,16 +334,20 @@ def cache_inventory():
         with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
             card = json.load(ssocard)
 
-            if card[ssodnet_id] is None:
-                # Faulty card, remove it
-                os.remove(os.path.join(rocks.PATH_CACHE, file_))
-            else:
-                cached_cards.append(
-                    (
-                        ssodnet_id,
-                        card[ssodnet_id]["ssocard"]["version"],
+            try:
+                if card[ssodnet_id] is None:
+                    # Faulty card, remove it
+                    os.remove(os.path.join(rocks.PATH_CACHE, file_))
+                else:
+                    cached_cards.append(
+                        (
+                            ssodnet_id,
+                            card[ssodnet_id]["ssocard"]["version"],
+                        )
                     )
-                )
+            # This skips files which do not belong to rocks
+            except KeyError:
+                continue
 
     # Get cached metadata files
     cached_meta = [
