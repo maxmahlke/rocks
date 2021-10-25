@@ -27,19 +27,8 @@ cache:   {PATH_CACHE}
 It looks like this is the first time you run 'rocks'.
 Some metadata is required to be present in the cache directory.
 'rocks' will download it now.
-
-Find out more by running '$ rocks docs'
 """
 
-# ------
-# Path definitions required throughout the code
-PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
-PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
-PATH_META = {
-    "description": os.path.join(PATH_CACHE, "ssoCard_description.json"),
-    "template": os.path.join(PATH_CACHE, "ssoCard_template.json"),
-    "units": os.path.join(PATH_CACHE, "ssoCard_units.json"),
-}
 
 # ------
 # Check for existence of index file and cache directory
@@ -48,3 +37,4 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 if not os.path.isfile(PATH_INDEX):
     rich.print(GREETING)
     utils._build_index()
+    rich.print("\nAll done. Find out more by running '$ rocks docs'\n")
