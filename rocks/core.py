@@ -200,6 +200,17 @@ class Colors(Parameter):
     H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
 
 
+class Density(Value):
+    method: List[Method] = []
+    bibref: List[Bibref] = []
+
+    path_unit: str = "unit.physical.density.value"
+
+    _ensure_list: classmethod = pydantic.validator(
+        "bibref", "method", allow_reuse=True, pre=True
+    )(ensure_list)
+
+
 class Diameter(Value):
     method: List[Method] = []
     bibref: List[Bibref] = []

@@ -1,5 +1,6 @@
 # 1.4 - 2021
 - The asteroid name-number index file is now compiled on SsODNet side. It is removed from the GitHub repo.
+- Added Density parameter to Rock
 - Added greeting which is displayed when index.pkl is missing
 - Added aliases for commands id (identify) and parameters (parameter)
 - Fixed bug in units display
