@@ -256,19 +256,18 @@ def reduce_id(id_):
 
 
 def retrieve_json_from_ssodnet(which):
-    """Retrieve the ssoCard template, units, or descriptions from SsODNet.
+    """Retrieve the ssoCard units, or descriptions from SsODNet.
 
     Parameters
     ----------
     which : str
-        The JSON file to download. Choose from ['template', 'units', 'description']
+        The JSON file to download. Choose from ['units', 'description']
     """
 
     # Construct URL
     URL_BASE = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/"
 
     URL_JSON = {
-        "template": "templates/catalogue-template_aster-astorb.json",
         "units": "unit_aster-astorb.json",
         "description": "description_aster-astorb.json",
     }

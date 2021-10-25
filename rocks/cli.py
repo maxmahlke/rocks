@@ -89,13 +89,13 @@ def info(id_):
 def parameters():
     """Print the ssoCard and its description."""
 
-    if not os.path.isfile(rocks.PATH_META["template"]):
-        rocks.utils.retrieve_json_from_ssodnet("template")
+    if not os.path.isfile(rocks.PATH_META["description"]):
+        rocks.utils.retrieve_json_from_ssodnet("description")
 
-    with open(rocks.PATH_META["template"], "r") as file_:
-        TEMPLATE = json.load(file_)
+    with open(rocks.PATH_META["description"], "r") as file_:
+        DESC = json.load(file_)
 
-    rich.print(TEMPLATE)
+    rich.print(DESC)
 
 
 @cli_rocks.command()
@@ -162,6 +162,11 @@ def status():
             rocks.utils.clear_cache()
 
         elif decision == "2":
+
+            # Update metadata
+            for meta in rocks.PATH_META.keys():
+                rocks.utils.retrieve_json_from_ssodnet(meta)
+
             # Update the cached data
             ids = [ssodnet_id[0] for ssodnet_id in cached_cards]
 

@@ -12,6 +12,17 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolve import identify
 
+# ------
+# Path definitions required throughout the code
+PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
+PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
+PATH_META = {
+    "description": os.path.join(PATH_CACHE, "ssoCard_description.json"),
+    "units": os.path.join(PATH_CACHE, "ssoCard_units.json"),
+}
+
+# ------
+# Welcome to rocks
 __version__ = "1.4"
 
 GREETING = fr"""
