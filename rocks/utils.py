@@ -61,7 +61,6 @@ def _build_index():
         index_ssodnet.items(),
         total=len(index_ssodnet),
         description="Building Index",
-        transient=True,
     ):
 
         name = values["Name"]
@@ -410,7 +409,3 @@ def retrieve_rocks_version():
     version = response.split("\n")[2].split('"')[1]
 
     return version
-
-
-if __name__ == "__main__":
-    _build_index()

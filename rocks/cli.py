@@ -183,10 +183,6 @@ def status():
             rich.print("\n(3/3) Updating the cached datacloud catalogues..")
             rocks.utils.update_datacloud_catalogues(cached_catalogues)
 
-            # Update metadata
-            for meta in ["template", "units", "description"]:
-                rocks.utils.retrieve_json_from_ssodnet(meta)
-
     # ------
     # Update asteroid name-number index
     response = prompt.Prompt.ask(

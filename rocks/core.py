@@ -293,6 +293,7 @@ class PhysicalParameters(Parameter):
     spin: List[Spin] = [Spin(**{})]
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
+    density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
     taxonomy: Taxonomy = Taxonomy(**{})
     phase_function: PhaseFunction = PhaseFunction(**{})
@@ -488,7 +489,7 @@ class Rock(pydantic.BaseModel):
             #     else:
             #         prop = [None]
 
-            super().__init__(**{"name": id_provide})
+            super().__init__(**{"name": id_provided})
 
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
         for catalogue in datacloud:
@@ -621,16 +622,17 @@ class Rock(pydantic.BaseModel):
             "parameters.dynamical.pair": "pair",
         },
         "physical": {
-            "parameters.physical.diameter": "diameter",
-            "parameters.physical.albedo": "albedo",
+            "H": "absolute_magnitude",
             "parameters.physical.absolute_magnitude": "absolute_magnitude",
+            "parameters.physical.albedo": "albedo",
             "parameters.physical.colors": "colors",
+            "parameters.physical.diameter": "diameter",
+            "parameters.physical.density": "density",
             "parameters.physical.mass": "mass",
-            "parameters.physical.thermal_properties": "thermal_properties",
+            "parameters.physical.phase": "phase",
             "parameters.physical.spin": "spin",
             "parameters.physical.taxonomy": "taxonomy",
-            "parameters.physical.phase": "phase",
-            "H": "absolute_magnitude",
+            "parameters.physical.thermal_properties": "thermal_properties",
         },
         "orbital_elements": {
             "a": "semi_major_axis",
