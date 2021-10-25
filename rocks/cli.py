@@ -19,10 +19,18 @@ class AliasedGroup(click.Group):
 
     def get_command(self, ctx, cmd_name):
 
+        # ------
+        # Resolve known commands
+
+        # Add command aliases
+        if cmd_name == "identify":
+            cmd_name = "id"
+        elif cmd_name == "parameter":
+            cmd_name = "parameters"
+
+        # If it's a known subcommand, execute it
         rv = click.Group.get_command(self, ctx, cmd_name)
 
-        # ------
-        # If it's a known subcommand, execute it
         if rv is not None:
             return rv
 
@@ -81,10 +89,10 @@ def info(id_):
 def parameters():
     """Print the ssoCard and its description."""
 
-    if not os.path.isfile(rocks.PATH_TEMPLATE):
+    if not os.path.isfile(rocks.PATH_META["template"]):
         rocks.utils.retrieve_json_from_ssodnet("template")
 
-    with open(rocks.PATH_TEMPLATE, "r") as file_:
+    with open(rocks.PATH_META["template"], "r") as file_:
         TEMPLATE = json.load(file_)
 
     rich.print(TEMPLATE)
