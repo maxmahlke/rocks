@@ -1,4 +1,6 @@
-# 1.3.6 - 2021
+# 1.4 - 2021
+- The asteroid name-number index file is now compiled on SsODNet side.
+- Added greeting which is displayed when index.pkl is missing
 - Fixed bugs in rocks status
 
 # 1.3.5 - 2021-10-22
