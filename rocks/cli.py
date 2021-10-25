@@ -138,11 +138,12 @@ def status():
             )
 
         decision = prompt.Prompt.ask(
-            "\nUpdate or clear the cached ssoCards and datacloud catalogues?\n"
+            "Update or clear the cached ssoCards and datacloud catalogues?\n"
             "[blue][0][/blue] Do nothing "
             "[blue][1][/blue] Clear the cache "
             "[blue][2][/blue] Update the data",
             choices=["0", "1", "2"],
+            show_choices=False,
             default="1",
         )
 
@@ -175,18 +176,15 @@ def status():
     # Update asteroid name-number index
     response = prompt.Prompt.ask(
         "\nUpdate the asteroid name-number index?\n"
-        "[blue][0][/blue] Do nothing "
-        "[blue][1][/blue] From GitHub (updated ~weekly) "
-        "[blue][2][/blue] Locally (not recommended)",
-        choices=["0", "1", "2"],
+        "[blue][0][/blue] No "
+        "[blue][1][/blue] Yes",
+        choices=["0", "1"],
+        show_choices=False,
         default="1",
     )
 
     if response == "1":
-        rocks.utils.retrieve_index()
-
-    elif response == "2":
-        rocks.utils.update_index()
+        rocks.utils._build_index()
 
 
 def echo(plot):
