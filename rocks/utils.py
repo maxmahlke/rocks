@@ -119,11 +119,8 @@ def get_unit(path_unit):
     with open(rocks.PATH_META["units"], "r") as units:
         units = json.load(units)
 
-    try:
-        for key in path_unit.split("."):
-            units = units[key]
-    except KeyError:
-        unit = ""
+    for key in path_unit.split("."):
+        units = units[key]
 
     return units
 

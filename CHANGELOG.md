@@ -2,6 +2,7 @@
 - The asteroid name-number index file is now compiled on SsODNet side. It is removed from the GitHub repo.
 - Added greeting which is displayed when index.pkl is missing
 - Added aliases for commands id (identify) and parameters (parameter)
+- Fixed bug in units display
 - Fixed bugs in rocks parameters
 - Fixed bugs in rocks status
 

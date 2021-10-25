@@ -204,14 +204,14 @@ class Diameter(Value):
     method: List[Method] = []
     bibref: List[Bibref] = []
 
-    path_unit: str = "unit.physical.diameter.diameter"
+    path_unit: str = "unit.physical.diameter.value"
 
 
 class Mass(Value):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
-    path_unit: str = "unit.physical.mass.mass"
+    path_unit: str = "unit.physical.mass.value"
 
 
 class Phase(Parameter):
