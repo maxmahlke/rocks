@@ -119,11 +119,13 @@ def status():
     latest_rocks = rocks.utils.retrieve_rocks_version()
     latest_card = rocks.utils.get_current_version()
 
-    if latest_rocks != rocks.__version__ and False:
+    if latest_rocks != rocks.__version__:
         rich.print(
             f"[red]The running 'rocks' version ({rocks.__version__}) is behind the "
-            f"latest version ({latest_rocks}). The ssoCard structure might have changed. "
-            f"You should update 'rocks' and clear the cache directory.[/red]\n"
+            f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"
+        )
+        rich.print(
+            f"You should run '$ pip install -U space-rocks' and clear the cache directory.\n"
         )
 
     # Update or clear
@@ -133,9 +135,9 @@ def status():
         if latest_card != oldest_card:
             rich.print(
                 f"[red]The ssoCard version ({oldest_card}) is behind the latest version "
-                f"({latest_card}). The ssoCard structure might have changed. You should clear "
-                f"the cache directory.[/red]\n"
+                f"({latest_card}). The ssoCard structure has changed.[/red]"
             )
+            rich.print(" You should clear the cache directory.\n")
 
         decision = prompt.Prompt.ask(
             "Update or clear the cached ssoCards and datacloud catalogues?\n"

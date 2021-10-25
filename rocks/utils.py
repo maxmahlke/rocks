@@ -53,7 +53,7 @@ def _build_index():
     index_ssodnet = index_ssodnet.set_index("SsODNetID")
     index_ssodnet = index_ssodnet.to_dict(orient="index")
 
-    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}, "aliases": {}}
+    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}}
 
     for id_, values in progress.track(
         index_ssodnet.items(),
@@ -75,9 +75,6 @@ def _build_index():
 
         if not np.isnan(number):
             INDEX["number"][number] = (name, id_)
-
-        for alias in values["Aliases"].split(";"):
-            INDEX["aliases"][alias] = (name, number, id_)
 
     with open(rocks.PATH_INDEX, "wb") as file_:
         pickle.dump(INDEX, file_, protocol=4)
