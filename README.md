@@ -5,6 +5,12 @@
 
 *Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
 
+## Install
+
+Install from PyPi using `pip`:
+
+     $ pip install space-rocks
+
 ## Features
 
 Explore asteroid data on the command-line...
@@ -21,6 +27,9 @@ $ rocks albedo Eos
 
 $ rocks taxonomy Eos
 K
+
+$ rocks density Eos
+4.559e+03 +- 1.139e+03 kg/m$^3$
 ```
 
 ... and in a `python` script.
