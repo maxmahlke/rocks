@@ -369,7 +369,9 @@ def confirm_identity(ids):
     # Drop the named asteroids - their identity won't change
     ids = set(id_ for id_ in ids if not re.match(r"^[A-Za-z \(\)\_]*$", id_))
 
-    if len(ids) == 1:
+    if not ids:
+        return  # nothing to do here
+    elif len(ids) == 1:
         _, _, current_ids = rocks.identify(ids, return_id=True, local=False)
         current_ids = [current_ids]
 
