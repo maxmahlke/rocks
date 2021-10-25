@@ -49,9 +49,11 @@ def _build_index():
     index_ssodnet.loc[index_ssodnet["Number"] == 0, "Number"] = np.nan
 
     # Reformat the index to a dictionary
-    index_ssodnet = index_ssodnet.drop(columns="Type")
-    index_ssodnet = index_ssodnet.set_index("SsODNetID")
-    index_ssodnet = index_ssodnet.to_dict(orient="index")
+    index_ssodnet = (
+        index_ssodnet.drop(columns="Type")
+        .set_index("SsODNetID")
+        .to_dict(orient="index")
+    )
 
     INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}}
 
@@ -84,57 +86,6 @@ def load_index():
     """Load local index of asteroid numbers, names, SsODNet IDs."""
     with open(rocks.PATH_INDEX, "rb") as ind:
         return pickle.load(ind)
-
-
-def update_index():
-    """Verify the names and numbers of asteroids in the name-number index."""
-
-    INDEX = load_index()
-
-    OLD_IDS = list(INDEX["id"].keys())
-    OLD_IDS = set(id_ for id_ in OLD_IDS if not re.match(r"^[A-Za-z \(\)\_]*$", id_))
-    NEW_IDS = rocks.identify(OLD_IDS, return_id=True, local=False, progress=True)
-
-    for old_id, new_ids in zip(OLD_IDS, NEW_IDS):
-
-        new_name, new_number, new_id = new_ids
-
-        if old_id == new_id:
-            continue
-
-        # ------
-        # Add new entry
-        new_reduced = reduce_id(new_id)
-
-        INDEX["name"][new_name] = (new_number, new_id)
-        INDEX["number"][new_number] = (new_name, new_id)
-        INDEX["id"][new_id] = (new_name, new_number)
-        INDEX["reduced"][new_reduced] = (new_name, new_number, new_id)
-
-        # ------
-        # Remove old entry
-        old_name, old_number = INDEX["id"][old_id]
-        old_reduced = reduce_id(old_id)
-
-        del INDEX["name"][old_name]
-        del INDEX["number"][old_number]
-        del INDEX["id"][old_id]
-        del INDEX["reduced"][old_reduced]
-
-    with open(rocks.PATH_INDEX, "wb") as file_:
-        pickle.dump(INDEX, file_, protocol=4)
-
-
-def retrieve_index():
-    """Download the index of numbered asteroids from the rocks GitHub
-    repository and saves it to the cache directory."""
-
-    URL = "https://github.com/maxmahlke/rocks/blob/master/data/index.pkl?raw=True"
-
-    index = pickle.load(urllib.request.urlopen(URL))
-
-    with open(rocks.PATH_INDEX, "wb") as ind:
-        pickle.dump(index, ind, protocol=4)
 
 
 # ------

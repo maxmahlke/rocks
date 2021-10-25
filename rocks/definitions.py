@@ -6,7 +6,7 @@ def rank_properties(prop_name, obs):
     """Select ranking method based on property name.
 
     Parameters
-    ==========
+    ----------
     prop_name : str
         The property to rank.
     obs : dict
@@ -14,7 +14,7 @@ def rank_properties(prop_name, obs):
 
 
     Returns
-    =======
+    -------
     list of bool
         Entry "preferred" in propertyCollection, True if preferred, else False
     """
@@ -76,19 +76,19 @@ def select_numeric_property(obs, prop_name):
     """Select preferred observations ranking methods.
 
     Parameters
-    ==========
+    ----------
     obs : dict
         Property measurements and metadata retrieved from SsODNet:datacloud.
     prop_name : str
         Name of the asteroid property.
 
     Returns
-    =======
+    -------
     list of bool
         True if selected, else False.
 
     Notes
-    =====
+    -----
     The method ranking depends on the observable.
     """
     RANKING = PROPERTIES[prop_name]["ranking"]
