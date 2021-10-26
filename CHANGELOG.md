@@ -1,4 +1,8 @@
-# 1.4 - 2021
+# 1.4.1 - 2021-10-26
+- Bugfix in confirm_identity
+- Bugfix in core
+
+# 1.4.0 - 2021-10-25
 - The asteroid name-number index file is now compiled on SsODNet side. It is removed from the GitHub repo.
 - Added Density parameter to Rock
 - Added greeting which is displayed when index.pkl is missing

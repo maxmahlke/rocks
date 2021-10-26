@@ -457,10 +457,10 @@ class Rock(pydantic.BaseModel):
                 # Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
 
-                warnings.warn(
+                rich.print(
                     f"Did not find ssoCard for asteroid '{id_provided}'. The "
                     f"local asteroid name-number index or the ssoCard cache may "
-                    f"be outdated, run 'rocks update' and repeat your command "
+                    f"be outdated, run 'rocks status' and repeat your command "
                     f"afterwards."
                 )
 
