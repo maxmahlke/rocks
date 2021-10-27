@@ -48,4 +48,4 @@ os.makedirs(PATH_CACHE, exist_ok=True)
 if not os.path.isfile(PATH_INDEX):
     rich.print(GREETING)
     utils._build_index()
-    rich.print("\nAll done. Find out more by running '$ rocks docs'\n")
+    rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
