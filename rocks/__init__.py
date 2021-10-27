@@ -35,9 +35,9 @@ GREETING = fr"""
 version: {__version__}
 cache:   {PATH_CACHE}
 
-It looks like this is the first time you run 'rocks'.
+It looks like this is the first time you run [green]rocks[/green].
 Some metadata is required to be present in the cache directory.
-'rocks' will download it now.
+[green]rocks[/green] will download it now.
 """
 
 
