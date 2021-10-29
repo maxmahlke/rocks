@@ -2,6 +2,9 @@
 Tutorials
 #########
 
+.. role:: raw-html(raw)
+    :format: html
+
 Asteroid Identification
 =======================
 
@@ -44,6 +47,8 @@ Miscellaneous
 -  :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
 
 -  :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
+
+-  :ref:`I got 'Error 404: missing ssoCard'. What is happening?<404>`
 
 ---
 
@@ -227,3 +232,26 @@ The average albedo can be retrieved using the ``diamalbedo`` :ref:`datacloud cat
     (0.23472026283829472, 0.005766951500463558)
 
 ---
+
+.. _404:
+
+*I got 'Error 404: missing ssoCard for IDENTIFIER'. What is happening?*
+
+``rocks`` tried to retrieve the :term:`ssoCard` of a confirmed identifier and
+got an invalid response from SsODNet. This can have several reasons:
+
+- The confirmed identifier is outdated. This may happen if an asteroid has
+  recently been named. In this cases, the ssoCard is associated to the new name of the asteroid, while ``rocks`` may still look for it under its previous designation. Updating the :term:`Asteroid name-number index` via ``$ rocks status`` fixes this.
+
+- The :term:`ssoCard` is unavailable due to a compilation error on the SsODNet
+  side. You can confirm this by looking up the ssoCard directly on SsODNet (replace ``IDENTIFIER`` in the URL below by the confirmed :term:`SsODNet ID` of the asteroid):
+
+  :raw-html:`<br />`
+
+
+  http://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=IDENTIFIER
+
+  :raw-html:`<br />`
+
+  If the returned ssoCard is ``null``, the card does not exist. This may be
+  fixed at the next weekly recompilation of all ssoCards.
