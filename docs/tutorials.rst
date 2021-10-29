@@ -48,7 +48,7 @@ Miscellaneous
 
 -  :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
 
--  :ref:`I got 'Error 404: missing ssoCard'. What is happening?<404>`
+-  :ref:`I got 'Error 404: missing ssoCard'. What is happening?<error_404>`
 
 ---
 
@@ -233,7 +233,7 @@ The average albedo can be retrieved using the ``diamalbedo`` :ref:`datacloud cat
 
 ---
 
-.. _404:
+.. _error_404:
 
 *I got 'Error 404: missing ssoCard for IDENTIFIER'. What is happening?*
 

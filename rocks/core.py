@@ -3,6 +3,7 @@
 import datetime as dt
 import json
 from typing import List, Optional
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -458,10 +459,11 @@ class Rock(pydantic.BaseModel):
                 ssocard = {"name": id_provided}
 
                 rich.print(
-                    f"Did not find ssoCard for asteroid '{id_provided}'. The "
-                    f"local asteroid name-number index or the ssoCard cache may "
-                    f"be outdated, run 'rocks status' and repeat your command "
-                    f"afterwards."
+                    f"Error 404: missing ssoCard for [green]{id_provided}[/green]."
+                )
+                # This only gets printed once
+                warnings.warn(
+                    "See https://rocks.readthedocs.io/en/latest/tutorials.html#error-404 for help."
                 )
 
             else:
