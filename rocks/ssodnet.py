@@ -100,7 +100,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     card = await _query_ssodnet(id_ssodnet, session)
 
     # save to cache
-    if card:
+    if card and card is not None:
         with open(PATH_CARD, "w") as file_card:
             json.dump(card, file_card)
 
