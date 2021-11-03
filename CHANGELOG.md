@@ -1,4 +1,4 @@
-# 1.4.2
+# 1.4.2 - 2021-11-3
 - Adapted GREETING to supervisor's liking
 - Improved "missing ssoCard" error message
 - Do not cache empty ssoCards
