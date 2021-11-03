@@ -16,7 +16,7 @@ from rich.progress import Progress
 import rocks
 
 
-def get_ssocard(id_ssodnet, progress=False, local=False):
+def get_ssocard(id_ssodnet, progress=False, local=True):
     """Retrieve the ssoCard of one or many asteroids, using their SsODNet IDs.
 
     Parameters
@@ -26,7 +26,7 @@ def get_ssocard(id_ssodnet, progress=False, local=False):
     progress : bool
         Show progressbar. Default is False.
     local : bool
-        If True, forces the remote query of the ssoCard. Default is False.
+        If False, forces the remote query of the ssoCard. Default is True.
 
     Returns
     -------
@@ -137,7 +137,7 @@ async def _query_ssodnet(id_ssodnet, session):
 
 
 # ------
-def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=False):
+def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     """Retrieve the datacloud catalogue of one or many asteroids, using their SsODNet IDs.
 
     Parameters
@@ -149,7 +149,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=False):
     progress : bool
         Show progressbar. Default is False.
     local : bool
-        If True, forces the remote query of the ssoCard. Default is False.
+        If False, forces the remote query of the ssoCard. Default is True.
 
     Returns
     -------
@@ -216,7 +216,7 @@ async def _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local):
     progress : bool or tdqm.std.tqdm
         If progress is True, this is a progress bar instance. Else, it's False.
     local : bool
-        If True, forces the remote query of the ssoCard. Default is False.
+        If False, forces the remote query of the ssoCard. Default is True.
 
     Returns
     -------

@@ -204,7 +204,7 @@ def pretty_print(rock, catalogue, parameter):
 
     # Some catalogues do not have a "preferred" attribute
     if not hasattr(catalogue, "preferred"):
-        preferred = [False for i in range(len(catalogue))]
+        preferred = [False for _ in range(len(catalogue))]
     else:
         preferred = catalogue.preferred
 
@@ -418,15 +418,15 @@ class Diamalbedo(Catalogue):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred_albedo", pre=True)
-    def select_preferred_albedo(cls, v, values):
+    def select_preferred_albedo(cls, _, values):
         return rocks.definitions.rank_properties("albedo", values)
 
     @pydantic.validator("preferred_diameter", pre=True)
-    def select_preferred_diameter(cls, v, values):
+    def select_preferred_diameter(cls, _, values):
         return rocks.definitions.rank_properties("diameter", values)
 
     @pydantic.validator("preferred", pre=True)
-    def preferred_albedo_or_diameter(cls, v, values):
+    def preferred_albedo_or_diameter(cls, _, values):
         return [
             True if pref_alb or pref_diam else False
             for pref_alb, pref_diam in zip(
@@ -456,7 +456,7 @@ class Masses(Catalogue):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
-    def select_preferred_mass(cls, v, values):
+    def select_preferred_mass(cls, _, values):
         return rocks.definitions.rank_properties("mass", values)
 
 
@@ -521,7 +521,7 @@ class Taxonomies(Catalogue):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
-    def select_preferred_taxonomy(cls, v, values):
+    def select_preferred_taxonomy(cls, _, values):
         return rocks.definitions.rank_properties("taxonomy", values)
 
 

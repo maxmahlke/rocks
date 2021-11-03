@@ -2,6 +2,7 @@
 - Adapted GREETING to supervisor's liking
 - Improved "missing ssoCard" error message
 - Do not cache empty ssoCards
+- Fixed bug which prevented usage of cached ssoCards
 
 # 1.4.1 - 2021-10-26
 - Bugfix in confirm_identity
