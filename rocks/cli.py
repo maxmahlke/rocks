@@ -27,6 +27,8 @@ class AliasedGroup(click.Group):
             cmd_name = "id"
         elif cmd_name == "parameter":
             cmd_name = "parameters"
+        elif cmd_name == "update":
+            cmd_name = "status"
 
         # If it's a known subcommand, execute it
         rv = click.Group.get_command(self, ctx, cmd_name)
@@ -129,11 +131,11 @@ def status():
 
     if latest_rocks != rocks.__version__:
         rich.print(
-            f"[red]The running 'rocks' version ({rocks.__version__}) is behind the "
+            f"[red]The running [green]rocks[/green] version ({rocks.__version__}) is behind the "
             f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"
         )
         rich.print(
-            f"You should run '$ pip install -U space-rocks' and clear the cache directory.\n"
+            f"You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
         )
 
     # Update or clear
