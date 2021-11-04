@@ -32,6 +32,12 @@ def ensure_list(value):
 
 def merge_entries(value):
     """Turn list of dicts into dict of lists."""
+
+    if isinstance(value, list):  # taxonomy
+        pass
+    elif isinstance(value, dict):  # spin
+        value = list(value.values())
+
     return {key: [entry[key] for entry in value] for key in value[0]}
 
 
@@ -116,18 +122,12 @@ class ProperElements(Parameter):
     proper_semi_major_axis: Value = Value(**{})
     proper_sine_inclination: Value = Value(**{})
 
-    def __str__(self):
-        return self.json()
-
 
 class Family(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
     family_number: Optional[int] = np.nan
     family_status: Optional[str] = ""
-
-    def __str__(self):
-        return self.json()
 
 
 class PairMembers(Parameter):
@@ -142,9 +142,6 @@ class PairMembers(Parameter):
 class Pair(Parameter):
     members: List[PairMembers] = [PairMembers(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
-
-    def __str__(self):
-        return self.json()
 
 
 class Yarkovsky(Parameter):
@@ -247,18 +244,17 @@ class PhaseFunction(Parameter):
 
 
 class Spin(Parameter):
-    period: Value = Value(**{})
-    t0: Optional[float] = np.nan
-    Wp: Optional[float] = np.nan
-    lat: Value = Value(**{})
-    RA0: Optional[float] = np.nan
-    DEC0: Optional[float] = np.nan
-    long_: Value(**{}) = pydantic.Field(Value(**{}), alias="long")
-    method: Optional[List[Method]] = [Method(**{})]
-    bibref: Optional[List[Bibref]] = [Bibref(**{})]
+    period: List[Value] = [Value(**{})]
+    t0: List[float] = [np.nan]
+    Wp: List[float] = [np.nan]
+    lat: List[Value] = [Value(**{})]
+    RA0: List[float] = [np.nan]
+    DEC0: List[float] = [np.nan]
+    long_: List[Value] = pydantic.Field([Value(**{})], alias="long")
+    method: List[List[Method]] = [[Method(**{})]]
+    bibref: List[List[Bibref]] = [[Bibref(**{})]]
 
-    def __str__(self):
-        return self.json()
+    path_unit: str = "unit.physical.spin.value"
 
 
 class Taxonomy(Parameter):
@@ -288,7 +284,7 @@ class AbsoluteMagnitude(Value):
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: List[Spin] = [Spin(**{})]
+    spin: Spin = Spin(**{})
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
@@ -298,15 +294,12 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    def __str__(self):
-        return self.json()
-
     _ensure_list: classmethod = pydantic.validator(
-        "spin", "taxonomy", allow_reuse=True, pre=True
+        "taxonomy", allow_reuse=True, pre=True
     )(ensure_list)
 
     _merge_entries: classmethod = pydantic.validator(
-        "taxonomy", allow_reuse=True, pre=True
+        "spin", "taxonomy", allow_reuse=True, pre=True
     )(merge_entries)
 
 
@@ -324,9 +317,6 @@ class Parameters(Parameter):
     physical: PhysicalParameters = PhysicalParameters(**{})
     dynamical: DynamicalParameters = DynamicalParameters(**{})
     eq_state_vector: EqStateVector = EqStateVector(**{})
-
-    def __str__(self):
-        return self.json()
 
     class Config:
         arbitrary_types_allowed = True
