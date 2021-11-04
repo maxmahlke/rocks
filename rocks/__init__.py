@@ -23,7 +23,7 @@ PATH_META = {
 
 # ------
 # Welcome to rocks
-__version__ = "1.4.2"
+__version__ = "1.4.3"
 
 GREETING = fr"""
                | |
