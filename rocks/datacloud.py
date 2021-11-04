@@ -131,8 +131,8 @@ CATALOGUES = {
         "ssodnet_name": "pairs",
         "print_columns": [],
     },
-    "phase_function": {
-        "attr_name": "phase_function",
+    "phase_functions": {
+        "attr_name": "phase_functions",
         "ssodnet_name": "phase_function",
         "print_columns": [],
     },

@@ -237,9 +237,6 @@ class Phase(Parameter):
     facility: Optional[str] = ""
     name_filter: Optional[str] = ""
 
-    def __str__(self):
-        return self.json()
-
 
 class PhaseFunction(Parameter):
     # Generic
@@ -393,7 +390,7 @@ class Rock(pydantic.BaseModel):
     mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
     mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
-    phase_function: rocks.datacloud.PhaseFunction = rocks.datacloud.PhaseFunction(**{})
+    phase_functions: rocks.datacloud.PhaseFunction = rocks.datacloud.PhaseFunction(**{})
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
     thermal_properties: rocks.datacloud.PhaseFunction = (
         rocks.datacloud.ThermalProperties(**{})
@@ -631,7 +628,7 @@ class Rock(pydantic.BaseModel):
             "parameters.physical.diameter": "diameter",
             "parameters.physical.density": "density",
             "parameters.physical.mass": "mass",
-            "parameters.physical.phase": "phase",
+            "parameters.physical.phase_function": "phase_function",
             "parameters.physical.spin": "spin",
             "parameters.physical.taxonomy": "taxonomy",
             "parameters.physical.thermal_properties": "thermal_properties",
