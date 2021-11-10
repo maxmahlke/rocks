@@ -1,3 +1,6 @@
+# 1.4.4 -
+- Bugfix in ssodnet module
+
 # 1.4.3 - 2021-11-04
 - Added command alias: update -> status
 - The phase-function parameter is now correctly called phase_function
