@@ -561,7 +561,7 @@ class Rock(pydantic.BaseModel):
         # retrieve the catalogue
         cat = rocks.ssodnet.get_datacloud_catalogue(id_, catalogue_ssodnet)
 
-        if cat is None:
+        if cat is None or not cat:
             return data
 
         # turn list of dict (catalogue entries) into dict of list

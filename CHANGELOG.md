@@ -1,5 +1,6 @@
 # 1.4.4 -
 - Bugfix in ssodnet module
+- Empty datacloud catalogues are now cached as well to reduce redundant queries
 
 # 1.4.3 - 2021-11-04
 - Added command alias: update -> status

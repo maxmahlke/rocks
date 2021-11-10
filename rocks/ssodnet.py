@@ -257,11 +257,15 @@ async def _local_or_remote_catalogue(
     cat = await _query_datacloud(id_ssodnet, catalogue, session)
     cat = cat["data"][id_ssodnet]["datacloud"]
 
-    if cat:
+    # Always save the result, even if catalogue is empty
+    if cat is not None:
         cat = cat[catalogue]
-        # save to cache
-        with open(PATH_CATALOGUE, "w") as file_card:
-            json.dump(cat, file_card)
+    else:
+        cat = {}
+
+    # save to cache
+    with open(PATH_CATALOGUE, "w") as file_card:
+        json.dump(cat, file_card)
 
     progress_bar.update(progress, advance=1)
     return cat
