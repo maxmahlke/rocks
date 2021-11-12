@@ -38,7 +38,31 @@ def merge_entries(value):
     elif isinstance(value, dict):  # spin
         value = list(value.values())
 
-    return {key: [entry[key] for entry in value] for key in value[0]}
+    return_dict = {}
+
+    # Take keys of first dict
+    for key in value[0]:
+
+        # Turn all dicts in the list into lists
+        return_dict[key] = []
+
+        for v in value:
+            if key in v:
+                return_dict[key].append(v[key])
+            else:
+                # This entry of the current parameter does not have all
+                # values (eg "period" for Spin)
+
+                # Add the correct NaN value
+                if isinstance(value[0][key], dict):
+                    return_dict[key].append({})
+                elif isinstance(value[0][key], (float, int)):
+                    return_dict[key].append(np.nan)
+                elif isinstance(value[0][key], str):
+                    return_dict[key].append(None)
+    return return_dict
+
+    # return {key: [entry[key] for entry in value] for key in value[0]}
 
 
 # ------
