@@ -406,7 +406,7 @@ class Rock(pydantic.BaseModel):
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
     phase_functions: rocks.datacloud.PhaseFunction = rocks.datacloud.PhaseFunction(**{})
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
-    thermal_properties: rocks.datacloud.PhaseFunction = (
+    thermal_properties: rocks.datacloud.ThermalProperties = (
         rocks.datacloud.ThermalProperties(**{})
     )
     yarkovskies: rocks.datacloud.Yarkovskies = rocks.datacloud.Yarkovskies(**{})
