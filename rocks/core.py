@@ -702,7 +702,7 @@ def rocks_(identifier, datacloud=[], progress=False):
 
             if cat not in rocks.datacloud.CATALOGUES.keys():
                 raise ValueError(
-                    f"Unknown datacloud catalogue name: '{catalogue}'"
+                    f"Unknown datacloud catalogue name: '{cat}'"
                     f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
                 )
 
