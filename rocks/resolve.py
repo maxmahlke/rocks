@@ -58,7 +58,7 @@ def identify(id_, return_id=False, local=True, progress=False):
         id_ = list(id_)
     elif id_ is None:
         warnings.warn(f"Received id_ of type {type(id_)}.")
-        return (None, np.nan) if not return_id else (None, np.nan, None)
+        return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected one of: "
@@ -67,39 +67,41 @@ def identify(id_, return_id=False, local=True, progress=False):
 
     if not id_:
         warnings.warn("Received empty list of identifiers.")
-        return (None, np.nan) if not return_id else (None, np.nan, None)
+        return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
 
     # ------
     # Run asynchronous event loop for name resolution
     with Progress(disable=not progress) as progress_bar:
 
-        progress = progress_bar.add_task("Identifying rocks", total=len(id_))
+        task = progress_bar.add_task("Identifying rocks", total=len(id_))  # type: ignore
         loop = asyncio.get_event_loop()
-        results = loop.run_until_complete(_identify(id_, local, progress_bar, progress))
+        results = loop.run_until_complete(_identify(id_, local, progress_bar, task))
 
-    # ------
-    # Check if any failed due to 502 and rerun them
-    idx_failed = [i for i, result in enumerate(results) if result == (None, None, None)]
+        # ------
+        # Check if any failed due to 502 and rerun them
+        idx_failed = [
+            i for i, result in enumerate(results) if result == (None, None, None)
+        ]
 
-    if idx_failed:
-        results = np.array(results)
-        results[idx_failed] = loop.run_until_complete(
-            _identify(np.array(id_)[idx_failed], local=local)
-        )
-        results = results.tolist()
+        if idx_failed:
+            results = np.array(results)
+            results[idx_failed] = loop.run_until_complete(
+                _identify(np.array(id_)[idx_failed], local, progress_bar, task)
+            )
+            results = results.tolist()
 
     # ------
     # Verify the output format
     if not return_id:
         results = [r[:2] for r in results]
 
-    if len(id_) == 1:
+    if len(id_) == 1:  # type: ignore
         results = results[0]
 
-    return results
+    return results  # type: ignore
 
 
-async def _identify(id_, local, progress_bar, progress):
+async def _identify(id_, local, progress_bar, task):
     """Establish the asynchronous HTTP session and launch the name resolution."""
     INDEX = rocks.utils.load_index()
 
@@ -107,7 +109,7 @@ async def _identify(id_, local, progress_bar, progress):
 
         tasks = [
             asyncio.ensure_future(
-                _resolve(i, session, local, progress_bar, progress, INDEX)
+                _resolve(i, session, local, progress_bar, task, INDEX)
             )
             for i in id_
         ]
@@ -117,19 +119,19 @@ async def _identify(id_, local, progress_bar, progress):
     return results
 
 
-async def _resolve(id_, session, local, progress_bar, progress, INDEX):
+async def _resolve(id_, session, local, progress_bar, task, INDEX):
     """Resolve the identifier locally or remotely."""
 
     if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
         warnings.warn("Received empty or NaN identifier.")
-        progress_bar.update(progress, advance=1)
+        progress_bar.update(task, advance=1)
         return (None, np.nan, None)
 
     if local:
         success, (name, number, ssodnet_id) = _local_lookup(id_, INDEX)
 
         if success:
-            progress_bar.update(progress, advance=1)
+            progress_bar.update(task, advance=1)
             return (name, number, ssodnet_id)
 
     # Local resolution failed, do remote query
@@ -137,14 +139,13 @@ async def _resolve(id_, session, local, progress_bar, progress, INDEX):
     response = await _query_quaero(id_, session)
 
     if response is None:  # query failed with 502
-        progress_bar.update(progress, advance=1)
         return (None, None, None)
 
     if not response:  # remote resolution failed
-        progress_bar.update(progress, advance=1)
+        progress_bar.update(task, advance=1)
         return (None, np.nan, None)
 
-    progress_bar.update(progress, advance=1)
+    progress_bar.update(task, advance=1)
     return _parse_quaero_response(response["data"], str(id_))
 
 
@@ -186,7 +187,7 @@ def _standardize_id(id_):
         The standardized name, designation, or number. None if id_ is NaN or None.
     """
     if isinstance(id_, (int, float)):
-        return id_
+        return int(id_)
 
     elif isinstance(id_, str):
         # String id_. Perform some regex tests to make sure it's well formatted
@@ -212,7 +213,7 @@ def _standardize_id(id_):
 
             # Ensure whitespace between year and id_
             id_ = re.sub(r"[\W_]+", "", id_)
-            ind = re.search(r"[A18920]{1,2}[0-9]{2}", id_).end()
+            ind = re.search(r"[A18920]{1,2}[0-9]{2}", id_).end()  # type: ignore
             id_ = f"{id_[:ind]} {id_[ind:]}"
 
             # Replace A by 1

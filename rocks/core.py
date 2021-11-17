@@ -70,22 +70,21 @@ def merge_entries(value):
 
 # The lowest level in the ssoCard tree is the Value
 class Error(pydantic.BaseModel):
-    min_: Optional[float] = pydantic.Field(np.nan, alias="min")
-    max_: Optional[float] = pydantic.Field(np.nan, alias="max")
+    min_: float = pydantic.Field(np.nan, alias="min")
+    max_: float = pydantic.Field(np.nan, alias="max")
 
 
 class Value(pydantic.BaseModel):
     error: Error = Error(**{})
     value: Optional[float] = np.nan
+    path_unit: str = ""
 
     def __str__(self):
         """Print the value of a numerical parameter including
         its errors and its unit if available.
         """
 
-        unit = (
-            rocks.utils.get_unit(self.path_unit) if hasattr(self, "path_unit") else ""
-        )
+        unit = rocks.utils.get_unit(self.path_unit) if self.path_unit else ""
 
         if abs(self.error.min_) == abs(self.error.max_):
             return f"{self.value:.4} +- {self.error.max_:.4} {unit}"
@@ -103,7 +102,7 @@ class Parameter(pydantic.BaseModel):
 class Method(Parameter):
     doi: Optional[str] = ""
     name: Optional[str] = ""
-    year: Optional[int] = np.nan
+    year: Optional[int] = None
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
@@ -111,7 +110,7 @@ class Method(Parameter):
 
 class Bibref(Parameter):
     doi: Optional[str] = ""
-    year: Optional[int] = np.nan
+    year: Optional[int] = None
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
@@ -127,13 +126,13 @@ class OrbitalElements(Parameter):
     ref_epoch: Optional[float] = np.nan
     inclination: Value = Value(**{})
     mean_motion: Value = Value(**{})
-    orbital_arc: Optional[int] = np.nan
+    orbital_arc: Optional[int] = None
     eccentricity: Value = Value(**{})
     mean_anomaly: Value = Value(**{})
     node_longitude: Value = Value(**{})
     orbital_period: Value = Value(**{})
     semi_major_axis: Value = Value(**{})
-    number_observation: Optional[int] = np.nan
+    number_observation: Optional[int] = None
     perihelion_argument: Value = Value(**{})
 
 
@@ -150,7 +149,7 @@ class ProperElements(Parameter):
 class Family(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
-    family_number: Optional[int] = np.nan
+    family_number: Optional[int] = None
     family_status: Optional[str] = ""
 
 
@@ -160,7 +159,7 @@ class PairMembers(Parameter):
     pair_delta_a: Optional[float] = np.nan
     pair_delta_e: Optional[float] = np.nan
     pair_delta_i: Optional[float] = np.nan
-    sibling_number: Optional[int] = np.nan
+    sibling_number: Optional[int] = None
 
 
 class Pair(Parameter):
@@ -381,7 +380,7 @@ class Rock(pydantic.BaseModel):
     name: Optional[str] = ""
     type_: Optional[str] = pydantic.Field("", alias="type")
     class_: Optional[str] = pydantic.Field("", alias="class")
-    number: Optional[int] = np.nan
+    number: Optional[int] = None
     parent: Optional[str] = ""
     system: Optional[str] = ""
 
@@ -411,7 +410,7 @@ class Rock(pydantic.BaseModel):
     )
     yarkovskies: rocks.datacloud.Yarkovskies = rocks.datacloud.Yarkovskies(**{})
 
-    def __init__(self, id_, ssocard={}, datacloud=[], skip_id_check=False):
+    def __init__(self, id_, ssocard=None, datacloud=None, skip_id_check=False):
         """Identify a minor body  and retrieve its properties from SsODNet.
 
         Parameters
@@ -446,7 +445,7 @@ class Rock(pydantic.BaseModel):
         'C'
         >>> ceres.taxonomy.shortbib
         'DeMeo+2009'
-        >>> ceres.diameter
+        >>> ceres.diameter.value
         848.4
         >>> ceres.diameter.unit
         'km'
@@ -461,7 +460,7 @@ class Rock(pydantic.BaseModel):
 
         # Get ssoCard and datcloud catalogues
         if not pd.isnull(id_):
-            if not ssocard:
+            if ssocard is None:
                 ssocard = rocks.ssodnet.get_ssocard(id_)
 
             if ssocard is None:
@@ -478,8 +477,11 @@ class Rock(pydantic.BaseModel):
                 )
 
             else:
-                for catalogue in datacloud:
-                    ssocard = self.__add_datacloud_catalogue(id_, catalogue, ssocard)
+                if datacloud is not None:
+                    for catalogue in datacloud:
+                        ssocard = self.__add_datacloud_catalogue(
+                            id_, catalogue, ssocard
+                        )
         else:
             # Something failed. Instantiate minimal ssoCard for meaningful error output.
             ssocard = {"name": id_provided}
@@ -505,18 +507,19 @@ class Rock(pydantic.BaseModel):
             super().__init__(**{"name": id_provided})
 
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
-        for catalogue in datacloud:
+        if datacloud is not None:
+            for catalogue in datacloud:
 
-            if catalogue in ["diameters", "albedos"]:
-                catalogue = "diamalbedo"
+                if catalogue in ["diameters", "albedos"]:
+                    catalogue = "diamalbedo"
 
-            setattr(
-                self,
-                catalogue,
-                rocks.datacloud.DataCloudDataFrame(
-                    data=getattr(self, catalogue).dict()
-                ),
-            )
+                setattr(
+                    self,
+                    catalogue,
+                    rocks.datacloud.DataCloudDataFrame(
+                        data=getattr(self, catalogue).dict()
+                    ),
+                )
 
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
@@ -661,12 +664,12 @@ class Rock(pydantic.BaseModel):
     }
 
 
-def rocks_(identifier, datacloud=[], progress=False):
+def rocks_(ids, datacloud=None, progress=False):
     """Create multiple Rock instances.
 
     Parameters
-    ----------
-    identifier : list of str, list of int, list of float, np.array, pd.Series
+    ==========
+    ids : list of str, list of int, list of float, np.array, pd.Series
         An iterable containing minor body identifiers.
     datacloud : list of str
         List of additional catalogues to retrieve from datacloud.
@@ -675,24 +678,24 @@ def rocks_(identifier, datacloud=[], progress=False):
         Show progress of instantiation. Default is False.
 
     Returns
-    -------
+    =======
     list of rocks.core.Rock
         A list of Rock instances
     """
 
     # Get IDs
-    if len(identifier) == 1 or isinstance(identifier, str):
-        ids = [rocks.identify(identifier, return_id=True, progress=progress)[-1]]
+    if len(ids) == 1 or isinstance(ids, str):
+        ids = [rocks.identify(ids, return_id=True, progress=progress)[-1]]
 
     else:
-        _, _, ids = zip(*rocks.identify(identifier, return_id=True, progress=progress))
+        _, _, ids = zip(*rocks.identify(ids, return_id=True, progress=progress))
 
     # Load ssoCards asynchronously
     rocks.ssodnet.get_ssocard(
         [id_ for id_ in ids if not id_ is None], progress=progress
     )
 
-    if datacloud:
+    if datacloud is not None:
 
         if isinstance(datacloud, str):
             datacloud = [datacloud]

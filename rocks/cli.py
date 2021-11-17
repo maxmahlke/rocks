@@ -68,7 +68,7 @@ def docs():
 @click.argument("id_")
 def id(id_):
     """Get asteroid name and number from string input."""
-    name, number = rocks.identify(id_)
+    name, number = rocks.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")

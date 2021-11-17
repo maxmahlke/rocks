@@ -1,12 +1,13 @@
-# 1.4.4 -
+# 1.4.4 - 2021-11-17
 - Bugfix in ssodnet module
 - Empty datacloud catalogues are now cached as well to reduce redundant queries
+- More fixes for the Spin parameter
 
 # 1.4.3 - 2021-11-04
 - Added command alias: update -> status
 - The phase-function parameter is now correctly called phase_function
 - The phase-function datacloud catalouge parameter is now correctly called phase_functions
-- Aligned implementation of Spin property with ssoCard changes
+- Aligned implementation of Spin parameter with ssoCard changes
 
 # 1.4.2 - 2021-11-03
 - Adapted GREETING to supervisor's liking
