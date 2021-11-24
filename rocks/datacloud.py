@@ -23,9 +23,11 @@ CATALOGUES = {
         "ssodnet_name": "diamalbedo",
         "print_columns": [
             "albedo",
-            "err_albedo",
+            "err_albedo_up",
+            "err_albedo_down",
             "diameter",
-            "err_diameter",
+            "err_diameter_up",
+            "err_diameter_down",
             "method",
             "shortbib",
         ],
@@ -73,9 +75,11 @@ CATALOGUES = {
         "ssodnet_name": "diamalbedo",
         "print_columns": [
             "albedo",
-            "err_albedo",
+            "err_albedo_up",
+            "err_albedo_down",
             "diameter",
-            "err_diameter",
+            "err_diameter_up",
+            "err_diameter_down",
             "method",
             "shortbib",
         ],
@@ -85,9 +89,11 @@ CATALOGUES = {
         "ssodnet_name": "diamalbedo",
         "print_columns": [
             "albedo",
-            "err_albedo",
+            "err_albedo_up",
+            "err_albedo_down",
             "diameter",
-            "err_diameter",
+            "err_diameter_up",
+            "err_diameter_down",
             "method",
             "shortbib",
         ],
@@ -405,9 +411,11 @@ class Diamalbedo(Catalogue):
     shortbib: List[str] = [""]
 
     albedo: List[float] = [np.nan]
-    err_albedo: List[float] = [np.nan]
+    err_albedo_up: List[float] = [np.nan]
+    err_albedo_down: List[float] = [np.nan]
     diameter: List[float] = [np.nan]
-    err_diameter: List[float] = [np.nan]
+    err_diameter_up: List[float] = [np.nan]
+    err_diameter_down: List[float] = [np.nan]
     beaming: List[float] = [np.nan]
     err_beaming: List[float] = [np.nan]
     emissivity: List[float] = [np.nan]
