@@ -1,3 +1,6 @@
+# 1.4.5 - 2021-11-24
+- Updated diamalbedo catalogue structure
+
 # 1.4.4 - 2021-11-17
 - Bugfix in ssodnet module
 - Empty datacloud catalogues are now cached as well to reduce redundant queries
