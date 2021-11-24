@@ -360,7 +360,6 @@ class Ssocard(Parameter):
 class Datacloud(Parameter):
     """The collection of links to datacloud catalogue associated to this ssoCard."""
 
-    astdys: Optional[str] = ""
     astorb: Optional[str] = ""
     binarymp: Optional[str] = ""
     diamalbedo: Optional[str] = ""
@@ -393,7 +392,6 @@ class Rock(pydantic.BaseModel):
     datacloud: Datacloud = Datacloud(**{})
 
     # the catalogues
-    astdys: rocks.datacloud.AstDyS = rocks.datacloud.AstDyS(**{})
     astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
     binarymp: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
     colors: rocks.datacloud.Colors = rocks.datacloud.Colors(**{})
@@ -594,7 +592,7 @@ class Rock(pydantic.BaseModel):
         # turn list of dict (catalogue entries) into dict of list
         cat = {
             key: [c[key] for c in cat]
-            if catalogue not in ["aams", "astdys", "astorb", "pairs", "families"]
+            if catalogue not in ["aams", "astorb", "pairs", "families"]
             else cat[0][key]
             for key in cat[0].keys()
         }

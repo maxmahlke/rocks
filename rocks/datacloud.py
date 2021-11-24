@@ -316,25 +316,25 @@ class Catalogue(pydantic.BaseModel):
     )(ensure_int)
 
 
-class AstDyS(Catalogue):
-    H: List[float] = [np.nan]
-    ProperSemimajorAxis: List[float] = [np.nan]
-    err_ProperSemimajorAxis: List[float] = [np.nan]
-    ProperEccentricity: List[float] = [np.nan]
-    err_ProperEccentricity: List[float] = [np.nan]
-    ProperSinI: List[float] = [np.nan]
-    err_ProperSinI: List[float] = [np.nan]
-    ProperInclination: List[float] = [np.nan]
-    err_ProperInclination: List[float] = [np.nan]
-    n: List[float] = [np.nan]
-    err_n: List[float] = [np.nan]
-    g: List[float] = [np.nan]
-    err_g: List[float] = [np.nan]
-    s: List[float] = [np.nan]
-    err_s: List[float] = [np.nan]
-    LCE: List[float] = [np.nan]
-    My: List[float] = [np.nan]
-    lam_fit: List[float] = pydantic.Field([np.nan], alias="lam-fit")
+# class AstDyS(Catalogue):
+#     H: List[float] = [np.nan]
+#     ProperSemimajorAxis: List[float] = [np.nan]
+#     err_ProperSemimajorAxis: List[float] = [np.nan]
+#     ProperEccentricity: List[float] = [np.nan]
+#     err_ProperEccentricity: List[float] = [np.nan]
+#     ProperSinI: List[float] = [np.nan]
+#     err_ProperSinI: List[float] = [np.nan]
+#     ProperInclination: List[float] = [np.nan]
+#     err_ProperInclination: List[float] = [np.nan]
+#     n: List[float] = [np.nan]
+#     err_n: List[float] = [np.nan]
+#     g: List[float] = [np.nan]
+#     err_g: List[float] = [np.nan]
+#     s: List[float] = [np.nan]
+#     err_s: List[float] = [np.nan]
+#     LCE: List[float] = [np.nan]
+#     My: List[float] = [np.nan]
+#     lam_fit: List[float] = pydantic.Field([np.nan], alias="lam-fit")
 
 
 class Astorb(Catalogue):
