@@ -11,6 +11,7 @@ import urllib
 import warnings
 
 import numpy as np
+import Levenshtein as lev
 import pandas as pd
 import requests
 import rich
@@ -411,3 +412,40 @@ def retrieve_rocks_version():
     version = response.split("\n")[2].split('"')[1]
 
     return version
+
+
+def find_candidates(id_):
+    """Propose a match among the named asteroids for the pass id_.
+
+    Parameters
+    ----------
+    id_ : str
+        The user-provided asteroid identifier.
+
+    Returns
+    -------
+    list of tuple
+        The name-number pairs of possible matches.
+
+    Notes
+    -----
+    The matches are found using the Levenshtein distance metric.
+    """
+
+    # Get list of named asteroids
+    index = load_index()
+
+    candidates = []
+
+    # Use Levenshtein distance to identify potential matches
+    max_distance = 2  # found by trial and error
+
+    for name in index["name"].keys():
+        distance = lev.distance(id_, name)
+
+        if distance <= max_distance:
+            candidates.append((name, index["name"][name][0]))
+
+    # Sort by number
+    candidates = sorted(candidates, key=lambda x: x[1])
+    return candidates

@@ -3,6 +3,7 @@
 import json
 import keyword
 import os
+import re
 import sys
 import time
 import webbrowser
@@ -72,6 +73,19 @@ def id(id_):
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
+    else:
+        # The query failed. Propose some names if the id_ looks like a name,
+        # designations give too many false positives
+        if not re.match(r"^[A-Za-z ]*$", id_):
+            sys.exit()
+
+        candidates = rocks.utils.find_candidates(id_)
+
+        if candidates:
+            rich.print("\nCould these be the rocks you're looking for?")
+
+            for name, number in candidates:
+                rich.print(f"{f'({number})':>8} {name}")
 
 
 @cli_rocks.command()
