@@ -1,3 +1,6 @@
+# 1.4.6 - 2021
+- Reduced verbosity of output if name resolution fails during parameter query
+
 # 1.4.5 - 2021-11-24
 - Updated diamalbedo catalogue structure
 

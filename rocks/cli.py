@@ -230,6 +230,10 @@ def echo(plot):
 
     rock = rocks.Rock(id_, datacloud=datacloud)
 
+    # Identifier could not be resolved
+    if not rock.id_:
+        sys.exit()
+
     # Pretty-print the paramter
     if not datacloud:
         rich.print(rocks.utils.rgetattr(rock, parameter))
