@@ -82,7 +82,10 @@ def id(id_):
         candidates = rocks.utils.find_candidates(id_)
 
         if candidates:
-            rich.print("\nCould these be the rocks you're looking for?")
+            rich.print(
+                f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
+                f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
+            )
 
             for name, number in candidates:
                 rich.print(f"{f'({number})':>8} {name}")

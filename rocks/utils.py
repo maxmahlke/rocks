@@ -435,10 +435,10 @@ def find_candidates(id_):
     # Get list of named asteroids
     index = load_index()
 
-    candidates = []
-
     # Use Levenshtein distance to identify potential matches
-    max_distance = 2  # found by trial and error
+    candidates = []
+    max_distance = 1  # found by trial and error
+    id_ = id_.capitalize()  # remove one possible dof
 
     for name in index["name"].keys():
         distance = lev.distance(id_, name)
