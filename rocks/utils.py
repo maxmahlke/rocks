@@ -408,8 +408,15 @@ def retrieve_rocks_version():
 
     URL = "https://github.com/maxmahlke/rocks/blob/master/pyproject.toml?raw=True"
 
-    response = urllib.request.urlopen(URL).read().decode("utf-8")
-    version = response.split("\n")[2].split('"')[1]
+    try:
+        response = requests.get(URL, timeout=10)
+    except requests.exceptions.ReadTimeout:
+        version = ""
+    finally:
+        if response.status_code == 200:
+            version = re.findall(r"\d\.\d\.?\d?", response.text)[0]
+        else:
+            version = ""
 
     return version
 

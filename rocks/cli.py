@@ -146,7 +146,7 @@ def status():
     latest_rocks = rocks.utils.retrieve_rocks_version()
     latest_card = rocks.utils.get_current_version()
 
-    if latest_rocks != rocks.__version__:
+    if latest_rocks and latest_rocks != rocks.__version__:
         rich.print(
             f"[red]The running [green]rocks[/green] version ({rocks.__version__}) is behind the "
             f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"
