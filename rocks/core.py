@@ -233,8 +233,8 @@ class Density(Value):
 
 
 class Diameter(Value):
-    method: List[Method] = []
-    bibref: List[Bibref] = []
+    method: List[Method] = [Method(**{})]
+    bibref: List[Bibref] = [Bibref(**{})]
 
     path_unit: str = "unit.physical.diameter.value"
 
@@ -491,18 +491,18 @@ class Rock(pydantic.BaseModel):
 
             self.__parse_error_message(message, id_, ssocard)
 
-            # TODO
-            # Set the offending properties to NaN to allow for instantiation anyway
-            # for error in message.errors():
+            # Set the offending properties to None to allow for instantiation anyway
+            for error in message.errors():
 
-            #     prop = ssocard[error["loc"][0]]
+                # Dynamically remove offending parts of the ssoCard
+                offending_part = ssocard
 
-            #     for l in error["loc"][1:]:
-            #         prop = prop[l]
-            #     else:
-            #         prop = [None]
+                for location in error["loc"][:-1]:
+                    offending_part = offending_part[location]
 
-            super().__init__(**{"name": id_provided})
+                del offending_part[error["loc"][-1]]
+
+            super().__init__(**ssocard)  # type: ignore
 
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
         if datacloud is not None:
@@ -610,7 +610,7 @@ class Rock(pydantic.BaseModel):
 
     def __parse_error_message(self, message, id_, data):
         """Print informative error message if ssocard data is invalid."""
-        print(f"{id_}:")
+        print(f"\n{id_}:")
 
         # Look up offending value in ssoCard
         for error in message.errors():
@@ -625,6 +625,7 @@ class Rock(pydantic.BaseModel):
             rich.print(
                 f"Error: {' -> '.join([str(e) for e in error['loc']])} is invalid: {error['msg']}\n"
                 f"Passed value: {value}\n"
+                f"Replacing value with empty default to continue.\n"
             )
 
     __aliases = {
