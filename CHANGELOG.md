@@ -1,5 +1,10 @@
-# 1.4.6 - 2021
+# 1.4.6 - 2021-11-28
+- Rocks can now be created even if part of the ssoCard is invalid. An erroneous
+  albedo entry does not prevent retrieving the diameter anymore.
+- If the query of a named asteroid via the CLI fails, rocks proposes some
+  matches
 - Reduced verbosity of output if name resolution fails during parameter query
+- Added timeout to rocks version check
 
 # 1.4.5 - 2021-11-24
 - Updated diamalbedo catalogue structure

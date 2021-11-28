@@ -21,8 +21,8 @@ sys.path.insert(0, os.path.abspath("../rocks"))
 # -- Project information -----------------------------------------------------
 
 project = "rocks"
-copyright = "2021, Max Mahlke, Benoit Carry"
-author = "Max Mahlke, Benoit Carry"
+copyright = "2021, Max Mahlke"
+author = "Max Mahlke"
 
 # The full version, including alpha/beta/rc tags
 release = "0.1"

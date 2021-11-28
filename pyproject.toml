@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-rocks"
-version = "1.4.5"
+version = "1.4.6"
 description = "Python client for SsODNet data access."
 authors = ["Max Mahlke <max.mahlke@oca.eu>"]
 license = "MIT"
@@ -26,6 +26,7 @@ rich = "^10.7.0"
 click = "^8.0.1"
 nest-asyncio = "^1.5.1"
 requests = "^2.26.0"
+Levenshtein = "^0.16.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-redactor-theme", "sphinx-hoverxref"]

@@ -7,7 +7,6 @@ import os
 import pickle
 import re
 import sys
-import urllib
 import warnings
 
 import numpy as np
