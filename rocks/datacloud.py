@@ -204,7 +204,7 @@ def pretty_print(rock, catalogue, parameter):
 
     # Sort catalogue by year of reference
     if "year" in catalogue.columns:
-        catalogue = catalogue.sort_values("year")
+        catalogue = catalogue.sort_values("year").reset_index()
 
     # The columns depend on the catalogue
     columns = CATALOGUES[parameter]["print_columns"]

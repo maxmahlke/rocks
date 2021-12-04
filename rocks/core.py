@@ -167,6 +167,11 @@ class Pair(Parameter):
     bibref: List[Bibref] = [Bibref(**{})]
 
 
+class TisserandParameter(Value):
+    method: List[Method] = []
+    bibref: List[Bibref] = []
+
+
 class Yarkovsky(Parameter):
     S: Optional[float] = np.nan
     A2: Value = Value(**{})
@@ -181,6 +186,7 @@ class Yarkovsky(Parameter):
 class DynamicalParameters(Parameter):
     pair: Pair = Pair(**{})
     family: Family = Family(**{})
+    tisserand_parameter: TisserandParameter = TisserandParameter(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
     orbital_elements: OrbitalElements = OrbitalElements(**{})

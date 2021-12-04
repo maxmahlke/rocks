@@ -1,5 +1,6 @@
 # 1.4.7 - 2021
 - Datacloud properties are now sorted by year of publication when echoed on the command line
+- Added the Tisserand parameter to the ssoCard
 
 # 1.4.6 - 2021-11-28
 - Rocks can now be created even if part of the ssoCard is invalid. An erroneous
