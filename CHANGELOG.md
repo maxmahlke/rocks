@@ -1,6 +1,8 @@
 # 1.4.7 - 2021
 - Datacloud properties are now sorted by year of publication when echoed on the command line
 - Added the Tisserand parameter to the ssoCard
+- Rock.parameters.physical.spin is now a list of Spin instances, rather than a Spin instance with lists.
+  This is consistent with the Rock.parameters.physical.taxonomy parameter.
 
 # 1.4.6 - 2021-11-28
 - Rocks can now be created even if part of the ssoCard is invalid. An erroneous

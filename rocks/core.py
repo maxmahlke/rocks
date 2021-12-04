@@ -30,39 +30,33 @@ def ensure_list(value):
     return value
 
 
-def merge_entries(value):
-    """Turn list of dicts into dict of lists."""
+def convert_spin_to_list(spins: Dict) -> List:
+    """Convert the Spin dictionary from the ssoCard into a list.
+    Add the spin index as parameter to the Spin entries.
 
-    if isinstance(value, list):  # taxonomy
-        pass
-    elif isinstance(value, dict):  # spin
-        value = list(value.values())
+    Parameters
+    ----------
+    spin : dict
+        The dictionary located at parameters.physical.spin in the ssoCard.
 
-    return_dict = {}
+    Returns
+    -------
+    list
+        A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
+        after removing the index layer.
+    """
 
-    # Take keys of first dict
-    for key in value[0]:
+    spin_dicts = []
 
-        # Turn all dicts in the list into lists
-        return_dict[key] = []
+    for spin_id, spin_dict in spins.items():
 
-        for v in value:
-            if key in v:
-                return_dict[key].append(v[key])
-            else:
-                # This entry of the current parameter does not have all
-                # values (eg "period" for Spin)
+        # Add spin id
+        spin_dict["id_"] = spin_id
 
-                # Add the correct NaN value
-                if isinstance(value[0][key], dict):
-                    return_dict[key].append({})
-                elif isinstance(value[0][key], (float, int)):
-                    return_dict[key].append(np.nan)
-                elif isinstance(value[0][key], str):
-                    return_dict[key].append(None)
-    return return_dict
+        # And done
+        spin_dicts.append(spin_dict)
 
-    # return {key: [entry[key] for entry in value] for key in value[0]}
+    return spin_dicts
 
 
 # ------
@@ -273,15 +267,16 @@ class PhaseFunction(Parameter):
 
 
 class Spin(Parameter):
-    period: List[Value] = [Value(**{})]
-    t0: List[float] = [np.nan]
-    Wp: List[float] = [np.nan]
-    lat: List[Value] = [Value(**{})]
-    RA0: List[float] = [np.nan]
-    DEC0: List[float] = [np.nan]
-    long_: List[Value] = pydantic.Field([Value(**{})], alias="long")
-    method: List[List[Method]] = [[Method(**{})]]
-    bibref: List[List[Bibref]] = [[Bibref(**{})]]
+    t0: float = np.nan
+    Wp: float = np.nan
+    id_: Optional[int] = None
+    lat: Value = Value(**{})
+    RA0: float = np.nan
+    DEC0: float = np.nan
+    long_: Value = pydantic.Field(Value(**{}), alias="long")
+    period: Value = Value(**{})
+    method: List[Method] = [Method(**{})]
+    bibref: List[Bibref] = [Bibref(**{})]
 
     path_unit: str = "unit.physical.spin.value"
 
@@ -313,7 +308,7 @@ class AbsoluteMagnitude(Value):
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: Spin = Spin(**{})
+    spin: List[Spin] = [Spin(**{})]
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
@@ -323,13 +318,9 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _ensure_list: classmethod = pydantic.validator(
-        "taxonomy", allow_reuse=True, pre=True
-    )(ensure_list)
-
-    _merge_entries: classmethod = pydantic.validator(
-        "spin", "taxonomy", allow_reuse=True, pre=True
-    )(merge_entries)
+    _convert_spin_to_list: classmethod = pydantic.validator(
+        "spin", allow_reuse=True, pre=True
+    )(convert_spin_to_list)
 
 
 # ------
