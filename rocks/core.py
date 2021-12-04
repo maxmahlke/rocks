@@ -2,7 +2,7 @@
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
 import json
-from typing import List, Optional
+from typing import Dict, List, Optional
 import warnings
 
 import numpy as np
@@ -282,11 +282,11 @@ class Spin(Parameter):
 
 
 class Taxonomy(Parameter):
-    class_: List[str] = pydantic.Field([""], alias="class")
-    scheme: List[str] = [""]
-    bibref: List[List[Bibref]] = [[Bibref(**{})]]
-    method: List[List[Method]] = [[Method(**{})]]
-    waverange: List[str] = [""]
+    class_: str = pydantic.Field("", alias="class")
+    scheme: str = ""
+    bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
+    waverange: str = ""
 
     def __str__(self):
         if not self.class_:
@@ -313,7 +313,7 @@ class PhysicalParameters(Parameter):
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
-    taxonomy: Taxonomy = Taxonomy(**{})
+    taxonomy: List[Taxonomy] = [Taxonomy(**{})]
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
