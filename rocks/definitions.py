@@ -323,7 +323,8 @@ CLASS_TO_COMPLEX = {
     "Xt": "X",
     "XU": "U",
     "Z": "U",
-    np.nan: np.nan,
-    None: np.nan,
-    float("nan"): np.nan,
+    np.nan: None,
+    "": None,
+    None: None,
+    float("nan"): None,
 }
