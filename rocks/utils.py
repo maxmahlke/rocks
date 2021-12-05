@@ -258,43 +258,43 @@ def cache_inventory():
 
     for file_ in cached_jsons:
 
+        # Is it metadata?
         if file_ in [os.path.basename(f) for f in rocks.PATH_META.values()]:
             continue
 
-        # Datacloud catalogue?
+        # Datacloud catalogue or ssoCard?
         if any(
             [
                 cat["ssodnet_name"] in file_
                 for cat in rocks.datacloud.CATALOGUES.values()
             ]
         ):
-
             ssodnet_id = "_".join(file_.split("_")[:-1])
             catalogue = os.path.splitext(file_)[0].split("_")[-1]
-
-            cached_catalogues.append((ssodnet_id, catalogue))
-            continue
-
-        # Likely an ssoCard, check the version
-        ssodnet_id = os.path.splitext(file_)[0]
-
+        else:
+            ssodnet_id = os.path.splitext(file_)[0]
+            catalogue = ""
+        # Is it valid?
         with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
+
             card = json.load(ssocard)
 
-            try:
+            if not card:
+                # Empty card or catalogue, remove it
+                os.remove(os.path.join(rocks.PATH_CACHE, file_))
+                continue
+
+            if not catalogue:
                 if card[ssodnet_id] is None:
                     # Faulty card, remove it
                     os.remove(os.path.join(rocks.PATH_CACHE, file_))
-                else:
-                    cached_cards.append(
-                        (
-                            ssodnet_id,
-                            card[ssodnet_id]["ssocard"]["version"],
-                        )
-                    )
-            # This skips files which do not belong to rocks
-            except KeyError:
-                continue
+                    continue
+
+        # Append to inventory
+        if catalogue:
+            cached_catalogues.append((ssodnet_id, catalogue))
+        else:
+            cached_cards.append(ssodnet_id)
 
     # Get cached metadata files
     cached_meta = [
@@ -308,7 +308,7 @@ def clear_cache():
     cards, catalogues, _ = cache_inventory()
 
     for card in cards:
-        PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{card[0]}.json")
+        PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{card}.json")
         os.remove(PATH_CARD)
 
     for catalogue in catalogues:
@@ -318,32 +318,6 @@ def clear_cache():
     for file_ in rocks.PATH_META.values():
         if os.path.isfile(file_):
             os.remove(file_)
-
-
-def get_current_version():
-    """Get the current version of ssoCards.
-
-    Returns
-    -------
-    str
-        The current version of ssoCards.
-
-    Notes
-    -----
-    There will soon be a stub card online to check this. For now, we just check
-    the version of Ceres.
-    """
-
-    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/Ceres"
-    response = requests.get(URL)
-
-    if response.ok:
-        card = response.json()
-    else:
-        warnings.warn("Retrieving the current ssoCard version failed.")
-        sys.exit()
-
-    return card["Ceres"]["ssocard"]["version"]
 
 
 def update_datacloud_catalogues(cached_catalogues):
@@ -374,9 +348,7 @@ def confirm_identity(ids):
     elif len(ids) == 1:
         _, _, current_ids = rocks.identify(ids, return_id=True, local=False)
         current_ids = [current_ids]
-
     else:
-
         _, _, current_ids = zip(
             *rocks.identify(ids, return_id=True, local=False, progress=True)
         )

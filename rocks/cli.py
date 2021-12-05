@@ -144,7 +144,6 @@ def status():
     # ------
     # Echo update recommendations
     latest_rocks = rocks.utils.retrieve_rocks_version()
-    latest_card = rocks.utils.get_current_version()
 
     if latest_rocks and latest_rocks != rocks.__version__:
         rich.print(
@@ -157,14 +156,6 @@ def status():
 
     # Update or clear
     if cached_cards:
-        oldest_card = min([version[1] for version in cached_cards])
-
-        if latest_card != oldest_card:
-            rich.print(
-                f"[red]The ssoCard version ({oldest_card}) is behind the latest version "
-                f"({latest_card}). The ssoCard structure has changed.[/red]"
-            )
-            rich.print(" You should clear the cache directory.\n")
 
         decision = prompt.Prompt.ask(
             "Update or clear the cached ssoCards and datacloud catalogues?\n"
@@ -187,7 +178,7 @@ def status():
                 rocks.utils.retrieve_json_from_ssodnet(meta)
 
             # Update the cached data
-            ids = [ssodnet_id[0] for ssodnet_id in cached_cards]
+            ids = [ssodnet_id for ssodnet_id in cached_cards]
 
             # Ensure that the IDs are current
             rich.print("\n(1/3) Verifying the ID of the cached ssoCards..")
@@ -253,7 +244,7 @@ def echo(plot):
 
     # Pretty-print the paramter
     if not datacloud:
-        rich.print(rocks.utils.rgetattr(rock, parameter))
+        print(rocks.utils.rgetattr(rock, parameter))
     else:
         rocks.datacloud.pretty_print(
             rock, rocks.utils.rgetattr(rock, parameter), parameter
