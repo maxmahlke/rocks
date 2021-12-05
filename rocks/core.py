@@ -416,7 +416,7 @@ class Rock(pydantic.BaseModel):
         """Identify a minor body  and retrieve its properties from SsODNet.
 
         Parameters
-        ==========
+        ----------
         id_ : str, int, float
             Identifying asteroid name, designation, or number
         ssocard : dict
@@ -430,17 +430,17 @@ class Rock(pydantic.BaseModel):
             Default is False.
 
         Returns
-        =======
+        -------
         rocks.core.Rock
             An asteroid class instance, with its properties as attributes.
 
         Notes
-        =====
+        -----
         If the asteroid could not be identified or the data contains invalid
         types, the number is None and no further attributes but the name are set.
 
         Example
-        =======
+        -------
         >>> from rocks import Rock
         >>> ceres = Rock('ceres')
         >>> ceres.taxonomy.class_
