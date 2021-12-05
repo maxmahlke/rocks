@@ -14,52 +14,6 @@ import rocks
 
 
 # ------
-# Validators
-def ensure_list(value):
-    """Ensure that parameters are always a list.
-    Some parameters are a dict if it's a single reference and a list otherwise.
-
-    Further replaces all None values by empty dictionaries.
-    """
-    if isinstance(value, dict):
-        value = [value]
-
-    for i, v in enumerate(value):
-        if v is None:
-            value[i] = {}
-    return value
-
-
-def convert_spin_to_list(spins: Dict) -> List:
-    """Convert the Spin dictionary from the ssoCard into a list.
-    Add the spin index as parameter to the Spin entries.
-
-    Parameters
-    ----------
-    spin : dict
-        The dictionary located at parameters.physical.spin in the ssoCard.
-
-    Returns
-    -------
-    list
-        A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
-        after removing the index layer.
-    """
-
-    spin_dicts = []
-
-    for spin_id, spin_dict in spins.items():
-
-        # Add spin id
-        spin_dict["id_"] = spin_id
-
-        # And done
-        spin_dicts.append(spin_dict)
-
-    return spin_dicts
-
-
-# ------
 # ssoCard as pydantic model
 
 # The lowest level in the ssoCard tree is the Value
@@ -108,6 +62,64 @@ class Bibref(Parameter):
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
+
+
+# And a special class for the Spin and Taxonomy lists
+class ParameterList(list):
+    """Subclass of <list> with a custom __str__ for the Spin and Taxonomy parameters."""
+
+    def __init__(self, list_):
+        """Convert the list items to Spin or Taxonomy instances."""
+
+        if "class" in list_[0]:
+            list_ = [Taxonomy(**entry) for entry in list_]
+        else:
+            list_ = [Spin(**entry) for entry in list_]
+
+        return super().__init__(list_)
+
+    def __str__(self) -> str:
+
+        if hasattr(self[0], "class_"):
+            if len(self) == 1:
+                return self[0].class_
+            else:
+                classifications = []
+
+                for entry in self:
+                    shortbib = ", ".join(bib.shortbib for bib in entry.bibref)
+                    classifications.append(f"{entry.class_:<4}{shortbib}")
+
+                return "\n".join(classifications)
+
+        return super().__str__()
+
+
+# ------
+# Validators
+def convert_spin_to_list(spins: Dict) -> List:
+    """Convert the Spin dictionary from the ssoCard into a list.
+    Add the spin index as parameter to the Spin entries.
+
+    Parameters
+    ----------
+    spin : dict
+        The dictionary located at parameters.physical.spin in the ssoCard.
+
+    Returns
+    -------
+    list
+        A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
+        after removing the index layer.
+    """
+
+    spin_dicts = []
+
+    for spin_id, spin_dict in spins.items():
+        spin_dict["id_"] = spin_id
+        spin_dicts.append(spin_dict)
+
+    return spin_dicts
 
 
 # ------
@@ -195,10 +207,6 @@ class Albedo(Value):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
-
 
 class Color(Value):
     color: Value = Value(**{})
@@ -226,10 +234,6 @@ class Density(Value):
     bibref: List[Bibref] = []
 
     path_unit: str = "unit.physical.density.value"
-
-    _ensure_list: classmethod = pydantic.validator(
-        "bibref", "method", allow_reuse=True, pre=True
-    )(ensure_list)
 
 
 class Diameter(Value):
@@ -267,26 +271,26 @@ class PhaseFunction(Parameter):
 
 
 class Spin(Parameter):
-    t0: float = np.nan
-    Wp: float = np.nan
+    t0: Optional[float] = np.nan
+    Wp: Optional[float] = np.nan
     id_: Optional[int] = None
-    lat: Value = Value(**{})
-    RA0: float = np.nan
-    DEC0: float = np.nan
-    long_: Value = pydantic.Field(Value(**{}), alias="long")
-    period: Value = Value(**{})
-    method: List[Method] = [Method(**{})]
-    bibref: List[Bibref] = [Bibref(**{})]
+    lat: Optional[Value] = Value(**{})
+    RA0: Optional[float] = np.nan
+    DEC0: Optional[float] = np.nan
+    long_: Optional[Value] = pydantic.Field(Value(**{}), alias="long")
+    period: Optional[Value] = Value(**{})
+    method: Optional[List[Method]] = [Method(**{})]
+    bibref: Optional[List[Bibref]] = [Bibref(**{})]
 
     path_unit: str = "unit.physical.spin.value"
 
 
 class Taxonomy(Parameter):
-    class_: str = pydantic.Field("", alias="class")
-    scheme: str = ""
-    bibref: List[Bibref] = [Bibref(**{})]
-    method: List[Method] = [Method(**{})]
-    waverange: str = ""
+    class_: Optional[str] = pydantic.Field("", alias="class")
+    scheme: Optional[str] = ""
+    bibref: Optional[List[Bibref]] = [Bibref(**{})]
+    method: Optional[List[Method]] = [Method(**{})]
+    waverange: Optional[str] = ""
 
     def __str__(self):
         if not self.class_:
@@ -308,19 +312,22 @@ class AbsoluteMagnitude(Value):
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: List[Spin] = [Spin(**{})]
+    spin: ParameterList = ParameterList([{}])
     colors: Colors = Colors(**{})
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
-    taxonomy: List[Taxonomy] = [Taxonomy(**{})]
+    taxonomy: ParameterList = ParameterList([{"class": ""}])
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _convert_spin_to_list: classmethod = pydantic.validator(
-        "spin", allow_reuse=True, pre=True
-    )(convert_spin_to_list)
+    _convert_spin_to_list: classmethod = pydantic.validator("spin", pre=True)(
+        convert_spin_to_list
+    )
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "spin", "taxonomy", allow_reuse=True, pre=True
+    )(lambda list_: ParameterList(list_))
 
 
 # ------
