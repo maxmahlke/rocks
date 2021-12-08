@@ -1,6 +1,5 @@
 """For space rocks."""
 import os
-import sys
 import rich
 
 # rocks modules
@@ -22,7 +21,7 @@ PATH_META = {
 
 # ------
 # Welcome to rocks
-__version__ = "1.4.7"
+__version__ = "1.4.8"
 
 GREETING = fr"""
                | |
