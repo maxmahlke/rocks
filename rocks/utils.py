@@ -144,13 +144,14 @@ def weighted_average(catalogue, parameter):
         The standard error of the weighted average.
     """
 
+    values = catalogue[parameter]
+
     if parameter in ["albedo", "diameter"]:
         preferred = catalogue[f"preferred_{parameter}"]
+        errors = catalogue[f"err_{parameter}_up"]
     else:
         preferred = catalogue["preferred"]
-
-    values = catalogue[parameter]
-    errors = catalogue[f"err_{parameter}"]
+        errors = catalogue[f"err_{parameter}"]
 
     observable = np.array(values)[preferred]
     error = np.array(errors)[preferred]
