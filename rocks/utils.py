@@ -432,3 +432,21 @@ def find_candidates(id_):
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
     return candidates
+
+
+def list_candidate_ssos(id_):
+    # The query failed. Propose some names if the id_ looks like a name,
+    # designations give too many false positives
+    if not re.match(r"^[A-Za-z ]*$", id_):
+        return
+
+    candidates = rocks.utils.find_candidates(id_)
+
+    if candidates:
+        rich.print(
+            f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
+            f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
+        )
+
+        for name, number in candidates:
+            rich.print(f"{f'({number})':>8} {name}")

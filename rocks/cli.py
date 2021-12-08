@@ -236,6 +236,7 @@ def echo():
 
     # Identifier could not be resolved
     if not rock.id_:
+        rocks.utils.list_candidate_ssos(id_)
         sys.exit()
 
     # Pretty-print the paramter
