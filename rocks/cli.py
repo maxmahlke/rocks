@@ -38,18 +38,8 @@ class AliasedGroup(click.Group):
             return rv
 
         # ------
-        # Unknown subcommand -> echo asteroid parameter and optionally plot
-        for arg in ["-p", "--plot"]:
-
-            if arg in sys.argv:
-                sys.argv.remove(arg)
-
-                plot = True
-                break
-        else:
-            plot = False
-
-        return echo(plot)
+        # Unknown subcommand -> echo asteroid parameter
+        return echo()
 
 
 @click.group(cls=AliasedGroup)
@@ -208,15 +198,21 @@ def status():
         rocks.utils._build_index()
 
 
-def echo(plot):
-    """Echos asteroid parameter to command line. Optionally opens plot.
+def echo():
+    """Echos asteroid parameter to command line. Optionally opens plot."""
 
-    Parameters
-    ==========
-    plot : bool
-        If the paramter values should be plotted.
-    """
+    # Should we plot?
+    for arg in ["-p", "--plot"]:
 
+        if arg in sys.argv:
+            sys.argv.remove(arg)
+
+            plot = True
+            break
+    else:
+        plot = False
+
+    # Are there enough arguments to continue?
     if len(sys.argv) == 2:
         print(f"\nUnknown command '{sys.argv[-1]}'.\n")
         ctx = click.get_current_context()
