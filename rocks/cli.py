@@ -223,15 +223,22 @@ def echo():
     _, parameter, *id_ = sys.argv
     id_ = " ".join(id_)
 
-    # Check if the parameter might be missing an underscore
-    if keyword.iskeyword(parameter.split(".")[-1]):
-        parameter = f"{parameter}_"
+    # Allow for comma-separated parameter chaining
+    parameter = parameter.split(",")
 
-    if parameter.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
-        datacloud = parameter.split(".")[0]
-    else:
-        datacloud = []
+    # Check if any of the parameters might be missing an underscore
+    parameter = [
+        f"{p}_" if keyword.iskeyword(p.split(".")[-1]) else p for p in parameter
+    ]
 
+    # Check what datacloud properties we need
+    datacloud = [
+        p.split(".")[0]
+        for p in parameter
+        if p.split(".")[0] in rocks.datacloud.CATALOGUES.keys()
+    ]
+
+    # And let's go
     rock = rocks.Rock(id_, datacloud=datacloud)
 
     # Identifier could not be resolved
@@ -240,21 +247,21 @@ def echo():
         sys.exit()
 
     # Pretty-print the paramter
-    if not datacloud:
-        print(rocks.utils.rgetattr(rock, parameter))
-    else:
-        rocks.datacloud.pretty_print(
-            rock, rocks.utils.rgetattr(rock, parameter), parameter
-        )
+    for p in parameter:
+        if p in datacloud:
+            rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, p), p)
+        else:
+            print(rocks.utils.rgetattr(rock, p))
 
-    if plot:
-        if not datacloud:
-            print(
-                f"Only datacloud collections can be plotted. "
-                f"Try the plural of {parameter}."
-            )
-            sys.exit()
+        if plot:
+            if p not in datacloud:
+                print(
+                    f"Only datacloud collections can be plotted. "
+                    f"Try the plural of {parameter}."
+                )
+                sys.exit()
 
-        rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
+            rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
 
+    # Avoid error message from click
     sys.exit()

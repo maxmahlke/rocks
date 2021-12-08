@@ -1,4 +1,5 @@
 # 1.4.9
+- Multiple parameters can now be queried via the CLI by chaining them with commas: $ rocks ap,ep pallas
 - Added alias for sine of proper incliniation: sinip
 
 # 1.4.8 - 2021-12-08
