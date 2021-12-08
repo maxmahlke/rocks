@@ -1,3 +1,6 @@
+# 1.4.8 - 2021-12-08
+- Reduced startup time by 50% by reducing the size of the asteroid name-number index
+
 # 1.4.7 - 2021-12-05
 - Added the Tisserand parameter to the ssoCard
 - Rock.parameters.physical.spin is now a list of Spin instances, rather than a Spin instance with lists.

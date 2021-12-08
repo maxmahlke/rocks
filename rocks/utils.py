@@ -5,6 +5,7 @@ from functools import reduce
 import json
 import os
 import pickle
+import pickletools
 import re
 import warnings
 
@@ -54,7 +55,7 @@ def _build_index():
         .to_dict(orient="index")
     )
 
-    INDEX = {"name": {}, "number": {}, "id": {}, "reduced": {}}
+    INDEX = {"number": {}, "reduced": {}}
 
     for id_, values in progress.track(
         index_ssodnet.items(),
@@ -69,15 +70,15 @@ def _build_index():
         if not np.isnan(number):
             number = int(number)
 
-        INDEX["name"][name] = (number, id_)
-        INDEX["id"][id_] = (name, number)
         INDEX["reduced"][reduced] = (name, number, id_)
 
         if not np.isnan(number):
             INDEX["number"][number] = (name, id_)
 
     with open(rocks.PATH_INDEX, "wb") as file_:
-        pickle.dump(INDEX, file_, protocol=4)
+        index_pickled = pickle.dumps(INDEX, protocol=4)
+        index_pickled_opt = pickletools.optimize(index_pickled)
+        file_.write(index_pickled_opt)
 
 
 def load_index():
