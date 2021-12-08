@@ -1,3 +1,6 @@
+# 1.4.9
+- Added alias for sine of proper incliniation: sinip
+
 # 1.4.8 - 2021-12-08
 - Reduced startup time by 50% by reducing the size of the asteroid name-number index
 
