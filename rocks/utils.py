@@ -81,10 +81,14 @@ def _build_index():
         file_.write(index_pickled_opt)
 
 
-def load_index():
+def load_index() -> dict:
     """Load local index of asteroid numbers, names, SsODNet IDs."""
-    with open(rocks.PATH_INDEX, "rb") as ind:
-        return pickle.load(ind)
+
+    if rocks.INDEX is None:
+        with open(rocks.PATH_INDEX, "rb") as ind:
+            rocks.INDEX = pickle.load(ind)
+
+    return rocks.INDEX
 
 
 # ------
