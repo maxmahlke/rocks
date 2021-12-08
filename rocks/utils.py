@@ -6,7 +6,6 @@ import json
 import os
 import pickle
 import re
-import sys
 import warnings
 
 import numpy as np
