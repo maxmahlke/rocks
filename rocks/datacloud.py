@@ -111,7 +111,7 @@ CATALOGUES = {
     "masses": {
         "attr_name": "masses",
         "ssodnet_name": "masses",
-        "print_columns": ["mass", "err_mass", "method", "shortbib"],
+        "print_columns": ["mass", "err_mass_max", "err_mass_min", "method", "shortbib"],
     },
     "mpcatobs": {
         "attr_name": "mpcatobs",
@@ -172,7 +172,7 @@ def pretty_print(rock, catalogue, parameter):
     """Print datacloud catalogue using a nice table format.
 
     Parameters
-    ==========
+    ----------
     rock : rocks.Rock
         The Rock instance the catalogue is associated to.
     catalogue : pd.DataFrame
@@ -463,7 +463,8 @@ class Masses(Catalogue):
 
     year: List[Optional[int]] = [None]
     mass: List[float] = [np.nan]
-    err_mass: List[float] = [np.nan]
+    err_mass_max: List[float] = [np.nan]
+    err_mass_min: List[float] = [np.nan]
 
     preferred: List[bool] = [False]
 

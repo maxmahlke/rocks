@@ -102,17 +102,17 @@ def rgetattr(obj, attr):
     return reduce(_getattr, [obj] + attr.split("."))
 
 
-def get_unit(path_unit):
+def get_unit(path_unit: str) -> str:
     """Get unit from units JSON file.
 
     Parameters
-    ==========
+    ----------
     path_unit : str
         Path to the parameter in the JSON tree, starting at unit and
         separating the levels with periods.
 
     Returns
-    =======
+    -------
     str
         The unit of the requested parameter.
     """
@@ -134,14 +134,14 @@ def weighted_average(catalogue, parameter):
     """Computes weighted average of observable.
 
     Parameters
-    ==========
+    ----------
     observable : np.ndarray
         Float values of observable
     error : np.ndarray
         Corresponding errors of observable.
 
     Returns
-    =======
+    -------
     float
         The weighted average.
 
@@ -340,7 +340,7 @@ def confirm_identity(ids):
     ssoCard and remove the former one if the ID has changed.
 
     Parameters
-    ==========
+    ----------
     ids : list
         The list of SsODNet IDs to confirm.
     """
@@ -420,14 +420,14 @@ def find_candidates(id_):
 
     # Use Levenshtein distance to identify potential matches
     candidates = []
-    max_distance = 1  # found by trial and error
-    id_ = id_.capitalize()  # remove one possible dof
+    max_distance = 2  # found by trial and error
+    id_ = reduce_id(id_)
 
-    for name in index["name"].keys():
+    for name in index["reduced"].keys():
         distance = lev.distance(id_, name)
 
         if distance <= max_distance:
-            candidates.append((name, index["name"][name][0]))
+            candidates.append(index["reduced"][name][:-1])
 
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])

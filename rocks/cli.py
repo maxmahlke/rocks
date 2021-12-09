@@ -3,7 +3,6 @@
 import json
 import keyword
 import os
-import re
 import sys
 import time
 import webbrowser
@@ -51,40 +50,26 @@ def cli_rocks():
 
 @cli_rocks.command()
 def docs():
-    """Open rocks documentation in browser."""
+    """Open the rocks documentation in browser."""
     webbrowser.open("https://rocks.readthedocs.io/en/latest/", new=2)
 
 
 @cli_rocks.command()
 @click.argument("id_")
 def id(id_):
-    """Get asteroid name and number from string input."""
+    """Resolve the asteroid name and number from string input."""
     name, number = rocks.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
     else:
-        # The query failed. Propose some names if the id_ looks like a name,
-        # designations give too many false positives
-        if not re.match(r"^[A-Za-z ]*$", id_):
-            sys.exit()
-
-        candidates = rocks.utils.find_candidates(id_)
-
-        if candidates:
-            rich.print(
-                f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
-                f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
-            )
-
-            for name, number in candidates:
-                rich.print(f"{f'({number})':>8} {name}")
+        rocks.utils.list_candidate_ssos(id_)
 
 
 @cli_rocks.command()
 @click.argument("id_")
 def info(id_):
-    """Print ssoCard of minor body."""
+    """Print the ssoCard of an asteroid."""
     _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
 
     if not isinstance(id_, str):
@@ -96,7 +81,7 @@ def info(id_):
 
 @cli_rocks.command()
 def parameters():
-    """Print the ssoCard and its description."""
+    """Print the ssoCard structure and its description."""
 
     if not os.path.isfile(rocks.PATH_META["description"]):
         rocks.utils.retrieve_json_from_ssodnet("description")

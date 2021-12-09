@@ -7,8 +7,8 @@
 
 # 1.4.7 - 2021-12-05
 - Added the Tisserand parameter to the ssoCard
-- Rock.parameters.physical.spin is now a list of Spin instances, rather than a Spin instance with lists.
-  This is consistent with the Rock.parameters.physical.taxonomy parameter.
+- Rock.parameters.physical.spin is now a list of Spin instances, rather than a
+  Spin instance with lists. This is consistent with the Rock.parameters.physical.taxonomy parameter.
 - If multiple taxonomic classifications exist, rocks will now print the class and the shortbib
 - Datacloud properties are now sorted by year of publication when echoed on the command line
 
