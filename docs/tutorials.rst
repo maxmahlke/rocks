@@ -29,7 +29,9 @@ Data Exploration
 
 - :ref:`What is the average weighted albedo of Hebe? <weighted_average_scripted>`
 
-- :ref:`What parameters can I open in a plot?`
+- :ref:`Which parameters can I open in a plot?`
+
+- :ref:`Which parameters can be abbreviated? <Parameter Aliases>`
 
 - :ref:`How do I access the entries in a catalogue one by one? <iterate_catalogues>`
 
@@ -135,7 +137,7 @@ and in a ``python`` script as :ref:`DataCloudDataFrame` instance
 
 .. code-block:: python
 
-    
+
     .. #!/usr/bin/env python
 
     .. """Retrieve taxonomies of first 1000 numbered minor planets with rocks.
