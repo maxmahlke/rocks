@@ -24,7 +24,7 @@ INDEX = None  # holds the asteroid name-number index at runtime
 
 # ------
 # Welcome to rocks
-__version__ = "1.4.8"
+__version__ = "1.4.9"
 
 GREETING = fr"""
                 _
