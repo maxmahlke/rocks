@@ -80,9 +80,50 @@ def _build_index():
         index_pickled_opt = pickletools.optimize(index_pickled)
         file_.write(index_pickled_opt)
 
+    # Create the short index
+    INDEX_SHORT = copy.deepcopy(INDEX)
 
-def load_index() -> dict:
-    """Load local index of asteroid numbers, names, SsODNet IDs."""
+    for key in INDEX["number"]:
+        if key > 1e4:
+            del INDEX_SHORT["number"][key]
+
+    for key in progress.track(
+        INDEX["reduced"],
+        total=len(INDEX["reduced"]),
+        description="Building Short Index",
+    ):
+        if np.isnan(INDEX["reduced"][key][1]):
+            del INDEX_SHORT["reduced"][key]
+
+    with open(rocks.PATH_INDEX_SHORT, "wb") as file_:
+        index_pickled = pickle.dumps(INDEX_SHORT, protocol=4)
+        index_pickled_opt = pickletools.optimize(index_pickled)
+        file_.write(index_pickled_opt)
+
+
+def load_index(short: bool = False) -> dict:
+    """Load local index of asteroid numbers, names, SsODNet IDs.
+
+    Parameters
+    ----------
+    short : bool
+        If true, return the short index, containing asteroid with numbers up to
+        1e4. Default is False.
+
+    Returns
+    -------
+    dict
+        The asteroid name-number index, a dictionary containing two
+        dictionaries.
+
+    Notes
+    -----
+    If the index has already been loaded at runtime, it is not loaded again.
+    """
+
+    if short:
+        with open(rocks.PATH_INDEX_SHORT, "rb") as ind:
+            return pickle.load(ind)
 
     if rocks.INDEX is None:
         with open(rocks.PATH_INDEX, "rb") as ind:
