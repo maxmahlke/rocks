@@ -14,6 +14,7 @@ from .resolve import identify
 # Path definitions required throughout the code
 PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
 PATH_INDEX = os.path.join(PATH_CACHE, "index.pkl")
+PATH_INDEX_SHORT = os.path.join(PATH_CACHE, "index_short.pkl")
 PATH_META = {
     "description": os.path.join(PATH_CACHE, "ssoCard_description.json"),
     "units": os.path.join(PATH_CACHE, "ssoCard_units.json"),
@@ -46,7 +47,7 @@ Some metadata is required to be present in the cache directory.
 # Check for existence of index file and cache directory
 os.makedirs(PATH_CACHE, exist_ok=True)
 
-if not os.path.isfile(PATH_INDEX):
+if not os.path.isfile(PATH_INDEX_SHORT) or not os.path.isfile(PATH_INDEX):
     rich.print(GREETING)
     utils._build_index()
     rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")

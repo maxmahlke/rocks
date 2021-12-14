@@ -1,6 +1,10 @@
-# 1.4.9
+# 1.4.9 - 2021-12-14
+- Added the short index containing only asteroids with number up to
+  10,000. Command line queries will first check this index, which saves about
+  0.5s in case of a successful resolution and carries a negligible time penalty
+  on an unsuccessful one.
 - Multiple parameters can now be queried via the CLI by chaining them with commas: $ rocks ap,ep pallas
-- Added alias for sine of proper incliniation: sinip
+- Added alias for sine of proper inclination: sinip
 
 # 1.4.8 - 2021-12-08
 - Reduced startup time by 50% by reducing the size of the asteroid name-number index
@@ -105,7 +109,7 @@
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue
 - Added weighted average output to some datacloud catalogue queries from the command line
-- Added weigted_average method to Datacloud catalogue class
+- Added weigthed_average method to Datacloud catalogue class
 - Print warning when no ssoCard could be retrieved for an asteroid.
 - Added 'no_cache' keyword to 'rocks.ssodnet.get_ssocard'. If True, it forces the remote query of the ssoCard
 - Improved 'rocks status' command to echo the number of cached ssoCards and offer to update the out-of-date ones
