@@ -70,6 +70,18 @@ def identify(id_, return_id=False, local=True, progress=False):
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
 
     # ------
+    # For a single name, try resolving in the short index first
+    if len(id_) == 1:
+        INDEX_SHORT = rocks.utils.load_index(short=True)
+        success, (name, number, ssodnet_id) = _local_lookup(id_[0], INDEX_SHORT)
+
+        if success:
+            if not return_id:
+                return (name, number)
+            else:
+                return (name, number, ssodnet_id)
+
+    # ------
     # Run asynchronous event loop for name resolution
     with Progress(disable=not progress) as progress_bar:
 
