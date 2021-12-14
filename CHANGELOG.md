@@ -35,7 +35,7 @@
 # 1.4.3 - 2021-11-04
 - Added command alias: update -> status
 - The phase-function parameter is now correctly called phase_function
-- The phase-function datacloud catalouge parameter is now correctly called phase_functions
+- The phase-function datacloud catalogue parameter is now correctly called phase_functions
 - Aligned implementation of Spin parameter with ssoCard changes
 
 # 1.4.2 - 2021-11-03

@@ -115,6 +115,7 @@ def identify(id_, return_id=False, local=True, progress=False):
 
 async def _identify(id_, local, progress_bar, task):
     """Establish the asynchronous HTTP session and launch the name resolution."""
+
     INDEX = rocks.utils.load_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:

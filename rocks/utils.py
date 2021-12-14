@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
 
+import copy
 from functools import reduce
 import json
 import os
