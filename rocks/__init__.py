@@ -26,6 +26,7 @@ INDEX = None  # holds the asteroid name-number index at runtime
 __version__ = "1.4.8"
 
 GREETING = fr"""
+                _
                | |
  _ __ ___   ___| | _____
 | '__/ _ \ / __| |/ / __|
