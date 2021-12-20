@@ -558,7 +558,11 @@ def find_candidates(id_):
     """
 
     # Get list of named asteroids
-    index = load_index()
+    index = {}
+
+    for char in string.ascii_lowercase:
+        idx = get_index_file(char)
+        index = {**index, **idx}
 
     # Use Levenshtein distance to identify potential matches
     candidates = []
