@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 """Implement the Datacloud catalogue pydantic models."""
+
 from typing import List, Optional
 
 import numpy as np
 import pandas as pd
 import pydantic
 import rich
-from rich.table import Table
+from rich import table
 
 import rocks
 
@@ -194,7 +195,7 @@ def pretty_print(rock, catalogue, parameter):
     else:
         caption = "Green: preferred entry" if hasattr(catalogue, "preferred") else ""
 
-    table = Table(
+    table = table.Table(
         header_style="bold blue",
         box=rich.box.SQUARE,
         footer_style="dim",

@@ -569,11 +569,11 @@ def find_candidates(id_):
     max_distance = 2  # found by trial and error
     id_ = reduce_id(id_)
 
-    for name in index["reduced"].keys():
+    for name in index.keys():
         distance = lev.distance(id_, name)
 
         if distance <= max_distance:
-            candidates.append(index["reduced"][name][:-1])
+            candidates.append(index[name][:-1])
 
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
