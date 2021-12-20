@@ -19,7 +19,8 @@ PATH_META = {
     "units": os.path.join(PATH_CACHE, "ssoCard_units.json"),
 }
 
-INDEX = None  # holds the asteroid name-number index at runtime
+# Dict to hold the asteroid name-number indices at runtime
+INDEX = {}
 
 # ------
 # Welcome to rocks

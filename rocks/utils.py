@@ -58,6 +58,7 @@ def _build_index():
     #     .to_dict(orient="index")
     # )
     index_ssodnet.drop(columns=["Type", "Aliases", "Reduced"])
+    index_ssodnet["Number"] = index_ssodnet["Number"].astype("Int64")
 
     os.makedirs(rocks.PATH_INDEX, exist_ok=True)
 
@@ -68,7 +69,7 @@ def _build_index():
     # Numbers
 
     # Build chunks of 10k
-    step = 1e4
+    step = 1e3
 
     # Find next 10,000 to largest number
     nmax = np.ceil(index_ssodnet.Number.max() / step) * step
@@ -96,7 +97,7 @@ def _build_index():
     # Reduced
 
     # Names
-    names = set(red for red in index_ssodnet.Reduced if re.match(r"^[a-z\'-\`]*$", red))
+    names = set(red for red in index_ssodnet.Reduced if re.match(r"^[a-z\'-]*$", red))
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
 
     # Create name index chunks
@@ -137,7 +138,7 @@ def _build_index():
     split_by = [
         "18",
         "19",
-        *[f"20{year:02}" for year in range(1, max_year)],
+        *[f"20{year:02}" for year in range(0, max_year)],
     ]
 
     for year in split_by:
@@ -187,28 +188,6 @@ def _build_index():
         index_pickled_opt = pickletools.optimize(index_pickled)
         file_.write(index_pickled_opt)
 
-    # Designations
-
-    # INDEX = {"number": {}, "reduced": {}}
-
-    # for id_, values in progress.track(
-    #     index_ssodnet.items(),
-    #     total=len(index_ssodnet),
-    #     description="Building Index",
-    # ):
-
-    #     name = values["Name"]
-    #     number = values["Number"]
-    #     reduced = reduce_id(id_)
-
-    #     if not np.isnan(number):
-    #         number = int(number)
-
-    #     INDEX["reduced"][reduced] = (name, number, id_)
-
-    #     if not np.isnan(number):
-    #         INDEX["number"][number] = (name, id_)
-
 
 def load_index() -> dict:
     """Load local index of asteroid numbers, names, SsODNet IDs.
@@ -228,13 +207,13 @@ def load_index() -> dict:
     """
 
     if rocks.INDEX is None:
-        with open(rocks.PATH_INDEX, "rb") as ind:
+        with open(os.path.join(rocks.PATH_INDEX, "index.pkl"), "rb") as ind:
             rocks.INDEX = pickle.load(ind)
 
     return rocks.INDEX
 
 
-def get_index_file(id_: typing.Union[int, str]) -> str:
+def get_index_file(id_: typing.Union[int, str]) -> dict:
     """Get absolute path to the index chunk where id_ should be located it.
 
     Parameters
@@ -250,13 +229,17 @@ def get_index_file(id_: typing.Union[int, str]) -> str:
 
     # Is it numeric?
     if isinstance(id_, int):
-        for lower_limit in np.arange(1, 1e6, 1e4, dtype=int):
-            if lower_limit <= id_ < lower_limit + 1e4:
-                return os.path.join(rocks.PATH_INDEX, f"number_{lower_limit}.pkl")
+        index_range = np.arange(1, int(1e6), int(1e3))
+        try:
+            index_number = index_range[index_range <= id_][-1]
+        # The passed id_ is larger than 1e6
+        except IndexError:
+            index_number = 1
+        path = os.path.join(rocks.PATH_INDEX, f"number_{index_number}.pkl")
 
     # Is it a name?
-    elif re.match(r"^[a-z\'-\`]*$", id_) or id_ == r"g!kun||'homdima":
-        return os.path.join(rocks.PATH_INDEX, f"names_{id_[0]}.pkl")
+    elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
+        path = os.path.join(rocks.PATH_INDEX, f"names_{id_[0]}.pkl")
 
     # Is it a designation?
     elif re.match(
@@ -268,10 +251,16 @@ def get_index_file(id_: typing.Union[int, str]) -> str:
             year = f"20{id_[2:4]}"
         else:
             year = id_[:2]
-        return os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl")
+        path = os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl")
 
     # Should be in this one then
-    return os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl")
+    else:
+        path = os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl")
+
+    if not path in rocks.INDEX:
+        with open(path, "rb") as ind:
+            rocks.INDEX[path] = pickle.load(ind)
+    return rocks.INDEX[path]
 
 
 # ------

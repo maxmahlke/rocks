@@ -69,17 +69,17 @@ def identify(id_, return_id=False, local=True, progress=False):
         warnings.warn("Received empty list of identifiers.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
 
-    # # ------
-    # # For a single name, try resolving in the short index first
-    # if len(id_) == 1:
-    #     INDEX_SHORT = rocks.utils.load_index(short=True)
-    #     success, (name, number, ssodnet_id) = _local_lookup(id_[0], INDEX_SHORT)
+    # ------
+    # For a single name, try local lookup right away, async process has overhead
+    if len(id_) == 1:
 
-    #     if success:
-    #         if not return_id:
-    #             return (name, number)
-    #         else:
-    #             return (name, number, ssodnet_id)
+        success, (name, number, ssodnet_id) = _local_lookup(id_[0])
+
+        if success:
+            if not return_id:
+                return (name, number)
+            else:
+                return (name, number, ssodnet_id)
 
     # ------
     # Run asynchronous event loop for name resolution
@@ -116,14 +116,10 @@ def identify(id_, return_id=False, local=True, progress=False):
 async def _identify(id_, local, progress_bar, task):
     """Establish the asynchronous HTTP session and launch the name resolution."""
 
-    INDEX = rocks.utils.load_index()
-
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
 
         tasks = [
-            asyncio.ensure_future(
-                _resolve(i, session, local, progress_bar, task, INDEX)
-            )
+            asyncio.ensure_future(_resolve(i, session, local, progress_bar, task))
             for i in id_
         ]
 
@@ -132,7 +128,7 @@ async def _identify(id_, local, progress_bar, task):
     return results
 
 
-async def _resolve(id_, session, local, progress_bar, task, INDEX):
+async def _resolve(id_, session, local, progress_bar, task):
     """Resolve the identifier locally or remotely."""
 
     if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
@@ -141,14 +137,14 @@ async def _resolve(id_, session, local, progress_bar, task, INDEX):
         return (None, np.nan, None)
 
     if local:
-        success, (name, number, ssodnet_id) = _local_lookup(id_, INDEX)
+        success, (name, number, ssodnet_id) = _local_lookup(id_)
 
         if success:
             progress_bar.update(task, advance=1)
             return (name, number, ssodnet_id)
 
     # Local resolution failed, do remote query
-    id_ = _standardize_id(id_)
+    id_ = _standardize_id_for_quaero(id_)
     response = await _query_quaero(id_, session)
 
     if response is None:  # query failed with 502
@@ -162,30 +158,60 @@ async def _resolve(id_, session, local, progress_bar, task, INDEX):
     return _parse_quaero_response(response["data"], str(id_))
 
 
-def _local_lookup(id_, INDEX):
+def _local_lookup(id_):
     """Perform local index resolution."""
 
-    # Check for int, float, numeric str
-    if isinstance(id_, (int, float)) or (isinstance(id_, str) and id_.isnumeric()):
-        id_ = int(id_)
+    # Reduce ID and retrieve fitting index
+    id_ = _reduce_id_for_local(id_)
+    INDEX = rocks.utils.get_index_file(id_)
 
-        if id_ in INDEX["number"]:
-            name, ssodnet_id = INDEX["number"][id_]
-            return True, (name, id_, ssodnet_id)
+    if id_ in INDEX:
+        # Is the number included?
+        # Not included for number queries and for unnumbered asteroids
+        if len(INDEX[id_]) == 2:
+            name, ssodnet_id = INDEX[id_]
+
+            # Use ID as number if it is one
+            if isinstance(id_, int):
+                number = id_
+            else:
+                number = np.nan
         else:
-            return False, (None, np.nan, None)
-
-    # It's a name or SsODNet ID - reduce the identifier
-    reduced = rocks.utils.reduce_id(id_)
-
-    if reduced in INDEX["reduced"]:
-        name, number, id_ = INDEX["reduced"][reduced]
-        return True, (name, number, id_)
+            name, number, ssodnet_id = INDEX[id_]
+        return True, (name, number, ssodnet_id)
     else:
         return False, (None, np.nan, None)
 
 
-def _standardize_id(id_):
+def _reduce_id_for_local(id_):
+    """Reduce the id_ to a string or number with fewer free parameters.
+
+    Parameters
+    ----------
+    id_ : str, int, float
+        The minor body's name, designation, or number.
+
+    Returns
+    -------
+    str, int
+        The standardized name, designation, or number. None if id_ is NaN or None.
+    """
+
+    # Number?
+    if isinstance(id_, (int, float)):
+        return int(id_)
+
+    try:
+        id_ = int(float(id_))
+        return id_
+    except ValueError:
+        pass
+
+    # Name or designation
+    return id_.replace("_(Asteroid)", "").replace("_", "").replace(" ", "").lower()
+
+
+def _standardize_id_for_quaero(id_):
     """Try to infer id_ type and re-format if necessary to ensure
     successful remote lookup.
 
@@ -196,7 +222,7 @@ def _standardize_id(id_):
 
     Returns
     -------
-    str, int, float, None
+    str, int, None
         The standardized name, designation, or number. None if id_ is NaN or None.
     """
     if isinstance(id_, (int, float)):
