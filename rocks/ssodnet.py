@@ -4,7 +4,6 @@
 """
 import asyncio
 from itertools import product
-import os
 import warnings
 
 import aiohttp
@@ -89,9 +88,9 @@ async def _get_ssocard(id_ssodnet, progress_bar, progress, local):
 async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{id_ssodnet}.json")
+    PATH_CARD = rocks.PATH_CACHE / f"{id_ssodnet}.json"
 
-    if os.path.isfile(PATH_CARD) and local:
+    if PATH_CARD.is_file() and local:
         with open(PATH_CARD, "r") as file_card:
             progress_bar.update(progress, advance=1)
             return json.load(file_card)[id_ssodnet]
@@ -246,9 +245,9 @@ async def _local_or_remote_catalogue(
 ):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CATALOGUE = os.path.join(rocks.PATH_CACHE, f"{id_ssodnet}_{catalogue}.json")
+    PATH_CATALOGUE = rocks.PATH_CACHE / f"{id_ssodnet}_{catalogue}.json"
 
-    if os.path.isfile(PATH_CATALOGUE) and local:
+    if PATH_CATALOGUE.is_file() and local:
         with open(PATH_CATALOGUE, "r") as file_card:
             progress_bar.update(progress, advance=1)
             return json.load(file_card)

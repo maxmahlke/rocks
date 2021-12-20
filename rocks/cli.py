@@ -83,7 +83,7 @@ def info(id_):
 def parameters():
     """Print the ssoCard structure and its description."""
 
-    if not os.path.isfile(rocks.PATH_META["description"]):
+    if not rocks.PATH_META["description"].is_file():
         rocks.utils.retrieve_json_from_ssodnet("description")
 
     with open(rocks.PATH_META["description"], "r") as file_:
@@ -239,6 +239,8 @@ def echo():
             print(rocks.utils.rgetattr(rock, p))
 
         if plot:
+            from . import plots
+
             if p not in datacloud:
                 print(
                     f"Only datacloud collections can be plotted. "

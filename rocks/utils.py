@@ -4,7 +4,6 @@
 import copy
 from functools import reduce
 import json
-import os
 import pickle
 import pickletools
 import re
@@ -60,8 +59,6 @@ def _build_index():
     index_ssodnet.drop(columns=["Type", "Aliases", "Reduced"])
     index_ssodnet["Number"] = index_ssodnet["Number"].astype("Int64")
 
-    os.makedirs(rocks.PATH_INDEX, exist_ok=True)
-
     # ------
     # Split index into chunks
 
@@ -88,7 +85,7 @@ def _build_index():
 
             index_chunk[ast.Number] = [ast.Name, ast.SsODNetID]
 
-        with open(os.path.join(rocks.PATH_INDEX, f"number_{nmin}.pkl"), "wb") as file_:
+        with open(rocks.PATH_INDEX / f"{nmin}.pkl", "wb") as file_:
             index_pickled = pickle.dumps(index_chunk, protocol=4)
             index_pickled_opt = pickletools.optimize(index_pickled)
             file_.write(index_pickled_opt)
@@ -117,7 +114,7 @@ def _build_index():
             else:
                 index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
 
-        with open(os.path.join(rocks.PATH_INDEX, f"names_{char}.pkl"), "wb") as file_:
+        with open(rocks.PATH_INDEX / f"{char}.pkl", "wb") as file_:
             index_pickled = pickle.dumps(index_chunk, protocol=4)
             index_pickled_opt = pickletools.optimize(index_pickled)
             file_.write(index_pickled_opt)
@@ -159,7 +156,7 @@ def _build_index():
             else:
                 index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
 
-        with open(os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl"), "wb") as file_:
+        with open(rocks.PATH_INDEX / f"{year}.pkl", "wb") as file_:
             index_pickled = pickle.dumps(index_chunk, protocol=4)
             index_pickled_opt = pickletools.optimize(index_pickled)
             file_.write(index_pickled_opt)
@@ -183,34 +180,10 @@ def _build_index():
         else:
             index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
 
-    with open(os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl"), "wb") as file_:
+    with open(rocks.PATH_INDEX / f"PLT.pkl", "wb") as file_:
         index_pickled = pickle.dumps(index_chunk, protocol=4)
         index_pickled_opt = pickletools.optimize(index_pickled)
         file_.write(index_pickled_opt)
-
-
-def load_index() -> dict:
-    """Load local index of asteroid numbers, names, SsODNet IDs.
-
-    Parameters
-    ----------
-
-    Returns
-    -------
-    dict
-        The asteroid name-number index, a dictionary containing two
-        dictionaries.
-
-    Notes
-    -----
-    If the index has already been loaded at runtime, it is not loaded again.
-    """
-
-    if rocks.INDEX is None:
-        with open(os.path.join(rocks.PATH_INDEX, "index.pkl"), "rb") as ind:
-            rocks.INDEX = pickle.load(ind)
-
-    return rocks.INDEX
 
 
 def get_index_file(id_: typing.Union[int, str]) -> dict:
@@ -235,11 +208,11 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
         # The passed id_ is larger than 1e6
         except IndexError:
             index_number = 1
-        path = os.path.join(rocks.PATH_INDEX, f"number_{index_number}.pkl")
+        path = rocks.PATH_INDEX / f"{index_number}.pkl"
 
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
-        path = os.path.join(rocks.PATH_INDEX, f"names_{id_[0]}.pkl")
+        path = rocks.PATH_INDEX / f"{id_[0]}.pkl"
 
     # Is it a designation?
     elif re.match(
@@ -251,11 +224,11 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
             year = f"20{id_[2:4]}"
         else:
             year = id_[:2]
-        path = os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl")
+        path = rocks.PATH_INDEX / f"{year}.pkl"
 
     # Should be in this one then
     else:
-        path = os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl")
+        path = rocks.PATH_INDEX / f"PLT.pkl"
 
     if not path in rocks.INDEX:
         with open(path, "rb") as ind:
@@ -288,7 +261,7 @@ def get_unit(path_unit: str) -> str:
     str
         The unit of the requested parameter.
     """
-    if not os.path.isfile(rocks.PATH_META["units"]):
+    if not rocks.PATH_META["units"].is_file():
         retrieve_json_from_ssodnet("units")
 
     with open(rocks.PATH_META["units"], "r") as units:
@@ -426,9 +399,7 @@ def cache_inventory():
     """
 
     # Get all JSONs in cache
-    cached_jsons = set(
-        file_ for file_ in os.listdir(rocks.PATH_CACHE) if file_.endswith(".json")
-    )
+    cached_jsons = set(file_ for file_ in rocks.PATH_CACHE.glob("*.json"))
 
     cached_cards = []
     cached_catalogues = []
@@ -436,7 +407,7 @@ def cache_inventory():
     for file_ in cached_jsons:
 
         # Is it metadata?
-        if file_ in [os.path.basename(f) for f in rocks.PATH_META.values()]:
+        if file_.stem in rocks.PATH_META.values():
             continue
 
         # Datacloud catalogue or ssoCard?
@@ -446,25 +417,26 @@ def cache_inventory():
                 for cat in rocks.datacloud.CATALOGUES.values()
             ]
         ):
-            ssodnet_id = "_".join(file_.split("_")[:-1])
-            catalogue = os.path.splitext(file_)[0].split("_")[-1]
+            *ssodnet_id, catalogue = file_.stem.split("_")
+            ssodnet_id = "_".join(ssodnet_id)
         else:
-            ssodnet_id = os.path.splitext(file_)[0]
+            ssodnet_id = file_.stem
             catalogue = ""
+
         # Is it valid?
-        with open(os.path.join(rocks.PATH_CACHE, file_), "r") as ssocard:
+        with open(file_, "r") as ssocard:
 
             card = json.load(ssocard)
 
             if not card:
                 # Empty card or catalogue, remove it
-                os.remove(os.path.join(rocks.PATH_CACHE, file_))
+                file_.unlink()
                 continue
 
             if not catalogue:
                 if card[ssodnet_id] is None:
                     # Faulty card, remove it
-                    os.remove(os.path.join(rocks.PATH_CACHE, file_))
+                    file_.unlink()
                     continue
 
         # Append to inventory
@@ -474,9 +446,7 @@ def cache_inventory():
             cached_cards.append(ssodnet_id)
 
     # Get cached metadata files
-    cached_meta = [
-        os.path.basename(f) for f in rocks.PATH_META.values() if os.path.isfile(f)
-    ]
+    cached_meta = [f.stem for f in rocks.PATH_META.values() if f.is_file()]
     return cached_cards, cached_catalogues, cached_meta
 
 
@@ -485,16 +455,16 @@ def clear_cache():
     cards, catalogues, _ = cache_inventory()
 
     for card in cards:
-        PATH_CARD = os.path.join(rocks.PATH_CACHE, f"{card}.json")
-        os.remove(PATH_CARD)
+        PATH_CARD = rocks.PATH_CACHE / f"{card}.json"
+        PATH_CARD.unlink()
 
     for catalogue in catalogues:
-        PATH_CATALOGUE = os.path.join(rocks.PATH_CACHE, f"{'_'.join(catalogue)}.json")
-        os.remove(PATH_CATALOGUE)
+        PATH_CATALOGUE = rocks.PATH_CACHE / f"{'_'.join(catalogue)}.json"
+        PATH_CATALOGUE.unlink()
 
     for file_ in rocks.PATH_META.values():
-        if os.path.isfile(file_):
-            os.remove(file_)
+        if file_.is_file():
+            file_.unlink()
 
 
 def update_datacloud_catalogues(cached_catalogues):
@@ -542,7 +512,7 @@ def confirm_identity(ids):
 
         # Get new card and remove the old one
         rocks.ssodnet.get_ssocard(current_id, local=False)
-        os.remove(os.path.join(rocks.PATH_CACHE, f"{old_id}.json"))
+        (rocks.PATH_CACHE / f"{old_id}.json").unlink()
 
         # This is now up-to-date
         updated.append(old_id)

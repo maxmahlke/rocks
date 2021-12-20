@@ -1,9 +1,10 @@
 """For space rocks."""
-import os
+from pathlib import Path
 import rich
 
 # rocks modules
-from . import datacloud, definitions, plots, ssodnet, utils
+# rocks.plots is lazy-loaded as it is expensive
+from . import datacloud, definitions, ssodnet, utils
 
 # Expose API to user
 from .core import Rock
@@ -12,11 +13,11 @@ from .resolve import identify
 
 # ------
 # Path definitions required throughout the code
-PATH_CACHE = os.path.join(os.path.expanduser("~"), ".cache/rocks")
-PATH_INDEX = os.path.join(PATH_CACHE, "index")
+PATH_CACHE = Path.home() / ".cache/rocks"
+PATH_INDEX = PATH_CACHE / "index"
 PATH_META = {
-    "description": os.path.join(PATH_CACHE, "ssoCard_description.json"),
-    "units": os.path.join(PATH_CACHE, "ssoCard_units.json"),
+    "description": PATH_CACHE / "ssoCard_description.json",
+    "units": PATH_CACHE / "ssoCard_units.json",
 }
 
 # Dict to hold the asteroid name-number indices at runtime
@@ -45,9 +46,10 @@ Some metadata is required to be present in the cache directory.
 
 # ------
 # Check for existence of index file and cache directory
-os.makedirs(PATH_CACHE, exist_ok=True)
+if not PATH_INDEX.is_dir():
 
-if not os.path.isdir(PATH_INDEX):
+    PATH_INDEX.mkdir(parents=True)
+
     rich.print(GREETING)
     utils._build_index()
     rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
