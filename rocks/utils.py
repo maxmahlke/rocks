@@ -7,6 +7,8 @@ import os
 import pickle
 import pickletools
 import re
+import string
+import typing
 import warnings
 
 import numpy as np
@@ -49,42 +51,208 @@ def _build_index():
     index_ssodnet.loc[index_ssodnet["Number"] == 0, "Number"] = np.nan
 
     # Reformat the index to a dictionary
-    index_ssodnet = (
-        index_ssodnet.drop(columns="Type")
-        .set_index("SsODNetID")
-        .to_dict(orient="index")
+    # index_ssodnet = (
+    #     index_ssodnet.drop(columns="Type")
+    #     .set_index("SsODNetID")
+    #     .to_dict(orient="index")
+    # )
+    index_ssodnet.drop(columns=["Type", "Aliases", "Reduced"])
+
+    os.makedirs(rocks.PATH_INDEX, exist_ok=True)
+
+    # ------
+    # Split index into chunks
+
+    # -----
+    # Numbers
+
+    # Build chunks of 10k
+    step = 1e4
+
+    # Find next 10,000 to largest number
+    nmax = np.ceil(index_ssodnet.Number.max() / step) * step
+
+    # Create number index chunks
+    for nmin in np.arange(1, nmax, step, dtype=int):
+
+        index_chunk = {}
+
+        # Asteroids in this chunk
+        asts = index_ssodnet.loc[
+            (nmin <= index_ssodnet.Number) & (index_ssodnet.Number < nmin + step)
+        ]
+
+        for _, ast in asts.iterrows():
+
+            index_chunk[ast.Number] = [ast.Name, ast.SsODNetID]
+
+        with open(os.path.join(rocks.PATH_INDEX, f"number_{nmin}.pkl"), "wb") as file_:
+            index_pickled = pickle.dumps(index_chunk, protocol=4)
+            index_pickled_opt = pickletools.optimize(index_pickled)
+            file_.write(index_pickled_opt)
+
+    # -----
+    # Reduced
+
+    # Names
+    names = set(red for red in index_ssodnet.Reduced if re.match(r"^[a-z\'-\`]*$", red))
+    names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
+
+    # Create name index chunks
+    for char in string.ascii_lowercase:
+
+        index_chunk = {}
+
+        names_subset = set(name for name in names if name.startswith(char))
+
+        # Asteroids in this chunk
+        asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(names_subset)]
+
+        for _, ast in asts.iterrows():
+
+            if pd.isna(ast.Number):
+                index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
+            else:
+                index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
+
+        with open(os.path.join(rocks.PATH_INDEX, f"names_{char}.pkl"), "wb") as file_:
+            index_pickled = pickle.dumps(index_chunk, protocol=4)
+            index_pickled_opt = pickletools.optimize(index_pickled)
+            file_.write(index_pickled_opt)
+
+    # Designations
+    designations = set(
+        red
+        for red in index_ssodnet.Reduced
+        if re.match(
+            r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
+            r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
+            red,
+        )
     )
 
-    INDEX = {"number": {}, "reduced": {}}
+    # Create designation index chunks
+    max_year = max([int(year[2:4]) for year in designations if year.startswith("20")])
+    split_by = [
+        "18",
+        "19",
+        *[f"20{year:02}" for year in range(1, max_year)],
+    ]
 
-    for id_, values in progress.track(
-        index_ssodnet.items(),
-        total=len(index_ssodnet),
-        description="Building Index",
-    ):
+    for year in split_by:
 
-        name = values["Name"]
-        number = values["Number"]
-        reduced = reduce_id(id_)
+        index_chunk = {}
 
-        if not np.isnan(number):
-            number = int(number)
+        designations_subset = set(
+            desi for desi in designations if desi.startswith(year)
+        )
 
-        INDEX["reduced"][reduced] = (name, number, id_)
+        # Asteroids in this chunk
+        asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(designations_subset)]
 
-        if not np.isnan(number):
-            INDEX["number"][number] = (name, id_)
+        for _, ast in asts.iterrows():
 
-    with open(rocks.PATH_INDEX, "wb") as file_:
-        index_pickled = pickle.dumps(INDEX, protocol=4)
+            if pd.isna(ast.Number):
+                index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
+            else:
+                index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
+
+        with open(os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl"), "wb") as file_:
+            index_pickled = pickle.dumps(index_chunk, protocol=4)
+            index_pickled_opt = pickletools.optimize(index_pickled)
+            file_.write(index_pickled_opt)
+
+    # And the rest
+    rest = set(
+        red
+        for red in index_ssodnet.Reduced
+        if red not in names and red not in designations
+    )
+
+    index_chunk = {}
+
+    # Asteroids in this chunk
+    asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(rest)]
+
+    for _, ast in asts.iterrows():
+
+        if pd.isna(ast.Number):
+            index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
+        else:
+            index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
+
+    with open(os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl"), "wb") as file_:
+        index_pickled = pickle.dumps(index_chunk, protocol=4)
         index_pickled_opt = pickletools.optimize(index_pickled)
         file_.write(index_pickled_opt)
+
+    # Designations
+
+    # INDEX = {"number": {}, "reduced": {}}
+
+    # for id_, values in progress.track(
+    #     index_ssodnet.items(),
+    #     total=len(index_ssodnet),
+    #     description="Building Index",
+    # ):
+
+    #     name = values["Name"]
+    #     number = values["Number"]
+    #     reduced = reduce_id(id_)
+
+    #     if not np.isnan(number):
+    #         number = int(number)
+
+    #     INDEX["reduced"][reduced] = (name, number, id_)
+
+    #     if not np.isnan(number):
+    #         INDEX["number"][number] = (name, id_)
 
 
 def load_index():
     """Load local index of asteroid numbers, names, SsODNet IDs."""
     with open(rocks.PATH_INDEX, "rb") as ind:
         return pickle.load(ind)
+
+
+def get_index_file(id_: typing.Union[int, str]) -> str:
+    """Get absolute path to the index chunk where id_ should be located it.
+
+    Parameters
+    ----------
+    id_ : str, int
+        The asteroid identifier.
+
+    Returns
+    -------
+    str
+        The absolute path to the index chunk.
+    """
+
+    # Is it numeric?
+    if isinstance(id_, int):
+        for lower_limit in np.arange(1, 1e6, 1e4, dtype=int):
+            if lower_limit <= id_ < lower_limit + 1e4:
+                return os.path.join(rocks.PATH_INDEX, f"number_{lower_limit}.pkl")
+
+    # Is it a name?
+    elif re.match(r"^[a-z\'-\`]*$", id_) or id_ == r"g!kun||'homdima":
+        return os.path.join(rocks.PATH_INDEX, f"names_{id_[0]}.pkl")
+
+    # Is it a designation?
+    elif re.match(
+        r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
+        r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
+        id_,
+    ):
+        if id_.startswith("20"):
+            year = f"20{id_[2:4]}"
+        else:
+            year = id_[:2]
+        return os.path.join(rocks.PATH_INDEX, f"desi_{year}.pkl")
+
+    # Should be in this one then
+    return os.path.join(rocks.PATH_INDEX, f"reduced_rest.pkl")
 
 
 # ------
