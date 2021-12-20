@@ -239,8 +239,6 @@ def echo():
             print(rocks.utils.rgetattr(rock, p))
 
         if plot:
-            from . import plots
-
             if p not in datacloud:
                 print(
                     f"Only datacloud collections can be plotted. "
@@ -248,7 +246,7 @@ def echo():
                 )
                 sys.exit()
 
-            rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
+            (rocks.utils.rgetattr(rock, parameter), parameter).plot()
 
     # Avoid error message from click
     sys.exit()

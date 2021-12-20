@@ -262,7 +262,9 @@ class DataCloudDataFrame(pd.DataFrame):
 
     def plot(self, parameter, **kwargs):
         """Plot the parameter of the catalogue."""
-        return rocks.plots.plot(self, parameter, **kwargs)
+        from . import plots
+
+        return plots.plot(self, parameter, **kwargs)
 
     def weighted_average(self, parameter):
         """Compute the weighted average of the parameter using the preferred
