@@ -3,7 +3,6 @@
 import json
 import keyword
 import os
-import re
 import sys
 import time
 import webbrowser
@@ -38,18 +37,8 @@ class AliasedGroup(click.Group):
             return rv
 
         # ------
-        # Unknown subcommand -> echo asteroid parameter and optionally plot
-        for arg in ["-p", "--plot"]:
-
-            if arg in sys.argv:
-                sys.argv.remove(arg)
-
-                plot = True
-                break
-        else:
-            plot = False
-
-        return echo(plot)
+        # Unknown subcommand -> echo asteroid parameter
+        return echo()
 
 
 @click.group(cls=AliasedGroup)
@@ -61,40 +50,26 @@ def cli_rocks():
 
 @cli_rocks.command()
 def docs():
-    """Open rocks documentation in browser."""
+    """Open the rocks documentation in browser."""
     webbrowser.open("https://rocks.readthedocs.io/en/latest/", new=2)
 
 
 @cli_rocks.command()
 @click.argument("id_")
 def id(id_):
-    """Get asteroid name and number from string input."""
+    """Resolve the asteroid name and number from string input."""
     name, number = rocks.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
     else:
-        # The query failed. Propose some names if the id_ looks like a name,
-        # designations give too many false positives
-        if not re.match(r"^[A-Za-z ]*$", id_):
-            sys.exit()
-
-        candidates = rocks.utils.find_candidates(id_)
-
-        if candidates:
-            rich.print(
-                f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
-                f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
-            )
-
-            for name, number in candidates:
-                rich.print(f"{f'({number})':>8} {name}")
+        rocks.utils.list_candidate_ssos(id_)
 
 
 @cli_rocks.command()
 @click.argument("id_")
 def info(id_):
-    """Print ssoCard of minor body."""
+    """Print the ssoCard of an asteroid."""
     _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
 
     if not isinstance(id_, str):
@@ -106,7 +81,7 @@ def info(id_):
 
 @cli_rocks.command()
 def parameters():
-    """Print the ssoCard and its description."""
+    """Print the ssoCard structure and its description."""
 
     if not os.path.isfile(rocks.PATH_META["description"]):
         rocks.utils.retrieve_json_from_ssodnet("description")
@@ -208,15 +183,21 @@ def status():
         rocks.utils._build_index()
 
 
-def echo(plot):
-    """Echos asteroid parameter to command line. Optionally opens plot.
+def echo():
+    """Echos asteroid parameter to command line. Optionally opens plot."""
 
-    Parameters
-    ==========
-    plot : bool
-        If the paramter values should be plotted.
-    """
+    # Should we plot?
+    for arg in ["-p", "--plot"]:
 
+        if arg in sys.argv:
+            sys.argv.remove(arg)
+
+            plot = True
+            break
+    else:
+        plot = False
+
+    # Are there enough arguments to continue?
     if len(sys.argv) == 2:
         print(f"\nUnknown command '{sys.argv[-1]}'.\n")
         ctx = click.get_current_context()
@@ -227,37 +208,45 @@ def echo(plot):
     _, parameter, *id_ = sys.argv
     id_ = " ".join(id_)
 
-    # Check if the parameter might be missing an underscore
-    if keyword.iskeyword(parameter.split(".")[-1]):
-        parameter = f"{parameter}_"
+    # Allow for comma-separated parameter chaining
+    parameter = parameter.split(",")
 
-    if parameter.split(".")[0] in rocks.datacloud.CATALOGUES.keys():
-        datacloud = parameter.split(".")[0]
-    else:
-        datacloud = []
+    # Check if any of the parameters might be missing an underscore
+    parameter = [
+        f"{p}_" if keyword.iskeyword(p.split(".")[-1]) else p for p in parameter
+    ]
 
+    # Check what datacloud properties we need
+    datacloud = [
+        p.split(".")[0]
+        for p in parameter
+        if p.split(".")[0] in rocks.datacloud.CATALOGUES.keys()
+    ]
+
+    # And let's go
     rock = rocks.Rock(id_, datacloud=datacloud)
 
     # Identifier could not be resolved
     if not rock.id_:
+        rocks.utils.list_candidate_ssos(id_)
         sys.exit()
 
     # Pretty-print the paramter
-    if not datacloud:
-        print(rocks.utils.rgetattr(rock, parameter))
-    else:
-        rocks.datacloud.pretty_print(
-            rock, rocks.utils.rgetattr(rock, parameter), parameter
-        )
+    for p in parameter:
+        if p in datacloud:
+            rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, p), p)
+        else:
+            print(rocks.utils.rgetattr(rock, p))
 
-    if plot:
-        if not datacloud:
-            print(
-                f"Only datacloud collections can be plotted. "
-                f"Try the plural of {parameter}."
-            )
-            sys.exit()
+        if plot:
+            if p not in datacloud:
+                print(
+                    f"Only datacloud collections can be plotted. "
+                    f"Try the plural of {parameter}."
+                )
+                sys.exit()
 
-        rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
+            rocks.plots.plot(rocks.utils.rgetattr(rock, parameter), parameter)
 
+    # Avoid error message from click
     sys.exit()

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
 
+import copy
 from functools import reduce
 import json
 import os
@@ -209,10 +210,28 @@ def _build_index():
     #         INDEX["number"][number] = (name, id_)
 
 
-def load_index():
-    """Load local index of asteroid numbers, names, SsODNet IDs."""
-    with open(rocks.PATH_INDEX, "rb") as ind:
-        return pickle.load(ind)
+def load_index() -> dict:
+    """Load local index of asteroid numbers, names, SsODNet IDs.
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    dict
+        The asteroid name-number index, a dictionary containing two
+        dictionaries.
+
+    Notes
+    -----
+    If the index has already been loaded at runtime, it is not loaded again.
+    """
+
+    if rocks.INDEX is None:
+        with open(rocks.PATH_INDEX, "rb") as ind:
+            rocks.INDEX = pickle.load(ind)
+
+    return rocks.INDEX
 
 
 def get_index_file(id_: typing.Union[int, str]) -> str:
@@ -266,17 +285,17 @@ def rgetattr(obj, attr):
     return reduce(_getattr, [obj] + attr.split("."))
 
 
-def get_unit(path_unit):
+def get_unit(path_unit: str) -> str:
     """Get unit from units JSON file.
 
     Parameters
-    ==========
+    ----------
     path_unit : str
         Path to the parameter in the JSON tree, starting at unit and
         separating the levels with periods.
 
     Returns
-    =======
+    -------
     str
         The unit of the requested parameter.
     """
@@ -298,14 +317,14 @@ def weighted_average(catalogue, parameter):
     """Computes weighted average of observable.
 
     Parameters
-    ==========
+    ----------
     observable : np.ndarray
         Float values of observable
     error : np.ndarray
         Corresponding errors of observable.
 
     Returns
-    =======
+    -------
     float
         The weighted average.
 
@@ -504,7 +523,7 @@ def confirm_identity(ids):
     ssoCard and remove the former one if the ID has changed.
 
     Parameters
-    ==========
+    ----------
     ids : list
         The list of SsODNet IDs to confirm.
     """
@@ -584,15 +603,33 @@ def find_candidates(id_):
 
     # Use Levenshtein distance to identify potential matches
     candidates = []
-    max_distance = 1  # found by trial and error
-    id_ = id_.capitalize()  # remove one possible dof
+    max_distance = 2  # found by trial and error
+    id_ = reduce_id(id_)
 
-    for name in index["name"].keys():
+    for name in index["reduced"].keys():
         distance = lev.distance(id_, name)
 
         if distance <= max_distance:
-            candidates.append((name, index["name"][name][0]))
+            candidates.append(index["reduced"][name][:-1])
 
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
     return candidates
+
+
+def list_candidate_ssos(id_):
+    # The query failed. Propose some names if the id_ looks like a name,
+    # designations give too many false positives
+    if not re.match(r"^[A-Za-z ]*$", id_):
+        return
+
+    candidates = rocks.utils.find_candidates(id_)
+
+    if candidates:
+        rich.print(
+            f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
+            f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
+        )
+
+        for name, number in candidates:
+            rich.print(f"{f'({number})':>8} {name}")

@@ -1,10 +1,18 @@
+# 1.4.9 - 2021-12-14
+- Added the short index containing only asteroids with number up to
+  10,000. Command line queries will first check this index, which saves about
+  0.5s in case of a successful resolution and carries a negligible time penalty
+  on an unsuccessful one.
+- Multiple parameters can now be queried via the CLI by chaining them with commas: $ rocks ap,ep pallas
+- Added alias for sine of proper inclination: sinip
+
 # 1.4.8 - 2021-12-08
 - Reduced startup time by 50% by reducing the size of the asteroid name-number index
 
 # 1.4.7 - 2021-12-05
 - Added the Tisserand parameter to the ssoCard
-- Rock.parameters.physical.spin is now a list of Spin instances, rather than a Spin instance with lists.
-  This is consistent with the Rock.parameters.physical.taxonomy parameter.
+- Rock.parameters.physical.spin is now a list of Spin instances, rather than a
+  Spin instance with lists. This is consistent with the Rock.parameters.physical.taxonomy parameter.
 - If multiple taxonomic classifications exist, rocks will now print the class and the shortbib
 - Datacloud properties are now sorted by year of publication when echoed on the command line
 
@@ -27,7 +35,7 @@
 # 1.4.3 - 2021-11-04
 - Added command alias: update -> status
 - The phase-function parameter is now correctly called phase_function
-- The phase-function datacloud catalouge parameter is now correctly called phase_functions
+- The phase-function datacloud catalogue parameter is now correctly called phase_functions
 - Aligned implementation of Spin parameter with ssoCard changes
 
 # 1.4.2 - 2021-11-03
@@ -101,7 +109,7 @@
 # 1.2.3 - 2021-09-08
 - Fail gracefully if no ssoCard is present for asteroid when querying datacloud catalogue
 - Added weighted average output to some datacloud catalogue queries from the command line
-- Added weigted_average method to Datacloud catalogue class
+- Added weigthed_average method to Datacloud catalogue class
 - Print warning when no ssoCard could be retrieved for an asteroid.
 - Added 'no_cache' keyword to 'rocks.ssodnet.get_ssocard'. If True, it forces the remote query of the ssoCard
 - Improved 'rocks status' command to echo the number of cached ssoCards and offer to update the out-of-date ones

@@ -2,35 +2,25 @@
 ``rocks``
 #########
 
-*for space-rocks*
+*for space-rocks*.
 
-|ImageLink|_
-
-.. |ImageLink| image:: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
-               :width: 50
-.. _ImageLink: http://github.com/maxmahlke/rocks
+A ``python`` client to retrieve and explore asteroid data from
+`SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
+Latest version: 1.4.9  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
 
 .. highlight:: python
 
-A ``python`` package to query and explore asteroid data from
-`SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
 
-**Disclaimer: The SsODNet service and its database are in an alpha version and
-under constant revision. The provided values and access methods may change
-without notice.**
-
-
-Latest version: 1.4.8  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_
 
 via the Command Line
 ====================
 
-Quick exploration of asteroid parameters using the ``rocks`` :ref:`command-line interface<Command Line Interface>`.
+Quick exploration of asteroid parameters using the ``rocks`` :ref:`command-line interface<cli>`.
 
-.. code-block:: bash       
-                           
+.. code-block:: bash
+
    $ rocks id 221
-   (221) Eos               
+   (221) Eos
 
    $ rocks class Eos
    MB>Outer
@@ -67,18 +57,23 @@ via a ``python`` script
 
 Easy access of asteroid properties using the :ref:`Rock<rock_class>` class.
 
-.. code-block:: python     
-                           
+.. code-block:: python
+
   >>> from rocks import Rock
   >>> ceres = Rock("ceres")
   >>> ceres.diameter.value
-  848.4                    
+  848.4
   >>> ceres.mass.value
-  9.384e+20                
+  9.384e+20
   >>> ceres.mass.error
   6.711e+17
 
 See more use cases in the :ref:`Tutorials<Tutorials>`.
+
+**Disclaimer: The SsODNet service and its database are in an alpha version and
+under constant revision.
+The provided values and access methods may change
+without notice.**
 
 .. toctree::
    :maxdepth: 2
@@ -87,7 +82,8 @@ See more use cases in the :ref:`Tutorials<Tutorials>`.
 
    Getting Started<getting_started>
    Available Data<ssodnet>
-   The python package<core>
    Command Line Interface<cli>
+   python Interface<core>
    tutorials
+   appendix
    glossary

@@ -11,6 +11,8 @@ Install from PyPi using `pip`:
 
      $ pip install space-rocks
 
+The minimum required `python` version is 3.7.
+
 ## Features
 
 Explore asteroid data on the command-line...
@@ -35,8 +37,10 @@ $ rocks density Eos
 ... and in a `python` script.
 
 ``` python
->>> from rocks import Rock
->>> ceres = Rock("ceres")
+>>> import rocks
+>>> rocks.identify("1902ug")
+('Fortuna', 19)
+>>> ceres = rocks.Rock("ceres")
 >>> ceres.diameter.value
 848.4
 >>> ceres.mass.value

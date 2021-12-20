@@ -69,6 +69,18 @@ def identify(id_, return_id=False, local=True, progress=False):
         warnings.warn("Received empty list of identifiers.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
 
+    # # ------
+    # # For a single name, try resolving in the short index first
+    # if len(id_) == 1:
+    #     INDEX_SHORT = rocks.utils.load_index(short=True)
+    #     success, (name, number, ssodnet_id) = _local_lookup(id_[0], INDEX_SHORT)
+
+    #     if success:
+    #         if not return_id:
+    #             return (name, number)
+    #         else:
+    #             return (name, number, ssodnet_id)
+
     # ------
     # Run asynchronous event loop for name resolution
     with Progress(disable=not progress) as progress_bar:
@@ -103,6 +115,7 @@ def identify(id_, return_id=False, local=True, progress=False):
 
 async def _identify(id_, local, progress_bar, task):
     """Establish the asynchronous HTTP session and launch the name resolution."""
+
     INDEX = rocks.utils.load_index()
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:

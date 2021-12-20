@@ -662,6 +662,7 @@ class Rock(pydantic.BaseModel):
             "ap": "proper_semi_major_axis",
             "ep": "proper_eccentricity",
             "ip": "proper_inclination",
+            "sinip": "proper_sine_inclination",
         },
         "diamalbedo": ["albedos", "diameters"],
     }

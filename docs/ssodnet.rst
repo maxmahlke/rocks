@@ -19,20 +19,27 @@ The ``datacloud`` is the collection of (almost) all published data on asteroids.
 It is split into catalogues, e.g. the ``diamalbedo`` catalogue containing
 observations of asteroid diameters and albedos. ``rocks`` offers to query these
 catalogues for one asteroid at a time, returning all entries belonging to that
-asteroid in that catalogue.
+asteroid in the requested catalogue.
 
-In `rocks`, the parameter names are singular if they refer to the value in the
-``ssoCard`` and plural if they refer to the ``datacloud`` entries. When creating
-a `rocks.Rock` instance, ``datacloud`` catalogues which should be available have
-to be specified explicitly (to avoid unnecessary data queries and retrievals).
+When querying for asteroid parameters, specifying the parameter name as singular or plural will retrieve its
+value from the ``ssoCard`` in the former and from the ``datacloud`` in the latter case, as shown below.
 
 .. code-block:: bash
 
-   $ rocks taxonomy.class_ Ceres    # ssoCard
-   C
+   $ rocks taxonomy Eos
+   K
 
-   $ rocks taxonomies.class_ Ceres  # datacloud
-   ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+   $ rocks taxonomies Eos
+   +-----------+---------+--------+-----------+------------------+------+--------+
+   | scheme    | complex | method | waverange | shortbib         | year | class_ |
+   +-----------+---------+--------+-----------+------------------+------+--------+
+   | Tholen    | S       | Phot   | VIS       | Tholen+1989      | 1989 | S      |
+   | Bus       | K       | Spec   | VIS       | Bus&Binzel+2002  | 2002 | K      |
+   | Bus       | K       | Spec   | VIS       | MotheDiniz+2005  | 2005 | K      |
+   | Bus       | K       | Spec   | VISNIR    | MotheDiniz+2008a | 2008 | K      |
+   | Bus-DeMeo | K       | Spec   | VISNIR    | Clark+2009       | 2009 | K      |
+   | Bus-DeMeo | K       | Spec   | VISNIR    | DeMeo+2009       | 2009 | K      |
+   +-----------+---------+--------+-----------+------------------+------+--------+
 
 .. code-block:: python
 
@@ -44,33 +51,31 @@ to be specified explicitly (to avoid unnecessary data queries and retrievals).
    ['G', 'C', 'C', 'C', 'C', 'G', 'C']
 
 
-:ref:`ssoCards and datacloud catalogues are cached on your computer for quicker data access.<cache-directory>`
+``ssoCards`` and ``datacloud`` catalogues are :ref:`cached on your computer <cache-directory>` for quicker data access.
 
 .. _out-of-date:
 
-Updating the cached asteroid data
----------------------------------
+Updating the Cached Data
+=================================
 
-After some weeks / months, the data in the cached ssoCards may be outdated. The
-``$ rocks update`` command echos the number of locally cached ssoCards  and
-checks their version against the current SsODNet global ssoCard version. If any
-ssoCard is out-of-date, ``rocks`` offers to retrieve the latest versions of
-these cards.
+All ``ssoCards`` and ``datacloud`` catalogues are updated and recompiled weekly
+by :term:`SsODNet`. It is therefore recommended to either remove or update the
+cached data regularly. The ``$ rocks status`` command offers to do just this.
 
 .. code-block:: bash
 
-   $ rocks update
+   $ rocks status
 
-.. _clear_cache:
+    Contents of /home/mmahlke/.cache/rocks:
 
-Removing the cached asteroid data
----------------------------------
+            48179 ssoCards
+            3598 datacloud catalogues
 
-You can delete all cached ssoCards and datacloud catalogues by deleting the cache directory.
+            Asteroid name-number index [index.pkl] updated on 08 Dec 2021
+            Metadata files ['ssoCard_description.json', 'ssoCard_units.json']
 
-.. code-block:: bash
+    Update or clear the cached ssoCards and datacloud catalogues?
+    [0] Do nothing [1] Clear the cache [2] Update the data (1): 1
 
-   $ rm -r ~/.cache/rocks
-
-On the next run of ``rocks``, you will be asked to retrieve the :term:`asteroid
-name-number index<Asteroid name-number index>` from the GitHub repository again.
+    Update the asteroid name-number index?
+    [0] No [1] Yes (1): 0

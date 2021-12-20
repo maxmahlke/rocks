@@ -22,6 +22,15 @@ Glossary
    each asteroid can appear multiple times in the catalogue. They are retrieved
    and stored as ``JSON`` files in the :term:`cache directory<Cache Directory>`.
 
+  DataCloudDataFrame
+
+   The ``python`` implementation of a :term:`datacloud catalogue <Datacloud
+   Catalogue>` is the ``DataCloudDataFrame`` class. As the name suggests, it is
+   a subclass of the ``pandas``  ``DataFrame`` and inherits its properties. The
+   only  difference to the ``DataFrame`` is the overloaded ``plot()`` method
+   and the added ``weighted_average()`` method. by the abbreviation on the
+   right.
+
   Identifier
 
     A user-provided string, float, or integer, which serves to identify an
@@ -30,10 +39,6 @@ Glossary
     <https://ssp.imcce.fr/webservices/ssodnet/api/quaero/>`_. The identifier is
     *not* case-sensitive and frequent shortforms (such as dropping the
     whitespace in the designation, ``"1882BA"``) are accepted as well.
-
-  DataCloudDataFrame
-
-   The ``python`` implementation of a :term:`datacloud catalogue <Datacloud Catalogue>` is the ``DataCloudDataFrame`` class. As the name suggests, it is a subclass of the ``pandas``  ``DataFrame`` and inherits its properties. The only  difference to the ``DataFrame`` is the overloaded ``plot()`` method and the added ``weighted_average()`` method.
 
   ssoCard
 
