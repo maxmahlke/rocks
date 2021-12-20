@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """rocks command line suite."""
+
 import json
 import keyword
 import os
@@ -232,21 +233,21 @@ def echo():
         sys.exit()
 
     # Pretty-print the paramter
-    for p in parameter:
-        if p in datacloud:
-            rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, p), p)
+    for param in parameter:
+        if param in datacloud:
+            rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, param), param)
         else:
-            print(rocks.utils.rgetattr(rock, p))
+            print(rocks.utils.rgetattr(rock, param))
 
         if plot:
-            if p not in datacloud:
+            if param not in datacloud:
                 print(
                     f"Only datacloud collections can be plotted. "
-                    f"Try the plural of {parameter}."
+                    f"Try the plural of {param}."
                 )
                 sys.exit()
 
-            (rocks.utils.rgetattr(rock, parameter), parameter).plot()
+            rocks.utils.rgetattr(rock, param).plot(param)
 
     # Avoid error message from click
     sys.exit()
