@@ -48,8 +48,13 @@ Some metadata is required to be present in the cache directory.
 # Check for existence of index file and cache directory
 if not PATH_INDEX.is_dir():
 
-    PATH_INDEX.mkdir(parents=True)
-
     rich.print(GREETING)
+
+    # Just for a while
+    if (Path.home() / ".cache/rocks/index.pkl").is_file():
+        (Path.home() / ".cache/rocks/index.pkl").unlink()
+
+    PATH_INDEX.mkdir(parents=True)
     utils._build_index()
+
     rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")

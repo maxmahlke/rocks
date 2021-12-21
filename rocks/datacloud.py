@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pydantic
 import rich
-from rich import table
+from rich.table import Table
 
 import rocks
 
@@ -195,7 +195,7 @@ def pretty_print(rock, catalogue, parameter):
     else:
         caption = "Green: preferred entry" if hasattr(catalogue, "preferred") else ""
 
-    table = table.Table(
+    table = Table(
         header_style="bold blue",
         box=rich.box.SQUARE,
         footer_style="dim",
