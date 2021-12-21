@@ -51,75 +51,23 @@ def _build_index():
     index_ssodnet.loc[index_ssodnet["Number"] == 0, "Number"] = np.nan
 
     # Reformat the index to a dictionary
-    # index_ssodnet = (
-    #     index_ssodnet.drop(columns="Type")
-    #     .set_index("SsODNetID")
-    #     .to_dict(orient="index")
-    # )
     index_ssodnet.drop(columns=["Type", "Aliases", "Reduced"])
     index_ssodnet["Number"] = index_ssodnet["Number"].astype("Int64")
 
     # ------
     # Split index into chunks
 
-    # -----
     # Numbers
-
-    # Build chunks of 10k
-    step = 1e3
-
-    # Find next 10,000 to largest number
-    nmax = np.ceil(index_ssodnet.Number.max() / step) * step
-
-    # Create number index chunks
-    for nmin in np.arange(1, nmax, step, dtype=int):
-
-        index_chunk = {}
-
-        # Asteroids in this chunk
-        asts = index_ssodnet.loc[
-            (nmin <= index_ssodnet.Number) & (index_ssodnet.Number < nmin + step)
-        ]
-
-        for _, ast in asts.iterrows():
-
-            index_chunk[ast.Number] = [ast.Name, ast.SsODNetID]
-
-        with open(rocks.PATH_INDEX / f"{nmin}.pkl", "wb") as file_:
-            index_pickled = pickle.dumps(index_chunk, protocol=4)
-            index_pickled_opt = pickletools.optimize(index_pickled)
-            file_.write(index_pickled_opt)
-
-    # -----
-    # Reduced
+    step = 1e3  # Build chunks of 1k entries
+    number_max = (
+        np.ceil(index_ssodnet.Number.max() / step) * step
+    )  # Find next 10,000 to largest number
+    number_chunks = np.arange(1, number_max, step, dtype=int)
 
     # Names
-    names = set(red for red in index_ssodnet.Reduced if re.match(r"^[a-z\'-]*$", red))
-    names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
+    name_chunks = string.ascii_lowercase  # first character of name
 
-    # Create name index chunks
-    for char in string.ascii_lowercase:
-
-        index_chunk = {}
-
-        names_subset = set(name for name in names if name.startswith(char))
-
-        # Asteroids in this chunk
-        asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(names_subset)]
-
-        for _, ast in asts.iterrows():
-
-            if pd.isna(ast.Number):
-                index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
-            else:
-                index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
-
-        with open(rocks.PATH_INDEX / f"{char}.pkl", "wb") as file_:
-            index_pickled = pickle.dumps(index_chunk, protocol=4)
-            index_pickled_opt = pickletools.optimize(index_pickled)
-            file_.write(index_pickled_opt)
-
-    # Designations
+    # Designation
     designations = set(
         red
         for red in index_ssodnet.Reduced
@@ -129,25 +77,109 @@ def _build_index():
             red,
         )
     )
-
-    # Create designation index chunks
     max_year = max([int(year[2:4]) for year in designations if year.startswith("20")])
-    split_by = [
+    designation_chunks = [
         "18",
         "19",
         *[f"20{year:02}" for year in range(0, max_year)],
     ]
 
-    for year in split_by:
+    with progress.Progress() as progress_bar:
+        ntasks = len(number_chunks) + len(name_chunks) + len(designation_chunks)
+        +1  # +1 for the rest
+        task = progress_bar.add_task("Building index", total=ntasks)
+
+        # Create number index chunks
+        for number_min in number_chunks:
+
+            index_chunk = {}
+
+            # Asteroids in this chunk
+            asts = index_ssodnet.loc[
+                (number_min <= index_ssodnet.Number)
+                & (index_ssodnet.Number < number_min + step)
+            ]
+
+            for _, ast in asts.iterrows():
+
+                index_chunk[ast.Number] = [ast.Name, ast.SsODNetID]
+
+            with open(rocks.PATH_INDEX / f"{number_min}.pkl", "wb") as file_:
+                index_pickled = pickle.dumps(index_chunk, protocol=4)
+                index_pickled_opt = pickletools.optimize(index_pickled)
+                file_.write(index_pickled_opt)
+            progress_bar.update(task, advance=1)
+
+        # -----
+        # Reduced
+
+        # Names
+        names = set(
+            red for red in index_ssodnet.Reduced if re.match(r"^[a-z\'-]*$", red)
+        )
+        names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
+
+        # Create name index chunks
+        for char in name_chunks:
+
+            index_chunk = {}
+
+            names_subset = set(name for name in names if name.startswith(char))
+
+            # Asteroids in this chunk
+            asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(names_subset)]
+
+            for _, ast in asts.iterrows():
+
+                if pd.isna(ast.Number):
+                    index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
+                else:
+                    index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
+
+            with open(rocks.PATH_INDEX / f"{char}.pkl", "wb") as file_:
+                index_pickled = pickle.dumps(index_chunk, protocol=4)
+                index_pickled_opt = pickletools.optimize(index_pickled)
+                file_.write(index_pickled_opt)
+
+            progress_bar.update(task, advance=1)
+        # Designations
+
+        # Create designation index chunks
+        for year in designation_chunks:
+
+            index_chunk = {}
+
+            designations_subset = set(
+                desi for desi in designations if desi.startswith(year)
+            )
+
+            # Asteroids in this chunk
+            asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(designations_subset)]
+
+            for _, ast in asts.iterrows():
+
+                if pd.isna(ast.Number):
+                    index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
+                else:
+                    index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
+
+            with open(rocks.PATH_INDEX / f"{year}.pkl", "wb") as file_:
+                index_pickled = pickle.dumps(index_chunk, protocol=4)
+                index_pickled_opt = pickletools.optimize(index_pickled)
+                file_.write(index_pickled_opt)
+
+            progress_bar.update(task, advance=1)
+        # And the rest
+        rest = set(
+            red
+            for red in index_ssodnet.Reduced
+            if red not in names and red not in designations
+        )
 
         index_chunk = {}
 
-        designations_subset = set(
-            desi for desi in designations if desi.startswith(year)
-        )
-
         # Asteroids in this chunk
-        asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(designations_subset)]
+        asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(rest)]
 
         for _, ast in asts.iterrows():
 
@@ -156,34 +188,12 @@ def _build_index():
             else:
                 index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
 
-        with open(rocks.PATH_INDEX / f"{year}.pkl", "wb") as file_:
+        with open(rocks.PATH_INDEX / f"PLT.pkl", "wb") as file_:
             index_pickled = pickle.dumps(index_chunk, protocol=4)
             index_pickled_opt = pickletools.optimize(index_pickled)
             file_.write(index_pickled_opt)
 
-    # And the rest
-    rest = set(
-        red
-        for red in index_ssodnet.Reduced
-        if red not in names and red not in designations
-    )
-
-    index_chunk = {}
-
-    # Asteroids in this chunk
-    asts = index_ssodnet.loc[index_ssodnet.Reduced.isin(rest)]
-
-    for _, ast in asts.iterrows():
-
-        if pd.isna(ast.Number):
-            index_chunk[ast.Reduced] = [ast.Name, ast.SsODNetID]
-        else:
-            index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
-
-    with open(rocks.PATH_INDEX / f"PLT.pkl", "wb") as file_:
-        index_pickled = pickle.dumps(index_chunk, protocol=4)
-        index_pickled_opt = pickletools.optimize(index_pickled)
-        file_.write(index_pickled_opt)
+        progress_bar.update(task, advance=1)
 
 
 def get_index_file(id_: typing.Union[int, str]) -> dict:
@@ -407,13 +417,13 @@ def cache_inventory():
     for file_ in cached_jsons:
 
         # Is it metadata?
-        if file_.stem in rocks.PATH_META.values():
+        if file_ in rocks.PATH_META.values():
             continue
 
         # Datacloud catalogue or ssoCard?
         if any(
             [
-                cat["ssodnet_name"] in file_
+                cat["ssodnet_name"] in str(file_)
                 for cat in rocks.datacloud.CATALOGUES.values()
             ]
         ):
@@ -566,7 +576,7 @@ def find_candidates(id_):
 
     # Use Levenshtein distance to identify potential matches
     candidates = []
-    max_distance = 2  # found by trial and error
+    max_distance = 1  # found by trial and error
     id_ = reduce_id(id_)
 
     for name in index.keys():
