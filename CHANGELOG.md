@@ -1,3 +1,9 @@
+# 1.4.10 - 2021-12-21
+- Decreased execution time on command line by splitting index file and
+  lazy-loading the plots module
+- The previous index.pkl is now split into many smaller files living in
+  $HOME/.cache/rocks/index
+
 # 1.4.9 - 2021-12-14
 - Added the short index containing only asteroids with number up to
   10,000. Command line queries will first check this index, which saves about
