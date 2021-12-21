@@ -5,14 +5,6 @@
 
 *Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
 
-## Install
-
-Install from PyPi using `pip`:
-
-     $ pip install space-rocks
-
-The minimum required `python` version is 3.7.
-
 ## Features
 
 Explore asteroid data on the command-line...
@@ -48,6 +40,15 @@ $ rocks density Eos
 >>> ceres.mass.error
 6.711e+17
 ```
+
+## Install
+
+Install from PyPi using `pip`:
+
+     $ pip install space-rocks
+
+The minimum required `python` version is 3.7.
+
 
 ## Documentation
 
