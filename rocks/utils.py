@@ -542,7 +542,7 @@ def retrieve_rocks_version():
         version = ""
     finally:
         if response.status_code == 200:
-            version = re.findall(r"\d\.\d\.?\d?", response.text)[0]
+            version = re.findall(r"\d+\.\d+[\.\d]*", response.text)[0]
         else:
             version = ""
 
