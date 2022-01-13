@@ -623,6 +623,12 @@ class Rock(pydantic.BaseModel):
             for loc in error["loc"]:
                 try:
                     value = value[loc]
+                except KeyError:
+                    # for Spin entries, the location list is messed up
+                    # disabling the entire Spin parameter
+                    if "spin" in error["loc"]:
+                        error["loc"] = ("parameters", "physical", "spin")
+                        break
                 except TypeError:
                     break
 
