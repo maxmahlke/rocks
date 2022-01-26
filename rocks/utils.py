@@ -85,8 +85,9 @@ def _build_index():
     ]
 
     with progress.Progress() as progress_bar:
-        ntasks = len(number_chunks) + len(name_chunks) + len(designation_chunks)
-        +1  # +1 for the rest
+        ntasks = (
+            len(number_chunks) + len(name_chunks) + len(designation_chunks) + 1
+        )  # +1 for the rest
         task = progress_bar.add_task("Building index", total=ntasks)
 
         # Create number index chunks

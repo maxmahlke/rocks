@@ -104,7 +104,7 @@ def status():
     cached_cards, cached_catalogues, cached_meta = rocks.utils.cache_inventory()
 
     # Get the modification date of the index
-    date_index = os.path.getmtime(rocks.PATH_INDEX)
+    date_index = os.path.getmtime(rocks.PATH_INDEX / "1.pkl")
     date_index = time.strftime("%d %b %Y", time.localtime(date_index))
 
     # Print the findings

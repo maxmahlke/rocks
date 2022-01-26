@@ -275,8 +275,8 @@ class Spin(Parameter):
     Wp: Optional[float] = np.nan
     id_: Optional[int] = None
     lat: Optional[Value] = Value(**{})
-    RA0: Optional[float] = np.nan
-    DEC0: Optional[float] = np.nan
+    RA0: Optional[Value] = Value(**{})
+    DEC0: Optional[Value] = Value(**{})
     long_: Optional[Value] = pydantic.Field(Value(**{}), alias="long")
     period: Optional[Value] = Value(**{})
     method: Optional[List[Method]] = [Method(**{})]

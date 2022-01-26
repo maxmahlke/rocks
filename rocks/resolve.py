@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Local and remote asteroid name resolution."""
 import asyncio
 import re

@@ -1,3 +1,6 @@
+# 1.4.11 - 2022-01-26
+- Added a failsafe for broken Spin entries which pydantic cannot handle
+
 # 1.4.10 - 2021-12-21
 - Decreased execution time on command line by splitting index file and
   lazy-loading the plots module
