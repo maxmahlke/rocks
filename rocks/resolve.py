@@ -305,7 +305,7 @@ async def _query_quaero(id_, session):
     params = {
         "q": f'type:("Dwarf Planet" OR Asteroid)' f' AND "{id_}"~0',
         "from": "rocks",
-        "limit": 10000,
+        "limit": 100,
     }
 
     response = await session.request(method="GET", url=url, params=params)
