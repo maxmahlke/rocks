@@ -112,7 +112,7 @@ CATALOGUES = {
     "masses": {
         "attr_name": "masses",
         "ssodnet_name": "masses",
-        "print_columns": ["mass", "err_mass_max", "err_mass_min", "method", "shortbib"],
+        "print_columns": ["mass", "err_mass_up", "err_mass_down", "method", "shortbib"],
     },
     "mpcatobs": {
         "attr_name": "mpcatobs",
@@ -466,8 +466,8 @@ class Masses(Catalogue):
 
     year: List[Optional[int]] = [None]
     mass: List[float] = [np.nan]
-    err_mass_max: List[float] = [np.nan]
-    err_mass_min: List[float] = [np.nan]
+    err_mass_up: List[float] = [np.nan]
+    err_mass_down: List[float] = [np.nan]
 
     preferred: List[bool] = [False]
 
