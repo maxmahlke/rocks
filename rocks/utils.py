@@ -235,7 +235,7 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
             year = f"20{id_[2:4]}"
         else:
             year = id_[:2]
-        path = rocks.PATH_INDEX / f"{year}.pkl"
+        path = rocks.PATH_INDEX / f"d{year}.pkl"
 
     # Should be in this one then
     else:
