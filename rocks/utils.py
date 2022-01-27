@@ -358,11 +358,6 @@ def weighted_average(catalogue, parameter):
 
 # ------
 # Misc
-def reduce_id(id_):
-    """Reduce the SsODNet ID to a string with fewer free parameters."""
-    return id_.replace("_(Asteroid)", "").replace("_", "").replace(" ", "").lower()
-
-
 def retrieve_json_from_ssodnet(which):
     """Retrieve the ssoCard units, or descriptions from SsODNet.
 
@@ -578,7 +573,7 @@ def find_candidates(id_):
     # Use Levenshtein distance to identify potential matches
     candidates = []
     max_distance = 1  # found by trial and error
-    id_ = reduce_id(id_)
+    id_ = rocks.resolve._reduce_id_for_local(id_)
 
     for name in index.keys():
         distance = lev.distance(id_, name)
