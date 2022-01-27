@@ -164,7 +164,7 @@ def _build_index():
                 else:
                     index_chunk[ast.Reduced] = [ast.Name, ast.Number, ast.SsODNetID]
 
-            with open(rocks.PATH_INDEX / f"{year}.pkl", "wb") as file_:
+            with open(rocks.PATH_INDEX / f"d{year}.pkl", "wb") as file_:
                 index_pickled = pickle.dumps(index_chunk, protocol=4)
                 index_pickled_opt = pickletools.optimize(index_pickled)
                 file_.write(index_pickled_opt)
