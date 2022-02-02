@@ -81,13 +81,16 @@ def info(id_):
 
 
 @cli_rocks.command()
-def parameters():
+@click.option("--units", "-u", is_flag=True, help="Echo the parameter units.")
+def parameters(units):
     """Print the ssoCard structure and its description."""
 
-    if not rocks.PATH_META["description"].is_file():
-        rocks.utils.retrieve_json_from_ssodnet("description")
+    which = "description" if not units else "units"
 
-    with open(rocks.PATH_META["description"], "r") as file_:
+    if not rocks.PATH_META[which].is_file():
+        rocks.utils.retrieve_json_from_ssodnet(which)
+
+    with open(rocks.PATH_META[which], "r") as file_:
         DESC = json.load(file_)
 
     rich.print(DESC)

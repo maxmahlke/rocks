@@ -1,4 +1,8 @@
-# 1.4.12 - 2022
+# 1.4.13  - 2022-02-02
+- Added the -u/--units argument to the "parameters" CLI command to echo the
+  units
+
+# 1.4.12 - 2022-01-27
 - Bugfix in index creation, designation file was showing number
 - Bugfix in datacloud masses catalogue
 
