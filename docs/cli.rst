@@ -65,13 +65,23 @@ combination with ``grep`` to quickly find the right parameter name to provide to
 
 .. code-block:: bash
 
- $ rocks parameters | grep semi_major
-    'semi_major_axis': 'Semi-major axis (au)',
-    'err_semi_major_axis': {'min': 'Lower value of uncertainty of the semi-major axis (au)',
-                            'max': 'Upper value of uncertainty of the semi-major axis (au)'},
-    'proper_semi_major_axis': 'Proper semi-major axis (au)',
-    'err_proper_semi_major_axis': {'min': 'Lower value of uncertainty of the proper semi-major axis (au)',
-                                   'max': 'Upper value of uncertainty of the proper semi-major axis (au)'},
+ $ rocks parameters | grep period
+   'orbital_period': {
+       'value': 'Orbital period',
+           'min': 'Lower value of uncertainty of the orbital period',
+           'max': 'Upper value of uncertainty of the orbital period'
+       'period': {
+           'value': 'Synodic or sidereal period of rotation',
+               'min': 'Lower uncertainty of the period of rotation',
+               'max': 'Upper uncertainty of the period of rotation'
+
+The parameter units are echoed using the ``--units/-u`` flag.
+
+.. code-block:: bash
+
+ $ rocks parameters --units | period
+   'orbital_period': {'value': 'd', 'error': {'min': 'd', 'max': 'd'}}
+       'period': {'value': 'h', 'error': {'min': 'h', 'max': 'h'}},
 
 Some parameters have aliases implemented to avoid verbosity. See the
 :ref:`list of parameter aliases<Parameter Aliases>` in the appendix.
@@ -109,7 +119,6 @@ To echo the complete :term:`ssoCard` of an asteroid, use the ``$ rocks info [ide
                'orbital_elements': {
 
     [...]
-
 
 Getting values from datacloud catalogues
 ----------------------------------------
