@@ -79,7 +79,7 @@ The parameter units are echoed using the ``--units/-u`` flag.
 
 .. code-block:: bash
 
- $ rocks parameters --units | period
+ $ rocks parameters --units | grep period
    'orbital_period': {'value': 'd', 'error': {'min': 'd', 'max': 'd'}}
        'period': {'value': 'h', 'error': {'min': 'h', 'max': 'h'}},
 
