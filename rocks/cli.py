@@ -184,7 +184,7 @@ def status():
     )
 
     if response == "1":
-        rocks.utils._build_index()
+        rocks.index._build_index()
 
 
 def echo():

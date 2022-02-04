@@ -4,7 +4,7 @@ import rich
 
 # rocks modules
 # rocks.plots is lazy-loaded as it is expensive
-from . import datacloud, definitions, ssodnet, utils
+from . import datacloud, definitions, ssodnet, utils, index
 
 # Expose API to user
 from .core import Rock
@@ -55,6 +55,6 @@ if not PATH_INDEX.is_dir():
         (Path.home() / ".cache/rocks/index.pkl").unlink()
 
     PATH_INDEX.mkdir(parents=True)
-    utils._build_index()
+    index._build_index()
 
     rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")

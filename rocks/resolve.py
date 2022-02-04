@@ -162,7 +162,7 @@ def _local_lookup(id_):
 
     # Reduce ID and retrieve fitting index
     id_ = _reduce_id_for_local(id_)
-    INDEX = rocks.utils.get_index_file(id_)
+    INDEX = rocks.index.get_index_file(id_)
 
     if id_ in INDEX:
         # Is the number included?
