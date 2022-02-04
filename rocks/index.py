@@ -250,6 +250,23 @@ def _retrieve_index_from_ssodnet():
     return index
 
 
+def get_aliases(ssodnetid):
+    """Return the aliases of the passed reduced identifier.
+
+    Parameters
+    ----------
+    ssodnetid :  str
+        The SsODNetID of the asteroid to alias.
+
+    Returns
+    -------
+    list
+        The list of aliases of the asteroid.
+    """
+    with open(rocks.PATH_INDEX / "aliases.pkl", "rb") as ind:
+        return pickle.load(ind)[ssodnetid]
+
+
 def get_index_file(id_: typing.Union[int, str]) -> dict:
     """Get absolute path to the index chunk where id_ is located.
 
@@ -263,7 +280,6 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
     str
         The absolute path to the index chunk.
     """
-
     # Is it numeric?
     if isinstance(id_, int):
         index_range = np.arange(1, int(1e6), int(1e3))

@@ -97,6 +97,18 @@ def parameters(units):
 
 
 @cli_rocks.command()
+@click.argument("id_")
+def aliases(id_):
+    """Echo the aliases of an asteroid."""
+
+    name, number, ssodnetid = rocks.identify(id_, return_id=True)  # type: ignore
+
+    aliases = rocks.index.get_aliases(ssodnetid)
+
+    rich.print(f"({number}) {name}, aka \n {aliases}")
+
+
+@cli_rocks.command()
 def status():
     """Echo the status of the ssoCards and datacloud catalogues."""
 
