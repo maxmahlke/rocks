@@ -280,6 +280,7 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
     str
         The absolute path to the index chunk.
     """
+
     # Is it numeric?
     if isinstance(id_, int):
         index_range = np.arange(1, int(1e6), int(1e3))

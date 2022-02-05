@@ -93,7 +93,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     if PATH_CARD.is_file() and local:
         with open(PATH_CARD, "r") as file_card:
             progress_bar.update(progress, advance=1)
-            return json.load(file_card)[id_ssodnet]
+            return json.load(file_card)
 
     # Local retrieval failed, do remote query
     card = await _query_ssodnet(id_ssodnet, session)
@@ -101,7 +101,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     # save to cache
     if card and card is not None:
         with open(PATH_CARD, "w") as file_card:
-            json.dump(card, file_card)
+            json.dump(card[id_ssodnet], file_card)
 
     progress_bar.update(progress, advance=1)
     return card[id_ssodnet]
