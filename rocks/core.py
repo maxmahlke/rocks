@@ -24,6 +24,7 @@ class Error(pydantic.BaseModel):
 
 class Value(pydantic.BaseModel):
     error: Error = Error(**{})
+    error_: Optional[float] = np.nan
     value: Optional[float] = np.nan
     path_unit: str = ""
 
@@ -38,6 +39,17 @@ class Value(pydantic.BaseModel):
             return f"{self.value:.4} +- {self.error.max_:.4} {unit}"
         else:
             return f"{self.value:.4} +- ({self.error.max_:.4}, {self.error.min_:.4}) {unit}"
+
+    @pydantic.root_validator(pre=True)
+    def _compute_mean_error(cls, values):
+
+        if "error" in values:
+            if "min" in values["error"] and "max" in values["error"]:
+                values["error_"] = np.mean(
+                    [np.abs(values["error"][which]) for which in ["min", "max"]]
+                )
+
+        return values
 
 
 # The second lowest level is the Parameter
