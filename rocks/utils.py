@@ -219,11 +219,11 @@ def cache_inventory():
                 file_.unlink()
                 continue
 
-            if not catalogue:
-                if card[ssodnet_id] is None:
-                    # Faulty card, remove it
-                    file_.unlink()
-                    continue
+            # if not catalogue:
+            #     if card[ssodnet_id] is None:
+            #         # Faulty card, remove it
+            #         file_.unlink()
+            #         continue
 
         # Append to inventory
         if catalogue:
@@ -382,3 +382,46 @@ def list_candidate_ssos(id_):
 
         for name, number in candidates:
             rich.print(f"{f'({number})':>8} {name}")
+
+
+def cache_all_ssocards():
+    """
+
+    Parameters
+    ----------
+
+
+    Returns
+    -------
+
+    """
+    # URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/ssoCard-latest.tar.bz2"
+
+    # response = requests.get(URL)
+
+    import shutil
+    import tarfile
+
+    # path = "/tmp/folder.tar.bz2"
+    path = "/tmp/ssoCard-latest.tar.bz2"
+    path_out = "/tmp/cards"
+
+    cards = tarfile.open(path, mode="r:bz2")
+    cards.extractall(path_out)
+
+    import glob
+
+    for file in glob.glob(f"{path_out}/*/store/*/*.json"):
+        shutil.move(file, rocks.PATH_CACHE / file.split("/")[-1])
+
+    # decompressor = bz.BZ2Decompressor()
+
+    # zipfile = bz2.BZ2File("/tmp/ssoCard-latest.tar.bz2")  # open the file
+
+    # with open('/tmp/ssoCard-latest.tar.bz2', 'rb') as file_:
+    #     decompressor.decompresso(file_.read())
+
+    # with open("/tmp/ssocards.tar.bz2", "wb") as fp:
+    # decomp = decompressor.decompress(response.raw)
+    # if decomp:
+    #     fp.write(decomp)

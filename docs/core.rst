@@ -85,6 +85,7 @@ Differences to the ``ssoCard`` structure arise in two cases:
 
 - the ``ssoCard`` uses keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
 
+ .. TODO Document the errors_ attribute of the Values class
 
 Access of ``datacloud`` tables
 ------------------------------

@@ -11,6 +11,7 @@ import webbrowser
 import click
 import rich
 from rich import prompt
+from rich.console import Console
 
 import rocks
 
@@ -153,7 +154,7 @@ def status():
             "[blue][0][/blue] Do nothing "
             "[blue][1][/blue] Clear the cache "
             "[blue][2][/blue] Update the data",
-            choices=["0", "1", "2"],
+            choices=["0", "1", "2", "3"],
             show_choices=False,
             default="1",
         )
@@ -183,6 +184,10 @@ def status():
             # Update datacloud catalogues
             rich.print("\n(3/3) Updating the cached datacloud catalogues..")
             rocks.utils.update_datacloud_catalogues(cached_catalogues)
+
+        elif decision == "3":
+            with Console().status("Observing all asteroids.. [~11GB]", spinner="earth"):
+                rocks.utils.cache_all_ssocards()
 
     # ------
     # Update asteroid name-number index
