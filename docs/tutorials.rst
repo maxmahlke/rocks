@@ -12,6 +12,8 @@ Asteroid Identification
 
 - :ref:`How do I identify an asteroid in a python script?<Identification of asteroids>`
 
+- :ref:`How do I update the designations of many asteroids in a pandas dataframe?<update_pandas_names>`
+
 - :ref:`Instead of a list of tuples, how can I get the list of resolved asteroid names from my identifiers? <>`
 
 - :ref:`How can I get the aliases (e.g. outdated designations, packed designation) of this asteroid?<find_aliases>`
@@ -53,6 +55,37 @@ Miscellaneous
 -  :ref:`I got 'Error 404: missing ssoCard'. What is happening?<error_404>`
 
 ---
+
+
+.. _update_pandas_names:
+
+*How do I update the designations of many asteroids in a pandas dataframe?*
+
+A one-liner suffices to ensure that all designations and names are up-to-date:
+
+.. code-block:: python
+
+   import pandas as pd
+   import rocks
+
+   data = pd.read_csv("/path/to/data.csv")
+
+   # Assuming that the asteroid names and designations are in a column called "name"
+   data["name"] = [name for name, number in rocks.identify(data["name"])]
+
+   # To update the numbers, just change the list comprehension
+   data["number"] = [number for name, number in rocks.identify(data["name"])]
+
+The example below achieves the same thing with a single run of `rocks.identify`, however, the code
+is less comprehensible. Note that although the name resolution is asynchronous,
+the order of the returned name-number tuples is guaranteed to reflect the order
+of the passed identifiers.
+
+.. code-block:: python
+
+   names, numbers = *zip(rocks.identify(data["name"]))
+   data["name"] = names
+   data["number"] = numbers
 
 .. _sdssmoc1:
 
