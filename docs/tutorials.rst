@@ -100,9 +100,9 @@ of the passed identifiers.
     import rocks
 
     # ------
-    # Download SDSS MOC1 (6.2MB)
+    # Download SDSS MOC1 (28.6MB)
     data = pd.read_fwf(
-        "https://faculty.washington.edu/ivezic/sdssmoc/ADR1.dat.gz",
+        "https://faculty.washington.edu/ivezic/sdssmoc/ADR1.dat",
         colspecs=[(244, 250), (250, 270)],
         names=["numeration", "designation"],
     )

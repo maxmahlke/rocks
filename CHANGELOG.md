@@ -1,4 +1,5 @@
-# 1.4.14 - 2022-02
+# 1.4.14 - 2022-02-12
+- Updated implementation of asteroid pair to reflect change in ssoCard
 - Added the error_ attributes to Values. It contains the mean of the absolute values of the min and max error.
 - Added 'aliases' command in CLI to echo asteroid aliases
 - Cached ssoCards are now dereferenced to the actual level of the ssoCard
