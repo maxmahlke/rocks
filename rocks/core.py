@@ -171,18 +171,11 @@ class Family(Parameter):
     family_status: Optional[str] = ""
 
 
-class PairMembers(Parameter):
+class PairMember(Parameter):
+    age: Value = Value(**{})
+    distance: Optional[float] = np.nan
     sibling_name: Optional[str] = ""
-    pair_delta_v: Optional[float] = np.nan
-    pair_delta_a: Optional[float] = np.nan
-    pair_delta_e: Optional[float] = np.nan
-    pair_delta_i: Optional[float] = np.nan
     sibling_number: Optional[int] = None
-
-
-class Pair(Parameter):
-    members: List[PairMembers] = [PairMembers(**{})]
-    bibref: List[Bibref] = [Bibref(**{})]
 
 
 class TisserandParameter(Value):
@@ -202,7 +195,7 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
-    pair: Pair = Pair(**{})
+    pair: List[PairMember] = [PairMember(**{})]
     family: Family = Family(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
