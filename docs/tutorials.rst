@@ -83,9 +83,7 @@ of the passed identifiers.
 
 .. code-block:: python
 
-   names, numbers = *zip(rocks.identify(data["name"]))
-   data["name"] = names
-   data["number"] = numbers
+   data["name"], data["number"] = *zip(rocks.identify(data["name"]))
 
 .. _sdssmoc1:
 
