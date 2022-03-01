@@ -506,10 +506,28 @@ class Rock(pydantic.BaseModel):
                 # Dynamically remove offending parts of the ssoCard
                 offending_part = ssocard
 
-                for location in error["loc"][:-1]:
-                    offending_part = offending_part[location]
+                location_list = error["loc"][:-1]
 
-                del offending_part[error["loc"][-1]]
+                if any(
+                    [property_ in location_list for property_ in ["taxonomy", "spin"]]
+                ):
+                    for property_ in ["taxonomy", "spin"]:
+                        if property_ in location_list:
+                            # these are lists instead of dicts and the indices are flipped
+                            # eg taxonomy bibref 0 becomes taxonomy 0 bibref
+                            idx = location_list.index(property_)
+                            entry, idx_list = location_list[idx + 1 : idx + 3]
+
+                            try:
+                                del ssocard["parameters"]["physical"][property_]
+                            except KeyError:
+                                pass
+                else:
+
+                    for location in error["loc"][:-1]:
+                        offending_part = offending_part[location]
+
+                    del offending_part[error["loc"][-1]]
 
             super().__init__(**ssocard)  # type: ignore
 

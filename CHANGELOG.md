@@ -1,3 +1,7 @@
+# 1.4.15 - 2022-03-01
+- Fix in name resolution which caused degeneracy with packed permanent
+  designation format
+
 # 1.4.14 - 2022-02-12
 - Updated implementation of asteroid pair to reflect change in ssoCard
 - Added the error_ attributes to Values. It contains the mean of the absolute values of the min and max error.
