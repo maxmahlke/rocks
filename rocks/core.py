@@ -292,9 +292,10 @@ class Spin(Parameter):
 
 class Taxonomy(Parameter):
     class_: Optional[str] = pydantic.Field("", alias="class")
-    scheme: Optional[str] = ""
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
     method: Optional[List[Method]] = [Method(**{})]
+    scheme: Optional[str] = ""
+    complex: Optional[str] = ""
     waverange: Optional[str] = ""
 
     def __str__(self):

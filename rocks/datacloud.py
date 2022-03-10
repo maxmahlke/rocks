@@ -148,7 +148,7 @@ CATALOGUES = {
         "ssodnet_name": "taxonomy",
         "print_columns": [
             "class_",
-            "complex_",
+            "complex",
             "method",
             "waverange",
             "scheme",
@@ -528,7 +528,7 @@ class Taxonomies(Catalogue):
     waverange: List[str] = [""]
     method: List[str] = [""]
     scheme: List[str] = [""]
-    complex_: List[str] = pydantic.Field([""], alias="complex")
+    complex: List[str] = pydantic.Field([""], alias="complex")
     class_: List[str] = pydantic.Field([""], alias="class")
     shortbib: List[str] = [""]
 

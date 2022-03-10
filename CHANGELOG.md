@@ -1,3 +1,7 @@
+# 1.4.16 - 2022-03-10
+- Add "complex" keyword to taxonomy
+- Change "complex_" to "complex" in the taxonomies datacloud catalogue as it is not a protected python keyword
+
 # 1.4.15 - 2022-03-01
 - Fix in name resolution which caused degeneracy with packed permanent
   designation format

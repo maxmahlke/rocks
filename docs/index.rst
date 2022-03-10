@@ -8,7 +8,7 @@
 
 .. role:: gray
 
-:gray:`Latest version: 1.4.15  -` `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_ :gray:`| Bug or feature request? Open an issue on` `GitHub <https://github.com/maxmahlke/rocks/issues>`_:gray:`.`
+:gray:`Latest version: 1.4.16  -` `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_ :gray:`| Bug or feature request? Open an issue on` `GitHub <https://github.com/maxmahlke/rocks/issues>`_:gray:`.`
 
 A ``python`` client to retrieve and explore asteroid data from
 `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_.
