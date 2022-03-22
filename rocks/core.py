@@ -720,6 +720,8 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
         Default is no additional catalogues.
     progress : bool
         Show progress of instantiation. Default is False.
+    suppress_errors: bool
+        Do not print errors in the ssoCard. Default is False.
 
     Returns
     -------
