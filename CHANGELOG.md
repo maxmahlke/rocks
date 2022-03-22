@@ -1,3 +1,7 @@
+# 1.4.17 - 2022-03-22
+- Add "suppress_errors" argument to rocks.rocks and rocks.Rock. If True, errors in the ssoCard JSON are not printed
+  when creating the Rock instances. Default is False, errors are printed.
+
 # 1.4.16 - 2022-03-10
 - Add "complex" keyword to taxonomy
 - Change "complex_" to "complex" in the taxonomies datacloud catalogue as it is not a protected python keyword

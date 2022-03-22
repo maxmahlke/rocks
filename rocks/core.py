@@ -418,7 +418,14 @@ class Rock(pydantic.BaseModel):
     )
     yarkovskies: rocks.datacloud.Yarkovskies = rocks.datacloud.Yarkovskies(**{})
 
-    def __init__(self, id_, ssocard=None, datacloud=None, skip_id_check=False):
+    def __init__(
+        self,
+        id_,
+        ssocard=None,
+        datacloud=None,
+        skip_id_check=False,
+        suppress_errors=False,
+    ):
         """Identify a minor body  and retrieve its properties from SsODNet.
 
         Parameters
@@ -434,6 +441,8 @@ class Rock(pydantic.BaseModel):
         skip_id_check : bool
             Optional argument to prevent resolution of ID before getting ssoCard.
             Default is False.
+        suppress_errors: bool
+            Do not print errors in the ssoCard. Default is False.
 
         Returns
         -------
@@ -499,7 +508,8 @@ class Rock(pydantic.BaseModel):
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
 
-            self.__parse_error_message(message, id_, ssocard)
+            if not suppress_errors:
+                self.__parse_error_message(message, id_, ssocard)
 
             # Set the offending properties to None to allow for instantiation anyway
             for error in message.errors():
@@ -698,11 +708,11 @@ class Rock(pydantic.BaseModel):
     }
 
 
-def rocks_(ids, datacloud=None, progress=False):
+def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
     """Create multiple Rock instances.
 
     Parameters
-    ==========
+    ----------
     ids : list of str, list of int, list of float, np.array, pd.Series
         An iterable containing minor body identifiers.
     datacloud : list of str
@@ -712,7 +722,7 @@ def rocks_(ids, datacloud=None, progress=False):
         Show progress of instantiation. Default is False.
 
     Returns
-    =======
+    -------
     list of rocks.core.Rock
         A list of Rock instances
     """
@@ -748,7 +758,14 @@ def rocks_(ids, datacloud=None, progress=False):
             )
 
     rocks_ = [
-        Rock(id_, skip_id_check=True, datacloud=datacloud) if not id_ is None else None
+        Rock(
+            id_,
+            skip_id_check=True,
+            datacloud=datacloud,
+            suppress_errors=suppress_errors,
+        )
+        if not id_ is None
+        else None
         for id_ in ids
     ]
 
