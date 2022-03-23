@@ -297,6 +297,8 @@ def ensure_list(value):
 
 
 def ensure_int(value):
+    if isinstance(value, str):
+        return [int(value)]
     return [int(v) if v else None for v in value]
 
 
@@ -311,6 +313,7 @@ class Catalogue(pydantic.BaseModel):
     title: List[str] = [""]
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
     iddataset: List[str] = [""]
+    selection: List[int] = [None]
     datasetname: List[str] = [""]
     idcollection: List[int] = [None]
     resourcename: List[str] = [""]
@@ -508,14 +511,13 @@ class Mpcorb(Catalogue):
 
 
 class Pairs(Catalogue):
+    age: List[float] = [np.nan]
+    method: List[str] = [""]
+    distance: List[float] = [np.nan]
+    err_age_up: List[float] = [np.nan]
     sibling_num: List[float] = [np.nan]
+    err_age_down: List[float] = [np.nan]
     sibling_name: List[str] = [""]
-    delta_v: List[float] = [np.nan]
-    delta_a: List[float] = [np.nan]
-    delta_e: List[float] = [np.nan]
-    delta_sini: List[float] = [np.nan]
-    delta_i: List[float] = [np.nan]
-    membership: List[int] = [None]
 
 
 class PhaseFunction(Catalogue):
