@@ -103,7 +103,7 @@ Multiple tables are retrieved by passing a list of table names.
 
 .. code-block:: python
 
-    >>> ceres = Rock(1, datacloud=['taxonomy', 'masses'])
+    >>> ceres = Rock(1, datacloud=['taxonomies', 'masses'])
     >>> ceres.taxonomies.class_
     ['G', 'C', 'C', 'C', 'C', 'G', 'C']
     >>> ceres.taxonomies.shortbib
@@ -258,4 +258,4 @@ Accessing the properties can now be done with a loop or list comprehension.
     >>> Counter(themis_taxonomies)
     Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
 
-Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail. 
+Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail.

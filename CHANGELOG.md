@@ -1,4 +1,4 @@
-# 1.4.17 - 2022-03-22
+# 1.4.17 - 2022-03-23
 - Add "suppress_errors" argument to rocks.rocks and rocks.Rock. If True, errors in the ssoCard JSON are not printed
   when creating the Rock instances. Default is False, errors are printed.
 - Updated structure of Pairs datacloud catalogue
