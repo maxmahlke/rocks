@@ -667,18 +667,19 @@ class Rock(pydantic.BaseModel):
                     break
 
             rich.print(
-                f"Error: {' -> '.join([str(e) for e in error['loc']])} is invalid: {error['msg']}\n"
-                f"Passed value: {value}\n"
-                f"Replacing value with empty default to continue.\n"
+                f"Warning: {' -> '.join([str(e) for e in error['loc']])} is invalid."
+                # {error['msg']} f"Passed value: {value}\n"
             )
+        rich.print("\n")
 
     __aliases = {
         "dynamical": {
             "parameters.dynamical.orbital_elements": "orbital_elements",
-            "parameters.dynamical.proper_elements": "proper_elements",
-            "parameters.dynamical.yarkovsky": "yarkovsky",
             "parameters.dynamical.family": "family",
             "parameters.dynamical.pair": "pair",
+            "parameters.dynamical.proper_elements": "proper_elements",
+            "parameters.dynamical.tisserand_parameter": "tisserand_parameter",
+            "parameters.dynamical.yarkovsky": "yarkovsky",
         },
         "physical": {
             "H": "absolute_magnitude",

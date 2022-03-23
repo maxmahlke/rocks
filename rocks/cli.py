@@ -218,6 +218,17 @@ def echo():
     else:
         plot = False
 
+    # Verbose output?
+    for arg in ["-v", "--verbose"]:
+
+        if arg in sys.argv:
+            sys.argv.remove(arg)
+
+            verbose = True
+            break
+    else:
+        verbose = False
+
     # Are there enough arguments to continue?
     if len(sys.argv) == 2:
         print(f"\nUnknown command '{sys.argv[-1]}'.\n")
@@ -245,7 +256,7 @@ def echo():
     ]
 
     # And let's go
-    rock = rocks.Rock(id_, datacloud=datacloud)
+    rock = rocks.Rock(id_, datacloud=datacloud, suppress_errors=not verbose)
 
     # Identifier could not be resolved
     if not rock.id_:
