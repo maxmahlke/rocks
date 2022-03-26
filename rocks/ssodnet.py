@@ -101,10 +101,10 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     # save to cache
     if card and card is not None:
         with open(PATH_CARD, "w") as file_card:
-            json.dump(card[id_ssodnet], file_card)
+            json.dump(card, file_card)
 
     progress_bar.update(progress, advance=1)
-    return card[id_ssodnet]
+    return card
 
 
 async def _query_ssodnet(id_ssodnet, session):
@@ -254,7 +254,7 @@ async def _local_or_remote_catalogue(
 
     # Local retrieval failed, do remote query
     cat = await _query_datacloud(id_ssodnet, catalogue, session)
-    cat = cat["data"][id_ssodnet]["datacloud"]
+    cat = cat["data"][0]["datacloud"]
 
     # Always save the result, even if catalogue is empty
     if cat is not None:

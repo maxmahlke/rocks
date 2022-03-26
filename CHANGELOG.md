@@ -1,3 +1,6 @@
+# 1.4.19 - 2022-03-26
+- Implement upstream change to fix storing of ssocards and datacloud catalogues
+
 # 1.4.18 - 2022-03-23
 - Add -v|--verbose flag to parameter queries on the command line. Errors in the ssoCard
   structure are suppressed unless the verbose flag is set.
