@@ -1,3 +1,8 @@
+# 1.4.20 - 2022-03-28
+- Properly catch empty JSON responses stored as ssocards or datacloud catalogues
+- Updated color entries in ssoCard and datacloud. datacloud 'colors' no longer shadows the ssoCard 'colors' as the latter
+  has been renamed to 'color'
+
 # 1.4.19 - 2022-03-26
 - Implement upstream change to fix storing of ssocards and datacloud catalogues
 

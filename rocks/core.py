@@ -216,22 +216,45 @@ class Albedo(Value):
 class Color(Value):
     color: Value = Value(**{})
     epoch: Optional[float] = np.nan
-    from_: Optional[str] = pydantic.Field("", alias="from")
-    bibref: Bibref = Bibref(**{})
+    method: List[Method] = []
+    bibref: List[Bibref] = []
+    facility: Optional[str] = ""
     observer: Optional[str] = ""
     phot_sys: Optional[str] = ""
     delta_time: Optional[float] = np.nan
     id_filter_1: Optional[str] = ""
     id_filter_2: Optional[str] = ""
 
+    def __str__(self):
+        return self.json()
 
-class Colors(Parameter):
-    # Atlas
-    c_o: List[Color] = [pydantic.Field(Color(**{}), alias="c-o")]
-    # 2MASS / VISTA
-    J_H: List[Color] = [pydantic.Field(Color(**{}), alias="J-H")]
-    J_K: List[Color] = [pydantic.Field(Color(**{}), alias="J-K")]
-    H_K: List[Color] = [pydantic.Field(Color(**{}), alias="H-K")]
+
+class Color(Parameter):
+    g_i: Color = pydantic.Field(Color(**{}), alias="g-i")
+    g_r: Color = pydantic.Field(Color(**{}), alias="g-r")
+    g_z: Color = pydantic.Field(Color(**{}), alias="g-z")
+    i_z: Color = pydantic.Field(Color(**{}), alias="i-z")
+    r_i: Color = pydantic.Field(Color(**{}), alias="r-i")
+    r_z: Color = pydantic.Field(Color(**{}), alias="r-z")
+    u_g: Color = pydantic.Field(Color(**{}), alias="u-g")
+    u_g: Color = pydantic.Field(Color(**{}), alias="u-g")
+    u_r: Color = pydantic.Field(Color(**{}), alias="u-r")
+    u_z: Color = pydantic.Field(Color(**{}), alias="u-z")
+    J_K: Color = pydantic.Field(Color(**{}), alias="J-K")
+    Y_J: Color = pydantic.Field(Color(**{}), alias="Y-J")
+    Y_K: Color = pydantic.Field(Color(**{}), alias="Y-K")
+    c_o: Color = pydantic.Field(Color(**{}), alias="c-o")
+    v_g: Color = pydantic.Field(Color(**{}), alias="v-g")
+    v_i: Color = pydantic.Field(Color(**{}), alias="v-i")
+    v_r: Color = pydantic.Field(Color(**{}), alias="v-r")
+    v_z: Color = pydantic.Field(Color(**{}), alias="v-z")
+    H_K: Color = pydantic.Field(Color(**{}), alias="H-K")
+    J_H: Color = pydantic.Field(Color(**{}), alias="J-H")
+    Y_H: Color = pydantic.Field(Color(**{}), alias="Y-H")
+    u_v: Color = pydantic.Field(Color(**{}), alias="u-v")
+    V_I: Color = pydantic.Field(Color(**{}), alias="V-I")
+    V_R: Color = pydantic.Field(Color(**{}), alias="V-R")
+    B_V: Color = pydantic.Field(Color(**{}), alias="B-V")
 
 
 class Density(Value):
@@ -319,7 +342,7 @@ class AbsoluteMagnitude(Value):
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
     spin: ParameterList = ParameterList([{}])
-    colors: Colors = Colors(**{})
+    color: Color = pydantic.Field(Color(**{}), alias="colors")
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
@@ -648,7 +671,6 @@ class Rock(pydantic.BaseModel):
 
     def __parse_error_message(self, message, id_, data):
         """Print informative error message if ssocard data is invalid."""
-        print(f"\n{id_}:")
 
         # Look up offending value in ssoCard
         for error in message.errors():
@@ -667,10 +689,9 @@ class Rock(pydantic.BaseModel):
                     break
 
             rich.print(
-                f"Warning: {' -> '.join([str(e) for e in error['loc']])} is invalid."
-                # {error['msg']} f"Passed value: {value}\n"
+                f"[blue]Warning[/] [magenta]object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
+                # f"\nPassed value: {value}"
             )
-        rich.print("\n")
 
     __aliases = {
         "dynamical": {
@@ -685,7 +706,7 @@ class Rock(pydantic.BaseModel):
             "H": "absolute_magnitude",
             "parameters.physical.absolute_magnitude": "absolute_magnitude",
             "parameters.physical.albedo": "albedo",
-            "parameters.physical.colors": "colors",
+            "parameters.physical.colors": "color",
             "parameters.physical.diameter": "diameter",
             "parameters.physical.density": "density",
             "parameters.physical.mass": "mass",

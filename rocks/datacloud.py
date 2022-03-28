@@ -69,7 +69,7 @@ CATALOGUES = {
     "colors": {
         "attr_name": "colors",
         "ssodnet_name": "colors",
-        "print_columns": [""],
+        "print_columns": ["color", "value", "uncertainty", "phot_sys", "shortbib"],
     },
     "diamalbedo": {
         "attr_name": "diamalbedo",
@@ -317,6 +317,7 @@ class Catalogue(pydantic.BaseModel):
     datasetname: List[str] = [""]
     idcollection: List[int] = [None]
     resourcename: List[str] = [""]
+    shortbib: List[str] = [""]
 
     _ensure_list: classmethod = pydantic.validator("*", allow_reuse=True, pre=True)(
         ensure_list
@@ -407,7 +408,15 @@ class Binarymp(Catalogue):
 
 
 class Colors(Catalogue):
-    pass
+    color: List[str] = [""]
+    value: List[float] = [np.nan]
+    epoch: List[float] = [np.nan]
+    facility: List[str] = [""]
+    observer: List[str] = [""]
+    phot_sys: List[str] = [""]
+    id_filter_1: List[str] = [""]
+    id_filter_2: List[str] = [""]
+    uncertainty: List[float] = [np.nan]
 
 
 class Diamalbedo(Catalogue):
@@ -418,7 +427,6 @@ class Diamalbedo(Catalogue):
     method: List[str] = [""]
     year: List[Optional[int]] = [None]
     source: List[str] = [""]
-    shortbib: List[str] = [""]
 
     albedo: List[float] = [np.nan]
     err_albedo_up: List[float] = [np.nan]
@@ -465,7 +473,6 @@ class Masses(Catalogue):
     url: List[str] = [""]
     source: List[str] = [""]
     method: List[str] = [""]
-    shortbib: List[str] = [""]
 
     year: List[Optional[int]] = [None]
     mass: List[float] = [np.nan]
@@ -532,7 +539,6 @@ class Taxonomies(Catalogue):
     scheme: List[str] = [""]
     complex: List[str] = pydantic.Field([""], alias="complex")
     class_: List[str] = pydantic.Field([""], alias="class")
-    shortbib: List[str] = [""]
 
     year: List[Optional[int]] = [None]
 

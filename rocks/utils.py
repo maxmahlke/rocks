@@ -212,18 +212,12 @@ def cache_inventory():
         # Is it valid?
         with open(file_, "r") as ssocard:
 
-            card = json.load(ssocard)
-
-            if not card:
+            try:
+                card = json.load(ssocard)
+            except json.decoder.JSONDecodeError:
                 # Empty card or catalogue, remove it
                 file_.unlink()
                 continue
-
-            # if not catalogue:
-            #     if card[ssodnet_id] is None:
-            #         # Faulty card, remove it
-            #         file_.unlink()
-            #         continue
 
         # Append to inventory
         if catalogue:
