@@ -213,7 +213,7 @@ class Albedo(Value):
     method: List[Method] = []
 
 
-class Color(Value):
+class Color(Parameter):
     color: Value = Value(**{})
     epoch: Optional[float] = np.nan
     method: List[Method] = []
@@ -224,9 +224,6 @@ class Color(Value):
     delta_time: Optional[float] = np.nan
     id_filter_1: Optional[str] = ""
     id_filter_2: Optional[str] = ""
-
-    def __str__(self):
-        return self.json()
 
 
 class Color(Parameter):

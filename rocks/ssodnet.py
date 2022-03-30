@@ -254,11 +254,15 @@ async def _local_or_remote_catalogue(
 
     # Local retrieval failed, do remote query
     cat = await _query_datacloud(id_ssodnet, catalogue, session)
-    cat = cat["data"][0]["datacloud"]
+    cat = cat["data"]
 
     # Always save the result, even if catalogue is empty
     if cat is not None:
-        cat = cat[catalogue]
+        cat = cat[0]["datacloud"]
+        if catalogue in cat:
+            cat = cat[catalogue]
+        else:
+            cat = {}
     else:
         cat = {}
 
