@@ -1,3 +1,7 @@
+# 1.4.22 - 2022-04-01
+- Updated taxonomy implementation to reflect change in ssoCard
+- Set all colour values to "grayish" and shapes to "roughly potato-like"
+
 # 1.4.21 - 2022-03-30
 - Bugfix in datacloud catalogue retrieval
 

@@ -76,33 +76,17 @@ class Bibref(Parameter):
     shortbib: Optional[str] = ""
 
 
-# And a special class for the Spin and Taxonomy lists
+# And a special class for the Spin list
 class ParameterList(list):
-    """Subclass of <list> with a custom __str__ for the Spin and Taxonomy parameters."""
+    """Subclass of <list> with a custom __str__ for the Spin parameters."""
 
     def __init__(self, list_):
-        """Convert the list items to Spin or Taxonomy instances."""
-
-        if "class" in list_[0]:
-            list_ = [Taxonomy(**entry) for entry in list_]
-        else:
-            list_ = [Spin(**entry) for entry in list_]
+        """Convert the list items to Spin instances."""
+        list_ = [Spin(**entry) for entry in list_]
 
         return super().__init__(list_)
 
     def __str__(self) -> str:
-
-        if hasattr(self[0], "class_"):
-            if len(self) == 1:
-                return self[0].class_
-            else:
-                classifications = []
-
-                for entry in self:
-                    shortbib = ", ".join(bib.shortbib for bib in entry.bibref)
-                    classifications.append(f"{entry.class_:<4}{shortbib}")
-
-                return "\n".join(classifications)
 
         return super().__str__()
 
@@ -343,7 +327,7 @@ class PhysicalParameters(Parameter):
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
-    taxonomy: ParameterList = ParameterList([{"class": ""}])
+    taxonomy: Taxonomy = Taxonomy(**{})
     phase_function: PhaseFunction = PhaseFunction(**{})
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
@@ -352,7 +336,7 @@ class PhysicalParameters(Parameter):
         convert_spin_to_list
     )
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "spin", "taxonomy", allow_reuse=True, pre=True
+        "spin", allow_reuse=True, pre=True
     )(lambda list_: ParameterList(list_))
 
 
