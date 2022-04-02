@@ -146,7 +146,7 @@ def _build_designation_index(index):
     parts = [
         "18",
         "19",
-        *[f"20{year:02}" for year in range(0, max_year)],
+        *[f"20{year:02}" for year in range(0, max_year + 1)],
     ]
 
     for part in parts:

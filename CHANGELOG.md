@@ -1,3 +1,7 @@
+# 1.4.23 - 2022-04-
+- Fixed incorrect display of double-letter taxonomic classes on command line
+- Index for asteroids with designation 2022 is now correctly compiled
+
 # 1.4.22 - 2022-04-01
 - Updated taxonomy implementation to reflect change in ssoCard
 - Set all colour values to "grayish" and shapes to "roughly potato-like"

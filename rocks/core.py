@@ -305,7 +305,7 @@ class Taxonomy(Parameter):
     def __str__(self):
         if not self.class_:
             return "No taxonomy on record."
-        return ", ".join(self.class_)
+        return self.class_
 
 
 class ThermalInertia(Parameter):
