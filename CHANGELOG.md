@@ -1,4 +1,4 @@
-# 1.4.23 - 2022-04-
+# 1.4.23 - 2022-04-02
 - Fixed incorrect display of double-letter taxonomic classes on command line
 - Index for asteroids with designation 2022 is now correctly compiled
 
