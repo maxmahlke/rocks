@@ -137,7 +137,9 @@ def status():
     # Echo update recommendations
     latest_rocks = rocks.utils.retrieve_rocks_version()
 
-    if latest_rocks and latest_rocks != rocks.__version__:
+    if latest_rocks and tuple(map(int, latest_rocks.split("."))) > tuple(
+        map(int, rocks.__version__.split("."))
+    ):
         rich.print(
             f"[red]The running [green]rocks[/green] version ({rocks.__version__}) is behind the "
             f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"

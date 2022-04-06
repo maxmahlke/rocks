@@ -107,6 +107,11 @@ def _build_name_index(index):
     for part in parts:
 
         names_subset = set(name for name in names if name.startswith(part))
+
+        if part == "a":
+            names_subset.add(
+                "'aylo'chaxnim"
+            )  # another edge case for the daughter of venus
         part_index = index.loc[index.Reduced.isin(names_subset)]
 
         part_index = dict(
@@ -293,7 +298,11 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
 
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
-        path = rocks.PATH_INDEX / f"{id_[0]}.pkl"
+
+        if id_[0] == "'":  # catch 'aylo'chaxnim
+            path = rocks.PATH_INDEX / f"a.pkl"
+        else:
+            path = rocks.PATH_INDEX / f"{id_[0]}.pkl"
 
     # Is it a designation?
     elif re.match(

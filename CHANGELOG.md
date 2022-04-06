@@ -1,3 +1,7 @@
+# 1.4.24 - 2022-04-
+- Improved rocks version comparison
+- Add catch for 594913 'Aylo'chaxnim in index lookup
+
 # 1.4.23 - 2022-04-02
 - Fixed incorrect display of double-letter taxonomic classes on command line
 - Index for asteroids with designation 2022 is now correctly compiled
