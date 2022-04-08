@@ -4,13 +4,16 @@
 from functools import reduce
 import json
 import re
+import shutil
 import string
+import tarfile
 import warnings
 
 import numpy as np
 import Levenshtein as lev
 import requests
 import rich
+from rich.progress import track
 
 import rocks
 
@@ -309,18 +312,18 @@ def retrieve_rocks_version():
     try:
         response = requests.get(URL, timeout=10)
     except requests.exceptions.ReadTimeout:
+        return ""
+
+    if response.status_code == 200:
+        version = re.findall(r"\d+\.\d+[\.\d]*", response.text)[0]
+    else:
         version = ""
-    finally:
-        if response.status_code == 200:
-            version = re.findall(r"\d+\.\d+[\.\d]*", response.text)[0]
-        else:
-            version = ""
 
     return version
 
 
 def find_candidates(id_):
-    """Propose a match among the named asteroids for the pass id_.
+    """Identify possible matches among all asteroid names based on Levenshtein distance.
 
     Parameters
     ----------
@@ -361,8 +364,19 @@ def find_candidates(id_):
 
 
 def list_candidate_ssos(id_):
-    # The query failed. Propose some names if the id_ looks like a name,
-    # designations give too many false positives
+    """Propose matches for failed id queries based on Levenshtein distance if the passed identifier is a name.
+
+    Parameters
+    ----------
+    id_ : str
+        The passed asteroid identifier.
+
+    Note
+    ----
+    The proposed matches are printed to stdout.
+    """
+
+    # This only makes sense for named asteroids
     if not re.match(r"^[A-Za-z ]*$", id_):
         return
 
@@ -379,43 +393,29 @@ def list_candidate_ssos(id_):
 
 
 def cache_all_ssocards():
+    """Retrieves all ssoCards and stores them in the cache directory.
+
+    Warning: This will slow down the '$ rocks status' command considerably.
     """
 
-    Parameters
-    ----------
+    # Retrieve archive of ssoCards
+    PATH_ARCHIVE = "/tmp/ssoCard-latest.tar.gz"
 
+    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/ssoCard-latest.tar.bz2"
 
-    Returns
-    -------
+    response = requests.get(URL, stream=True)
 
-    """
-    # URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/ssoCard-latest.tar.bz2"
+    with open(PATH_ARCHIVE, "wb") as fp:
+        shutil.copyfileobj(response.raw, fp)
 
-    # response = requests.get(URL)
+    # Extract to the cache directory
+    cards = tarfile.open(PATH_ARCHIVE, mode="r:bz2")
+    members = cards.getmembers()
 
-    import shutil
-    import tarfile
+    for member in track(members, total=len(members), description="Unpacking ssoCards"):
 
-    # path = "/tmp/folder.tar.bz2"
-    path = "/tmp/ssoCard-latest.tar.bz2"
-    path_out = "/tmp/cards"
+        if not member.name.endswith(".json"):
+            continue
 
-    cards = tarfile.open(path, mode="r:bz2")
-    cards.extractall(path_out)
-
-    import glob
-
-    for file in glob.glob(f"{path_out}/*/store/*/*.json"):
-        shutil.move(file, rocks.PATH_CACHE / file.split("/")[-1])
-
-    # decompressor = bz.BZ2Decompressor()
-
-    # zipfile = bz2.BZ2File("/tmp/ssoCard-latest.tar.bz2")  # open the file
-
-    # with open('/tmp/ssoCard-latest.tar.bz2', 'rb') as file_:
-    #     decompressor.decompresso(file_.read())
-
-    # with open("/tmp/ssocards.tar.bz2", "wb") as fp:
-    # decomp = decompressor.decompress(response.raw)
-    # if decomp:
-    #     fp.write(decomp)
+        member.path = member.path.split("/")[-1]
+        cards.extract(member, rocks.PATH_CACHE)
