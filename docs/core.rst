@@ -162,6 +162,27 @@ The ``datacloud`` tables have slightly different names in ``rocks``.
 | taxonomy        | ``taxonomies``             |
 +-----------------+----------------------------+
 
+Some attributes are called different in ``rocks`` than in the ``datacloud`` table:
+
+
+The ``datacloud`` tables have slightly different names in ``rocks``.
+
++-----------------+----------------------------+
+| datacloud Table | Attribute Name             |
++-----------------+----------------------------+
+| num             | ``number``                 |
++-----------------+----------------------------+
+| sibling_num     | ``sibling_number``         |
++-----------------+----------------------------+
+| id              | ``id_``                    |
++-----------------+----------------------------+
+| lambda          | ``lambda_``                |
++-----------------+----------------------------+
+| class           | ``class_``                 |
++-----------------+----------------------------+
+| from           | ``from_``                   |
++-----------------+----------------------------+
+
 Some observations in the catalogues might be preferred to others. For example, a
 taxonomical classification using a visible-near-infrared spectrum is more
 reliable than one based on visible colours. ``rocks`` includes **opinionated**
