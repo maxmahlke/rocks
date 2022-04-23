@@ -58,7 +58,7 @@ class Parameter(pydantic.BaseModel):
         return str(rich.print_json(data=json.loads(self.json()), sort_keys=True))
 
 
-# Other common branches are method and bibref
+# Other common branches are bibred, links and method
 class Method(Parameter):
     doi: Optional[str] = ""
     name: Optional[str] = ""
@@ -74,6 +74,10 @@ class Bibref(Parameter):
     title: Optional[str] = ""
     bibcode: Optional[str] = ""
     shortbib: Optional[str] = ""
+
+
+class LinksParameter(Parameter):
+    datacloud: Optional[str] = ""
 
 
 # And a special class for the Spin list
@@ -122,6 +126,7 @@ def convert_spin_to_list(spins: Dict) -> List:
 # Dynamical parameters
 class OrbitalElements(Parameter):
     ceu: Value = Value(**{})
+    links: LinksParameter = LinksParameter(**{})
     author: Optional[str] = ""
     bibref: List[Bibref] = [Bibref(**{})]
     ceu_rate: Value = Value(**{})
@@ -139,6 +144,7 @@ class OrbitalElements(Parameter):
 
 
 class ProperElements(Parameter):
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     proper_g: Value = Value(**{})
     proper_s: Value = Value(**{})
@@ -149,6 +155,7 @@ class ProperElements(Parameter):
 
 
 class Family(Parameter):
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     family_name: Optional[str] = ""
     family_number: Optional[int] = None
@@ -193,13 +200,15 @@ class DynamicalParameters(Parameter):
 # ------
 # Physical Value
 class Albedo(Value):
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = []
     method: List[Method] = []
 
 
-class Color(Parameter):
+class ColorEntry(Parameter):
     color: Value = Value(**{})
     epoch: Optional[float] = np.nan
+    links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
     bibref: List[Bibref] = []
     facility: Optional[str] = ""
@@ -211,31 +220,31 @@ class Color(Parameter):
 
 
 class Color(Parameter):
-    g_i: Color = pydantic.Field(Color(**{}), alias="g-i")
-    g_r: Color = pydantic.Field(Color(**{}), alias="g-r")
-    g_z: Color = pydantic.Field(Color(**{}), alias="g-z")
-    i_z: Color = pydantic.Field(Color(**{}), alias="i-z")
-    r_i: Color = pydantic.Field(Color(**{}), alias="r-i")
-    r_z: Color = pydantic.Field(Color(**{}), alias="r-z")
-    u_g: Color = pydantic.Field(Color(**{}), alias="u-g")
-    u_g: Color = pydantic.Field(Color(**{}), alias="u-g")
-    u_r: Color = pydantic.Field(Color(**{}), alias="u-r")
-    u_z: Color = pydantic.Field(Color(**{}), alias="u-z")
-    J_K: Color = pydantic.Field(Color(**{}), alias="J-K")
-    Y_J: Color = pydantic.Field(Color(**{}), alias="Y-J")
-    Y_K: Color = pydantic.Field(Color(**{}), alias="Y-K")
-    c_o: Color = pydantic.Field(Color(**{}), alias="c-o")
-    v_g: Color = pydantic.Field(Color(**{}), alias="v-g")
-    v_i: Color = pydantic.Field(Color(**{}), alias="v-i")
-    v_r: Color = pydantic.Field(Color(**{}), alias="v-r")
-    v_z: Color = pydantic.Field(Color(**{}), alias="v-z")
-    H_K: Color = pydantic.Field(Color(**{}), alias="H-K")
-    J_H: Color = pydantic.Field(Color(**{}), alias="J-H")
-    Y_H: Color = pydantic.Field(Color(**{}), alias="Y-H")
-    u_v: Color = pydantic.Field(Color(**{}), alias="u-v")
-    V_I: Color = pydantic.Field(Color(**{}), alias="V-I")
-    V_R: Color = pydantic.Field(Color(**{}), alias="V-R")
-    B_V: Color = pydantic.Field(Color(**{}), alias="B-V")
+    g_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-i")
+    g_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-r")
+    g_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-z")
+    i_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="i-z")
+    r_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="r-i")
+    r_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="r-z")
+    u_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-g")
+    u_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-g")
+    u_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-r")
+    u_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-z")
+    J_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="J-K")
+    Y_J: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-J")
+    Y_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-K")
+    c_o: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="c-o")
+    v_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-g")
+    v_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-i")
+    v_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-r")
+    v_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-z")
+    H_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="H-K")
+    J_H: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="J-H")
+    Y_H: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-H")
+    u_v: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-v")
+    V_I: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-I")
+    V_R: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-R")
+    B_V: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="B-V")
 
 
 class Density(Value):
@@ -246,6 +255,7 @@ class Density(Value):
 
 
 class Diameter(Value):
+    links: LinksParameter = LinksParameter(**{})
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
@@ -253,6 +263,7 @@ class Diameter(Value):
 
 
 class Mass(Value):
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
@@ -266,6 +277,7 @@ class Phase(Parameter):
     G2: Value = Value(**{})
     rms: Optional[float] = np.nan
     phase: Error = Error(**{})
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     facility: Optional[str] = ""
     name_filter: Optional[str] = ""
@@ -286,6 +298,7 @@ class Spin(Parameter):
     lat: Optional[Value] = Value(**{})
     RA0: Optional[Value] = Value(**{})
     DEC0: Optional[Value] = Value(**{})
+    links: LinksParameter = LinksParameter(**{})
     long_: Optional[Value] = pydantic.Field(Value(**{}), alias="long")
     period: Optional[Value] = Value(**{})
     method: Optional[List[Method]] = [Method(**{})]
@@ -295,6 +308,7 @@ class Spin(Parameter):
 
 
 class Taxonomy(Parameter):
+    links: LinksParameter = LinksParameter(**{})
     class_: Optional[str] = pydantic.Field("", alias="class")
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
     method: Optional[List[Method]] = [Method(**{})]
@@ -311,6 +325,7 @@ class Taxonomy(Parameter):
 class ThermalInertia(Parameter):
     TI: Value = Value(**{})
     dsun: Optional[float] = np.nan
+    links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = []
     method: List[Method] = []
 
@@ -359,30 +374,15 @@ class Parameters(Parameter):
         arbitrary_types_allowed = True
 
 
-class Link(Parameter):
-    unit: Optional[str] = ""
-    self_: Optional[str] = pydantic.Field("", alias="self")
-    quaero: Optional[str] = ""
-    description: Optional[str] = ""
-
-
 class Ssocard(Parameter):
     version: Optional[str] = ""
     datetime: Optional[dt.datetime] = None
 
 
-class Datacloud(Parameter):
-    """The collection of links to datacloud catalogue associated to this ssoCard."""
-
-    astorb: Optional[str] = ""
-    binarymp: Optional[str] = ""
-    diamalbedo: Optional[str] = ""
-    families: Optional[str] = ""
-    masses: Optional[str] = ""
-    mpcatobs: Optional[str] = ""
-    mpcorb: Optional[str] = ""
-    pairs: Optional[str] = ""
-    taxonomy: Optional[str] = ""
+class Links(Parameter):
+    self_: Optional[str] = pydantic.Field("", alias="self")
+    quaero: Optional[str] = ""
+    mapping: Optional[str] = ""
 
 
 class Rock(pydantic.BaseModel):
@@ -401,9 +401,8 @@ class Rock(pydantic.BaseModel):
     parameters: Parameters = Parameters(**{})
 
     # the meta
-    link: Link = Link(**{})
+    links: Links = Links(**{})
     ssocard: Ssocard = Ssocard(**{})
-    datacloud: Datacloud = Datacloud(**{})
 
     # the catalogues
     astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
