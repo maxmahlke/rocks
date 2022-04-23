@@ -415,12 +415,7 @@ class Rock(pydantic.BaseModel):
     mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
     mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
-    phase_functions: rocks.datacloud.PhaseFunction = rocks.datacloud.PhaseFunction(**{})
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
-    thermal_properties: rocks.datacloud.ThermalProperties = (
-        rocks.datacloud.ThermalProperties(**{})
-    )
-    yarkovskies: rocks.datacloud.Yarkovskies = rocks.datacloud.Yarkovskies(**{})
 
     def __init__(
         self,
@@ -633,7 +628,7 @@ class Rock(pydantic.BaseModel):
 
         # turn list of dict (catalogue entries) into dict of list
         cat = {
-            key: [c[key] for c in cat]
+            key: [c[key] if key in c else "" for c in cat]
             if catalogue not in ["aams", "astorb", "pairs", "families"]
             else cat[0][key]
             for key in cat[0].keys()

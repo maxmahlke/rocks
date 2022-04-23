@@ -56,4 +56,6 @@ The minimum required `python` version is 3.7.
 
 ## Documentation
 
-Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.io/en/latest/).
+Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.io/en/latest/) or run
+
+     $ rocks docs
