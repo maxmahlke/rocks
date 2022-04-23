@@ -55,7 +55,7 @@ class Value(pydantic.BaseModel):
 # The second lowest level is the Parameter
 class Parameter(pydantic.BaseModel):
     def __str__(self):
-        return json.dumps(json.loads(self.json()), indent=2, sort_keys=True)
+        return str(rich.print_json(data=json.loads(self.json()), sort_keys=True))
 
 
 # Other common branches are method and bibref
