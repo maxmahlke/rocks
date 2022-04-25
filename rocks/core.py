@@ -186,7 +186,7 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
-    pair: List[PairMember] = [PairMember(**{})]
+    pair: List[PairMember] = pydantic.Field([PairMember(**{})], alias="pairs")
     family: Family = Family(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
@@ -214,6 +214,7 @@ class ColorEntry(Parameter):
     facility: Optional[str] = ""
     observer: Optional[str] = ""
     phot_sys: Optional[str] = ""
+    technique: Optional[str] = ""
     delta_time: Optional[float] = np.nan
     id_filter_1: Optional[str] = ""
     id_filter_2: Optional[str] = ""
@@ -303,6 +304,7 @@ class Spin(Parameter):
     period: Optional[Value] = Value(**{})
     method: Optional[List[Method]] = [Method(**{})]
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
+    technique: Optional[str] = ""
 
     path_unit: str = "unit.physical.spin.value"
 
@@ -314,6 +316,7 @@ class Taxonomy(Parameter):
     method: Optional[List[Method]] = [Method(**{})]
     scheme: Optional[str] = ""
     complex: Optional[str] = ""
+    technique: Optional[str] = ""
     waverange: Optional[str] = ""
 
     def __str__(self):
@@ -628,7 +631,7 @@ class Rock(pydantic.BaseModel):
         # turn list of dict (catalogue entries) into dict of list
         cat = {
             key: [c[key] if key in c else "" for c in cat]
-            if catalogue not in ["aams", "astorb", "pairs", "families"]
+            if catalogue not in ["aams", "astorb", "families"]
             else cat[0][key]
             for key in cat[0].keys()
         }
@@ -678,6 +681,7 @@ class Rock(pydantic.BaseModel):
             "parameters.dynamical.yarkovsky": "yarkovsky",
         },
         "physical": {
+            "D": "diameter",
             "H": "absolute_magnitude",
             "parameters.physical.absolute_magnitude": "absolute_magnitude",
             "parameters.physical.albedo": "albedo",

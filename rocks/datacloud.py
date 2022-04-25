@@ -136,7 +136,7 @@ CATALOGUES = {
     "pairs": {
         "attr_name": "pairs",
         "ssodnet_name": "pairs",
-        "print_columns": [],
+        "print_columns": ["sibling_number", "sibling_name", "delta_v", "membership"],
     },
     "phase_functions": {
         "attr_name": "phase_functions",
@@ -181,8 +181,7 @@ def pretty_print(rock, catalogue, parameter):
     parameter : str
         The name of the user-requested parameter to echo.
     """
-
-    if len(catalogue) == 1 and pd.isna(catalogue.id_[0]):
+    if len(catalogue) == 1 and pd.isna(catalogue.number[0]):
         print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
         return
 

@@ -1,6 +1,9 @@
-# 1.4.24 - 2022-04-
+# 1.5 - 2022-04-
+- Updated Rock class to reflect upstream changes in ssoCard structure
 - Improved rocks version comparison
 - Add catch for 594913 'Aylo'chaxnim in index lookup
+- Added shortcut "D" for diameter
+- Removed the "units" argument from "rocks parameters", units are now printed by default
 
 # 1.4.23 - 2022-04-02
 - Fixed incorrect display of double-letter taxonomic classes on command line
