@@ -550,13 +550,35 @@ class Rock(pydantic.BaseModel):
                 if catalogue in ["diameters", "albedos"]:
                     catalogue = "diamalbedo"
 
-                setattr(
-                    self,
-                    catalogue,
-                    rocks.datacloud.DataCloudDataFrame(
+                try:
+                    catalogue_instance = rocks.datacloud.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
-                    ),
-                )
+                    )
+
+                # Common occurence of
+                # ValueError: All arrays must be of the same length
+                # due to malformed datacloud catalogue
+                except ValueError:
+                    # Drop catalogue attributes with a single entry
+                    to_drop = []
+
+                    for attribute, entries in getattr(self, catalogue).dict().items():
+                        if len(entries) == 1:
+                            to_drop.append(attribute)
+
+                    for attribute in to_drop:
+                        delattr(getattr(self, catalogue), attribute)
+
+                    # Let's try this again
+                    catalogue_instance = rocks.datacloud.DataCloudDataFrame(
+                        data=getattr(self, catalogue).dict()
+                    )
+
+                    warnings.warn(
+                        f"Removed malformed attributes {to_drop} from datacloud catalogue {catalogue}"
+                    )
+
+                setattr(self, catalogue, catalogue_instance)
 
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""

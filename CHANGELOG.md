@@ -4,6 +4,10 @@
 - Add catch for 594913 'Aylo'chaxnim in index lookup
 - Added shortcut "D" for diameter
 - Removed the "units" argument from "rocks parameters", units are now printed by default
+- Add catch for malformed datacloud catalogues
+
+# 1.4.24 - 2022-04-25
+- Fix implementation of diamalbedo catalogue
 
 # 1.4.23 - 2022-04-02
 - Fixed incorrect display of double-letter taxonomic classes on command line
