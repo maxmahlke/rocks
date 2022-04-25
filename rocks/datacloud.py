@@ -30,7 +30,6 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "shortbib",
         ],
     },
     "astdys": {
@@ -82,7 +81,6 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "shortbib",
         ],
     },
     "diameters": {
@@ -96,7 +94,6 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "shortbib",
         ],
     },
     "families": {
@@ -598,21 +595,20 @@ class Binarymp(pydantic.BaseModel):
 class Diamalbedo(pydantic.BaseModel):
     """Diameters and Albedos database from literature"""
 
-    id_: List[int] = pydantic.Field([None], alias="id")
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
     name: List[str] = [""]
     diameter: List[float] = [np.nan]
     err_diameter_up: List[float] = [np.nan]
     err_diameter_down: List[float] = [np.nan]
     albedo: List[float] = [np.nan]
-    err_albedo: List[float] = [np.nan]
+    err_albedo_up: List[float] = [np.nan]
+    err_albedo_down: List[float] = [np.nan]
     beaming: List[float] = [np.nan]
     err_beaming: List[float] = [np.nan]
     emissivity: List[float] = [np.nan]
     err_emissivity: List[float] = [np.nan]
     selection: List[int] = [None]
     method: List[str] = [""]
-    iddataset: List[int] = [None]
 
     preferred_albedo: List[bool] = [False]
     preferred_diameter: List[bool] = [False]
