@@ -521,7 +521,7 @@ class Rock(pydantic.BaseModel):
                 location_list = error["loc"][:-1]
 
                 if any(
-                    [property_ in location_list for property_ in ["taxonomy", "spin"]]
+                    property_ in location_list for property_ in ["taxonomy", "spin"]
                 ):
                     for property_ in ["taxonomy", "spin"]:
                         if property_ in location_list:
@@ -615,7 +615,7 @@ class Rock(pydantic.BaseModel):
 
         raise AttributeError(
             f"'Rock' object has no attribute '{name}'. Run "
-            f"'rocks parameters' to get a list of accepted properties."
+            "'rocks parameters' to get a list of accepted properties."
         )
 
     def __repr__(self):

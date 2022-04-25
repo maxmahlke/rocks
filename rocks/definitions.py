@@ -101,11 +101,9 @@ def select_numeric_property(obs, prop_name):
             # Ensure that rows do not contain all 0 values, as can be the case
             # for albedo in diamalbedo
             if all(
-                [
                     obs[prop_name][i] == 0
                     for i, m in enumerate(obs["method"])
                     if m in method
-                ]
             ):
                 continue
 

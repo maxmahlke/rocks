@@ -50,7 +50,7 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
     elif not isinstance(id_ssodnet, (list, np.ndarray)):
         raise TypeError(
             f"Received SsODNet ID of type {type(id_ssodnet)}, expected one of: "
-            f"str, list, np.ndarray, pd.Series"
+            "str, list, np.ndarray, pd.Series"
         )
 
     # ---
@@ -123,7 +123,7 @@ async def _query_ssodnet(id_ssodnet, session):
         SsODNet response as dict if successful. Empty if query failed.
     """
 
-    URL = f"https://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=" f"{id_ssodnet}"
+    URL = f"https://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q={id_ssodnet}"
 
     response = await session.request(method="GET", url=URL)
 
@@ -175,7 +175,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     elif not isinstance(id_ssodnet, (list, np.ndarray)):
         raise TypeError(
             f"Received SsODNet ID of type {type(id_ssodnet)}, expected one of: "
-            f"str, list, np.ndarray, pd.Series"
+            "str, list, np.ndarray, pd.Series"
         )
 
     if isinstance(catalogue, str):
@@ -183,7 +183,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     elif not isinstance(catalogue, (list, np.ndarray)):
         raise TypeError(
             f"Received catalogue of type {type(catalogue)}, expected one of: "
-            f"str, list, np.ndarray"
+            "str, list, np.ndarray"
         )
 
     # Flatten input for easier calling

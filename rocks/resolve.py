@@ -61,7 +61,7 @@ def identify(id_, return_id=False, local=True, progress=False):
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected one of: "
-            f"str, int, float, list, set, range, np.ndarray, pd.Series"
+            "str, int, float, list, set, range, np.ndarray, pd.Series"
         )
 
     if not id_:
@@ -278,7 +278,7 @@ def _standardize_id_for_quaero(id_):
     else:
         warnings.warn(
             f"Did not understand type of id: {type(id_)}"
-            f"\nShould be integer, float, or string."
+            "\nShould be integer, float, or string."
         )
     return id_
 
@@ -303,7 +303,7 @@ async def _query_quaero(id_, session):
     url = "https://api.ssodnet.imcce.fr/quaero/1/sso/search"
 
     params = {
-        "q": f'type:("Dwarf Planet" OR Asteroid)' f' AND "{id_}"~0',
+        "q": f'type:("Dwarf Planet" OR Asteroid) AND "{id_}"~0',
         "from": "rocks",
         "limit": 100,
     }
@@ -351,7 +351,7 @@ def _parse_quaero_response(data, id_):
             break
         elif match["id"] == id_:
             break
-        elif any([alias == id_ for alias in match["aliases"]]):
+        elif any(alias == id_ for alias in match["aliases"]):
             break
     else:
         # Unclear which match is correct.

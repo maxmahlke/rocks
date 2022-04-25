@@ -24,7 +24,7 @@ def warning_on_one_line(message, category, filename, lineno, file=None, line=Non
     if "rocks/" in filename:
         return f"rocks: {message}\n"
     else:
-        return "%s:%s: %s: %s\n" % (filename, lineno, category.__name__, message)
+        return f"{filename}:{lineno}: {category.__name__}: {message}\n"
 
 
 warnings.formatwarning = warning_on_one_line
@@ -100,8 +100,8 @@ def weighted_average(catalogue, parameter):
     observable = np.array(values)[preferred]
     error = np.array(errors)[preferred]
 
-    if all([np.isnan(value) for value in values]) or all(
-        [np.isnan(error) for error in errors]
+    if all(np.isnan(value) for value in values) or all(
+        np.isnan(error) for error in errors
     ):
         warnings.warn(
             f"{catalogue.name[0]}: The values or errors of property '{parameter}' are all NaN. Average failed."
@@ -115,7 +115,7 @@ def weighted_average(catalogue, parameter):
     if len(observable) == 1:
         return (observable[0], error[0])
 
-    if any([e == 0 for e in error]):
+    if any(e == 0 for e in error):
         weights = np.ones(observable.shape)
         warnings.warn("Encountered zero in errors array. Setting all weights to 1.")
     else:
@@ -131,8 +131,8 @@ def weighted_average(catalogue, parameter):
         len(observable)
         / (len(observable) - 1)
         * (
-            sum(w * o ** 2 for w, o in zip(weights, observable)) / sum(weights)
-            - avg ** 2
+            sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights)
+            - avg**2
         )
     )
     std_avg = np.sqrt(var_avg / len(observable))
@@ -187,10 +187,8 @@ def cache_inventory():
 
         # Datacloud catalogue or ssoCard?
         if any(
-            [
-                cat["ssodnet_name"] in str(file_)
-                for cat in rocks.datacloud.CATALOGUES.values()
-            ]
+            cat["ssodnet_name"] in str(file_)
+            for cat in rocks.datacloud.CATALOGUES.values()
         ):
             *ssodnet_id, catalogue = file_.stem.split("_")
             ssodnet_id = "_".join(ssodnet_id)

@@ -211,7 +211,7 @@ def _build_palomar_transit_index(index):
         )
     )
 
-    _write_to_cache(part_index, f"PLT.pkl")
+    _write_to_cache(part_index, "PLT.pkl")
 
 
 def _write_to_cache(obj, filename):
@@ -300,7 +300,7 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
 
         if id_[0] == "'":  # catch 'aylo'chaxnim
-            path = rocks.PATH_INDEX / f"a.pkl"
+            path = rocks.PATH_INDEX / "a.pkl"
         else:
             path = rocks.PATH_INDEX / f"{id_[0]}.pkl"
 
@@ -318,7 +318,7 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
 
     # Should be in this one then
     else:
-        path = rocks.PATH_INDEX / f"PLT.pkl"
+        path = rocks.PATH_INDEX / "PLT.pkl"
 
     if not path in rocks.INDEX:
         with open(path, "rb") as ind:

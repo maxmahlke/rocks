@@ -142,7 +142,7 @@ def status():
             f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"
         )
         rich.print(
-            f"You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
+            "You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
         )
 
     # Update or clear
@@ -271,7 +271,7 @@ def echo():
         if plot:
             if param not in datacloud:
                 print(
-                    f"Only datacloud collections can be plotted. "
+                    "Only datacloud collections can be plotted. "
                     f"Try the plural of {param}."
                 )
                 sys.exit()
