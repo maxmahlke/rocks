@@ -15,10 +15,7 @@ from .resolve import identify
 # Path definitions required throughout the code
 PATH_CACHE = Path.home() / ".cache/rocks"
 PATH_INDEX = PATH_CACHE / "index"
-PATH_META = {
-    "description": PATH_CACHE / "ssoCard_description.json",
-    "units": PATH_CACHE / "ssoCard_units.json",
-}
+PATH_MAPPING = PATH_CACHE / "mapping_aster-astorb.json"
 
 # Dict to hold the asteroid name-number indices at runtime
 INDEX = {}

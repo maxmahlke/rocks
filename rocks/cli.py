@@ -82,16 +82,13 @@ def info(id_):
 
 
 @cli_rocks.command()
-@click.option("--units", "-u", is_flag=True, help="Echo the parameter units.")
-def parameters(units):
+def parameters():
     """Print the ssoCard structure and its description."""
 
-    which = "description" if not units else "units"
+    if not rocks.PATH_MAPPING.is_file():
+        rocks.utils.retrieve_mappings_from_ssodnet()
 
-    if not rocks.PATH_META[which].is_file():
-        rocks.utils.retrieve_json_from_ssodnet(which)
-
-    with open(rocks.PATH_META[which], "r") as file_:
+    with open(rocks.PATH_MAPPING, "r") as file_:
         DESC = json.load(file_)
 
     rich.print(DESC)
@@ -168,8 +165,7 @@ def status():
         elif decision == "2":
 
             # Update metadata
-            for meta in rocks.PATH_META.keys():
-                rocks.utils.retrieve_json_from_ssodnet(meta)
+            rocks.utils.retrieve_mappings_from_ssodnet()
 
             # Update the cached data
             ids = [ssodnet_id for ssodnet_id in cached_cards]

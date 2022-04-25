@@ -55,10 +55,10 @@ def get_unit(path_unit: str) -> str:
     str
         The unit of the requested parameter.
     """
-    if not rocks.PATH_META["units"].is_file():
+    if not rocks.PATH_MAPPING["units"].is_file():
         retrieve_json_from_ssodnet("units")
 
-    with open(rocks.PATH_META["units"], "r") as units:
+    with open(rocks.PATH_MAPPING["units"], "r") as units:
         units = json.load(units)
 
     for key in path_unit.split("."):
@@ -141,37 +141,23 @@ def weighted_average(catalogue, parameter):
 
 # ------
 # Misc
-def retrieve_json_from_ssodnet(which):
-    """Retrieve the ssoCard units, or descriptions from SsODNet.
+def retrieve_mappings_from_ssodnet():
+    """Retrieve the mappings JSON from SsODNet to the cache directory."""
 
-    Parameters
-    ----------
-    which : str
-        The JSON file to download. Choose from ['units', 'description']
-    """
+    URL = (
+        "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/mapping_aster-astorb.json"
+    )
 
-    # Construct URL
-    URL_BASE = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/"
-
-    URL_JSON = {
-        "units": "unit_aster-astorb.json",
-        "description": "description_aster-astorb.json",
-    }
-
-    # Query and save to file
-    response = requests.get("".join([URL_BASE, URL_JSON[which]]))
+    response = requests.get(URL)
 
     if response.ok:
         ssoCard = response.json()
 
-        with open(rocks.PATH_META[which], "w") as file_:
+        with open(rocks.PATH_MAPPING, "w") as file_:
             json.dump(ssoCard, file_)
 
     else:
-        warnings.warn(
-            f"Retrieving metadata file '{which}' failed with url:\n"
-            f"{URL_JSON[which]}"
-        )
+        warnings.warn(f"Retrieving mappings file failed with URL:\n{URL}")
 
 
 def cache_inventory():
@@ -196,7 +182,7 @@ def cache_inventory():
     for file_ in cached_jsons:
 
         # Is it metadata?
-        if file_ in rocks.PATH_META.values():
+        if file_ == str(rocks.PATH_MAPPING):
             continue
 
         # Datacloud catalogue or ssoCard?
@@ -216,7 +202,7 @@ def cache_inventory():
         with open(file_, "r") as ssocard:
 
             try:
-                card = json.load(ssocard)
+                _ = json.load(ssocard)
             except json.decoder.JSONDecodeError:
                 # Empty card or catalogue, remove it
                 file_.unlink()
@@ -229,7 +215,9 @@ def cache_inventory():
             cached_cards.append(ssodnet_id)
 
     # Get cached metadata files
-    cached_meta = [f.stem for f in rocks.PATH_META.values() if f.is_file()]
+    cached_meta = (
+        [rocks.PATH_MAPPING.stem] if rocks.rocks.PATH_MAPPING.is_file() else []
+    )
     return cached_cards, cached_catalogues, cached_meta
 
 
@@ -245,9 +233,8 @@ def clear_cache():
         PATH_CATALOGUE = rocks.PATH_CACHE / f"{'_'.join(catalogue)}.json"
         PATH_CATALOGUE.unlink()
 
-    for file_ in rocks.PATH_META.values():
-        if file_.is_file():
-            file_.unlink()
+    if rocks.PATH_MAPPING.is_file():
+        rocks.PATH_MAPPING.unlink()
 
 
 def update_datacloud_catalogues(cached_catalogues):
