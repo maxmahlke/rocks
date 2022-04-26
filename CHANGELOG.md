@@ -1,5 +1,6 @@
-# 1.5 - 2022-04-
+# 1.5 - 2022-04-26
 - Updated Rock class to reflect upstream changes in ssoCard structure
+- Updated datacloud classes to reflect upstream changes in datacloud catalogue structures
 - Improved rocks version comparison
 - Add catch for 594913 'Aylo'chaxnim in index lookup
 - Added shortcut "D" for diameter

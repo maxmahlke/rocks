@@ -411,13 +411,26 @@ class Rock(pydantic.BaseModel):
     astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
     binarymp: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
     colors: rocks.datacloud.Colors = rocks.datacloud.Colors(**{})
+    densities: rocks.datacloud.Density = rocks.datacloud.Density(**{})
     diamalbedo: rocks.datacloud.Diamalbedo = rocks.datacloud.Diamalbedo(**{})
     families: rocks.datacloud.Families = rocks.datacloud.Families(**{})
     masses: rocks.datacloud.Masses = rocks.datacloud.Masses(**{})
     mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
     mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
+    proper_elements: rocks.datacloud.Proper_elements = rocks.datacloud.Proper_elements(
+        **{}
+    )
+    phase_function: rocks.datacloud.Phase_function = rocks.datacloud.Phase_function(
+        **{}
+    )
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
+    thermal_inertia: rocks.datacloud.Thermal_inertia = rocks.datacloud.Thermal_inertia(
+        **{}
+    )
+    shapes: rocks.datacloud.Shape = rocks.datacloud.Shape(**{})
+    spins: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
+    yarkovsky: rocks.datacloud.Yarkovsky = rocks.datacloud.Yarkovsky(**{})
 
     def __init__(
         self,
