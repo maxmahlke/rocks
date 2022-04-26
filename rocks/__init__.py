@@ -22,7 +22,7 @@ INDEX = {}
 
 # ------
 # Welcome to rocks
-__version__ = "1.4.24"
+__version__ = "1.5.0"
 
 GREETING = rf"""
                 _
