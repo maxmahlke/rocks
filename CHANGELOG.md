@@ -1,3 +1,6 @@
+# 1.5.1 - 2022
+- Fixed implementation of parameter unit
+
 # 1.5.0 - 2022-04-26
 - Updated Rock class to reflect upstream changes in ssoCard structure
 - Updated datacloud classes to reflect upstream changes in datacloud catalogue structures

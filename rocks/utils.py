@@ -41,30 +41,31 @@ def rgetattr(obj, attr):
     return reduce(_getattr, [obj] + attr.split("."))
 
 
-def get_unit(path_unit: str) -> str:
+def get_unit(path_parameter: str) -> str:
     """Get unit from units JSON file.
 
     Parameters
     ----------
-    path_unit : str
-        Path to the parameter in the JSON tree, starting at unit and
-        separating the levels with periods.
+    path_parameter : str
+        Path to the parameter in the mappings JSON tree.
 
     Returns
     -------
     str
         The unit of the requested parameter.
     """
-    if not rocks.PATH_MAPPING["units"].is_file():
-        retrieve_json_from_ssodnet("units")
+    if not rocks.PATH_MAPPING.is_file():
+        retrieve_mappings_from_ssodnet()
 
-    with open(rocks.PATH_MAPPING["units"], "r") as units:
-        units = json.load(units)
+    with open(rocks.PATH_MAPPING, "r") as file_:
+        mappings = json.load(file_)["mapping"]
 
-    for key in path_unit.split("."):
-        units = units[key]
+    if "unit" in mappings[path_parameter]:
+        unit = mappings[path_parameter]["unit"]
+    else:
+        unit = ""
 
-    return units
+    return unit
 
 
 # ------
@@ -131,8 +132,8 @@ def weighted_average(catalogue, parameter):
         len(observable)
         / (len(observable) - 1)
         * (
-            sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights)
-            - avg**2
+            sum(w * o ** 2 for w, o in zip(weights, observable)) / sum(weights)
+            - avg ** 2
         )
     )
     std_avg = np.sqrt(var_avg / len(observable))

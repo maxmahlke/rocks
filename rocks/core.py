@@ -32,7 +32,6 @@ class Value(pydantic.BaseModel):
         """Print the value of a numerical parameter including
         its errors and its unit if available.
         """
-
         unit = rocks.utils.get_unit(self.path_unit) if self.path_unit else ""
 
         if abs(self.error.min_) == abs(self.error.max_):
@@ -252,7 +251,7 @@ class Density(Value):
     method: List[Method] = []
     bibref: List[Bibref] = []
 
-    path_unit: str = "unit.physical.density.value"
+    path_unit: str = "parameters.physical.density"
 
 
 class Diameter(Value):
@@ -260,7 +259,7 @@ class Diameter(Value):
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
-    path_unit: str = "unit.physical.diameter.value"
+    path_unit: str = "parameters.physical.diameter"
 
 
 class Mass(Value):
@@ -268,7 +267,7 @@ class Mass(Value):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
-    path_unit: str = "unit.physical.mass.value"
+    path_unit: str = "parameters.physical.mass"
 
 
 class Phase(Parameter):
@@ -306,7 +305,7 @@ class Spin(Parameter):
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
     technique: Optional[str] = ""
 
-    path_unit: str = "unit.physical.spin.value"
+    path_unit: str = "parameters.physical.spin"
 
 
 class Taxonomy(Parameter):
