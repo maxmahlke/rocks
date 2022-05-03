@@ -30,6 +30,7 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
+            "bibcode",
         ],
     },
     "astdys": {
@@ -610,6 +611,7 @@ class Diamalbedo(pydantic.BaseModel):
     err_emissivity: List[float] = [np.nan]
     selection: List[int] = [None]
     method: List[str] = [""]
+    bibcode: List[str] = [""]
 
     preferred_albedo: List[bool] = [False]
     preferred_diameter: List[bool] = [False]
