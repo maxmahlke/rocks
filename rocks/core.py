@@ -39,6 +39,11 @@ class Value(pydantic.BaseModel):
         else:
             return f"{self.value:.4} +- ({self.error.max_:.4}, {self.error.min_:.4}) {unit}"
 
+    def __bool__(self):
+        if np.isnan(self.value):
+            return False
+        return True
+
     @pydantic.root_validator(pre=True)
     def _compute_mean_error(cls, values):
 

@@ -1,5 +1,6 @@
 # 1.5.1 - 2022
 - Fixed implementation of parameter unit
+- Implemented boolean property of Value: "bool(rocks.Rock(1).albedo)" is True if the albedo.value is not NaN, else False
 
 # 1.5.0 - 2022-04-26
 - Updated Rock class to reflect upstream changes in ssoCard structure
