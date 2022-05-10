@@ -337,7 +337,8 @@ class ThermalInertia(Parameter):
     method: List[Method] = []
 
 
-class AbsoluteMagnitude(Value):
+class AbsoluteMagnitude(Parameter):
+    H: Value = Value(**{})
     G: Optional[float] = np.nan
     bibref: List[Bibref] = []
 

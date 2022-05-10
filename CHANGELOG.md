@@ -1,3 +1,6 @@
+# 1.5.2 - 2022-05-10
+- Update implementation of absolute magnitude in ssoCard following upstream change
+
 # 1.5.1 - 2022-05-03
 - Fixed implementation of parameter unit
 - Implemented boolean property of Value: "bool(rocks.Rock(1).albedo)" is True if the albedo.value is not NaN, else False
