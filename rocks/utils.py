@@ -214,9 +214,7 @@ def cache_inventory():
             cached_cards.append(ssodnet_id)
 
     # Get cached metadata files
-    cached_meta = (
-        [rocks.PATH_MAPPING.stem] if rocks.rocks.PATH_MAPPING.is_file() else []
-    )
+    cached_meta = [rocks.PATH_MAPPING.stem] if rocks.PATH_MAPPING.is_file() else []
     return cached_cards, cached_catalogues, cached_meta
 
 

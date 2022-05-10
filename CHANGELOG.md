@@ -1,3 +1,6 @@
+# 1.5.3 - 2022-05-10
+- Fix bug in cache inventory function
+
 # 1.5.2 - 2022-05-10
 - Update implementation of absolute magnitude in ssoCard following upstream change
 
