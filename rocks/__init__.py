@@ -1,6 +1,11 @@
 """For space rocks."""
 from pathlib import Path
+
 import rich
+from rich import traceback
+
+# pretty-print tracebacks with rich
+traceback.install()
 
 # rocks modules
 # rocks.plots is lazy-loaded as it is expensive

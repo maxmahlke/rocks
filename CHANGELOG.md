@@ -1,3 +1,6 @@
+# 1.5.4 - 2022-05-10
+- Pretty-print tracebacks with rich
+
 # 1.5.3 - 2022-05-10
 - Fix bug in cache inventory function
 
