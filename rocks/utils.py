@@ -58,7 +58,7 @@ def get_unit(path_parameter: str) -> str:
         retrieve_mappings_from_ssodnet()
 
     with open(rocks.PATH_MAPPING, "r") as file_:
-        mappings = json.load(file_)["mapping"]
+        mappings = json.load(file_)
 
     if "unit" in mappings[path_parameter]:
         unit = mappings[path_parameter]["unit"]
@@ -132,8 +132,8 @@ def weighted_average(catalogue, parameter):
         len(observable)
         / (len(observable) - 1)
         * (
-            sum(w * o ** 2 for w, o in zip(weights, observable)) / sum(weights)
-            - avg ** 2
+            sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights)
+            - avg**2
         )
     )
     std_avg = np.sqrt(var_avg / len(observable))
@@ -145,17 +145,15 @@ def weighted_average(catalogue, parameter):
 def retrieve_mappings_from_ssodnet():
     """Retrieve the mappings JSON from SsODNet to the cache directory."""
 
-    URL = (
-        "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/mapping_aster-astorb.json"
-    )
+    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/metadata_aster.json"
 
     response = requests.get(URL)
 
     if response.ok:
-        ssoCard = response.json()
+        metadata = response.json()
 
         with open(rocks.PATH_MAPPING, "w") as file_:
-            json.dump(ssoCard, file_)
+            json.dump(metadata["mapping"], file_)
 
     else:
         warnings.warn(f"Retrieving mappings file failed with URL:\n{URL}")

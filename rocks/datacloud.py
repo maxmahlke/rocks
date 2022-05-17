@@ -82,6 +82,7 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
+            "bibcode",
         ],
     },
     "diameters": {
@@ -95,6 +96,7 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
+            "bibcode",
         ],
     },
     "families": {
