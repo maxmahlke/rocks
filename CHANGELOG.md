@@ -1,4 +1,5 @@
-# 1.5.4 - 2022-05-10
+# 1.5.4 - 2022-05-17
+- Update the metadata json url
 - Pretty-print tracebacks with rich
 
 # 1.5.3 - 2022-05-10
