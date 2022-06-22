@@ -116,7 +116,6 @@ def convert_spin_to_list(spins: Dict) -> List:
         A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
         after removing the index layer.
     """
-
     spin_dicts = []
 
     for spin_id, spin_dict in spins.items():
@@ -150,12 +149,15 @@ class OrbitalElements(Parameter):
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-    proper_g: Value = Value(**{})
-    proper_s: Value = Value(**{})
+    lyapunov_time: Optional[float] = np.nan
+    integration_time: Optional[float] = (np.nan,)
     proper_eccentricity: Value = Value(**{})
     proper_inclination: Value = Value(**{})
     proper_semi_major_axis: Value = Value(**{})
     proper_sine_inclination: Value = Value(**{})
+    proper_frequency_mean_motion: Value = Value(**{})
+    proper_frequency_nodal_longitude: Value = Value(**{})
+    proper_frequency_perihelion_longitude: Value = Value(**{})
 
 
 class Family(Parameter):
@@ -164,6 +166,12 @@ class Family(Parameter):
     family_name: Optional[str] = ""
     family_number: Optional[int] = None
     family_status: Optional[str] = ""
+
+    def __str__(self):
+        if self.family_number is not None:
+            return f"({self.family_number}) {self.family_name}"
+        else:
+            return "No family membership known."
 
 
 class PairMember(Parameter):
@@ -295,6 +303,8 @@ class PhaseFunction(Parameter):
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
 
+    path_unit: str = "parameters.physical.phase_function"
+
 
 class Spin(Parameter):
     t0: Optional[float] = np.nan
@@ -329,18 +339,21 @@ class Taxonomy(Parameter):
         return self.class_
 
 
-class ThermalInertia(Parameter):
-    TI: Value = Value(**{})
+class ThermalInertia(Value):
     dsun: Optional[float] = np.nan
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = []
     method: List[Method] = []
 
+    path_unit: str = "parameters.physical.thermal_inertia"
 
-class AbsoluteMagnitude(Parameter):
-    H: Value = Value(**{})
+
+class AbsoluteMagnitude(Value):
     G: Optional[float] = np.nan
     bibref: List[Bibref] = []
+    links: LinksParameter = LinksParameter(**{})
+
+    path_unit: str = "parameters.physical.absolute_magnitude"
 
 
 class PhysicalParameters(Parameter):
@@ -430,11 +443,11 @@ class Rock(pydantic.BaseModel):
         **{}
     )
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
-    thermal_inertia: rocks.datacloud.Thermal_inertia = rocks.datacloud.Thermal_inertia(
+    thermal_inertias: rocks.datacloud.Thermal_inertia = rocks.datacloud.Thermal_inertia(
         **{}
     )
     shapes: rocks.datacloud.Shape = rocks.datacloud.Shape(**{})
-    spins: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
+    spins: rocks.datacloud.Spin = rocks.datacloud.Spin(**{})
     yarkovsky: rocks.datacloud.Yarkovsky = rocks.datacloud.Yarkovsky(**{})
 
     def __init__(
@@ -513,6 +526,11 @@ class Rock(pydantic.BaseModel):
                 )
 
             else:
+
+                ssocard["parameters"]["physical"]["spin"] = ssocard["parameters"][
+                    "physical"
+                ]["spins"]
+
                 if datacloud is not None:
                     for catalogue in datacloud:
                         ssocard = self.__add_datacloud_catalogue(
@@ -556,6 +574,9 @@ class Rock(pydantic.BaseModel):
 
                     for location in error["loc"][:-1]:
                         offending_part = offending_part[location]
+
+                    print(error["loc"])
+                    print(offending_part)
 
                     del offending_part[error["loc"][-1]]
 
@@ -708,7 +729,7 @@ class Rock(pydantic.BaseModel):
 
             rich.print(
                 f"[blue]Warning[/] [magenta]object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
-                # f"\nPassed value: {value}"
+                f"\nPassed value: {value}"
             )
 
     __aliases = {
@@ -732,7 +753,7 @@ class Rock(pydantic.BaseModel):
             "parameters.physical.phase_function": "phase_function",
             "parameters.physical.spin": "spin",
             "parameters.physical.taxonomy": "taxonomy",
-            "parameters.physical.thermal_properties": "thermal_properties",
+            "parameters.physical.thermal_inertia": "thermal_inertia",
         },
         "orbital_elements": {
             "a": "semi_major_axis",

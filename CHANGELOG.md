@@ -1,3 +1,7 @@
+# 1.5.5 - 2022-06-22
+- Fixed implementation of thermal inertia, absolute magnitude, spins, and proper elements
+- Fixed implementation of thermal inertias and spins (ie the datacloud attributes)
+
 # 1.5.4 - 2022-05-17
 - Update the metadata json url
 - Pretty-print tracebacks with rich

@@ -69,7 +69,7 @@ CATALOGUES = {
     "colors": {
         "attr_name": "colors",
         "ssodnet_name": "colors",
-        "print_columns": ["color", "value", "uncertainty", "phot_sys", "shortbib"],
+        "print_columns": ["color", "value", "uncertainty", "phot_sys"],
     },
     "diamalbedo": {
         "attr_name": "diamalbedo",
@@ -143,6 +143,11 @@ CATALOGUES = {
         "ssodnet_name": "phase_function",
         "print_columns": [],
     },
+    "spins": {
+        "attr_name": "spins",
+        "ssodnet_name": "spin",
+        "print_columns": ["period", "long_", "lat", "RA0", "DEC0", "Wp", "shortbib"],
+    },
     "taxonomies": {
         "attr_name": "taxonomies",
         "ssodnet_name": "taxonomy",
@@ -155,10 +160,17 @@ CATALOGUES = {
             "shortbib",
         ],
     },
-    "thermal_properties": {
-        "attr_name": "thermal_properties",
-        "ssodnet_name": "thermal_properties",
-        "print_columns": [],
+    "thermal_inertias": {
+        "attr_name": "thermal_inertias",
+        "ssodnet_name": "thermal_inertia",
+        "print_columns": [
+            "TI",
+            "err_TI_up",
+            "err_TI_down",
+            "dsun",
+            "method",
+            "shortbib",
+        ],
     },
     "yarkovskies": {
         "attr_name": "yarkovskies",
@@ -300,6 +312,20 @@ def ensure_int(value):
     return [int(v) if v else None for v in value]
 
 
+def empty_str_to_none(value):
+    for i, v in enumerate(value[:]):
+        if v == "":
+            value[i] = None
+    return value
+
+
+def empty_str_to_nan(value):
+    for i, v in enumerate(value[:]):
+        if v == "":
+            value[i] = np.nan
+    return value
+
+
 # ------
 # SsODNet catalogues as pydantic model
 # https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/templates/ssodnet_datacloud.sql
@@ -308,11 +334,12 @@ def ensure_int(value):
 class Collection(pydantic.BaseModel):
     """Table de definition des references des jeux de donnees de la base SsODNet.datacloud"""
 
+    link: List[str] = [""]
+    title: List[str] = [""]
+    shortbib: List[str] = [""]
+    datasetname: List[str] = [""]
     idcollection: List[int] = [None]
     resourcename: List[str] = [""]
-    datasetname: List[str] = [""]
-    title: List[str] = [""]
-    link: List[str] = [""]
 
 
 class Methods(pydantic.BaseModel):
@@ -596,7 +623,7 @@ class Binarymp(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Diamalbedo(pydantic.BaseModel):
+class Diamalbedo(Collection):
     """Diameters and Albedos database from literature"""
 
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
@@ -637,7 +664,7 @@ class Diamalbedo(pydantic.BaseModel):
         ]
 
 
-class Masses(pydantic.BaseModel):
+class Masses(Collection):
     """Mass database from literature"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -657,7 +684,7 @@ class Masses(pydantic.BaseModel):
         return rocks.definitions.rank_properties("mass", values)
 
 
-class Taxonomies(pydantic.BaseModel):
+class Taxonomies(Collection):
     """Taxonomy database from literature"""
 
     # id_: List[int] = pydantic.Field([None], alias="id")
@@ -674,7 +701,7 @@ class Taxonomies(pydantic.BaseModel):
     # iddataset: List[int] = [None]
 
 
-class Proper_elements(pydantic.BaseModel):
+class Proper_elements(Collection):
     """Proper Elements from literature"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -701,7 +728,7 @@ class Proper_elements(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Phase_function(pydantic.BaseModel):
+class Phase_function(Collection):
     """Database of asteroid phase function"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -727,7 +754,7 @@ class Phase_function(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Families(pydantic.BaseModel):
+class Families(Collection):
     """Database of Sso families"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -742,7 +769,7 @@ class Families(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Pairs(pydantic.BaseModel):
+class Pairs(Collection):
     """Database of Sso pairs"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -759,7 +786,7 @@ class Pairs(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Spin(pydantic.BaseModel):
+class Spin(Collection):
     """Database of Sso spin coordiantes"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -779,7 +806,7 @@ class Spin(pydantic.BaseModel):
     err_period: List[float] = [np.nan]
     period_flag: List[float] = [np.nan]
     period_type: List[str] = [""]
-    long: List[float] = [np.nan]
+    long_: List[float] = pydantic.Field([np.nan], alias="long")
     lat: List[float] = [np.nan]
     err_long: List[float] = [np.nan]
     err_lat: List[float] = [np.nan]
@@ -787,8 +814,24 @@ class Spin(pydantic.BaseModel):
     method: List[str] = [""]
     iddataset: List[str] = [""]
 
+    _empty_str_to_nan: classmethod = pydantic.validator(
+        "Wp",
+        "RA0",
+        "DEC0",
+        "err_RA0",
+        "period",
+        "err_period",
+        "err_long",
+        "err_lat",
+        "err_DEC0",
+        "long_",
+        "lat",
+        allow_reuse=True,
+        pre=True,
+    )(empty_str_to_nan)
 
-class Yarkovsky(pydantic.BaseModel):
+
+class Yarkovsky(Collection):
     """Database of Sso Yarkovsky accelerations"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -805,7 +848,7 @@ class Yarkovsky(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Thermal_inertia(pydantic.BaseModel):
+class Thermal_inertia(Collection):
     """Database of asteroid thermal properties"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -820,7 +863,7 @@ class Thermal_inertia(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Colors(pydantic.BaseModel):
+class Colors(Collection):
     """Database of asteroid colors"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -841,7 +884,7 @@ class Colors(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Density(pydantic.BaseModel):
+class Density(Collection):
     """Database of asteroid density"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -855,7 +898,7 @@ class Density(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Mpcatobs(pydantic.BaseModel):
+class Mpcatobs(Collection):
     """MPCAT-OBS database"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
@@ -885,7 +928,7 @@ class Mpcatobs(pydantic.BaseModel):
     iddataset: List[int] = [None]
 
 
-class Shape(pydantic.BaseModel):
+class Shape(Collection):
     """Database of Sso triaxial ellipsoid and shape models"""
 
     id_: List[int] = pydantic.Field([None], alias="id")
