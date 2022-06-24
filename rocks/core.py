@@ -174,7 +174,7 @@ class Family(Parameter):
             return "No family membership known."
 
 
-class PairMember(Parameter):
+class Pair(Parameter):
     age: Value = Value(**{})
     distance: Optional[float] = np.nan
     sibling_name: Optional[str] = ""
@@ -198,7 +198,7 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
-    pair: List[PairMember] = pydantic.Field([PairMember(**{})], alias="pairs")
+    pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
     family: Family = Family(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
@@ -527,9 +527,12 @@ class Rock(pydantic.BaseModel):
 
             else:
 
-                ssocard["parameters"]["physical"]["spin"] = ssocard["parameters"][
-                    "physical"
-                ]["spins"]
+                # rename 'spins' to 'spin' so it does not shadow the datacloud property
+                # TODO this should be done at the parameter-name level
+                if "spins" in ssocard["parameters"]["physical"]:
+                    ssocard["parameters"]["physical"]["spin"] = ssocard["parameters"][
+                        "physical"
+                    ]["spins"]
 
                 if datacloud is not None:
                     for catalogue in datacloud:

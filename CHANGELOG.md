@@ -1,3 +1,7 @@
+# 1.5.6 - 2022-06-
+- Updated Pair implementation
+- Bugfix in ssoCard spin implementation
+
 # 1.5.5 - 2022-06-22
 - Fixed implementation of thermal inertia, absolute magnitude, spins, and proper elements
 - Fixed implementation of thermal inertias and spins (ie the datacloud attributes)
