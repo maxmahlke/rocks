@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
+import pandas as pd
 
 
 def rank_properties(prop_name, obs):
@@ -52,7 +53,16 @@ def select_taxonomy(taxonomies):
         "method": {"spec": 7, "phot": 3, "mix": 4},
     }
 
-    taxonomies = [dict(zip(taxonomies, t)) for t in zip(*taxonomies.values())]
+    # Make sure that all entries have the same length
+    lengths = [len(values) for values in taxonomies.values()]
+
+    if not all([max(lengths) == l for l in lengths]):
+        for key, values in taxonomies.copy().items():
+            if len(values) != max(lengths):
+                del taxonomies[key]
+
+    # Turn dicts of lists into list of dicts
+    taxonomies = pd.DataFrame(taxonomies).to_dict(orient="records")
 
     # Compute points of each classification
     points = []
@@ -101,9 +111,9 @@ def select_numeric_property(obs, prop_name):
             # Ensure that rows do not contain all 0 values, as can be the case
             # for albedo in diamalbedo
             if all(
-                    obs[prop_name][i] == 0
-                    for i, m in enumerate(obs["method"])
-                    if m in method
+                obs[prop_name][i] == 0
+                for i, m in enumerate(obs["method"])
+                if m in method
             ):
                 continue
 

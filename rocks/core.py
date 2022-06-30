@@ -578,9 +578,6 @@ class Rock(pydantic.BaseModel):
                     for location in error["loc"][:-1]:
                         offending_part = offending_part[location]
 
-                    print(error["loc"])
-                    print(offending_part)
-
                     del offending_part[error["loc"][-1]]
 
             super().__init__(**ssocard)  # type: ignore
@@ -616,9 +613,9 @@ class Rock(pydantic.BaseModel):
                         data=getattr(self, catalogue).dict()
                     )
 
-                    warnings.warn(
-                        f"Removed malformed attributes {to_drop} from datacloud catalogue {catalogue}"
-                    )
+                    # warnings.warn(
+                    #     f"Removed malformed attributes {to_drop} from datacloud catalogue {catalogue}"
+                    # )
 
                 setattr(self, catalogue, catalogue_instance)
 

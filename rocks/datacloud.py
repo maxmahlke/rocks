@@ -199,12 +199,25 @@ def pretty_print(rock, catalogue, parameter):
 
     # ------
     # Create table to echo
-    if parameter in ["diamalbedo", "diameters", "albedos"]:
-        caption = (
-            "Blue: preferred diameter, yellow: preferred albedo, green: both preferred"
-        )
+    if parameter in ["diameters", "albedos"]:
+
+        if parameter == "diameters":
+            preferred = catalogue.preferred_diameter
+            caption = "Green: preferred entry"
+        elif parameter == "albedos":
+            preferred = catalogue.preferred_albedo
+            caption = "Green: preferred entry"
+        # else:
+        #     preferred = catalogue.preferred
+        #     caption = "Blue: preferred diameter, yellow: preferred albedo, green: both preferred"
+
+    elif parameter in ["masses", "taxonomies", "diamalbedo"]:
+        caption = "Green: preferred entry"
+        preferred = catalogue.preferred
+
     else:
-        caption = "Green: preferred entry" if hasattr(catalogue, "selection") else ""
+        caption = None
+        preferred = [False for _ in range(len(catalogue))]
 
     table = Table(
         header_style="bold blue",
@@ -219,21 +232,20 @@ def pretty_print(rock, catalogue, parameter):
         catalogue = catalogue.sort_values("year").reset_index()
 
     # The columns depend on the catalogue
-    columns = CATALOGUES[parameter]["print_columns"]
+    columns = [""] + CATALOGUES[parameter]["print_columns"]
 
     for c in columns:
         table.add_column(c)
 
     # Some catalogues do not have a "preferred" attribute
-    if not hasattr(catalogue, "selection"):
-        preferred = [False for _ in range(len(catalogue))]
-    else:
-        preferred = [bool(s) for s in catalogue.selection]
+    # if not hasattr(catalogue, "preferred"):
+    #     preferred = [False for _ in range(len(catalogue))]
+    # else:
 
     # Add rows to table, styling by preferred-state of entry
     for i, pref in enumerate(preferred):
 
-        if parameter in ["diamalbedo", "diameters", "albedos"]:
+        if parameter in ["diamalbedos"]:
             if pref:
                 if (
                     catalogue.preferred_albedo[i]
@@ -254,7 +266,7 @@ def pretty_print(rock, catalogue, parameter):
             style = "bold green" if pref else "white"
 
         table.add_row(
-            *[str(catalogue[c][i]) for c in columns],
+            *[str(catalogue[c][i]) if c else str(i + 1) for c in columns],
             style=style,
         )
 
@@ -699,6 +711,12 @@ class Taxonomies(Collection):
     shortbib: List[str] = [""]
     waverange: List[str] = [""]
     # iddataset: List[int] = [None]
+
+    preferred: List[bool] = [False]
+
+    @pydantic.validator("preferred", pre=True)
+    def select_preferred_class(cls, _, values):
+        return rocks.definitions.rank_properties("taxonomy", values)
 
 
 class Proper_elements(Collection):

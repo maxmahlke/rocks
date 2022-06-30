@@ -1,4 +1,7 @@
-# 1.5.6 - 2022-06-
+# 1.5.7 - 2022-06-29
+- Fixed bug in preferred-attribute-highlighting
+
+# 1.5.6 - 2022-06-24
 - Updated Pair implementation
 - Bugfix in ssoCard spin implementation
 
