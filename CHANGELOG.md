@@ -1,3 +1,6 @@
+# 1.5.8 - 2022-07-03
+- Added bibcode and doi to datacloud entries
+
 # 1.5.7 - 2022-06-29
 - Fixed bug in preferred-attribute-highlighting
 

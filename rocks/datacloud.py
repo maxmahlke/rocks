@@ -352,6 +352,8 @@ class Collection(pydantic.BaseModel):
     datasetname: List[str] = [""]
     idcollection: List[int] = [None]
     resourcename: List[str] = [""]
+    bibcode: List[str] = [""]
+    doi: List[str] = [""]
 
 
 class Methods(pydantic.BaseModel):
