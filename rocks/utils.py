@@ -181,7 +181,7 @@ def cache_inventory():
     for file_ in cached_jsons:
 
         # Is it metadata?
-        if file_ == str(rocks.PATH_MAPPING):
+        if file_ == rocks.PATH_MAPPING:
             continue
 
         # Datacloud catalogue or ssoCard?
