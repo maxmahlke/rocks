@@ -197,6 +197,10 @@ def pretty_print(rock, catalogue, parameter):
         print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
         return
 
+    # Sort catalogue by year of reference
+    if "year" in catalogue.columns:
+        catalogue = catalogue.sort_values("year").reset_index()
+
     # ------
     # Create table to echo
     if parameter in ["diameters", "albedos"]:
@@ -226,10 +230,6 @@ def pretty_print(rock, catalogue, parameter):
         title=f"({rock.number}) {rock.name}",
         caption=caption,
     )
-
-    # Sort catalogue by year of reference
-    if "year" in catalogue.columns:
-        catalogue = catalogue.sort_values("year").reset_index()
 
     # The columns depend on the catalogue
     columns = [""] + CATALOGUES[parameter]["print_columns"]

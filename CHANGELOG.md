@@ -1,3 +1,6 @@
+# 1.5.9 - 2022-07-11
+- Fix highlighting of best-estimate parameters in datacloud queries
+
 # 1.5.8 - 2022-07-03
 - Added bibcode and doi to datacloud entries
 
