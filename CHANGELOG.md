@@ -1,7 +1,8 @@
-# 1.5.10 - 2022-
+# 1.5.10 - 2022-08-03
 - Added "who" CLI command to look up citation associated to named asteroid
 - Added interactive search using optional fzf tool
 - Simplified "rocks status" output
+- Updated SsoCard attributes following upstream changes
 - Removed CLASS_TO_COMPLEX dictionary: complex is given in SsODNet
 
 # 1.5.9 - 2022-07-11

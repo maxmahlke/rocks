@@ -163,6 +163,7 @@ class ProperElements(Parameter):
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
     family_name: Optional[str] = ""
     family_number: Optional[int] = None
     family_status: Optional[str] = ""
@@ -181,9 +182,10 @@ class Pair(Parameter):
     sibling_number: Optional[int] = None
 
 
-class TisserandParameter(Value):
-    method: List[Method] = []
-    bibref: List[Bibref] = []
+class TisserandParameter(Parameter):
+    jupiter: Value = pydantic.Field(Value(**{}), alias="Jupiter")
+    method: List[Method] = [Bibref(**{})]
+    bibref: List[Bibref] = [Method(**{})]
 
 
 class Yarkovsky(Parameter):
@@ -192,6 +194,7 @@ class Yarkovsky(Parameter):
     snr: Optional[float] = np.nan
     dadt: Value = Value(**{})
     bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
 
     def __str__(self):
         return "\n".join([self.A2.__str__(), self.dadt.__str__()])
@@ -316,6 +319,7 @@ class Spin(Parameter):
     links: LinksParameter = LinksParameter(**{})
     long_: Optional[Value] = pydantic.Field(Value(**{}), alias="long")
     period: Optional[Value] = Value(**{})
+    obliquity: Optional[float] = np.nan
     method: Optional[List[Method]] = [Method(**{})]
     bibref: Optional[List[Bibref]] = [Bibref(**{})]
     technique: Optional[str] = ""
@@ -448,7 +452,7 @@ class Rock(pydantic.BaseModel):
     )
     shapes: rocks.datacloud.Shape = rocks.datacloud.Shape(**{})
     spins: rocks.datacloud.Spin = rocks.datacloud.Spin(**{})
-    yarkovsky: rocks.datacloud.Yarkovsky = rocks.datacloud.Yarkovsky(**{})
+    yarkovskys: rocks.datacloud.Yarkovsky = rocks.datacloud.Yarkovsky(**{})
 
     def __init__(
         self,
