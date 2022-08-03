@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 """Local and remote asteroid name resolution."""
 import asyncio
+import pickle
 import re
+import shutil
+import subprocess
 import warnings
+import sys
 
 import aiohttp
 import nest_asyncio
@@ -362,3 +366,35 @@ def _parse_quaero_response(data, id_):
     numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]
     number = min(numeric) if numeric else np.nan
     return (match["name"], number, match["id"])
+
+
+def interactive():
+    """Launch interactive, fuzzy-searchable selection of asteroid."""
+
+    with open(rocks.PATH_INDEX / "fuzzy_index.pkl", "rb") as file_:
+        LINES = pickle.load(file_)
+
+    FZF_OPTIONS = []
+
+    # Open fzf subprocess
+    process = subprocess.Popen(
+        [shutil.which("fzf"), *FZF_OPTIONS],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=None,
+    )
+
+    for line in LINES:
+        process.stdin.write(line)
+        process.stdin.flush()
+
+    # Run process and wait for user selection
+    process.stdin.close()
+    process.wait()
+
+    # Extract selected asteroid
+    try:
+        choice = [line for line in process.stdout][0].decode()
+    except IndexError:  # no choice was made, c-c c-c
+        sys.exit()
+    return " ".join(choice.split()[1:])

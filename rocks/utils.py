@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 """Utility functions for rocks."""
 
+from bs4 import BeautifulSoup
 from functools import reduce
 import json
 import re
 import shutil
 import string
 import tarfile
+import urllib
 import warnings
 
 import numpy as np
@@ -401,3 +403,32 @@ def cache_all_ssocards():
 
         member.path = member.path.split("/")[-1]
         cards.extract(member, rocks.PATH_CACHE)
+
+
+def get_citation_from_mpc(name):
+    """Query asteroid information from MPC and extract citation from HTML response."""
+
+    URL = f"https://minorplanetcenter.net/db_search/show_object?object_id={urllib.parse.quote_plus(str(name))}"
+
+    soup = BeautifulSoup(requests.get(URL).text, "html.parser")
+
+    citation = soup.find("div", {"id": "citation"})
+
+    if citation is None:
+        return None
+
+    # Extract citation and do minor formatting
+    citation = citation.find("br").next_sibling.next_sibling
+    citation = citation.split("[")[0].strip().replace("  ", " ")
+    return citation
+
+    # contents = [content for content in citation.contents if not content.tag]
+
+    # alias, *_, citation, ref, ref_number = citation.contents
+
+    # alias = alias.strip()
+    # citation = citation.replace("[Ref:", "").replace("  ", " ").strip()
+    # ref_number = ref_number.replace("]", "").strip()
+    # ref = ref.text
+
+    # return alias, citation, " ".join([ref, ref_number])

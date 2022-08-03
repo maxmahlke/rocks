@@ -5,6 +5,7 @@ import pickle
 import pickletools
 import re
 import string
+import sys
 import typing
 
 import numpy as np
@@ -19,11 +20,12 @@ def _build_index():
     """Build asteroid name-number index from SsODNet sso_index."""
 
     tasks = [
-        _build_index_of_aliases,
-        _build_number_index,
-        _build_name_index,
-        _build_designation_index,
-        _build_palomar_transit_index,
+        # _build_index_of_aliases,
+        # _build_number_index,
+        # _build_name_index,
+        # _build_designation_index,
+        # _build_palomar_transit_index,
+        _build_fuzzy_searchable_index,
     ]
 
     with progress.Progress(
@@ -212,6 +214,32 @@ def _build_palomar_transit_index(index):
     )
 
     _write_to_cache(part_index, "PLT.pkl")
+
+
+def _build_fuzzy_searchable_index(index):
+    """Merge name, number and SsODNet ID of all entries to fuzzy-searchable lines.
+
+    Parameters
+    ----------
+    index : pd.DataFrame
+        The formatted index from SsODNet.
+    """
+
+    LINES = []
+
+    for _, row in index.sort_values(["Number", "Name"]).iterrows():
+
+        number = f"({int(row.Number)})" if not pd.isna(row.Number) else ""
+        name = row.Name
+
+        LINE = (
+            f"{number.ljust(9)} {name.ljust(20)}".encode(sys.getdefaultencoding())
+            + b"\n"
+        )
+
+        LINES.append(LINE)
+
+    _write_to_cache(LINES, "fuzzy_index.pkl")
 
 
 def _write_to_cache(obj, filename):

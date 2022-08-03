@@ -5,10 +5,12 @@ import json
 import keyword
 import os
 import sys
+import textwrap
 import time
 import webbrowser
 
 import click
+import numpy as np
 import rich
 from rich import prompt
 from rich.console import Console
@@ -200,6 +202,47 @@ def status():
 
     if response == "1":
         rocks.index._build_index()
+
+
+@cli_rocks.command()
+@click.argument("id_", nargs=-1)
+def who(id_):
+    """Get name citation of asteroid from MPC."""
+
+    if not id_:
+        id_ = rocks.resolve.interactive()
+    else:
+        id_ = id_[0]
+
+    name, number = rocks.identify(id_)
+
+    if name is None:
+        sys.exit()
+
+    if not np.isnan(number):
+        id_ = number
+    else:
+        id_ = name
+
+    # alias, citation, reference = rocks.utils.get_citation_from_mpc(id_)
+    citation = rocks.utils.get_citation_from_mpc(id_)
+
+    if citation is None:
+        rich.print(f"({number}) {name} has no citation attached to its name.")
+        sys.exit()
+
+    # Pretty-print citation
+    # rich.print(": ".join([reference, alias]), end="\n\n")
+    rich.print(f"({number}) {name}")
+    rich.print(
+        textwrap.fill(
+            citation,
+            width=os.get_terminal_size()[0] - 2,
+            initial_indent="  ",
+            subsequent_indent="  ",
+        ),
+        # end="\n",
+    )
 
 
 def echo():
