@@ -31,7 +31,7 @@ CATALOGUES = {
             "err_diameter_down",
             "method",
             # "bibcode",
-            "shortbib"
+            "shortbib",
         ],
     },
     "astdys": {
@@ -341,7 +341,7 @@ def empty_str_to_nan(value):
 
 # ------
 # SsODNet catalogues as pydantic model
-# https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/templates/ssodnet_datacloud.sql
+# https://ssp.imcce.fr/data/ssodnet_datacloud.sql
 
 # Metacatalogues
 class Collection(pydantic.BaseModel):
@@ -703,7 +703,7 @@ class Masses(Collection):
 class Taxonomies(Collection):
     """Taxonomy database from literature"""
 
-    # id_: List[int] = pydantic.Field([None], alias="id")
+    id_: List[int] = pydantic.Field([None], alias="id")
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
     name: List[str] = [""]
     year: List[int] = [None]
@@ -719,7 +719,7 @@ class Taxonomies(Collection):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
-    def select_preferred_class(cls, _, values):
+    def select_preferred_class(cls, value, values):
         return rocks.definitions.rank_properties("taxonomy", values)
 
 

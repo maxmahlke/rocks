@@ -3,8 +3,9 @@
 
 import json
 import keyword
-import os
 import sys
+import subprocess
+import shutil
 import textwrap
 import time
 import webbrowser
@@ -59,9 +60,15 @@ def docs():
 
 
 @cli_rocks.command()
-@click.argument("id_")
+@click.argument("id_", nargs=-1)
 def id(id_):
     """Resolve the asteroid name and number from string input."""
+
+    if not id_:
+        id_ = rocks.resolve._interactive()
+    else:
+        id_ = id_[0]
+
     name, number = rocks.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
@@ -71,9 +78,15 @@ def id(id_):
 
 
 @cli_rocks.command()
-@click.argument("id_")
+@click.argument("id_", nargs=-1)
 def info(id_):
     """Print the ssoCard of an asteroid."""
+
+    if not id_:
+        id_ = rocks.resolve._interactive()
+    else:
+        id_ = id_[0]
+
     _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
 
     if not isinstance(id_, str):
@@ -97,9 +110,14 @@ def parameters():
 
 
 @cli_rocks.command(hidden=True)
-@click.argument("id_")
+@click.argument("id_", nargs=-1)
 def aliases(id_):
     """Echo the aliases of an asteroid."""
+
+    if not id_:
+        id_ = rocks.resolve._interactive()
+    else:
+        id_ = id_[0]
 
     name, number, ssodnetid = rocks.identify(id_, return_id=True)  # type: ignore
 
@@ -116,10 +134,10 @@ def status():
     # Echo inventory
 
     # Get set of ssoCards and datacloud catalogues in cache
-    cached_cards, cached_catalogues, cached_meta = rocks.utils.cache_inventory()
+    cached_cards, cached_catalogues = rocks.utils.cache_inventory()
 
     # Get the modification date of the index
-    date_index = os.path.getmtime(rocks.PATH_INDEX / "1.pkl")
+    date_index = (rocks.PATH_INDEX / "1.pkl").stat().st_mtime
     date_index = time.strftime("%d %b %Y", time.localtime(date_index))
 
     # Print the findings
@@ -128,8 +146,7 @@ def status():
 
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
-        Asteroid name-number index [blue]\[index.pkl][/blue] updated on {date_index}
-        Metadata files [blue]{cached_meta}[/blue]\n"""
+        Asteroid name-number index updated on {date_index}\n"""
     )
 
     # ------
@@ -201,6 +218,7 @@ def status():
     )
 
     if response == "1":
+        click.echo
         rocks.index._build_index()
 
 
@@ -210,7 +228,7 @@ def who(id_):
     """Get name citation of asteroid from MPC."""
 
     if not id_:
-        id_ = rocks.resolve.interactive()
+        id_ = rocks.resolve._interactive()
     else:
         id_ = id_[0]
 
@@ -224,7 +242,6 @@ def who(id_):
     else:
         id_ = name
 
-    # alias, citation, reference = rocks.utils.get_citation_from_mpc(id_)
     citation = rocks.utils.get_citation_from_mpc(id_)
 
     if citation is None:
@@ -232,16 +249,14 @@ def who(id_):
         sys.exit()
 
     # Pretty-print citation
-    # rich.print(": ".join([reference, alias]), end="\n\n")
     rich.print(f"({number}) {name}")
     rich.print(
         textwrap.fill(
             citation,
-            width=os.get_terminal_size()[0] - 2,
+            width=shutil.get_terminal_size()[0] - 2,
             initial_indent="  ",
             subsequent_indent="  ",
         ),
-        # end="\n",
     )
 
 
@@ -323,3 +338,42 @@ def echo():
 
     # Avoid error message from click
     sys.exit()
+
+
+def _interactive(LINES):
+    """Launch interactive selection using fzf."""
+
+    PATH_EXECUTABLE = shutil.which("fzf")
+
+    if PATH_EXECUTABLE is None:
+        rich.print(
+            "Interactive selection is not possible as the fzf tool is not installed.\n"
+            "Either install fzf or specify an asteroid identifier.\n"
+            "Refer to https://rocks.readthedocs.io/en/latest/getting_started.html#optional-interactive-search"
+        )
+        sys.exit()
+
+    FZF_OPTIONS = []
+
+    # Open fzf subprocess
+    process = subprocess.Popen(
+        [shutil.which("fzf"), *FZF_OPTIONS],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=None,
+    )
+
+    for line in LINES:
+        process.stdin.write(line)
+        process.stdin.flush()
+
+    # Run process and wait for user selection
+    process.stdin.close()
+    process.wait()
+
+    # Extract selected line
+    try:
+        choice = [line for line in process.stdout][0].decode()
+    except IndexError:  # no choice was made, c-c c-c
+        sys.exit()
+    return choice

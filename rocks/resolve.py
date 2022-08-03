@@ -3,8 +3,6 @@
 import asyncio
 import pickle
 import re
-import shutil
-import subprocess
 import warnings
 import sys
 
@@ -368,33 +366,20 @@ def _parse_quaero_response(data, id_):
     return (match["name"], number, match["id"])
 
 
-def interactive():
-    """Launch interactive, fuzzy-searchable selection of asteroid."""
+def _interactive():
+    """Launch interactive, fuzzy-searchable selection of asteroid.
+
+    Returns
+    -------
+    str
+        The name of the selected asteroid.
+    """
 
     with open(rocks.PATH_INDEX / "fuzzy_index.pkl", "rb") as file_:
         LINES = pickle.load(file_)
 
-    FZF_OPTIONS = []
+    # Launch selection
+    choice = rocks.cli._interactive(LINES)
 
-    # Open fzf subprocess
-    process = subprocess.Popen(
-        [shutil.which("fzf"), *FZF_OPTIONS],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=None,
-    )
-
-    for line in LINES:
-        process.stdin.write(line)
-        process.stdin.flush()
-
-    # Run process and wait for user selection
-    process.stdin.close()
-    process.wait()
-
-    # Extract selected asteroid
-    try:
-        choice = [line for line in process.stdout][0].decode()
-    except IndexError:  # no choice was made, c-c c-c
-        sys.exit()
+    # Return asteroid name
     return " ".join(choice.split()[1:])

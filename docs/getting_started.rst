@@ -92,17 +92,17 @@ The data in the cache directory can be updated or removed using the ``$ rocks st
 
    Building index ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
 
-Optional: Interactive Finder
+Optional: Interactive Search
 ============================
 
 
 Sometimes you have the name of an asteroid in your head but you don't quite
-recall its spelling. In this case, ``rocks`` provides an interactive search dialogue
-using the `fzf <https://github.com/junegunn/fzf/>`_  fuzzy-finder.
-In the example below, the citation of asteroid (3834) *Zappafrank* is retrieved
-from the Minor Planet Centre. Instead of entering the asteroid name when typing
-the command, it is selected interactively from all 1,218,250 recognised
-asteroid names:
+recall its spelling. In this case, ``rocks`` provides an interactive search
+dialogue using the `fzf <https://github.com/junegunn/fzf/>`_  fuzzy-finder
+which is triggered if commands that expect an :term:`asteroid
+identifier<Identifier>` as argument are called without argument. In the example
+below, asteroid (3834) *Zappafrank* is selected interactively from all
+1,218,250 recognised asteroid names:
 
 .. code-block:: bash
 
@@ -116,5 +116,7 @@ asteroid names:
 
     > frank za  < 5/1218250
 
-The ``fzf`` tool needs to be installed separately from ``rocks``. On most systems (Linux + MacOS),
-this requires a single command on the terminal, as explained in the `fzf documentation <https://github.com/junegunn/fzf/#installation>`_
+The ``fzf`` tool needs to be installed separately from ``rocks``. On most
+systems (Linux + MacOS), this requires a single command on the terminal, as
+explained in the `fzf documentation
+<https://github.com/junegunn/fzf/#installation>`_
