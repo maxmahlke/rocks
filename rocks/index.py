@@ -20,11 +20,11 @@ def _build_index():
     """Build asteroid name-number index from SsODNet sso_index."""
 
     tasks = [
-        # _build_index_of_aliases,
-        # _build_number_index,
-        # _build_name_index,
-        # _build_designation_index,
-        # _build_palomar_transit_index,
+        _build_index_of_aliases,
+        _build_number_index,
+        _build_name_index,
+        _build_designation_index,
+        _build_palomar_transit_index,
         _build_fuzzy_searchable_index,
     ]
 
