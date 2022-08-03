@@ -23,8 +23,8 @@ class Error(pydantic.BaseModel):
 
 
 class Value(pydantic.BaseModel):
-    error: Error = Error(**{})
-    error_: Optional[float] = np.nan
+    error: Error = Error(**{})  # min_ and max_ values
+    error_: Optional[float] = np.nan  # average of min_ and max_
     value: Optional[float] = np.nan
     path_unit: str = ""
 

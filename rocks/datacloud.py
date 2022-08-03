@@ -30,7 +30,8 @@ CATALOGUES = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "bibcode",
+            # "bibcode",
+            "shortbib"
         ],
     },
     "astdys": {
@@ -354,6 +355,7 @@ class Collection(pydantic.BaseModel):
     resourcename: List[str] = [""]
     bibcode: List[str] = [""]
     doi: List[str] = [""]
+    year: List[int] = [None]
 
 
 class Methods(pydantic.BaseModel):
