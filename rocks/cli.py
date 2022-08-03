@@ -96,7 +96,7 @@ def parameters():
     rich.print(DESC)
 
 
-@cli_rocks.command()
+@cli_rocks.command(hidden=True)
 @click.argument("id_")
 def aliases(id_):
     """Echo the aliases of an asteroid."""
