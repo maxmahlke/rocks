@@ -38,24 +38,26 @@ Quick exploration of asteroid parameters using the ``rocks`` :ref:`command-line 
    K
 
    $ rocks taxonomies Eos
-   +-----------+---------+--------+-----------+------------------+------+--------+
-   | scheme    | complex | method | waverange | shortbib         | year | class_ |
-   +-----------+---------+--------+-----------+------------------+------+--------+
-   | Tholen    | S       | Phot   | VIS       | Tholen+1989      | 1989 | S      |
-   | Bus       | K       | Spec   | VIS       | Bus&Binzel+2002  | 2002 | K      |
-   | Bus       | K       | Spec   | VIS       | MotheDiniz+2005  | 2005 | K      |
-   | Bus       | K       | Spec   | VISNIR    | MotheDiniz+2008a | 2008 | K      |
-   | Bus-DeMeo | K       | Spec   | VISNIR    | Clark+2009       | 2009 | K      |
-   | Bus-DeMeo | K       | Spec   | VISNIR    | DeMeo+2009       | 2009 | K      |
-   +-----------+---------+--------+-----------+------------------+------+--------+
+   +---+--------+---------+--------+-----------+-----------+------------------+
+   |   | class_ | complex | method | waverange | scheme    | shortbib         |
+   +---+--------+---------+--------+-----------+-----------+------------------+
+   | 1 | S      | S       | Phot   | VIS       | Tholen    | Tholen+1989      |
+   | 2 | K      | K       | Spec   | VIS       | Bus       | Bus&Binzel+2002  |
+   | 3 | K      | K       | Spec   | VIS       | Bus       | MotheDiniz+2005  |
+   | 4 | K      | K       | Spec   | VISNIR    | Bus       | MotheDiniz+2008a |
+   | 5 | K      | K       | Spec   | VISNIR    | Bus-DeMeo | Clark+2009       |
+   | 6 | K      | K       | Spec   | VISNIR    | Bus-DeMeo | DeMeo+2009       |
+   | 7 | K      | K       | Spec   | VISNIR    | Mahlke    | Mahlke+2022      |
+   +---+--------+---------+--------+-----------+-----------+------------------+
 
    $ rocks masses Eos
-    +----------+----------+---------+-------------+------+
-    | mass     | err_mass | method  | shortbib    | year |
-    +----------+----------+---------+-------------+------+
-    | 2.39e+18 | 5.97e+17 | DEFLECT | Goffin+2014 | 2014 |
-    +----------+----------+---------+-------------+------+
-
+   +---+-------------+-------------+---------------+---------+--------------+
+   |   | mass        | err_mass_up | err_mass_down | method  | shortbib     |
+   +---+-------------+-------------+---------------+---------+--------------+
+   | 1 | 1.22125e+18 | 0.0         | 0.0           | EPHEM   | Folkner+2014 |
+   | 2 | 2.39e+18    | 5.97e+17    | -5.97e+17     | DEFLECT | Goffin+2014  |
+   | 3 | 1.04688e+18 | 5.16159e+17 | -5.16159e+17  | EPHEM   | Fienga+2019  |
+   +---+-------------+-------------+---------------+---------+--------------+
 
 
 via a ``python`` script
