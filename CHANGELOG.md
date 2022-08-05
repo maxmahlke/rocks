@@ -1,3 +1,6 @@
+# 1.5.11 -
+- Added catch for missing index files
+
 # 1.5.10 - 2022-08-03
 - Added "who" CLI command to look up citation associated to named asteroid
 - Added interactive search using optional fzf tool

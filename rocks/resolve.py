@@ -375,8 +375,8 @@ def _interactive():
         The name of the selected asteroid.
     """
 
-    with open(rocks.PATH_INDEX / "fuzzy_index.pkl", "rb") as file_:
-        LINES = pickle.load(file_)
+    # Load fuzzy index
+    LINES = rocks.index._load("fuzzy_index.pkl")
 
     # Launch selection
     choice = rocks.cli._interactive(LINES)

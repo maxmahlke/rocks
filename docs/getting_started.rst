@@ -90,7 +90,7 @@ The data in the cache directory can be updated or removed using the ``$ rocks st
    Update the asteroid name-number index?
    [0] No [1] Yes (1): 1
 
-   Building index ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+   Building index |---------------------------| 100%
 
 Optional: Interactive Search
 ============================

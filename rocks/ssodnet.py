@@ -10,6 +10,7 @@ import aiohttp
 import json
 import numpy as np
 import pandas as pd
+from pydantic.utils import deep_update
 from rich.progress import Progress
 
 import rocks
@@ -97,6 +98,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
 
     # Local retrieval failed, do remote query
     card = await _query_ssodnet(id_ssodnet, session)
+    card = _postprocess_ssocard(card)
 
     # save to cache
     if card and card is not None:
@@ -133,6 +135,46 @@ async def _query_ssodnet(id_ssodnet, session):
 
     response_json = await response.json()
     return response_json
+
+
+def _postprocess_ssocard(card):
+    """Apply ssoCard structure improvements for pydantic deserialization."""
+
+    # ------
+    # Add metadata label, description, unity, format, and symbol to parameters
+    def make_dict(values):
+        """Turn lower-level dict values into dicts."""
+        for key, value in values.items():
+            if isinstance(value, dict):
+                make_dict(value)
+            else:
+                # These keys are not touched, they don't have metadata
+                if key in ["links", "bibref", "method", "value", "error", "min", "max"]:
+                    continue
+                # Turn non-dict value into dict for merging with metadata
+                values[key] = {"value": value}
+        return values
+
+    # Turn low-level parameters into dictionaries
+    card["parameters"] = make_dict(card["parameters"])
+
+    # Add metadata entries
+    MAPPINGS = rocks.utils.load_mappings()
+    card = deep_update(card, MAPPINGS)
+
+    # for path, values in MAPPINGS.items():
+
+    # parameter = rocks.utils.deep_get(card, path)
+
+    # if not isinstance(parameter, dict):
+    #     parameter = {"value": parameter}
+
+    # for key, value in values.items():
+    #     parameter[key] = value
+
+    # for key in '.'.split(path)[:-1]:
+
+    return card
 
 
 # ------

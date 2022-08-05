@@ -24,15 +24,15 @@ class Error(pydantic.BaseModel):
 
 class Value(pydantic.BaseModel):
     error: Error = Error(**{})  # min_ and max_ values
-    error_: Optional[float] = np.nan  # average of min_ and max_
     value: Optional[float] = np.nan
-    path_unit: str = ""
+    unit: Optional[str] = ""
+    format: Optional[str] = ""
+    symbol: Optional[str] = ""
+    error_: Optional[float] = np.nan  # average of min_ and max_
 
     def __str__(self):
-        """Print the value of a numerical parameter including
-        its errors and its unit if available.
-        """
-        unit = rocks.utils.get_unit(self.path_unit) if self.path_unit else ""
+        """Print value of numerical parameter including errors and unit if available."""
+        unit = rocks.utils.get_unit(self.path_unit)
 
         if abs(self.error.min_) == abs(self.error.max_):
             return f"{self.value:.4} +- {self.error.max_:.4} {unit}"
@@ -127,7 +127,15 @@ def convert_spin_to_list(spins: Dict) -> List:
 
 # ------
 # Dynamical parameters
+# def _add_metadata(value, values, config, field):
+#     """Add label, description, unity, format, and symbol to parameters."""
+#     parameter = field.name
+#     breakpoint()
+
+
 class OrbitalElements(Parameter):
+    """parameters.dynamical.oribtal_elements"""
+
     ceu: Value = Value(**{})
     links: LinksParameter = LinksParameter(**{})
     author: Optional[str] = ""
@@ -144,6 +152,8 @@ class OrbitalElements(Parameter):
     semi_major_axis: Value = Value(**{})
     number_observation: Optional[int] = None
     perihelion_argument: Value = Value(**{})
+
+    # _add_metadata: classmethod = pydantic.validator("semi_major_axis")(_add_metadata)
 
 
 class ProperElements(Parameter):

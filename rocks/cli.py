@@ -101,7 +101,7 @@ def parameters():
     """Print the ssoCard structure and its description."""
 
     if not rocks.PATH_MAPPING.is_file():
-        rocks.utils.retrieve_mappings_from_ssodnet()
+        rocks.utils.retrieve_mappings()
 
     with open(rocks.PATH_MAPPING, "r") as file_:
         DESC = json.load(file_)
@@ -184,7 +184,7 @@ def status():
         elif decision == "2":
 
             # Update metadata
-            rocks.utils.retrieve_mappings_from_ssodnet()
+            rocks.utils.retrieve_mappings()
 
             # Update the cached data
             ids = [ssodnet_id for ssodnet_id in cached_cards]
@@ -218,7 +218,7 @@ def status():
     )
 
     if response == "1":
-        click.echo
+        click.echo()
         rocks.index._build_index()
 
 

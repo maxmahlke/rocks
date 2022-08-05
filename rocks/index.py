@@ -10,6 +10,7 @@ import typing
 
 import numpy as np
 import pandas as pd
+import rich
 from rich import progress
 
 import rocks
@@ -51,10 +52,6 @@ def _build_index_of_aliases(index):
     ----------
     index : pd.DataFrame
         The formatted index from SsODNet.
-
-    Returns
-    -------
-
     """
 
     aliases = dict(
@@ -296,8 +293,7 @@ def get_aliases(ssodnetid):
     list
         The list of aliases of the asteroid.
     """
-    with open(rocks.PATH_INDEX / "aliases.pkl", "rb") as ind:
-        return pickle.load(ind)[ssodnetid]
+    return _load("aliases.pkl")[ssodnetid]
 
 
 def get_index_file(id_: typing.Union[int, str]) -> dict:
@@ -322,15 +318,15 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
         # The passed id_ is larger than 1e6
         except IndexError:
             index_number = 1
-        path = rocks.PATH_INDEX / f"{index_number}.pkl"
+        which = f"{index_number}.pkl"
 
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
 
         if id_[0] == "'":  # catch 'aylo'chaxnim
-            path = rocks.PATH_INDEX / "a.pkl"
+            which = f"{id_[0]}.pkl"
         else:
-            path = rocks.PATH_INDEX / f"{id_[0]}.pkl"
+            which = rocks.PATH_INDEX / f"{id_[0]}.pkl"
 
     # Is it a designation?
     elif re.match(
@@ -342,14 +338,25 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
             year = f"20{id_[2:4]}"
         else:
             year = id_[:2]
-        path = rocks.PATH_INDEX / f"d{year}.pkl"
+        which = f"d{year}.pkl"
 
     # Should be in this one then
     else:
-        path = rocks.PATH_INDEX / "PLT.pkl"
+        which = "PLT.pkl"
 
-    if not path in rocks.INDEX:
-        with open(path, "rb") as ind:
-            rocks.INDEX[path] = pickle.load(ind)
+    if not which in rocks.INDEX:
+        rocks.INDEX[which] = _load(which)
 
-    return rocks.INDEX[path]
+    return rocks.INDEX[which]
+
+
+def _load(which):
+    """Load a pickled index file."""
+    if not (rocks.PATH_INDEX / which).exists():
+        rich.print(
+            "The asteroid name-number index is malformed. Run '$ rocks status' to update it."
+        )
+        sys.exit()
+
+    with open(rocks.PATH_INDEX / which, "rb") as file_:
+        return pickle.load(file_)

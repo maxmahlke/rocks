@@ -56,11 +56,7 @@ def get_unit(path_parameter: str) -> str:
     str
         The unit of the requested parameter.
     """
-    if not rocks.PATH_MAPPING.is_file():
-        retrieve_mappings_from_ssodnet()
-
-    with open(rocks.PATH_MAPPING, "r") as file_:
-        mappings = json.load(file_)
+    mappings = load_mappings()
 
     if "unit" in mappings[path_parameter]:
         unit = mappings[path_parameter]["unit"]
@@ -68,6 +64,17 @@ def get_unit(path_parameter: str) -> str:
         unit = ""
 
     return unit
+
+
+def load_mappings():
+    """Load SsODNet metadata mappings file from cache."""
+    if not rocks.MAPPINGS:
+        if not rocks.PATH_MAPPING.is_file():
+            retrieve_mappings()
+
+        with open(rocks.PATH_MAPPING, "r") as file_:
+            rocks.MAPPINGS = json.load(file_)
+    return rocks.MAPPINGS
 
 
 # ------
@@ -144,21 +151,42 @@ def weighted_average(catalogue, parameter):
 
 # ------
 # Misc
-def retrieve_mappings_from_ssodnet():
+def retrieve_mappings():
     """Retrieve the mappings JSON from SsODNet to the cache directory."""
 
     URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/metadata_aster.json"
 
     response = requests.get(URL)
 
-    if response.ok:
-        metadata = response.json()
+    if not response.ok:
+        warnings.error(f"Retrieving mappings file failed with URL:\n{URL}")
+        return
 
-        with open(rocks.PATH_MAPPING, "w") as file_:
-            json.dump(metadata["mapping"], file_)
+    metadata = response.json()
+    mappings = metadata["mapping"]
 
-    else:
-        warnings.warn(f"Retrieving mappings file failed with URL:\n{URL}")
+    breakpoint()
+
+    # Turn from flattened to nested dict
+    for path, value in mappings.copy().items():
+
+        parent = mappings
+        parameter = path.split(".")[-1]
+
+        for key in path.split("."):
+
+            if key == parameter:
+                parent[key] = value
+            else:
+                parent = parent.setdefault(key, {})
+
+        del mappings[path]
+
+    print(mappings)
+
+    # Turn into nested dict
+    with open(rocks.PATH_MAPPING, "w") as file_:
+        json.dump(mappings, file_)
 
 
 def cache_inventory():

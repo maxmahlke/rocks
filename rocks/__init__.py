@@ -22,8 +22,9 @@ PATH_CACHE = Path.home() / ".cache/rocks"
 PATH_INDEX = PATH_CACHE / "index"
 PATH_MAPPING = PATH_CACHE / "mapping_aster-astorb.json"
 
-# Dict to hold the asteroid name-number indices at runtime
+# Dict to hold the asteroid name-number indices and mappings at runtime
 INDEX = {}
+MAPPINGS = {}
 
 # ------
 # Welcome to rocks
