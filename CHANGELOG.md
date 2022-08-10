@@ -1,4 +1,5 @@
-# 1.5.11 -
+# 1.5.11 - 2022-08-10
+- Implement metadata attributes like .unit and .description
 - Added catch for missing index files
 
 # 1.5.10 - 2022-08-03

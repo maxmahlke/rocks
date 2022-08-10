@@ -28,7 +28,7 @@ MAPPINGS = {}
 
 # ------
 # Welcome to rocks
-__version__ = "1.5.10"
+__version__ = "1.5.11"
 
 GREETING = rf"""
                 _
