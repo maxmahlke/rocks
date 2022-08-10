@@ -324,7 +324,12 @@ def echo():
         if param in datacloud:
             rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, param), param)
         else:
-            print(rocks.utils.rgetattr(rock, param))
+            value = rocks.utils.rgetattr(rock, param)
+
+            if isinstance(value, rocks.core.Parameter):
+                rich.print_json(value.json(), sort_keys=True)
+            else:
+                rich.print(value)
 
         if plot:
             if param not in datacloud:

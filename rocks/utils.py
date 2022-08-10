@@ -163,9 +163,7 @@ def retrieve_mappings():
         return
 
     metadata = response.json()
-    mappings = metadata["mapping"]
-
-    breakpoint()
+    mappings = metadata["display"]
 
     # Turn from flattened to nested dict
     for path, value in mappings.copy().items():
@@ -181,8 +179,6 @@ def retrieve_mappings():
                 parent = parent.setdefault(key, {})
 
         del mappings[path]
-
-    print(mappings)
 
     # Turn into nested dict
     with open(rocks.PATH_MAPPING, "w") as file_:

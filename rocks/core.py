@@ -2,7 +2,7 @@
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
 import json
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import warnings
 
 import numpy as np
@@ -23,21 +23,27 @@ class Error(pydantic.BaseModel):
 
 
 class Value(pydantic.BaseModel):
+    label: str = ""
+    format: str = ""
+    symbol: str = ""
+    description: str = ""
+
+
+class FloatValue(Value):
+    unit: str = ""
     error: Error = Error(**{})  # min_ and max_ values
-    value: Optional[float] = np.nan
-    unit: Optional[str] = ""
-    format: Optional[str] = ""
-    symbol: Optional[str] = ""
-    error_: Optional[float] = np.nan  # average of min_ and max_
+    value: float = np.nan
+    error_: float = np.nan  # average of min_ and max_
 
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
-        unit = rocks.utils.get_unit(self.path_unit)
+
+        format = self.format.strip("%")
 
         if abs(self.error.min_) == abs(self.error.max_):
-            return f"{self.value:.4} +- {self.error.max_:.4} {unit}"
+            return f"{self.value:{format}} +- {self.error.max_:{format}} {self.unit}"
         else:
-            return f"{self.value:.4} +- ({self.error.max_:.4}, {self.error.min_:.4}) {unit}"
+            return f"{self.value:{format}} +- ({self.error.max_:{format}}, {self.error.min_:{format}}) {self.unit}"
 
     def __bool__(self):
         if np.isnan(self.value):
@@ -56,102 +62,142 @@ class Value(pydantic.BaseModel):
         return values
 
 
+class IntegerValue(Value):
+    unit: str = ""
+    value: int = None
+
+    def __str__(self):
+        """Print value of numerical parameter including errors and unit if available."""
+        return f"{self.value:{self.format.strip('%')}}{self.unit}"
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+class StringValue(Value):
+    value: str = ""
+
+    def __str__(self):
+        return self.value
+
+    def __bool__(self):
+        return bool(self.value)
+
+
+class ListValue(Value):
+    value: list = []
+
+    def __str__(self):
+        return self.value
+
+    def __bool__(self):
+        return bool(self.value)
+
+
 # The second lowest level is the Parameter
 class Parameter(pydantic.BaseModel):
+
+    label: str = ""
+    description: str = ""
+
     def __str__(self):
-        return str(rich.print_json(data=json.loads(self.json()), sort_keys=True))
+        return self.json()
 
 
 # Other common branches are bibred, links and method
 class Method(Parameter):
-    doi: Optional[str] = ""
-    name: Optional[str] = ""
-    year: Optional[int] = None
-    title: Optional[str] = ""
-    bibcode: Optional[str] = ""
-    shortbib: Optional[str] = ""
+    doi: str = ""
+    name: str = ""
+    year: int = None
+    title: str = ""
+    bibcode: str = ""
+    shortbib: str = ""
 
 
 class Bibref(Parameter):
-    doi: Optional[str] = ""
-    year: Optional[int] = None
-    title: Optional[str] = ""
-    bibcode: Optional[str] = ""
-    shortbib: Optional[str] = ""
+    doi: str = ""
+    year: int = None
+    title: str = ""
+    bibcode: str = ""
+    shortbib: str = ""
 
 
 class LinksParameter(Parameter):
-    datacloud: Optional[str] = ""
+    datacloud: StringValue = StringValue(**{})
+    selection: StringValue = StringValue(**{})
 
 
 # And a special class for the Spin list
-class ParameterList(list):
+class SpinList(list):
     """Subclass of <list> with a custom __str__ for the Spin parameters."""
 
     def __init__(self, list_):
         """Convert the list items to Spin instances."""
         list_ = [Spin(**entry) for entry in list_]
-
         return super().__init__(list_)
 
     def __str__(self) -> str:
-
-        return super().__str__()
+        return "\n".join(entry.json() for entry in self)
 
 
 # ------
 # Validators
-def convert_spin_to_list(spins: Dict) -> List:
-    """Convert the Spin dictionary from the ssoCard into a list.
-    Add the spin index as parameter to the Spin entries.
+# def convert_spin_to_list(spins: Dict) -> List:
+#     """Convert the Spin dictionary from the ssoCard into a list.
+#     Add the spin index as parameter to the Spin entries.
 
-    Parameters
-    ----------
-    spin : dict
-        The dictionary located at parameters.physical.spin in the ssoCard.
+#     Parameters
+#     ----------
+#     spin : dict
+#         The dictionary located at parameters.physical.spin in the ssoCard.
 
-    Returns
-    -------
-    list
-        A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
-        after removing the index layer.
-    """
-    spin_dicts = []
+#     Returns
+#     -------
+#     list
+#         A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
+#         after removing the index layer.
+#     """
+#     spin_solutions = []
 
-    for spin_id, spin_dict in spins.items():
-        spin_dict["id_"] = spin_id
-        spin_dicts.append(spin_dict)
+#     for key, spin in spins.items():
 
-    return spin_dicts
+#         # spin entries have integer ids
+#         if not key.isnumeric():
+#             continue
+
+#         # convert the spin key to an entry in the solution dict
+#         spin["id_"] = {
+#             "value": key,
+#             "description": "Identifier of the spin axis solution",
+#             "format": "%s",
+#         }
+
+#         spin_solutions.append(spin)
+
+#     return spin_solutions
 
 
 # ------
 # Dynamical parameters
-# def _add_metadata(value, values, config, field):
-#     """Add label, description, unity, format, and symbol to parameters."""
-#     parameter = field.name
-#     breakpoint()
-
-
 class OrbitalElements(Parameter):
     """parameters.dynamical.oribtal_elements"""
 
-    ceu: Value = Value(**{})
+    ceu: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
-    author: Optional[str] = ""
+    author: StringValue = StringValue(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-    ceu_rate: Value = Value(**{})
-    ref_epoch: Optional[float] = np.nan
-    inclination: Value = Value(**{})
-    mean_motion: Value = Value(**{})
-    orbital_arc: Optional[int] = None
-    eccentricity: Value = Value(**{})
-    mean_anomaly: Value = Value(**{})
-    node_longitude: Value = Value(**{})
-    orbital_period: Value = Value(**{})
-    semi_major_axis: Value = Value(**{})
-    number_observation: Optional[int] = None
-    perihelion_argument: Value = Value(**{})
+    ceu_rate: FloatValue = FloatValue(**{})
+    ref_epoch: FloatValue = FloatValue(**{})
+    inclination: FloatValue = FloatValue(**{})
+    mean_motion: FloatValue = FloatValue(**{})
+    orbital_arc: IntegerValue = IntegerValue(**{})
+    eccentricity: FloatValue = FloatValue(**{})
+    mean_anomaly: FloatValue = FloatValue(**{})
+    node_longitude: FloatValue = FloatValue(**{})
+    orbital_period: FloatValue = FloatValue(**{})
+    semi_major_axis: FloatValue = FloatValue(**{})
+    number_observation: FloatValue = FloatValue(**{})
+    perihelion_argument: FloatValue = FloatValue(**{})
 
     # _add_metadata: classmethod = pydantic.validator("semi_major_axis")(_add_metadata)
 
@@ -159,24 +205,24 @@ class OrbitalElements(Parameter):
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-    lyapunov_time: Optional[float] = np.nan
-    integration_time: Optional[float] = (np.nan,)
-    proper_eccentricity: Value = Value(**{})
-    proper_inclination: Value = Value(**{})
-    proper_semi_major_axis: Value = Value(**{})
-    proper_sine_inclination: Value = Value(**{})
-    proper_frequency_mean_motion: Value = Value(**{})
-    proper_frequency_nodal_longitude: Value = Value(**{})
-    proper_frequency_perihelion_longitude: Value = Value(**{})
+    lyapunov_time: FloatValue = FloatValue(**{})
+    integration_time: FloatValue = FloatValue(**{})
+    proper_eccentricity: FloatValue = FloatValue(**{})
+    proper_inclination: FloatValue = FloatValue(**{})
+    proper_semi_major_axis: FloatValue = FloatValue(**{})
+    proper_sine_inclination: FloatValue = FloatValue(**{})
+    proper_frequency_mean_motion: FloatValue = FloatValue(**{})
+    proper_frequency_nodal_longitude: FloatValue = FloatValue(**{})
+    proper_frequency_perihelion_longitude: FloatValue = FloatValue(**{})
 
 
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
-    family_name: Optional[str] = ""
-    family_number: Optional[int] = None
-    family_status: Optional[str] = ""
+    family_name: StringValue = StringValue(**{})
+    family_number: IntegerValue = IntegerValue(**{})
+    family_status: StringValue = StringValue(**{})
 
     def __str__(self):
         if self.family_number is not None:
@@ -187,21 +233,21 @@ class Family(Parameter):
 
 class Pair(Parameter):
     age: Value = Value(**{})
-    distance: Optional[float] = np.nan
-    sibling_name: Optional[str] = ""
-    sibling_number: Optional[int] = None
+    distance: FloatValue = FloatValue(**{})
+    sibling_name: StringValue = StringValue(**{})
+    sibling_number: IntegerValue = IntegerValue(**{})
 
 
 class TisserandParameter(Parameter):
-    jupiter: Value = pydantic.Field(Value(**{}), alias="Jupiter")
+    jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     method: List[Method] = [Bibref(**{})]
     bibref: List[Bibref] = [Method(**{})]
 
 
 class Yarkovsky(Parameter):
-    S: Optional[float] = np.nan
+    S: float = np.nan
     A2: Value = Value(**{})
-    snr: Optional[float] = np.nan
+    snr: FloatValue = FloatValue(**{})
     dadt: Value = Value(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
@@ -211,10 +257,10 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
-    pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
-    family: Family = Family(**{})
+    # pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
+    # family: Family = Family(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
-    yarkovsky: Yarkovsky = Yarkovsky(**{})
+    # yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
     orbital_elements: OrbitalElements = OrbitalElements(**{})
 
@@ -224,7 +270,7 @@ class DynamicalParameters(Parameter):
 
 # ------
 # Physical Value
-class Albedo(Value):
+class Albedo(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = []
     method: List[Method] = []
@@ -232,17 +278,17 @@ class Albedo(Value):
 
 class ColorEntry(Parameter):
     color: Value = Value(**{})
-    epoch: Optional[float] = np.nan
+    epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
     bibref: List[Bibref] = []
-    facility: Optional[str] = ""
-    observer: Optional[str] = ""
-    phot_sys: Optional[str] = ""
-    technique: Optional[str] = ""
-    delta_time: Optional[float] = np.nan
-    id_filter_1: Optional[str] = ""
-    id_filter_2: Optional[str] = ""
+    facility: StringValue = StringValue(**{})
+    observer: StringValue = StringValue(**{})
+    phot_sys: StringValue = StringValue(**{})
+    technique: StringValue = StringValue(**{})
+    delta_time: FloatValue = FloatValue(**{})
+    id_filter_1: StringValue = StringValue(**{})
+    id_filter_2: StringValue = StringValue(**{})
 
 
 class Color(Parameter):
@@ -273,40 +319,34 @@ class Color(Parameter):
     B_V: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="B-V")
 
 
-class Density(Value):
+class Density(FloatValue):
     method: List[Method] = []
     bibref: List[Bibref] = []
 
-    path_unit: str = "parameters.physical.density"
 
-
-class Diameter(Value):
+class Diameter(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
-    path_unit: str = "parameters.physical.diameter"
 
-
-class Mass(Value):
+class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
-
-    path_unit: str = "parameters.physical.mass"
 
 
 class Phase(Parameter):
     H: Value = Value(**{})
-    N: Optional[float] = np.nan
+    N: FloatValue = FloatValue(**{})
     G1: Value = Value(**{})
     G2: Value = Value(**{})
-    rms: Optional[float] = np.nan
+    rms: FloatValue = FloatValue(**{})
     phase: Error = Error(**{})
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-    facility: Optional[str] = ""
-    name_filter: Optional[str] = ""
+    facility: StringValue = StringValue(**{})
+    name_filter: StringValue = StringValue(**{})
 
 
 class PhaseFunction(Parameter):
@@ -316,36 +356,32 @@ class PhaseFunction(Parameter):
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
 
-    path_unit: str = "parameters.physical.phase_function"
-
 
 class Spin(Parameter):
-    t0: Optional[float] = np.nan
-    Wp: Optional[float] = np.nan
-    id_: Optional[int] = None
-    lat: Optional[Value] = Value(**{})
-    RA0: Optional[Value] = Value(**{})
-    DEC0: Optional[Value] = Value(**{})
+    t0: FloatValue = FloatValue(**{})
+    Wp: FloatValue = FloatValue(**{})
+    id_: IntegerValue = IntegerValue(**{})
+    lat: Value = Value(**{})
+    RA0: Value = Value(**{})
+    DEC0: Value = Value(**{})
     links: LinksParameter = LinksParameter(**{})
-    long_: Optional[Value] = pydantic.Field(Value(**{}), alias="long")
-    period: Optional[Value] = Value(**{})
-    obliquity: Optional[float] = np.nan
-    method: Optional[List[Method]] = [Method(**{})]
-    bibref: Optional[List[Bibref]] = [Bibref(**{})]
-    technique: Optional[str] = ""
-
-    path_unit: str = "parameters.physical.spin"
+    long_: Value = pydantic.Field(Value(**{}), alias="long")
+    period: Value = Value(**{})
+    obliquity: FloatValue = FloatValue(**{})
+    method: List[Method] = [Method(**{})]
+    bibref: List[Bibref] = [Bibref(**{})]
+    technique: StringValue = StringValue(**{})
 
 
 class Taxonomy(Parameter):
     links: LinksParameter = LinksParameter(**{})
-    class_: Optional[str] = pydantic.Field("", alias="class")
-    bibref: Optional[List[Bibref]] = [Bibref(**{})]
-    method: Optional[List[Method]] = [Method(**{})]
-    scheme: Optional[str] = ""
-    complex: Optional[str] = ""
-    technique: Optional[str] = ""
-    waverange: Optional[str] = ""
+    class_: StringValue = pydantic.Field(StringValue(**{}), alias="class")
+    bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
+    scheme: StringValue = StringValue(**{})
+    complex: StringValue = StringValue(**{})
+    technique: StringValue = StringValue(**{})
+    waverange: StringValue = StringValue(**{})
 
     def __str__(self):
         if not self.class_:
@@ -353,26 +389,22 @@ class Taxonomy(Parameter):
         return self.class_
 
 
-class ThermalInertia(Value):
-    dsun: Optional[float] = np.nan
+class ThermalInertia(FloatValue):
+    dsun: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = []
-    method: List[Method] = []
-
-    path_unit: str = "parameters.physical.thermal_inertia"
+    bibref: List[Bibref] = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
 
 
-class AbsoluteMagnitude(Value):
-    G: Optional[float] = np.nan
-    bibref: List[Bibref] = []
+class AbsoluteMagnitude(FloatValue):
+    G: FloatValue = FloatValue(**{})
+    bibref: List[Bibref] = [Bibref(**{})]
     links: LinksParameter = LinksParameter(**{})
-
-    path_unit: str = "parameters.physical.absolute_magnitude"
 
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: ParameterList = ParameterList([{}])
+    spin: SpinList = SpinList([])
     color: Color = pydantic.Field(Color(**{}), alias="colors")
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
@@ -382,20 +414,21 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _convert_spin_to_list: classmethod = pydantic.validator("spin", pre=True)(
-        convert_spin_to_list
-    )
+    # Can probably reduce verbosity here
+    # _convert_spin_to_list: classmethod = pydantic.validator("spin", pre=True)(
+    #     convert_spin_to_list
+    # )
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "spin", allow_reuse=True, pre=True
-    )(lambda list_: ParameterList(list_))
+    )(lambda list_: SpinList(list_))
 
 
 # ------
 # Equation of state
 class EqStateVector(Parameter):
-    ref_epoch: Optional[float] = np.nan
-    position: List[float] = [np.nan, np.nan, np.nan]
-    velocity: List[float] = [np.nan, np.nan, np.nan]
+    ref_epoch: FloatValue = FloatValue(**{})
+    position: ListValue = ListValue(**{})
+    velocity: ListValue = ListValue(**{})
 
 
 # ------
@@ -410,27 +443,27 @@ class Parameters(Parameter):
 
 
 class Ssocard(Parameter):
-    version: Optional[str] = ""
-    datetime: Optional[dt.datetime] = None
+    version: str = ""
+    datetime: dt.datetime = None
 
 
 class Links(Parameter):
-    self_: Optional[str] = pydantic.Field("", alias="self")
-    quaero: Optional[str] = ""
-    mapping: Optional[str] = ""
+    self_: str = pydantic.Field("", alias="self")
+    quaero: str = ""
+    mapping: str = ""
 
 
 class Rock(pydantic.BaseModel):
     """Instantiate a specific asteroid with data from its ssoCard."""
 
     # the basics
-    id_: Optional[str] = pydantic.Field("", alias="id")
-    name: Optional[str] = ""
-    type_: Optional[str] = pydantic.Field("", alias="type")
-    class_: Optional[str] = pydantic.Field("", alias="class")
-    number: Optional[int] = None
-    parent: Optional[str] = ""
-    system: Optional[str] = ""
+    id_: str = pydantic.Field("", alias="id")
+    name: str
+    type_: str = pydantic.Field("", alias="type")
+    class_: str = pydantic.Field("", alias="class")
+    number: int = None
+    parent: str = ""
+    system: str = ""
 
     # the heart
     parameters: Parameters = Parameters(**{})

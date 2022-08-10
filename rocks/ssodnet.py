@@ -142,6 +142,8 @@ def _postprocess_ssocard(card):
 
     # ------
     # Add metadata label, description, unity, format, and symbol to parameters
+    mappings = rocks.utils.load_mappings()
+
     def make_dict(values):
         """Turn lower-level dict values into dicts."""
         for key, value in values.items():
@@ -149,7 +151,7 @@ def _postprocess_ssocard(card):
                 make_dict(value)
             else:
                 # These keys are not touched, they don't have metadata
-                if key in ["links", "bibref", "method", "value", "error", "min", "max"]:
+                if key in ["bibref", "method", "value", "error", "min", "max"]:
                     continue
                 # Turn non-dict value into dict for merging with metadata
                 values[key] = {"value": value}
@@ -158,21 +160,34 @@ def _postprocess_ssocard(card):
     # Turn low-level parameters into dictionaries
     card["parameters"] = make_dict(card["parameters"])
 
-    # Add metadata entries
-    MAPPINGS = rocks.utils.load_mappings()
-    card = deep_update(card, MAPPINGS)
+    # Catch for spins
+    for id_ in card["parameters"]["physical"]["spins"]:
+        mappings["parameters"]["physical"]["spins"][id_] = mappings["parameters"][
+            "physical"
+        ]["spins"]["<id>"]
 
-    # for path, values in MAPPINGS.items():
+    card = deep_update(card, mappings)
 
-    # parameter = rocks.utils.deep_get(card, path)
+    # ------
+    # Convert spin to list
+    spins = card["parameters"]["physical"]["spins"]
+    spin_solutions = []
 
-    # if not isinstance(parameter, dict):
-    #     parameter = {"value": parameter}
+    for key, spin in spins.items():
 
-    # for key, value in values.items():
-    #     parameter[key] = value
+        # spin entries have integer ids
+        if not key.isnumeric():
+            continue
 
-    # for key in '.'.split(path)[:-1]:
+        # convert the spin key to an entry in the solution dict
+        spin["id_"] = {
+            "value": key,
+            "description": "Identifier of the spin axis solution",
+            "format": "%s",
+        }
+
+        spin_solutions.append(spin)
+    card["parameters"]["physical"]["spins"] = spin_solutions
 
     return card
 
