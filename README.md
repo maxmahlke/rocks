@@ -39,6 +39,8 @@ $ rocks density Eos
 >>> ceres = rocks.Rock("ceres")
 >>> ceres.diameter.value
 848.4
+>>> ceres.diameter.unit
+'km'
 >>> ceres.mass.value
 9.384e+20
 >>> ceres.mass.error
