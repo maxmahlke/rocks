@@ -339,6 +339,48 @@ def empty_str_to_nan(value):
     return value
 
 
+def get_preferred(name, parameter, ids):
+    """Get the preferred values for this catalogue from the ssoCard of the object.
+
+    Parameters
+    ----------
+    name : str
+        The asteroid name, extracted from the datacloud catalogue.
+    parameter : str
+        The full parameter path in the ssoCard.
+    ids : list of int
+        List of dataset ids present in the datacloud catalogue.
+
+    Returns
+    -------
+    list of bool
+        True if the id belongs to a preferred entry, else False.
+    """
+
+    # Get ssoCard
+    ssoCard = rocks.Rock(name)
+
+    # Get selected parameters
+    link_selection = rocks.utils.rgetattr(ssoCard, f"{parameter}.links.selection.value")
+
+    if not link_selection:
+        return [False for id_ in ids]
+
+    # Parse selection link for preferred dataset ids
+    match = re.search(r"(.+)(:id=)([0-9,]+)(.*)", link_selection)
+    ids_preferred = match.group(3)
+    ids_preferred = [int(id_) for id_ in ids_preferred.split(",")]
+
+    # Create list of preferred dataset ids
+    preferred = [True if id_ in ids_preferred else False for id_ in ids]
+
+    # If all are preferred, none are preferred
+    if all(preferred):
+        preferred = [False for _ in preferred]
+
+    return preferred
+
+
 # ------
 # SsODNet catalogues as pydantic model
 # https://ssp.imcce.fr/data/ssodnet_datacloud.sql
