@@ -745,7 +745,7 @@ class Rock(pydantic.BaseModel):
         }
 
         # add 'preferred' attribute where applicable
-        if catalogue_ssodnet in ["taxonomy", "masses", "diamalbedo"]:
+        if catalogue_ssodnet in ["thermal_inertia", "taxonomy", "masses", "diamalbedo"]:
             cat["preferred"] = [False] * len(list(cat.values())[0])
         if catalogue_ssodnet in ["diamalbedo"]:
             cat["preferred_albedo"] = [False] * len(list(cat.values())[0])

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Implement the Datacloud catalogue pydantic models."""
 
+import re
 from typing import List, Optional
 
 import numpy as np
@@ -132,7 +133,14 @@ CATALOGUES = {
     "mpcorb": {
         "attr_name": "mpcorb",
         "ssodnet_name": "mpcorb",
-        "print_columns": [],
+        "print_columns": [
+            "H",
+            "G",
+            "semi_major_axis",
+            "eccentricity",
+            "inclination",
+            "orbital_arc",
+        ],
     },
     "pairs": {
         "attr_name": "pairs",
@@ -205,24 +213,20 @@ def pretty_print(rock, catalogue, parameter):
     # ------
     # Create table to echo
     if parameter in ["diameters", "albedos"]:
-
         if parameter == "diameters":
             preferred = catalogue.preferred_diameter
-            caption = "Green: preferred entry"
         elif parameter == "albedos":
             preferred = catalogue.preferred_albedo
-            caption = "Green: preferred entry"
-        # else:
-        #     preferred = catalogue.preferred
-        #     caption = "Blue: preferred diameter, yellow: preferred albedo, green: both preferred"
-
-    elif parameter in ["masses", "taxonomies", "diamalbedo"]:
-        caption = "Green: preferred entry"
+    elif hasattr(catalogue, "preferred"):
         preferred = catalogue.preferred
+    else:
+        preferred = [False for _ in range(len(catalogue))]
 
+    # Only show the caption if there is a preferred entry
+    if any(preferred):
+        caption = "Green: preferred entry"
     else:
         caption = None
-        preferred = [False for _ in range(len(catalogue))]
 
     table = Table(
         header_style="bold blue",
@@ -684,6 +688,7 @@ class Binarymp(pydantic.BaseModel):
 class Diamalbedo(Collection):
     """Diameters and Albedos database from literature"""
 
+    id_: List[int] = pydantic.Field([None], alias="id")
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
     name: List[str] = [""]
     diameter: List[float] = [np.nan]
@@ -704,13 +709,17 @@ class Diamalbedo(Collection):
     preferred_diameter: List[bool] = [False]
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred_albedo", pre=True)
-    def select_preferred_albedo(cls, _, values):
-        return rocks.definitions.rank_properties("albedo", values)
+    @pydantic.validator("preferred_albedo", pre=True, allow_reuse=True)
+    def select_preferred(cls, _, values):
+        return get_preferred(
+            values["name"][0], "parameters.physical.albedo", values["id_"]
+        )
 
-    @pydantic.validator("preferred_diameter", pre=True)
-    def select_preferred_diameter(cls, _, values):
-        return rocks.definitions.rank_properties("diameter", values)
+    @pydantic.validator("preferred_diameter", pre=True, allow_reuse=True)
+    def select_preferred(cls, _, values):
+        return get_preferred(
+            values["name"][0], "parameters.physical.diameter", values["id_"]
+        )
 
     @pydantic.validator("preferred", pre=True)
     def preferred_albedo_or_diameter(cls, _, values):
@@ -738,8 +747,10 @@ class Masses(Collection):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
-    def select_preferred_mass(cls, _, values):
-        return rocks.definitions.rank_properties("mass", values)
+    def select_preferred(cls, _, values):
+        return get_preferred(
+            values["name"][0], "parameters.physical.mass", values["id_"]
+        )
 
 
 class Taxonomies(Collection):
@@ -761,8 +772,10 @@ class Taxonomies(Collection):
     preferred: List[bool] = [False]
 
     @pydantic.validator("preferred", pre=True)
-    def select_preferred_class(cls, value, values):
-        return rocks.definitions.rank_properties("taxonomy", values)
+    def select_preferred(cls, _, values):
+        return get_preferred(
+            values["name"][0], "parameters.physical.taxonomy", values["id_"]
+        )
 
 
 class Proper_elements(Collection):
@@ -925,6 +938,14 @@ class Thermal_inertia(Collection):
     selection: List[int] = [None]
     method: List[str] = [""]
     iddataset: List[int] = [None]
+
+    preferred: List[bool] = [False]
+
+    @pydantic.validator("preferred", pre=True)
+    def select_preferred(cls, _, values):
+        return get_preferred(
+            values["name"][0], "parameters.physical.thermal_inertia", values["id_"]
+        )
 
 
 class Colors(Collection):
