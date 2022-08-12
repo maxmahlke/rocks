@@ -739,7 +739,7 @@ class Rock(pydantic.BaseModel):
         # turn list of dict (catalogue entries) into dict of list
         cat = {
             key: [c[key] if key in c else "" for c in cat]
-            if catalogue not in ["aams", "astorb", "families"]
+            if catalogue not in ["aams", "families"]
             else cat[0][key]
             for key in cat[0].keys()
         }
