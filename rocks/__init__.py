@@ -9,7 +9,7 @@ traceback.install()
 
 # rocks modules
 # rocks.plots is lazy-loaded as it is expensive
-from . import datacloud, definitions, ssodnet, utils, index
+from . import datacloud, ssodnet, utils, index
 
 # Expose API to user
 from .core import Rock
