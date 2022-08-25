@@ -1,6 +1,8 @@
-# 1.5.12 - 2022-08-12
+# 1.5.12 - 2022-08-25
 - Get preferred entries from the ssoCard instead of hardcoded decision trees
+- Remove definitions module
 - Fix printing of astorb, mpcorb catalogues
+- Fix in ssoCard ingestion in case of missing spins
 
 # 1.5.11 - 2022-08-10
 - Implement metadata attributes like .unit and .description
