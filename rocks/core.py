@@ -232,7 +232,7 @@ class Family(Parameter):
 
 
 class Pair(Parameter):
-    age: Value = Value(**{})
+    age: FloatValue = FloatValue(**{})
     distance: FloatValue = FloatValue(**{})
     sibling_name: StringValue = StringValue(**{})
     sibling_number: IntegerValue = IntegerValue(**{})
@@ -245,10 +245,10 @@ class TisserandParameter(Parameter):
 
 
 class Yarkovsky(Parameter):
-    S: float = np.nan
-    A2: Value = Value(**{})
+    S: FloatValue = FloatValue(**{})
+    A2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
-    dadt: Value = Value(**{})
+    dadt: FloatValue = FloatValue(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
@@ -277,7 +277,7 @@ class Albedo(FloatValue):
 
 
 class ColorEntry(Parameter):
-    color: Value = Value(**{})
+    color: FloatValue = FloatValue(**{})
     epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
@@ -337,10 +337,10 @@ class Mass(FloatValue):
 
 
 class Phase(Parameter):
-    H: Value = Value(**{})
+    H: FloatValue = FloatValue(**{})
     N: FloatValue = FloatValue(**{})
-    G1: Value = Value(**{})
-    G2: Value = Value(**{})
+    G1: FloatValue = FloatValue(**{})
+    G2: FloatValue = FloatValue(**{})
     rms: FloatValue = FloatValue(**{})
     phase: Error = Error(**{})
     links: LinksParameter = LinksParameter(**{})
@@ -361,12 +361,12 @@ class Spin(Parameter):
     t0: FloatValue = FloatValue(**{})
     Wp: FloatValue = FloatValue(**{})
     id_: IntegerValue = IntegerValue(**{})
-    lat: Value = Value(**{})
-    RA0: Value = Value(**{})
-    DEC0: Value = Value(**{})
+    lat: FloatValue = FloatValue(**{})
+    RA0: FloatValue = FloatValue(**{})
+    DEC0: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
-    long_: Value = pydantic.Field(Value(**{}), alias="long")
-    period: Value = Value(**{})
+    long_: FloatValue = pydantic.Field(FloatValue(**{}), alias="long")
+    period: FloatValue = FloatValue(**{})
     obliquity: FloatValue = FloatValue(**{})
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
@@ -386,7 +386,7 @@ class Taxonomy(Parameter):
     def __str__(self):
         if not self.class_:
             return "No taxonomy on record."
-        return self.class_
+        return self.class_.value
 
 
 class ThermalInertia(FloatValue):
