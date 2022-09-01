@@ -1,5 +1,5 @@
 # 1.5.13 - 2022-09-01
-- Fix format of parameters echoed to console
+- Parameter echo to console now respects the -v|--verbose flag
 - Fix implementation of dynamical parameters
 
 # 1.5.12 - 2022-08-25

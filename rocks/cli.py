@@ -326,7 +326,10 @@ def echo():
         else:
             value = rocks.utils.rgetattr(rock, param)
 
-        rich.print(value)
+            if verbose and isinstance(value, rocks.core.Parameter):
+                rich.print_json(value.json(), sort_keys=True)
+            else:
+                rich.print(value)
 
         if plot:
             if param not in datacloud:
