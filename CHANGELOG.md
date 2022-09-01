@@ -1,3 +1,7 @@
+# 1.5.13 - 2022-09-01
+- Fix format of parameters echoed to console
+- Fix implementation of dynamical parameters
+
 # 1.5.12 - 2022-08-25
 - Get preferred entries from the ssoCard instead of hardcoded decision trees
 - Remove definitions module

@@ -257,10 +257,10 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
-    # pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
-    # family: Family = Family(**{})
+    pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
+    family: Family = Family(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
-    # yarkovsky: Yarkovsky = Yarkovsky(**{})
+    yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
     orbital_elements: OrbitalElements = OrbitalElements(**{})
 
