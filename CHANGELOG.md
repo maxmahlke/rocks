@@ -1,3 +1,7 @@
+# 1.5.14 - 2022-09-19
+- SpinList is never empty, it gets populated with an empty Spin object in case of missing spin information in ssoCard
+- SpinList is False if all period entries in the list are NaN
+
 # 1.5.13 - 2022-09-01
 - Parameter echo to console now respects the -v|--verbose flag
 - Fix implementation of dynamical parameters

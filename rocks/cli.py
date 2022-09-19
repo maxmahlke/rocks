@@ -158,7 +158,7 @@ def status():
     ):
         rich.print(
             f"[red]The running [green]rocks[/green] version ({rocks.__version__}) is behind the "
-            f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]"
+            f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]\n"
         )
         rich.print(
             "You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"

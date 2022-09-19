@@ -133,11 +133,19 @@ class SpinList(list):
 
     def __init__(self, list_):
         """Convert the list items to Spin instances."""
-        list_ = [Spin(**entry) for entry in list_]
+
+        if list_:  # spin list is populated
+            list_ = [Spin(**entry) for entry in list_]
+        else:
+            list_ = [Spin(**{})]  # ensure it's never empty
+
         return super().__init__(list_)
 
     def __str__(self) -> str:
         return "\n".join(entry.json() for entry in self)
+
+    def __bool__(self) -> bool:
+        return any(np.isfinite(entry.period.value) for entry in self)
 
 
 # ------
