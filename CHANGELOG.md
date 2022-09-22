@@ -1,4 +1,5 @@
-# 1.5.14 - 2022-09-19
+# 1.5.14 - 2022-09-22
+- Add shortcut P for orbit
 - SpinList is never empty, it gets populated with an empty Spin object in case of missing spin information in ssoCard
 - SpinList is False if all period entries in the list are NaN
 

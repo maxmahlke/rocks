@@ -814,6 +814,7 @@ class Rock(pydantic.BaseModel):
             "a": "semi_major_axis",
             "e": "eccentricity",
             "i": "inclination",
+            "P": "orbital_period",
         },
         "proper_elements": {
             "ap": "proper_semi_major_axis",
