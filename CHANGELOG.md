@@ -2,6 +2,7 @@
 - Add shortcut P for orbit
 - SpinList is never empty, it gets populated with an empty Spin object in case of missing spin information in ssoCard
 - SpinList is False if all period entries in the list are NaN
+- Fix verbose parameter output
 
 # 1.5.13 - 2022-09-01
 - Parameter echo to console now respects the -v|--verbose flag

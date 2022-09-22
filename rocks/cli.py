@@ -326,7 +326,7 @@ def echo():
         else:
             value = rocks.utils.rgetattr(rock, param)
 
-            if verbose and isinstance(value, rocks.core.Parameter):
+            if verbose:
                 rich.print_json(value.json(), sort_keys=True)
             else:
                 rich.print(value)
