@@ -123,8 +123,8 @@ class Bibref(Parameter):
 
 
 class LinksParameter(Parameter):
-    datacloud: StringValue = StringValue(**{})
-    selection: StringValue = StringValue(**{})
+    datacloud: str = ""
+    selection: str = ""
 
 
 # And a special class for the Spin list

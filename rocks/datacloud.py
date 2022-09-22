@@ -365,7 +365,7 @@ def get_preferred(name, parameter, ids):
     ssoCard = rocks.Rock(name)
 
     # Get selected parameters
-    link_selection = rocks.utils.rgetattr(ssoCard, f"{parameter}.links.selection.value")
+    link_selection = rocks.utils.rgetattr(ssoCard, f"{parameter}.links.selection")
 
     if not link_selection:
         return [False for id_ in ids]

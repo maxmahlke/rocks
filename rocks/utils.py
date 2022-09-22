@@ -173,7 +173,9 @@ def retrieve_mappings():
 
         for key in path.split("."):
 
-            if key == parameter:
+            if key in ["datacloud", "selection"]:
+                continue
+            elif key == parameter:
                 parent[key] = value
             else:
                 parent = parent.setdefault(key, {})
