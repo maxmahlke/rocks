@@ -30,6 +30,8 @@ class AliasedGroup(click.Group):
         # Add command aliases
         if cmd_name == "identify":
             cmd_name = "id"
+        elif cmd_name == "aliases":
+            cmd_name = "ids"
         elif cmd_name == "parameter":
             cmd_name = "parameters"
         elif cmd_name == "update":
@@ -111,7 +113,7 @@ def parameters():
 
 @cli_rocks.command(hidden=True)
 @click.argument("id_", nargs=-1)
-def aliases(id_):
+def ids(id_):
     """Echo the aliases of an asteroid."""
 
     if not id_:

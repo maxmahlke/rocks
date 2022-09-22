@@ -1,3 +1,7 @@
+# 1.5.15 - 2022-09-22
+- Bugfix in datacloud and selection echo
+- Rename 'aliases' to 'ids'
+
 # 1.5.14 - 2022-09-22
 - Add shortcut P for orbit
 - SpinList is never empty, it gets populated with an empty Spin object in case of missing spin information in ssoCard
