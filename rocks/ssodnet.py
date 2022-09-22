@@ -151,7 +151,17 @@ def _postprocess_ssocard(card):
                 make_dict(value)
             else:
                 # These keys are not touched, they don't have metadata
-                if key in ["bibref", "method", "value", "error", "min", "max"]:
+                if key in [
+                    "bibref",
+                    "method",
+                    "value",
+                    "error",
+                    "min",
+                    "max",
+                    "links",
+                    "datacloud",
+                    "selection",
+                ]:
                     continue
                 # Turn non-dict value into dict for merging with metadata
                 values[key] = {"value": value}
