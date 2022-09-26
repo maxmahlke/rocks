@@ -391,6 +391,9 @@ class Taxonomy(Parameter):
     technique: StringValue = StringValue(**{})
     waverange: StringValue = StringValue(**{})
 
+    def __bool__(self):
+        return bool(self.class_.value)
+
     def __str__(self):
         if not self.class_:
             return "No taxonomy on record."
