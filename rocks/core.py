@@ -15,6 +15,48 @@ import rocks
 
 # ------
 # ssoCard as pydantic model
+ALIASES = {
+    "dynamical": {
+        "parameters.dynamical.orbital_elements": "orbital_elements",
+        "parameters.dynamical.family": "family",
+        "parameters.dynamical.pair": "pair",
+        "parameters.dynamical.proper_elements": "proper_elements",
+        "parameters.dynamical.tisserand_parameter": "tisserand_parameter",
+        "parameters.dynamical.yarkovsky": "yarkovsky",
+    },
+    "physical": {
+        "D": "diameter",
+        "H": "absolute_magnitude",
+        "parameters.physical.absolute_magnitude": "absolute_magnitude",
+        "parameters.physical.albedo": "albedo",
+        "parameters.physical.colors": "color",
+        "parameters.physical.diameter": "diameter",
+        "parameters.physical.density": "density",
+        "parameters.physical.mass": "mass",
+        "parameters.physical.phase_function": "phase_function",
+        "parameters.physical.spin": "spin",
+        "parameters.physical.taxonomy": "taxonomy",
+        "parameters.physical.thermal_inertia": "thermal_inertia",
+    },
+    "orbital_elements": {
+        "a": "semi_major_axis",
+        "e": "eccentricity",
+        "i": "inclination",
+        "P": "orbital_period",
+    },
+    "proper_elements": {
+        "ap": "proper_semi_major_axis",
+        "ep": "proper_eccentricity",
+        "ip": "proper_inclination",
+        "sinip": "proper_sine_inclination",
+    },
+    "diamalbedo": ["albedos", "diameters"],
+    "phase_function": {
+        "V": "generic_johnson_V",
+        "cyan": "misc_atlas_cyan",
+        "orange": "misc_atlas_orange",
+    },
+}
 
 # The lowest level in the ssoCard tree is the Value
 class Error(pydantic.BaseModel):
@@ -142,6 +184,7 @@ class SpinList(list):
         return super().__init__(list_)
 
     def __str__(self) -> str:
+        breakpoint()
         return "\n".join(entry.json() for entry in self)
 
     def __bool__(self) -> bool:
@@ -359,10 +402,19 @@ class Phase(Parameter):
 
 class PhaseFunction(Parameter):
     # Generic
-    generic_johnson_v: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
+    generic_johnson_V: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
     # ATLAS
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
+
+    def __getattr__(self, name):
+        """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
+
+        if name in ALIASES["phase_function"].keys():
+            return getattr(
+                self,
+                ALIASES["phase_function"][name],
+            )
 
 
 class Spin(Parameter):
@@ -497,7 +549,7 @@ class Rock(pydantic.BaseModel):
     proper_elements: rocks.datacloud.Proper_elements = rocks.datacloud.Proper_elements(
         **{}
     )
-    phase_function: rocks.datacloud.Phase_function = rocks.datacloud.Phase_function(
+    phase_functions: rocks.datacloud.Phase_function = rocks.datacloud.Phase_function(
         **{}
     )
     taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
@@ -681,33 +733,33 @@ class Rock(pydantic.BaseModel):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
         # These are shortcuts
-        if name in self.__aliases["physical"].values():
+        if name in ALIASES["physical"].values():
             return getattr(self.parameters.physical, name)
 
-        if name in self.__aliases["dynamical"].values():
+        if name in ALIASES["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
 
         # TODO This could be coded in a more abstract way
         # These are proper aliases
-        if name in self.__aliases["orbital_elements"].keys():
+        if name in ALIASES["orbital_elements"].keys():
             return getattr(
                 self.parameters.dynamical.orbital_elements,
-                self.__aliases["orbital_elements"][name],
+                ALIASES["orbital_elements"][name],
             )
 
-        if name in self.__aliases["proper_elements"].keys():
+        if name in ALIASES["proper_elements"].keys():
             return getattr(
                 self.parameters.dynamical.proper_elements,
-                self.__aliases["proper_elements"][name],
+                ALIASES["proper_elements"][name],
             )
 
-        if name in self.__aliases["physical"].keys():
+        if name in ALIASES["physical"].keys():
             return getattr(
                 self.parameters.physical,
-                self.__aliases["physical"][name],
+                ALIASES["physical"][name],
             )
 
-        if name in self.__aliases["diamalbedo"]:
+        if name in ALIASES["diamalbedo"]:
             return getattr(self, "diamalbedo")
 
         raise AttributeError(
@@ -789,44 +841,6 @@ class Rock(pydantic.BaseModel):
                 f"[blue]Warning[/] [magenta]object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
                 f"\nPassed value: {value}"
             )
-
-    __aliases = {
-        "dynamical": {
-            "parameters.dynamical.orbital_elements": "orbital_elements",
-            "parameters.dynamical.family": "family",
-            "parameters.dynamical.pair": "pair",
-            "parameters.dynamical.proper_elements": "proper_elements",
-            "parameters.dynamical.tisserand_parameter": "tisserand_parameter",
-            "parameters.dynamical.yarkovsky": "yarkovsky",
-        },
-        "physical": {
-            "D": "diameter",
-            "H": "absolute_magnitude",
-            "parameters.physical.absolute_magnitude": "absolute_magnitude",
-            "parameters.physical.albedo": "albedo",
-            "parameters.physical.colors": "color",
-            "parameters.physical.diameter": "diameter",
-            "parameters.physical.density": "density",
-            "parameters.physical.mass": "mass",
-            "parameters.physical.phase_function": "phase_function",
-            "parameters.physical.spin": "spin",
-            "parameters.physical.taxonomy": "taxonomy",
-            "parameters.physical.thermal_inertia": "thermal_inertia",
-        },
-        "orbital_elements": {
-            "a": "semi_major_axis",
-            "e": "eccentricity",
-            "i": "inclination",
-            "P": "orbital_period",
-        },
-        "proper_elements": {
-            "ap": "proper_semi_major_axis",
-            "ep": "proper_eccentricity",
-            "ip": "proper_inclination",
-            "sinip": "proper_sine_inclination",
-        },
-        "diamalbedo": ["albedos", "diameters"],
-    }
 
 
 def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):

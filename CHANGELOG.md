@@ -1,3 +1,10 @@
+# 1.5.16 - 2022-09
+- Datacloud phase_functions no longer hide ssoCard phase_function
+- Added shortcuts for phase_function filters:
+  - phase_function.generic_johnson_V -> phase_function.V
+  - phase_function.misc_atlas_cyan -> phase_function.cyan
+  - phase_function.misc_atlas_orange -> phase_function.orange
+
 # 1.5.15 - 2022-09-22
 - Bugfix in datacloud and selection echo
 - Rename 'aliases' to 'ids'
