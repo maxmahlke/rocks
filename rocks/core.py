@@ -398,6 +398,11 @@ class Phase(Parameter):
     facility: StringValue = StringValue(**{})
     name_filter: StringValue = StringValue(**{})
 
+    def __str__(self):
+        if not np.isnan(self.H.value):
+            return rf"H: {self.H.value:.2f}  G1: {self.G1.value:.2f}  G2: {self.G2.value:.2f}  [{self.bibref[0].shortbib}]"
+        return "No phase function on record in this filter."
+
 
 class PhaseFunction(Parameter):
     # Generic

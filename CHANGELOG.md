@@ -5,6 +5,7 @@
   - phase_function.misc_atlas_cyan -> phase_function.cyan
   - phase_function.misc_atlas_orange -> phase_function.orange
 - Added summary output for phase_function ('$ rocks phase_function eos')
+- Added summary output for phase_function.filter ('$ rocks phase_function.cyan eos')
 
 # 1.5.15 - 2022-09-22
 - Bugfix in datacloud and selection echo
