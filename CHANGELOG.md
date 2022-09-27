@@ -6,6 +6,8 @@
   - phase_function.misc_atlas_orange -> phase_function.orange
 - Added summary output for phase_function ('$ rocks phase_function eos')
 - Added summary output for phase_function.filter ('$ rocks phase_function.cyan eos')
+- Added boolean properties to phase_function and phase_function.filter ('if rock.phase_function' is True if
+  an absolute magnitude is present in any filter)
 
 # 1.5.15 - 2022-09-22
 - Bugfix in datacloud and selection echo

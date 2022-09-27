@@ -398,6 +398,9 @@ class Phase(Parameter):
     facility: StringValue = StringValue(**{})
     name_filter: StringValue = StringValue(**{})
 
+    def __bool__(self):
+        return bool(np.isfinite(self.H.value))
+
     def __str__(self):
         if not np.isnan(self.H.value):
             return rf"H: {self.H.value:.2f}  G1: {self.G1.value:.2f}  G2: {self.G2.value:.2f}  [{self.bibref[0].shortbib}]"
@@ -417,6 +420,18 @@ class PhaseFunction(Parameter):
         if name in ALIASES["phase_function"].keys():
             return getattr(self, ALIASES["phase_function"][name])
 
+    def __bool__(self):
+        return any(
+            [
+                np.isfinite(getattr(self, filter_).H.value)
+                for filter_ in [
+                    "generic_johnson_V",
+                    "misc_atlas_cyan",
+                    "misc_atlas_orange",
+                ]
+            ]
+        )
+
     def __repr__(self):
         observed = []
 
@@ -424,7 +439,7 @@ class PhaseFunction(Parameter):
             entry = getattr(self, filter_)
             if not np.isnan(entry.H.value):
                 observed.append(
-                    f"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
+                    rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
                 )
         if observed:
             return "\n".join(observed)
