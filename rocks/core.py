@@ -184,7 +184,6 @@ class SpinList(list):
         return super().__init__(list_)
 
     def __str__(self) -> str:
-        breakpoint()
         return "\n".join(entry.json() for entry in self)
 
     def __bool__(self) -> bool:
@@ -411,10 +410,20 @@ class PhaseFunction(Parameter):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
         if name in ALIASES["phase_function"].keys():
-            return getattr(
-                self,
-                ALIASES["phase_function"][name],
-            )
+            return getattr(self, ALIASES["phase_function"][name])
+
+    def __repr__(self):
+        observed = []
+
+        for filter_ in ["generic_johnson_V", "misc_atlas_cyan", "misc_atlas_orange"]:
+            entry = getattr(self, filter_)
+            if not np.isnan(entry.H.value):
+                observed.append(
+                    f"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
+                )
+        if observed:
+            return "\n".join(observed)
+        return "No phase function on record."
 
 
 class Spin(Parameter):
@@ -473,14 +482,12 @@ class PhysicalParameters(Parameter):
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
     taxonomy: Taxonomy = Taxonomy(**{})
-    phase_function: PhaseFunction = PhaseFunction(**{})
+    phase_function: PhaseFunction = pydantic.Field(
+        PhaseFunction(**{}), alias="phase_functions"
+    )
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    # Can probably reduce verbosity here
-    # _convert_spin_to_list: classmethod = pydantic.validator("spin", pre=True)(
-    #     convert_spin_to_list
-    # )
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "spin", allow_reuse=True, pre=True
     )(lambda list_: SpinList(list_))

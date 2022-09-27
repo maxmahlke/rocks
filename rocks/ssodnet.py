@@ -1,7 +1,6 @@
 #!/usr/bin/env python
+"""Implement SsODNet:Datacloud queries."""
 
-"""Implement SsODNet:Datacloud queries.
-"""
 import asyncio
 from itertools import product
 import warnings
