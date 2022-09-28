@@ -123,6 +123,9 @@ def ids(id_):
 
     name, number, ssodnetid = rocks.identify(id_, return_id=True)  # type: ignore
 
+    if name is None:
+        sys.exit()
+
     aliases = rocks.index.get_aliases(ssodnetid)
 
     rich.print(f"({number}) {name}, aka \n {aliases}")

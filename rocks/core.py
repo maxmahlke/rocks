@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
-import json
-from typing import Dict, List, Optional, Union
+from typing import List
 import warnings
 
 import numpy as np
@@ -248,8 +247,6 @@ class OrbitalElements(Parameter):
     semi_major_axis: FloatValue = FloatValue(**{})
     number_observation: FloatValue = FloatValue(**{})
     perihelion_argument: FloatValue = FloatValue(**{})
-
-    # _add_metadata: classmethod = pydantic.validator("semi_major_axis")(_add_metadata)
 
 
 class ProperElements(Parameter):
