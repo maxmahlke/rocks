@@ -26,6 +26,7 @@ author = "Max Mahlke"
 
 # The full version, including alpha/beta/rc tags
 release = "0.1"
+html_title = "rocks"
 
 
 # -- General configuration ---------------------------------------------------
@@ -91,9 +92,8 @@ html_static_path = ["_static"]
 pygments_style = "monokai"
 pygments_dark_style = "monokai"
 
-html_show_copyright = ""
-html_show_sphinx = ""
-copyright = "Thi"
+html_show_copyright = False
+html_show_sphinx = False
 
 
 html_css_files = [
