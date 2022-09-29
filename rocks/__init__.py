@@ -14,7 +14,7 @@ from . import datacloud, ssodnet, utils, index
 # Expose API to user
 from .core import Rock
 from .core import rocks_ as rocks
-from .resolve import identify
+from .resolve import identify, id
 
 # ------
 # Path definitions required throughout the code

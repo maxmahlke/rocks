@@ -383,3 +383,7 @@ def _interactive():
 
     # Return asteroid name
     return " ".join(choice.split()[1:])
+
+
+def id(*args, **kwargs):
+    return identify(*args, **kwargs)
