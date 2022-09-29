@@ -448,14 +448,3 @@ def get_citation_from_mpc(name):
     citation = citation.find("br").next_sibling.next_sibling
     citation = citation.split("[")[0].strip().replace("  ", " ")
     return citation
-
-    # contents = [content for content in citation.contents if not content.tag]
-
-    # alias, *_, citation, ref, ref_number = citation.contents
-
-    # alias = alias.strip()
-    # citation = citation.replace("[Ref:", "").replace("  ", " ").strip()
-    # ref_number = ref_number.replace("]", "").strip()
-    # ref = ref.text
-
-    # return alias, citation, " ".join([ref, ref_number])

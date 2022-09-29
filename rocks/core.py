@@ -190,43 +190,6 @@ class SpinList(list):
 
 
 # ------
-# Validators
-# def convert_spin_to_list(spins: Dict) -> List:
-#     """Convert the Spin dictionary from the ssoCard into a list.
-#     Add the spin index as parameter to the Spin entries.
-
-#     Parameters
-#     ----------
-#     spin : dict
-#         The dictionary located at parameters.physical.spin in the ssoCard.
-
-#     Returns
-#     -------
-#     list
-#         A list of dictionaries, with one dictionary for each entry in parameters.physical.spin
-#         after removing the index layer.
-#     """
-#     spin_solutions = []
-
-#     for key, spin in spins.items():
-
-#         # spin entries have integer ids
-#         if not key.isnumeric():
-#             continue
-
-#         # convert the spin key to an entry in the solution dict
-#         spin["id_"] = {
-#             "value": key,
-#             "description": "Identifier of the spin axis solution",
-#             "format": "%s",
-#         }
-
-#         spin_solutions.append(spin)
-
-#     return spin_solutions
-
-
-# ------
 # Dynamical parameters
 class OrbitalElements(Parameter):
     """parameters.dynamical.oribtal_elements"""
