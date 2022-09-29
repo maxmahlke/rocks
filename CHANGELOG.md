@@ -1,6 +1,6 @@
 # 1.5.16 - 2022-09-29
 - Documentation now even better looking. Also more up-to-date.
-- add alias 'rocks.id' for 'rocks.identify' in python interface
+- Add alias 'rocks.id' for 'rocks.identify' in python interface
 - Datacloud phase_functions no longer hide ssoCard phase_function
 - Added shortcuts for phase_function filters:
   - phase_function.generic_johnson_V -> phase_function.V
