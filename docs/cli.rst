@@ -41,6 +41,8 @@ commands by running ``$ rocks``.
 Data Exploration
 ================
 
+.. _getting_values:
+
 Getting values from the ssoCard
 -------------------------------
 
@@ -120,6 +122,8 @@ To echo the complete :term:`ssoCard` of an asteroid, use the ``$ rocks info [ide
 
     [...]
 
+.. _datacloud:
+
 Getting values from datacloud catalogues
 ----------------------------------------
 
@@ -167,6 +171,7 @@ specifying the parameter name via the dot notation.
     3       Tholen
     Name: scheme, dtype: object
 
+.. _name_resolution:
 
 Name Resolution
 ===============
@@ -190,6 +195,18 @@ You can pass any valid asteroid :term:`identifier<Identifier>`.
 
    $ rocks id J65B00A
    (1727) Mette
+
+.. _aliases:
+
+Using the plural ``ids`` returns the list of aliases under which the asteroid may be listed as well.
+
+.. code-block:: bash
+
+   $ rocks ids aschera                                                                                     master
+     (214) Aschera, aka
+     ['1880 DB', '1903 SE', '1947 BP', '1948 JE', '1949 QG2', '1949 SX1',
+      '1950 XH', '1953 OO', '2000214', 'I80D00B', 'J03S00E', 'J47B00P',
+      'J48J00E', 'J49Q02G', 'J49S01X', 'J50X00H', 'J53O00O']
 
 If you have trouble remembering the name of an asteroid, ``rocks`` can give you a hint.
 
@@ -481,3 +498,11 @@ Accessing the properties can now be done with a loop or list comprehension.
     Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
 
 Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail.
+
+.. _who:
+
+Use ``$ rocks who`` to get the citations associated to each named asteroid.
+
+.. _author:
+
+Author look-up to be implemented.

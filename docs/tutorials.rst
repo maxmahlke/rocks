@@ -147,9 +147,8 @@ Data Exploration
       .. tab-item:: Command Line
 
         The basic usage is ``$ rocks [parameter] [identifier]``. The list of
-        valid parameter names can be found `here
-        <https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/>`_ and by using
-        the ``$ rocks parameters`` command.
+        valid parameter names can be found :ref:`here
+        <rocks-props>`.
 
         .. code-block:: bash
 
@@ -171,6 +170,8 @@ Data Exploration
           >>> pallas = rocks.Rock('pallas')
           >>> pallas.albedo.value
           0.1512
+
+.. _taxonomies:
 
 .. dropdown:: How do I get all the taxonomic classes proposed for Ceres?
 
@@ -229,6 +230,12 @@ Data Exploration
 
        # Print the distribution of taxonomic classes
        print(data.class_.value_counts())
+
+.. _thermal_barbarians:
+
+.. dropdown:: What is the distribution of thermal inertias of known Barbarian asteroids?
+
+   TBD
 
 .. dropdown:: What's the weighted average albedo of (6) Hebe?
 

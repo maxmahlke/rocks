@@ -27,7 +27,7 @@ to common questions as the ones below. All data is cited and new observations ar
 .. grid:: 2
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: name_resolution
       :link-type: ref
 
       What is the number of ``Didymos``?
@@ -35,7 +35,7 @@ to common questions as the ones below. All data is cited and new observations ar
 
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: aliases
       :link-type: ref
 
       What aliases of ``2000 UD93`` are used in different databases?
@@ -47,14 +47,14 @@ to common questions as the ones below. All data is cited and new observations ar
 .. grid:: 2
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: getting_values
       :link-type: ref
 
       What is the albedo of ``(221) Eos``?
 
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: thermal_barbarians
       :link-type: ref
 
       What is the distribution of thermal inertias of known Barbarian asteroids?
@@ -65,14 +65,14 @@ to common questions as the ones below. All data is cited and new observations ar
 .. grid:: 2
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: datacloud
       :link-type: ref
 
       What masses of ``(1) Ceres`` have been published? What are the measurement uncertainties and methods?
 
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: taxonomies
       :link-type: ref
 
       What taxonomic classifications of ``(214) Aschera`` have been proposed over time?
@@ -83,13 +83,13 @@ to common questions as the ones below. All data is cited and new observations ar
 .. grid:: 2
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: who
       :link-type: ref
 
       Who was ``zappafrank``?
 
     .. grid-item-card::
-      :link: cards-clickable
+      :link: author
       :link-type: ref
 
       Is my data in `SsODNet <https://ssp.imcce.fr/webservices/ssodnet/>`_ and getting cited?
