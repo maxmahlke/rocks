@@ -141,7 +141,7 @@ def _postprocess_ssocard(card):
 
     # ------
     # Add metadata label, description, unity, format, and symbol to parameters
-    mappings = rocks.utils.load_mappings()
+    # mappings = rocks.utils.load_mappings()
 
     def make_dict(values):
         """Turn lower-level dict values into dicts."""
@@ -170,16 +170,19 @@ def _postprocess_ssocard(card):
     card["parameters"] = make_dict(card["parameters"])
 
     # Catch for spins
-    if "spins" in card["parameters"]["physical"]:
-        for id_ in card["parameters"]["physical"]["spins"]:
-            mappings["parameters"]["physical"]["spins"][id_] = mappings["parameters"][
-                "physical"
-            ]["spins"]["<id>"]
+    # if "spins" in card["parameters"]["physical"]:
+    #     for id_ in card["parameters"]["physical"]["spins"]:
+    #         mappings["parameters"]["physical"]["spins"][id_] = mappings["parameters"][
+    #             "physical"
+    #         ]["spins"]["<id>"]
 
-    card = deep_update(card, mappings)
+    # card = deep_update(card, mappings)
 
     # ------
     # Convert spin to list
+    if "spins" not in card["parameters"]["physical"]:
+        card["parameters"]["physical"]["spins"] = {}
+
     spins = card["parameters"]["physical"]["spins"]
     spin_solutions = []
 
@@ -192,8 +195,6 @@ def _postprocess_ssocard(card):
         # convert the spin key to an entry in the solution dict
         spin["id_"] = {
             "value": key,
-            "description": "Identifier of the spin axis solution",
-            "format": "%s",
         }
 
         spin_solutions.append(spin)
