@@ -108,14 +108,6 @@ html_theme_options = {
     "navigation_with_keys": True,
     "light_logo": "logo_rocks.svg",
     "dark_logo": "logo_rocks_light.svg",
-    "footer_icons": [
-        {
-            "name": "GitHub",
-            "url": "https://github.com/pradyunsg/furo",
-            "html": "",
-            "class": "fa-solid fa-github fa-2x",
-        },
-    ],
     # "logo_only": True,
     # "display_version": True,
     # "prev_next_buttons_location": "bottom",
