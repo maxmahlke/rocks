@@ -106,6 +106,7 @@ html_css_files = [
 html_theme_options = {
     "sidebar_hide_name": True,
     "navigation_with_keys": True,
+    "top_of_page_button": None,
     "light_logo": "logo_rocks.svg",
     "dark_logo": "logo_rocks_light.svg",
     # "logo_only": True,
