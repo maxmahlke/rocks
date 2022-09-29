@@ -97,11 +97,16 @@ def weighted_average(catalogue, parameter):
     float
         The standard error of the weighted average.
     """
+    catalogue = catalogue[catalogue[parameter] != 0]
 
     values = catalogue[parameter]
 
     if parameter in ["albedo", "diameter"]:
         preferred = catalogue[f"preferred_{parameter}"]
+
+        if not any(preferred):
+            preferred = ~preferred
+
         errors = catalogue[f"err_{parameter}_up"]
     else:
         preferred = catalogue["preferred"]
