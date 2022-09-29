@@ -245,48 +245,43 @@ Data Exploration
    :link: iterate_catalogues
    :link-type: ref
 
-   :octicon:`cross-reference;1em`    How do I access the entries in a catalogue one by one?
+   :octicon:`cross-reference;1em`    **How do I access the entries in a catalogue one by one?**
 
 
 SsODNet and ``rocks``
 ---------------------
 
--  :ref:`What is the difference between data from the ssoCard and from the datacloud? <ssocard-datacloud>`
+- :ref:`What is the difference between data from the ssoCard and from the datacloud? <ssocard-datacloud>`
 
--  :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
+- :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
 
--  :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
+- :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
 
--  :ref:`I got 'Error 404: missing ssoCard'. What is happening?<error_404>`
+.. card::
+   :link: parameter_aliases
+   :link-type: ref
 
-- :ref:`Which parameters can be abbreviated? <Parameter Aliases>`
+   :octicon:`cross-reference;1em`  **Which parameters can be abbreviated?**
 
 - :ref:`Which parameters can I open in a plot?`
 
 
-
-
----
-
 .. _error_404:
 
-*I got 'Error 404: missing ssoCard for IDENTIFIER'. What is happening?*
+.. dropdown:: I got the error message: ``Error 404: missing ssoCard for IDENTIFIER``. What is happening?
 
-``rocks`` tried to retrieve the :term:`ssoCard` of a confirmed identifier and
-got an invalid response from SsODNet. This can have several reasons:
+  ``rocks`` tried to retrieve the :term:`ssoCard` of a confirmed identifier and
+  got an invalid response from SsODNet. This can have different reasons:
 
-- The confirmed identifier is outdated. This may happen if an asteroid has
-  recently been named. In this cases, the ssoCard is associated to the new name of the asteroid, while ``rocks`` may still look for it under its previous designation. Updating the :term:`Asteroid name-number index` via ``$ rocks status`` fixes this.
+  - The confirmed identifier is outdated. This may happen if an asteroid has
+    recently been named or the designation has changed. In this cases, the ssoCard is associated to
+    the new name of the asteroid, while ``rocks`` may still look for it under its previous
+    designation. Updating the :term:`Asteroid name-number index` via ``$ rocks status`` fixes this.
 
-- The :term:`ssoCard` is unavailable due to a compilation error on the SsODNet
-  side. You can confirm this by looking up the ssoCard directly on SsODNet (replace ``IDENTIFIER`` in the URL below by the confirmed :term:`SsODNet ID` of the asteroid):
+  - The :term:`ssoCard` is unavailable due to a compilation error on the SsODNet
+    side. You can confirm this by looking up the ssoCard directly on SsODNet (replace ``IDENTIFIER`` in the URL below by the confirmed :term:`SsODNet ID` of the asteroid):
 
-  :raw-html:`<br />`
+    http://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=IDENTIFIER
 
-
-  http://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=IDENTIFIER
-
-  :raw-html:`<br />`
-
-  If the returned ssoCard is ``null``, the card does not exist. This may be
-  fixed at the next weekly recompilation of all ssoCards.
+    If the returned ssoCard is ``null``, the card does not exist. This may be
+    fixed at the next weekly recompilation of all ssoCards.

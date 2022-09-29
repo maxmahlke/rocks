@@ -6,14 +6,14 @@ Appendix
 .. catalogue_names::
 
 Datacloud Catalogue Attribute Names
-===================================
+-----------------------------------
 
 The ``diamalbedo`` catalogue is aliased to ``diameters`` and ``albedos``.
 
-.. parameter_aliases::
+.. _parameter_aliases:
 
 Parameter Aliases
-=================
+-----------------
 
 Some parameters in the ssoCard have commonly used aliases defined to avoid verbosity. Both
 on the command-line and in the ``python`` interface, you can replace the parameter name given on the left
