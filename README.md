@@ -2,7 +2,7 @@
 ![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <p align="center">
-  <img width="260" src="https://raw.githubusercontent.com/maxmahlke/rocks/master/docs/gfx/logo_rocks.svg">
+  <img width="260" src="https://raw.githubusercontent.com/maxmahlke/rocks/master/docs/_static/logo_rocks.svg">
 </p>
 
 [Features](#features) - [Install](#install) - [Documentation](#documentation)
