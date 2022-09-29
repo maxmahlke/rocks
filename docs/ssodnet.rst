@@ -24,58 +24,79 @@ asteroid in the requested catalogue.
 When querying for asteroid parameters, specifying the parameter name as singular or plural will retrieve its
 value from the ``ssoCard`` in the former and from the ``datacloud`` in the latter case, as shown below.
 
-.. code-block:: bash
+.. tab-set::
 
-   $ rocks taxonomy Eos
-   K
+  .. tab-item:: Command Line
 
-   $ rocks taxonomies Eos
-   +-----------+---------+--------+-----------+------------------+------+--------+
-   | scheme    | complex | method | waverange | shortbib         | year | class_ |
-   +-----------+---------+--------+-----------+------------------+------+--------+
-   | Tholen    | S       | Phot   | VIS       | Tholen+1989      | 1989 | S      |
-   | Bus       | K       | Spec   | VIS       | Bus&Binzel+2002  | 2002 | K      |
-   | Bus       | K       | Spec   | VIS       | MotheDiniz+2005  | 2005 | K      |
-   | Bus       | K       | Spec   | VISNIR    | MotheDiniz+2008a | 2008 | K      |
-   | Bus-DeMeo | K       | Spec   | VISNIR    | Clark+2009       | 2009 | K      |
-   | Bus-DeMeo | K       | Spec   | VISNIR    | DeMeo+2009       | 2009 | K      |
-   +-----------+---------+--------+-----------+------------------+------+--------+
+      .. code-block:: bash
 
-.. code-block:: python
+        $ rocks taxonomy Eos
+        K
 
-   >>> from rocks import Rock
-   >>> ceres = Rock(1, datacloud='taxonomies')
-   >>> ceres.taxonomy.class_    # ssoCard
-   'C'
-   >>> ceres.taxonomies.class_  # datacloud
-   ['G', 'C', 'C', 'C', 'C', 'G', 'C']
+        $ rocks taxonomies Eos
+        +-----------+---------+--------+-----------+------------------+------+--------+
+        | scheme    | complex | method | waverange | shortbib         | year | class_ |
+        +-----------+---------+--------+-----------+------------------+------+--------+
+        | Tholen    | S       | Phot   | VIS       | Tholen+1989      | 1989 | S      |
+        | Bus       | K       | Spec   | VIS       | Bus&Binzel+2002  | 2002 | K      |
+        | Bus       | K       | Spec   | VIS       | MotheDiniz+2005  | 2005 | K      |
+        | Bus       | K       | Spec   | VISNIR    | MotheDiniz+2008a | 2008 | K      |
+        | Bus-DeMeo | K       | Spec   | VISNIR    | Clark+2009       | 2009 | K      |
+        | Bus-DeMeo | K       | Spec   | VISNIR    | DeMeo+2009       | 2009 | K      |
+        +-----------+---------+--------+-----------+------------------+------+--------+
 
+  .. tab-item:: python
+
+        .. code-block:: python
+
+           >>> from rocks import Rock
+           >>> ceres = Rock(1, datacloud='taxonomies')
+           >>> ceres.taxonomy.class_    # ssoCard
+           'C'
+           >>> ceres.taxonomies.class_  # datacloud
+           ['G', 'C', 'C', 'C', 'C', 'G', 'C']
 
 ``ssoCards`` and ``datacloud`` catalogues are :ref:`cached on your computer <cache-directory>` for quicker data access.
 
 .. _out-of-date:
 
-Updating the Cached Data
-=================================
+.. _cache-directory:
 
-All ``ssoCards`` and ``datacloud`` catalogues are updated and recompiled weekly
-by :term:`SsODNet`. It is therefore recommended to either remove or update the
-cached data regularly. The ``$ rocks status`` command offers to do just this.
+Data stored on your machine
+===========================
+
+``rocks`` retrieves all requested asteroid data from :term:`SsODNet` and stores
+it in a :term:`cache directory<Cache Directory>` to increase following data
+look-ups. The cache is located at ``~/.cache/rocks``. It is created if it does
+not exist when ``rocks`` is invoked.
+
+
+To reduce the time of resolving the identity of asteroids
+:term:`identifiers<Identifier>`, ``rocks`` keeps a local index of asteroid
+names and numbers in the cache directory. This index is retrieved from
+:term:`SsODNet` if it does not exist when ``rocks`` is invoked.
+
+The data in the cache directory can be updated or removed using the ``status`` command. **It should be run
+regularly** (e.g. once a month) to ensure that the data is up-to-date:
+
 
 .. code-block:: bash
 
    $ rocks status
 
-    Contents of /home/mmahlke/.cache/rocks:
+   Contents of /home/mmahlke/.cache/rocks:
 
-            48179 ssoCards
-            3598 datacloud catalogues
+           41 ssoCards
+           15 datacloud catalogues
 
-            Asteroid name-number index [index.pkl] updated on 08 Dec 2021
-            Metadata files ['ssoCard_description.json', 'ssoCard_units.json']
+           Asteroid name-number index updated on 12 Jul 2022
 
-    Update or clear the cached ssoCards and datacloud catalogues?
-    [0] Do nothing [1] Clear the cache [2] Update the data (1): 1
+   Update or clear the cached ssoCards and datacloud catalogues?
+   [0] Do nothing [1] Clear the cache [2] Update the data (1): 1
 
-    Update the asteroid name-number index?
-    [0] No [1] Yes (1): 0
+   Clearing the cached ssoCards and datacloud catalogues..
+
+   Update the asteroid name-number index?
+   [0] No [1] Yes (1): 1
+
+   Building index |---------------------------| 100%

@@ -55,4 +55,4 @@ Glossary
 
   SsODNet ID
 
-   The `identifier <https://ssp.imcce.fr/webservices/ssodnet/api/resolver/#output-params>`_ used by the SsODNet database to refer to this specific asteroid. For (1) Ceres, it's `"Ceres"`. For 2021 JB32, it's ``"2021_JB32"``. Queries for asteroid name resolution or data are faster when providing this identifier right away.
+   The `identifier <https://ssp.imcce.fr/webservices/ssodnet/api/resolver/#output-params>`_ used by the SsODNet database to refer to this specific asteroid. For ``(1) Ceres``, it's ``Ceres``. For ``2021 JB32``, it's ``2021_JB32``. Queries for asteroid name resolution or data are faster when providing this identifier right away.

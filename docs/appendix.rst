@@ -2,6 +2,7 @@
 Appendix
 ########
 
+
 .. catalogue_names::
 
 Datacloud Catalogue Attribute Names
@@ -34,6 +35,8 @@ by the abbreviation on the right. Feel free to suggest a new alias via the `GitH
 | proper_inclination        |  ip                    |
 +---------------------------+------------------------+
 | proper_sine_inclination   |  sinip                 |
++---------------------------+------------------------+
+| orbital_period            |  P                     |
 +---------------------------+------------------------+
 | absolute_magnitude        |  H                     |
 +---------------------------+------------------------+

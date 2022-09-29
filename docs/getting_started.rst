@@ -7,7 +7,7 @@
 Getting started
 ###############
 
-Install from PyPI
+Install ``rocks``
 =================
 
 
@@ -17,92 +17,51 @@ Install from PyPI
 
    $ pip install space-rocks
 
-The minimum version requirement for `python` is `3.7`. After
-installation, you should have the ``rocks`` executable available system-wide.
-
-.. code-block:: bash
-
-   $ rocks
-
-   Usage: rocks [OPTIONS] COMMAND [ARGS]...
-
-   CLI for minor body exploration.
-
-   Options:
-     --version  Show the version and exit.
-     --help     Show this message and exit.
-
-   Commands:
-     docs        Open the rocks documentation in browser.
-     id          Resolve the asteroid name and number from string input.
-     info        Print the ssoCard of an asteroid.
-     parameters  Print the ssoCard structure and its description.
-     status      Echo the status of the ssoCards and datacloud catalogues.
-     who         Get name citation of asteroid from MPC.
-
-
+The minimum version requirement for ``python`` is ``3.7``. After
+installation, you have the ``rocks`` executable available system-wide.
 In addition, you can now import the ``rocks`` ``python`` package.
 
-.. code-block:: python
 
-   >>> import rocks
+.. tab-set::
 
+  .. tab-item:: Command Line
 
-.. _cache-directory:
+      .. code-block:: bash
 
-Cache Directory
-===============
+           $ rocks
 
-``rocks`` retrieves all requested asteroid data from :term:`SsODNet`. Since you
-typically need this data again soon (e.g. when re-executing the analysis
-script), it is stored in a :term:`cache directory<Cache Directory>` located at
-``~/.cache/rocks``, where the ``~`` character refers to the home
-directory. This directory is created if it does not exist when ``rocks`` is
-invoked.
+           Usage: rocks [OPTIONS] COMMAND [ARGS]...
 
-|br|
+           CLI for minor body exploration.
 
-The first step in almost any ``rocks`` function is to identify an asteroid
-based on an :term:`identifier<Identifier>`. To reduce the time of this
-resolution as much as possible, ``rocks`` keeps a local index of asteroid names
-and numbers split over several files in the cache directory. This index
-is retrieved from :term:`SsODNet` if it does not exist when ``rocks`` is
-invoked.
+           Options:
+             --version  Show the version and exit.
+             --help     Show this message and exit.
 
-The data in the cache directory can be updated or removed using the ``$ rocks status`` command:
-
-.. code-block:: bash
-
-   $ rocks status
-
-   Contents of /home/mmahlke/.cache/rocks:
-
-           41 ssoCards
-           15 datacloud catalogues
-
-           Asteroid name-number index updated on 12 Jul 2022
-
-   Update or clear the cached ssoCards and datacloud catalogues?
-   [0] Do nothing [1] Clear the cache [2] Update the data (1): 1
-
-   Clearing the cached ssoCards and datacloud catalogues..
-
-   Update the asteroid name-number index?
-   [0] No [1] Yes (1): 1
-
-   Building index |---------------------------| 100%
-
-Optional: Interactive Search
-============================
+           Commands:
+             docs        Open the rocks documentation in browser.
+             id          Resolve the asteroid name and number from string input.
+             info        Print the ssoCard of an asteroid.
+             parameters  Print the ssoCard structure and its description.
+             status      Echo the status of the ssoCards and datacloud catalogues.
+             who         Get name citation of asteroid from MPC.
 
 
-Sometimes you have the name of an asteroid in your head but you don't quite
-recall its spelling. In this case, ``rocks`` provides an interactive search
-dialogue using the `fzf <https://github.com/junegunn/fzf/>`_  fuzzy-finder
-which is triggered if commands that expect an :term:`asteroid
-identifier<Identifier>` as argument are called without argument. In the example
-below, asteroid (3834) *Zappafrank* is selected interactively from all
-1,218,250 recognised asteroid names:
+  .. tab-item :: python
+
+
+     .. code-block:: python
+
+         >>> import rocks
+
+Optional but fun: Interactive Search
+====================================
+
+``rocks`` provides an interactive search dialogue using the `fzf
+<https://github.com/junegunn/fzf/>`_  fuzzy-finder which is triggered if
+commands that expect an :term:`asteroid identifier<Identifier>` as argument are
+called without argument.\ [#f1]_ In the example below, asteroid (3834) *Zappafrank* is
+selected interactively from all 1,218,250 recognised asteroid names:
 
 .. code-block:: bash
 
@@ -120,3 +79,8 @@ The ``fzf`` tool needs to be installed separately from ``rocks``. On most
 systems (Linux + MacOS), this requires a single command on the terminal, as
 explained in the `fzf documentation
 <https://github.com/junegunn/fzf/#installation>`_
+
+.. rubric:: Footnotes
+   :caption:
+
+.. [#f1] Useful in cases such as for ``(229762) G!kun||'homdima``: Tpying ``gkun`` is sufficient to find the asteroid in the proposed list.

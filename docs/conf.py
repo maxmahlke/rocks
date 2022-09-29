@@ -13,7 +13,7 @@
 import os
 import sys
 
-import sphinx_redactor_theme
+# import sphinx_redactor_theme
 
 sys.path.insert(0, os.path.abspath("../rocks"))
 
@@ -43,6 +43,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.graphviz",
     "hoverxref.extension",
+    "sphinx_design",
+    "sphinx_copybutton",
 ]
 
 # Print out todos in documentation?
@@ -80,12 +82,41 @@ hoverxref_version = "latest"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_redactor_theme"
-html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
-html_logo = "gfx/logo_rocks.svg"
+# html_theme = "sphinx_redactor_theme"
+# html_theme_path = [sphinx_redactor_theme.get_html_theme_path()]
+html_theme = "furo"
+html_static_path = ["_static"]
+# html_logo = "gfx/logo_rocks.svg"
+
+pygments_style = "monokai"
+pygments_dark_style = "monokai"
+
+html_show_copyright = ""
+html_show_sphinx = ""
+copyright = "Thi"
+
+
+html_css_files = [
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/fontawesome.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/solid.min.css",
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/brands.min.css",
+]
+
 
 html_theme_options = {
-    "logo_only": True,
+    "sidebar_hide_name": True,
+    "navigation_with_keys": True,
+    "light_logo": "logo_rocks.svg",
+    "dark_logo": "logo_rocks_light.svg",
+    "footer_icons": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/pradyunsg/furo",
+            "html": "",
+            "class": "fa-solid fa-github fa-2x",
+        },
+    ],
+    # "logo_only": True,
     # "display_version": True,
     # "prev_next_buttons_location": "bottom",
     # "style_external_links": False,
@@ -103,11 +134,10 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_style = "css/custom.css"
-html_static_path = ["_static"]
+# html_style = "css/custom.css"
 
 # These paths are either relative to html_static_path
 # or fully qualified paths (eg. https://...)
-html_css_files = [
-    "css/custom.css",
-]
+# html_css_files = [
+#     "css/custom.css",
+# ]

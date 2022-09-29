@@ -1,4 +1,6 @@
-# 1.5.16 - 2022-09
+# 1.5.16 - 2022-09-29
+- Documentation now even better looking. Also more up-to-date.
+- add alias 'rocks.id' for 'rocks.identify' in python interface
 - Datacloud phase_functions no longer hide ssoCard phase_function
 - Added shortcuts for phase_function filters:
   - phase_function.generic_johnson_V -> phase_function.V
@@ -8,6 +10,8 @@
 - Added summary output for phase_function.filter ('$ rocks phase_function.cyan eos')
 - Added boolean properties to phase_function and phase_function.filter ('if rock.phase_function' is True if
   an absolute magnitude is present in any filter)
+- Bugfix in aliases look-up in case of None
+- Bugfix in selection of preferred observations in weighted average
 
 # 1.5.15 - 2022-09-22
 - Bugfix in datacloud and selection echo
