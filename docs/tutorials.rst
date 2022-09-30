@@ -235,7 +235,22 @@ Data Exploration
 
 .. dropdown:: What is the distribution of thermal inertias of known Barbarian asteroids?
 
-   TBD
+    .. code-block:: python
+
+       #!/usr/bin/env python
+       """Retrieve thermal inertias of known Barbarian asteroids."""
+
+       import rocks
+
+       # List of known Barbarians from Devogèle+ 2018
+       BARBARIANS = [172, 234, 236, 387, 402, 458, 599, 606,
+                     611, 679, 729, 824, 980, 1284, 1372, 2085]
+
+       # Convert into list of Rock instances
+       barbarians = rocks.rocks(BARBARIANS)
+
+       thermal_ineratias = [barbarian.thermal_inertia.value for barbarian in barbarians]
+       print(thermal_ineratias )
 
 .. dropdown:: What's the weighted average albedo of (6) Hebe?
 
