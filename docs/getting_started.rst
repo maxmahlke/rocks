@@ -80,6 +80,23 @@ systems (Linux + MacOS), this requires a single command on the terminal, as
 explained in the `fzf documentation
 <https://github.com/junegunn/fzf/#installation>`_
 
+.. raw:: html
+
+    <style> .blue {color:blue;} </style>
+
+.. role:: blue
+
+.. raw:: html
+
+    <style> .coral {color:LightCoral;} </style>
+
+.. role:: coral
+
+.. admonition:: Hint
+   :class: tip
+
+   In this documentaiton, terms highlighted in :coral:`light red` show the term definition when placing the cursor on top.
+
 .. rubric:: Footnotes
    :caption:
 
