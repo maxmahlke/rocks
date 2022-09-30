@@ -4,8 +4,136 @@
 Usage
 #####
 
-The ``rocks`` command-line executable is useful for quick exploration of
-asteroid data from the command line. The most general use case is to provide an
+Most operations in ``rocks`` can be executed both via the command line and the ``python`` interface.
+The former is useful for quick data exploration, the latter for a scripted data analysis.
+The available functions can generally be divided into *identification* and *data exploration and retrieval*.
+
+Identification
+==============
+
+``rocks`` allows to quickly resolve the identity of asteroids, returning the current official designation and, if applicable, the number.
+It recognizes aliases such as previously used provisional designations.
+
+.. tab-set::
+
+   .. tab-item:: Command Line
+
+        The ``$ rocks id [identifier]`` command allows for quick name resolution via the command line.
+        You can pass any valid asteroid :term:`identifier<Identifier>`. Note that whitespace and capitalization are irrelevant.
+
+        .. code-block:: bash
+
+           $ rocks id 221
+           (221) Eos
+
+           $ rocks id Schwartz
+           (13820) Schwartz
+
+           $ rocks id "1902 UG"
+           (19) Fortuna
+
+           $ rocks id 2012fg3
+           (nan) 2012 FG3
+
+           $ rocks id J65B00A
+           (1727) Mette
+
+
+   .. tab-item:: python
+
+        The ``rocks.id()`` function identifies one or many asteroids based on
+        user-provided identifiers It is quite straight-forward: providing a
+        single :term:`identifier <Identifier>` (or a list of many) returns a
+        tuple containing the ``(asteroid name, asteroid number)`` (or a list of
+        tuples).
+
+        .. code-block:: python
+
+            >>> import rocks
+            >>> rocks.identify(11334)
+            ('Rio de Janeiro', 11334)
+            >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
+            [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
+
+        .. admonition:: Hint
+           :class: tip
+
+           Note the alphabetical order: first returned is the **na**\me, then the **nu**\mber.
+
+The command line offers more functionality related to identification of asteroids:
+
+.. tab-set::
+
+   .. tab-item:: Get Aliases
+
+     .. _aliases:
+
+     Using the plural ``ids`` returns the list of aliases under which the asteroid may be listed as well.
+
+     .. code-block:: bash
+
+        $ rocks ids aschera                                                                                     master
+          (214) Aschera, aka
+          ['1880 DB', '1903 SE', '1947 BP', '1948 JE', '1949 QG2', '1949 SX1',
+           '1950 XH', '1953 OO', '2000214', 'I80D00B', 'J03S00E', 'J47B00P',
+           'J48J00E', 'J49Q02G', 'J49S01X', 'J50X00H', 'J53O00O']
+
+     All these aliases are automatically resolved to ``(214) Aschera`` by ``rocks`` using `quaero <https://ssp.imcce.fr/webservices/ssodnet/api/quaero/>`_.
+
+   .. tab-item:: Citation Look-Up
+     :selected:
+
+     .. _who:
+
+     Use ``$ rocks who`` to get the citations associated to each named asteroid.
+
+     .. code-block:: bash
+
+       $ rocks who zappafrank
+       (3834) Zappafrank
+          Named in memory of Frank Zappa (1940-1993), rock musician and composer [...]
+
+   .. tab-item:: Search for Names
+
+    If the ``fzf`` :ref:`tool is installed<install_fzf>`, executing the
+    identification commands ``id|ids|who`` without passing and
+    :term:`identifier <Identifier>` will launch an interactive search through
+    all asteroids in the :term:`asteroid name-number index <Asteroid
+    name-number index>`. In the example below, asteroid `(3834) Zappafrank` is
+    selected interactively from all 1,218,250 recognised asteroid names:
+
+    .. code-block:: bash
+
+        $ rocks who
+
+          (225250)  Georgfranziska
+          (16127)   Farzan-Kashani
+          (520)     Franziska
+          (3183)    Franzkaiser
+        > (3834)    Zappafrank
+
+        > frank za  < 5/1218250
+
+    Furthermore, ``rocks`` provides a hint for unidentified names with close matches in the :term:`asteroid name-number index <Asteroid name-number index>`.
+
+    .. code-block:: bash
+
+       $ rocks id barkajdetolli
+       rocks: Could not find match for id Barkajdetolli.
+
+       Could this be the rock you're looking for?
+         (4524) Barklajdetolli
+
+.. admonition:: Hint
+   :class: tip
+
+   Whitespace and capitalization are irrelevant for successful identification of the passed :term:`identifier <Identifier>`.
+
+
+Data Exploration
+================
+
+The most general use case is to provide an
 asteroid parameter and :term:`identifier<Identifier>` to echo the value from
 the :term:`ssoCard`.
 
@@ -14,34 +142,10 @@ the :term:`ssoCard`.
    $ rocks diameter pallas
    514.1 +- 3.906 km
 
-Furthermore, there are commands to identify asteroids, interact with the cached
-:term:`ssoCards<ssoCard>` and :term:`datacloud catalogues<Datacloud
-Catalogue>`, look up available asteroid parameters, and more. You can get the list of available
-commands by running ``$ rocks``.
-
-.. code-block:: bash
-
-   $ rocks
-
-   Usage: rocks [OPTIONS] COMMAND [ARGS]...
-
-   CLI for minor body exploration.
-
-   Options:
-     --version  Show the version and exit.
-     --help     Show this message and exit.
-
-   Commands:
-     docs        Open the rocks documentation in browser.
-     id          Resolve the asteroid name and number from string input.
-     info        Print the ssoCard of an asteroid.
-     parameters  Print the ssoCard structure and its description.
-     status      Echo the status of the ssoCards and datacloud catalogues.
-
-Data Exploration
-================
-
 .. _getting_values:
+
+Data Retrieval
+==============
 
 Getting values from the ssoCard
 -------------------------------
@@ -176,47 +280,7 @@ specifying the parameter name via the dot notation.
 Name Resolution
 ===============
 
-The ``$ rocks id [identifier]`` command allows for quick name resolution via the command line.
-You can pass any valid asteroid :term:`identifier<Identifier>`.
 
-.. code-block:: bash
-
-   $ rocks id 221
-   (221) Eos
-
-   $ rocks id Schwartz
-   (13820) Schwartz
-
-   $ rocks id "1902 UG"
-   (19) Fortuna
-
-   $ rocks id 2012fg3
-   (nan) 2012 FG3
-
-   $ rocks id J65B00A
-   (1727) Mette
-
-.. _aliases:
-
-Using the plural ``ids`` returns the list of aliases under which the asteroid may be listed as well.
-
-.. code-block:: bash
-
-   $ rocks ids aschera                                                                                     master
-     (214) Aschera, aka
-     ['1880 DB', '1903 SE', '1947 BP', '1948 JE', '1949 QG2', '1949 SX1',
-      '1950 XH', '1953 OO', '2000214', 'I80D00B', 'J03S00E', 'J47B00P',
-      'J48J00E', 'J49Q02G', 'J49S01X', 'J50X00H', 'J53O00O']
-
-If you have trouble remembering the name of an asteroid, ``rocks`` can give you a hint.
-
-.. code-block:: bash
-
-   $ rocks id barkajdetolli
-   rocks: Could not find match for id Barkajdetolli.
-
-   Could this be the rock you're looking for?
-     (4524) Barklajdetolli
 
 .. _commands:
 
@@ -251,27 +315,10 @@ The ``python`` Package
 
 The public API only consists of two functions and one class:
 
-- ``rocks.identify()``: identify one or many asteroids based on user-provided identifiers
 
 - ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its :term:`ssoCard`
 
 - ``rocks.rocks()``: a wrapper around ``rocks.identify()`` and ``rocks.Rock`` to read in the data of many asteroids
-
-Identification of asteroids
-===========================
-
-It is quite straight-forward: providing a single :term:`identifier <Identifier>`
-(or a list of many) returns a tuple containing the ``(asteroid name, asteroid number)`` (or a list of tuples).
-
-.. code-block:: python
-
-    >>> import rocks
-    >>> rocks.identify(11334)
-    ('Rio de Janeiro', 11334)
-    >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
-    [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
-
-Note the alphabetical order: first returned is the **na**\me, then the **nu**\mber.
 
 .. _rock_class:
 
@@ -499,9 +546,6 @@ Accessing the properties can now be done with a loop or list comprehension.
 
 Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail.
 
-.. _who:
-
-Use ``$ rocks who`` to get the citations associated to each named asteroid.
 
 .. _author:
 

@@ -54,26 +54,16 @@ In addition, you can now import the ``rocks`` ``python`` package.
 
          >>> import rocks
 
+
+.. _install_fzf:
+
 Optional: Interactive Search
 ============================
 
 ``rocks`` provides an interactive search dialogue using the `fzf
 <https://github.com/junegunn/fzf/>`_  fuzzy-finder which is triggered if
 commands that expect an :term:`asteroid identifier<Identifier>` as argument are
-called without argument.\ [#f1]_ In the example below, asteroid (3834) *Zappafrank* is
-selected interactively from all 1,218,250 recognised asteroid names:
-
-.. code-block:: bash
-
-    $ rocks who
-
-      (225250)  Georgfranziska
-      (16127)   Farzan-Kashani
-      (520)     Franziska
-      (3183)    Franzkaiser
-    > (3834)    Zappafrank
-
-    > frank za  < 5/1218250
+called without argument.\ [#f1]_
 
 The ``fzf`` tool needs to be installed separately from ``rocks``. On most
 systems (Linux + MacOS), this requires a single command on the terminal, as

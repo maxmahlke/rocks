@@ -11,18 +11,20 @@ and the `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
 ssoCard and datacloud
 =====================
 
-Every known asteroid has an ``ssoCard`` and every ``ssoCard`` only refers to a
+Every known asteroid has an :term:`ssoCard` and every :term:`ssoCard` only refers to a
 single asteroid. It stores the best single value for each parameter
 of the asteroid, e.g. by computing weighted averages of the best available data.
 
-The ``datacloud`` is the collection of (almost) all published data on asteroids.
-It is split into catalogues, e.g. the ``diamalbedo`` catalogue containing
-observations of asteroid diameters and albedos. ``rocks`` offers to query these
-catalogues for one asteroid at a time, returning all entries belonging to that
-asteroid in the requested catalogue.
+The :term:`datacloud<Datacloud Catalogue>` is the collection of (almost) all
+published data on asteroids. It is split into catalogues, e.g. the
+``diamalbedo`` catalogue containing observations of asteroid diameters and
+albedos. ``rocks`` allows to query these catalogues for one asteroid at a time,
+returning all entries belonging to that asteroid in the requested catalogue.
 
-When querying for asteroid parameters, specifying the parameter name as singular or plural will retrieve its
-value from the ``ssoCard`` in the former and from the ``datacloud`` in the latter case, as shown below.
+When querying for asteroid parameters, specifying the parameter name as
+singular or plural will retrieve its value from the :term:`ssoCard` in the
+former and from the :term:`datacloud<Datacloud Catalogue>` in the latter case,
+as shown below. See the list of available parameters :ref:`here <parameter_names>`.
 
 .. tab-set::
 
@@ -56,7 +58,9 @@ value from the ``ssoCard`` in the former and from the ``datacloud`` in the latte
            >>> ceres.taxonomies.class_  # datacloud
            ['G', 'C', 'C', 'C', 'C', 'G', 'C']
 
-``ssoCards`` and ``datacloud`` catalogues are :ref:`cached on your computer <cache-directory>` for quicker data access.
+:term:`ssoCards <ssoCard>` and :term:`datacloud <Datacloud Catalogue>`
+catalogues are cached on your computer for quicker data access, as further
+outlined below.
 
 .. _cache-directory:
 
@@ -71,10 +75,10 @@ not exist when ``rocks`` is invoked.
 
 To reduce the time of resolving the identity of asteroids
 :term:`identifiers<Identifier>`, ``rocks`` keeps a local index of asteroid
-names and numbers in the cache directory. This index is retrieved from
+names and numbers in the :term:`cache directory<Cache Directory>`. This index is retrieved from
 :term:`SsODNet` if it does not exist when ``rocks`` is invoked.
 
-The data in the cache directory can be updated or removed using the ``status`` command. **It should be run
+The data in the :term:`cache directory<Cache Directory>` can be updated or removed using the ``status`` command. **It should be run
 regularly** (e.g. once a month) to ensure that the data is up-to-date:
 
 
