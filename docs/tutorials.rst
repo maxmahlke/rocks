@@ -258,7 +258,11 @@ Data Exploration
 SsODNet and ``rocks``
 ---------------------
 
-- :ref:`What is the difference between data from the ssoCard and from the datacloud? <ssocard-datacloud>`
+.. card::
+   :link: ssocard-datacloud
+   :link-type: ref
+
+   **What is the difference between data from the ssoCard and from the datacloud?**
 
 - :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
 
