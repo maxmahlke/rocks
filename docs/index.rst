@@ -214,6 +214,7 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
    :caption: Contents
    :hidden:
 
+   Home<self>
    Getting Started<getting_started>
    Available Data<ssodnet>
    Usage<cli>
