@@ -66,7 +66,14 @@ CATALOGUES = {
     "binarymp": {
         "attr_name": "binaries",
         "ssodnet_name": "binarymp",
-        "print_columns": [""],
+        "print_columns": [
+            "system_type",
+            "system_name",
+            "period",
+            "a",
+            "alpha",
+            "shortbib",
+        ],
     },
     "colors": {
         "attr_name": "colors",
@@ -150,7 +157,15 @@ CATALOGUES = {
     "phase_functions": {
         "attr_name": "phase_functions",
         "ssodnet_name": "phase_function",
-        "print_columns": [],
+        "print_columns": [
+            "name_filter",
+            "H",
+            "G1",
+            "G2",
+            "phase_min",
+            "phase_max",
+            "shortbib",
+        ],
     },
     "spins": {
         "attr_name": "spins",
@@ -181,10 +196,19 @@ CATALOGUES = {
             "shortbib",
         ],
     },
-    "yarkovskies": {
-        "attr_name": "yarkovskies",
+    "yarkovskys": {
+        "attr_name": "yarkovskys",
         "ssodnet_name": "yarkovsky",
-        "print_columns": [],
+        "print_columns": [
+            "A2",
+            "err_A2",
+            "dadt",
+            "err_dadt",
+            "S",
+            "snr",
+            "method",
+            "shortbib",
+        ],
     },
 }
 

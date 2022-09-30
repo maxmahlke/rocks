@@ -1,3 +1,7 @@
+# 1.5.17 - 2022-09-30
+- Fix output of phase_functions, yarkovskys, and binaries datacloud catalogues
+- Change parameter echo method to regular 'print' as rich outputs '__repr__' instead of '__str__'
+
 # 1.5.16 - 2022-09-29
 - Documentation now even better looking. Also more up-to-date.
 - Add alias 'rocks.id' for 'rocks.identify' in python interface

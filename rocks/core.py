@@ -524,7 +524,7 @@ class Rock(pydantic.BaseModel):
 
     # the catalogues
     astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
-    binarymp: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
+    binaries: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
     colors: rocks.datacloud.Colors = rocks.datacloud.Colors(**{})
     densities: rocks.datacloud.Density = rocks.datacloud.Density(**{})
     diamalbedo: rocks.datacloud.Diamalbedo = rocks.datacloud.Diamalbedo(**{})
