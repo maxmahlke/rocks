@@ -58,8 +58,6 @@ value from the ``ssoCard`` in the former and from the ``datacloud`` in the latte
 
 ``ssoCards`` and ``datacloud`` catalogues are :ref:`cached on your computer <cache-directory>` for quicker data access.
 
-.. _out-of-date:
-
 .. _cache-directory:
 
 Data stored on your machine

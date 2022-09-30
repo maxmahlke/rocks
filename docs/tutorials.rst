@@ -252,7 +252,7 @@ Data Exploration
    :link: iterate_catalogues
    :link-type: ref
 
-   :octicon:`cross-reference;1em`    **How do I access the entries in a catalogue one by one?**
+   **How do I access the entries in a catalogue one by one?**  :octicon:`chevron-right;1em`
 
 
 SsODNet and ``rocks``
@@ -262,24 +262,36 @@ SsODNet and ``rocks``
    :link: ssocard-datacloud
    :link-type: ref
 
-   **What is the difference between data from the ssoCard and from the datacloud?**
+   **What is the difference between data from the ssoCard and from the datacloud?**  :octicon:`chevron-right;1em`
 
-- :ref:`Are the cached ssoCards out-of-date? How do I update ssoCards?<out-of-date>`
+.. card::
+   :link: cache-directory
+   :link-type: ref
 
-- :ref:`How do I remove all cached asteroid data from my computer?<clear_cache>`
+   **Is the cached asteroid data out-of-date? How do I update it?**  :octicon:`chevron-right;1em`
 
 .. card::
    :link: parameter_aliases
    :link-type: ref
 
-   :octicon:`cross-reference;1em`  **Which parameters can be abbreviated?**
+   **Which parameters can be abbreviated?**  :octicon:`chevron-right;1em`
 
-- :ref:`Which parameters can I open in a plot?`
+.. card::
+   :link: parameter_aliases
+   :link-type: ref
+
+   **Which parameters can be abbreviated?**  :octicon:`chevron-right;1em`
+
+.. card::
+   :link: parameter_aliases
+   :link-type: ref
+
+   **Which parameters can I open in a plot?** :octicon:`chevron-right;1em`
 
 
 .. _error_404:
 
-.. dropdown:: I got the error message: ``Error 404: missing ssoCard for IDENTIFIER``. What is happening?
+.. dropdown:: I got ``Error 404: missing ssoCard for IDENTIFIER``. What is happening?
 
   ``rocks`` tried to retrieve the :term:`ssoCard` of a confirmed identifier and
   got an invalid response from SsODNet. This can have different reasons:
