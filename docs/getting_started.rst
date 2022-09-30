@@ -95,7 +95,7 @@ explained in the `fzf documentation
 .. admonition:: Hint
    :class: tip
 
-   In this documentaiton, terms highlighted in :coral:`light red` show the term definition when placing the cursor on top.
+   Terms highlighted in :coral:`light red` in the text show the term definition when placing the cursor on top.
 
 .. rubric:: Footnotes
    :caption:
