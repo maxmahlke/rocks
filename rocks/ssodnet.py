@@ -198,7 +198,8 @@ def _postprocess_ssocard(card):
         }
 
         spin_solutions.append(spin)
-    card["parameters"]["physical"]["spins"] = spin_solutions
+    card["parameters"]["physical"]["spin"] = spin_solutions
+    del card["parameters"]["physical"]["spins"]
 
     return card
 

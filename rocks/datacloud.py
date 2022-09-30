@@ -931,6 +931,12 @@ class Spin(Collection):
         pre=True,
     )(empty_str_to_nan)
 
+    _empty_str_to_none: classmethod = pydantic.validator(
+        "number",
+        allow_reuse=True,
+        pre=True,
+    )(empty_str_to_none)
+
 
 class Yarkovsky(Collection):
     """Database of Sso Yarkovsky accelerations"""

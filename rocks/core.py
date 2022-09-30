@@ -624,13 +624,6 @@ class Rock(pydantic.BaseModel):
 
             else:
 
-                # rename 'spins' to 'spin' so it does not shadow the datacloud property
-                # TODO this should be done at the parameter-name level
-                if "spins" in ssocard["parameters"]["physical"]:
-                    ssocard["parameters"]["physical"]["spin"] = ssocard["parameters"][
-                        "physical"
-                    ]["spins"]
-
                 if datacloud is not None:
                     for catalogue in datacloud:
                         ssocard = self.__add_datacloud_catalogue(
