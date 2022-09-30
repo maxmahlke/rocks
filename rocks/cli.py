@@ -343,7 +343,7 @@ def echo():
                 if verbose:
                     rich.print_json(value.json(), sort_keys=True)
                 else:
-                    rich.print(value)
+                    print(value)
 
         if plot:
             if param not in datacloud:
