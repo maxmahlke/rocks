@@ -43,3 +43,60 @@ by the abbreviation on the right. Feel free to suggest a new alias via the `GitH
 +---------------------------+------------------------+
 | absolute_magnitude        |  H                     |
 +---------------------------+------------------------+
+
+.. _need_suffix:
+
+The following parameters need an ``_``-suffix when accessing them using the ``python`` interface:
+
+.. code-block:: python
+
+   ['min', 'max', 'class', 'lambda']
+
+
+
+The ``datacloud`` tables have slightly different names in ``rocks``.
+
++-----------------+----------------------------+
+| datacloud Table | Attribute Name             |
++-----------------+----------------------------+
+| aams            | ``aams``                   |
++-----------------+----------------------------+
+| astdys          | ``astdys``                 |
++-----------------+----------------------------+
+| astorb          | ``astorb``                 |
++-----------------+----------------------------+
+| binarymp_tab    | ``binaries``               |
++-----------------+----------------------------+
+| diamalbedo      | ``diamalbedo``             |
++-----------------+----------------------------+
+| families        | ``families``               |
++-----------------+----------------------------+
+| masses          | ``masses``                 |
++-----------------+----------------------------+
+| mpcatobs        | ``mpc``                    |
++-----------------+----------------------------+
+| pairs           | ``pairs``                  |
++-----------------+----------------------------+
+| taxonomy        | ``taxonomies``             |
++-----------------+----------------------------+
+
+Some attributes are called different in ``rocks`` than in the ``datacloud`` table:
+
+
+The ``datacloud`` tables have slightly different names in ``rocks``.
+
++-----------------+----------------------------+
+| datacloud Table | Attribute Name             |
++-----------------+----------------------------+
+| num             | ``number``                 |
++-----------------+----------------------------+
+| sibling_num     | ``sibling_number``         |
++-----------------+----------------------------+
+| id              | ``id_``                    |
++-----------------+----------------------------+
+| lambda          | ``lambda_``                |
++-----------------+----------------------------+
+| class           | ``class_``                 |
++-----------------+----------------------------+
+| from           | ``from_``                   |
++-----------------+----------------------------+

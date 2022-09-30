@@ -21,7 +21,7 @@ to common questions as the ones below. All data is cited and new observations ar
 
 |br|
 
-:octicon:`telescope;1em` **Idenfitication of minor bodies using** `quaero <https://ssp.imcce.fr/webservices/ssodnet/api/quaero/>`_.
+:octicon:`telescope;1em` **Identification of minor bodies using** `quaero <https://ssp.imcce.fr/webservices/ssodnet/api/quaero/>`_.
 
 
 .. grid:: 2
@@ -206,7 +206,7 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
 .. rubric:: Footnotes
    :caption:
 
-.. [#f1] Latest version: 1.5.17  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
+.. [#f1] Latest version: 1.5.18  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
 .. [#f2] That's what we are aiming for. Is there a data source you are missing? `Email us! <mailto:benoit.carry@oca.eu>`_
 
 .. toctree::

@@ -14,7 +14,7 @@ Identification
 
 .. dropdown:: How do I identify an asteroid?
 
-   The basic usage is shown below. More information can be found
+   The  basic usage is shown below. More information can be found
    :ref:`here<cli_id>` and :ref:`here<Identification of asteroids>`.
 
    .. tab-set::
@@ -268,6 +268,51 @@ Data Exploration
    :link-type: ref
 
    **How do I access the entries in a catalogue one by one?**  :octicon:`chevron-right;1em`
+
+Data Analysis
+--------------
+
+.. _rocksrocks:
+
+.. dropdown:: How do I efficiently get the data of a large number of asteroids?
+
+    The ``rocks.rocks()`` function serves as a one-line replacement for a frequent
+    approach: get a list of asteroid identifiers from a catalogue and create
+    ``Rock`` instances from them.
+
+    .. code-block:: python
+
+        >>> from rocks import rocks
+        >>> themis_family = [24, 62, 90, 104, 171, 222, 223, 316, 379,
+                             383, 468, 492, 515, 526, 767, 846]
+        >>> themis_family = rocks(themis_family)
+        >>> themis_family
+        [Rock(number=316, name='Goberta'), Rock(number=492, name='Gismonda'),
+        Rock(number=767, name='Bondia'), Rock(number=90, name='Antiope'), ... ]
+
+    Accessing the properties can now be done with a loop or list comprehension.
+
+        >>> from collections import Counter
+        >>> themis_taxonomies = [t.taxonomy.class_ for t in themis_family]
+        >>> Counter(themis_taxonomies)
+        Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
+
+    Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail.
+
+.. dropdown:: Can I use my own data to build a ``Rock`` object?
+
+    You can provide a custom ssoCard to populate the ``Rock`` attributes. The ``ssocard`` argument
+    accepts a ``dict``\ ionary structure following the one of the original ssoCards. The easiest way
+    to achieve this is to edit a real ssoCard from SsODNet and load it via the ``json`` module.
+
+    .. code-block:: python
+
+        >>> import json
+        >>> import os
+        >>> import rocks
+        >>> with open("my_ssocard.json", "r") as file_:
+        >>>    data = json.load(file_)
+        >>> mars_crosser_2016fj = rocks.Rock("2016_FJ", ssocard=data["2016_FJ"])
 
 
 SsODNet and ``rocks``

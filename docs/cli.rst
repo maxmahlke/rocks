@@ -4,9 +4,10 @@
 Usage
 #####
 
-Most operations in ``rocks`` can be executed both via the command line and the ``python`` interface.
-The former is useful for quick data exploration, the latter for a scripted data analysis.
-The available functions can generally be divided into *identification* and *data exploration and retrieval*.
+Most operations in ``rocks`` can be executed both via the command line and the
+``python`` interface. The former is useful for quick data exploration, the
+latter for a scripted data analysis. The available functions can generally be
+divided into *identification*, *data exploration*, and *data analysis*.
 
 Identification
 ==============
@@ -50,9 +51,9 @@ It recognizes aliases such as previously used provisional designations.
         .. code-block:: python
 
             >>> import rocks
-            >>> rocks.identify(11334)
+            >>> rocks.id(11334)
             ('Rio de Janeiro', 11334)
-            >>> rocks.identify(["SCHWARTZ", "J95X00A", "47", 3.])
+            >>> rocks.id(["SCHWARTZ", "J95X00A", "47", 3.])
             [('Schwartz', 13820), ('1995 XA', 24850), ('Aglaja', 47), ('Juno', 3)]
 
         .. admonition:: Hint
@@ -133,267 +134,199 @@ The command line offers more functionality related to identification of asteroid
 Data Exploration
 ================
 
-The most general use case is to provide an
-asteroid parameter and :term:`identifier<Identifier>` to echo the value from
-the :term:`ssoCard`.
+The quick look-up of asteroid parameter values is most convenient via the command
+line. The most general use case is to provide an asteroid parameter and
+:term:`identifier<Identifier>` to echo the value from the :term:`ssoCard`.
 
-.. code-block:: bash
+.. tab-set::
 
-   $ rocks diameter pallas
-   514.1 +- 3.906 km
+   .. tab-item:: Command Line
+
+        .. code-block:: sh
+
+           $ rocks diameter pallas
+           514.1 +- 3.906 km
+
+   .. tab-item:: python
+
+        .. code-block:: python
+
+           >>> import rocks
+           >>> pallas = rocks.Rock('pallas')
+           >>> pallas.diameter.value
+           514.1
+           >>> pallas.diameter.error
+           3.906
+           >>> pallas.diameter.unit
+           'km'
+
+.. admonition:: Important
+   :class: important
+
+   All data that you look up is cached on your computer to increase the
+   execution speed repeated queries. Remember to run ``$ rocks status`` to
+   update or remove the cached data regularly (e.g. once a month) as there may
+   be new observations available.
+
+The parameter names follow the structure of the ssoCard. The different levels are connected
+via dots, e.g. ``parameters.physical.albedo``. For convenience, ``parameters.physical`` and ``parameters.dynamical``
+does not have to be specified.
+For even more convenience, there are shortcuts defined for some parameters to reduce the amount of
+typing, such as ``proper_elements.proper_semi_major_axis`` -> ``ap``, ``orbital_elements.orbital_period`` -> ``P``.
+
+
+.. code-block:: sh
+
+   $ rocks parameters.dynamical.orbital_elements.semi_major_axis ceres
+   2.76661907 +- 0.00000010 au
+
+   $ rocks orbital_elements.semi_major_axis ceres
+   2.76661907 +- 0.00000010 au
+
+   $ rocks a ceres
+   2.76661907 +- 0.00000010 au
+
+A complete list is given in the :ref:`appendix <parameter_aliases>`.\ [#f1]_
+
+.. admonition:: Warning
+   :class: warning
+
+   Some parameter names (e.g. ``class``) are protected ``python`` keywords and can therefore not be
+   used to refer to the asteroid parameter. These names carry a ``_``-suffix instead when using the ``python``
+   interface:
+
+   .. code-block:: python
+
+     >>> import rocks
+     >>> rocks.Rock(1).taxonomy.class_.value
+     'C'
+
+   The complete list of parameters which require the suffix is given in the :ref:`appendix <need_suffix>`.
+
+
+.. admonition:: Another Warning
+   :class: warning
+
+   Some parameter names in the :ref:`ssoCard` are invalid variable names in ``python``,
+   such as the name of colors (e.g. ``c-o``). In general, characters such
+   as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names (e.g. ``c_o``).
+
+
+Both the best-estimates stored in the :term:`ssoCard` and the literature compilation
+of the parameters stored in the :term:`datacloud <Datacloud Catalogue>` are available for look-up.
+In general, best-estimates are returned if the parameter is specified in singular form (e.g. `albedo`)
+while all available data is returned for the plural form (e.g. `albedos`).
+
+.. tab-set::
+
+   .. tab-item:: Singular: ssoCard
+
+        .. code-block:: sh
+
+           $ rocks taxonomy aschera
+           E
+
+   .. tab-item:: Plural: datacloud
+
+        .. code-block:: sh
+
+           $ rocks taxonomies aschera
+           +---+--------+---------+--------+-----------+-----------+-----------------+
+           |   │ class_ | complex | method | waverange | scheme    | shortbib        |
+           +---+--------+---------+--------+-----------+-----------+-----------------+
+           | 1 | E      | E       | Phot   | VIS       | Tholen    | Tholen+1989     |
+           | 2 | Xc     | X       | Spec   | VIS       | Bus       | Bus&Binzel+2002 |
+           | 3 | B      | B       | Spec   | VIS       | Bus       | Lazzaro+2004    |
+           | 4 | B      | B       | Spec   | VIS       | Tholen    | Lazzaro+2004    |
+           | 5 | Cgh    | Ch      | Spec   | VISNIR    | Bus-DeMeo | DeMeo+2009      |
+           | 6 | B      | B       | Spec   | VISNIR    | Bus       | deLeon+2012     |
+           | 7 | C      | C       | Spec   | VISNIR    | Bus-DeMeo | deLeon+2012     |
+           | 8 | B      | B       | Spec   | VISNIR    | Tholen    | deLeon+2012     |
+           | 9 | E      | E       | Spec   | VISNIR    | Mahlke    | Mahlke+2022     |
+           +---+--------+---------+--------+-----------+-----------+-----------------+
+
+An overview of the available parameters is given in the :ref:`appendix
+<parameter_names>`. Alternatively, you can run ``$ rocks parameters`` to echo
+the template form of the :term:`ssoCard` in ``JSON`` format.
+
+To echo the complete :term:`ssoCard` of an asteroid, use the ``$ rocks info`` command.
 
 .. _getting_values:
 
-Data Retrieval
-==============
-
-Getting values from the ssoCard
--------------------------------
-
-To get the value of the ``[parameter]`` (e.g. albedo, diameter) for the
-asteroid ``[identifier]`` (e.g. any valid :term:`identifier<Identifier>`) from
-the :term:`ssoCard`, use the command of the form ``$ rocks [parameter] [id]``.
-
-.. code-block:: bash
-
-   $ rocks class_ ceres
-   Dwarf Planet
-
-   $ rocks proper_semi_major_axis ceres
-   2.767 +- 4.71e-06
-
-.. _rocks-props:
-
-The list of accepted parameters names and a brief description is echoed with
-the ``$ rocks parameters`` command. This can be used in
-combination with ``grep`` to quickly find the right parameter name to provide to
-``rocks``.
-
-.. code-block:: bash
-
- $ rocks parameters | grep period
-   'orbital_period': {
-       'value': 'Orbital period',
-           'min': 'Lower value of uncertainty of the orbital period',
-           'max': 'Upper value of uncertainty of the orbital period'
-       'period': {
-           'value': 'Synodic or sidereal period of rotation',
-               'min': 'Lower uncertainty of the period of rotation',
-               'max': 'Upper uncertainty of the period of rotation'
-
-The parameter units are echoed using the ``--units/-u`` flag.
-
-.. code-block:: bash
-
- $ rocks parameters --units | grep period
-   'orbital_period': {'value': 'd', 'error': {'min': 'd', 'max': 'd'}}
-       'period': {'value': 'h', 'error': {'min': 'h', 'max': 'h'}},
-
-Some parameters have aliases implemented to avoid verbosity. See the
-:ref:`list of parameter aliases<Parameter Aliases>` in the appendix.
-
-.. code-block:: bash
-
-   $ rocks proper_semi_major_axis ceres
-   2.767 +- 4.71e-06
-
-   $ rocks ap ceres  # same as above, proper semi-major axis
-   2.767 +- 4.71e-06
-
-To echo the complete :term:`ssoCard` of an asteroid, use the ``$ rocks info [identifier]`` command.
-
-.. code-block:: bash
-
-   $ rocks info themis
-   {
-       'id': 'Themis',
-       'name': 'Themis',
-       'number': 24,
-       'type': 'Asteroid',
-       'class': 'MB>Outer',
-       'parent': 'Sun',
-       'system': 'Sun',
-       'ssocard': {'version': '0.9.7-rc1', 'datetime': '2021-12-03T09:40:51+00:00'},
-       'link': {
-           'self': 'http://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=Themis',
-           'quaero': 'https://api.ssodnet.imcce.fr/quaero/1/sso/Themis',
-           'description': 'http://ssp.imcce.fr/webservices/ssodnet/api/ssocard/description_aster-astorb.json',
-           'unit': 'http://ssp.imcce.fr/webservices/ssodnet/api/ssocard/unit_aster-astorb.json'
-       },
-       'parameters': {
-           'dynamical': {
-               'orbital_elements': {
-
-    [...]
-
-.. _datacloud:
-
-Getting values from datacloud catalogues
-----------------------------------------
-
-In general, if you provide the singular name of a parameter, the value from the
-:term:`ssoCard` is returned, while the plural name lists all parameter values
-present in the :term:`datacloud catalogues<Datacloud Catalogue>`. You can find
-the full :ref:`list of catalogues and their names <Datacloud Catalogue
-Attribute Names>` in ``rocks`` in the appendix.
-
-.. code-block:: bash
-
-  $ rocks mass 42
-  1.386e+18 +- 1.216e+17 kg
-
-  $ rocks masses 42
-  +----------+--------------+--------------+--------+------------------+
-  | mass     | err_mass_max | err_mass_min | method | shortbib         |
-  +----------+--------------+--------------+--------+------------------+
-  | 1.38e+18 | 1.38e+17     | -1.38e+17    | EPHEM  | Folkner+2009     |
-  | 1.85e+18 | 5.93e+17     | -5.93e+17    | EPHEM  | Fienga+2011      |
-  | 1.5e+18  | 4.5e+17      | -4.5e+17     | EPHEM  | Kuchynka+2013    |
-  | 2.15e+17 | 6.69e+17     | -6.69e+17    | EPHEM  | Fienga+2014      |
-  | 1.59e+18 | 4.45e+17     | -4.45e+17    | EPHEM  | Viswanathan+2017 |
-  +----------+--------------+--------------+--------+------------------+
-
-Specific entries from each :term:`datacloud catalogue<Datacloud Catalogue>` can be accessed by
-specifying the parameter name via the dot notation.
-
-.. code-block:: bash
-
-    $ rocks taxonomies 42
-    +--------+----------+--------+-----------+-----------+-----------------+
-    | class_ | complex_ | method | waverange | scheme    | shortbib        |
-    +--------+----------+--------+-----------+-----------+-----------------+
-    | S      | S        | Phot   | VIS       | Tholen    | Tholen+1989     |
-    | L      | L        | Spec   | VIS       | Bus       | Bus&Binzel+2002 |
-    | K      | K        | Spec   | VISNIR    | Bus-DeMeo | DeMeo+2009      |
-    | K      | K        | Spec   | NIR       | Bus-DeMeo | Gietzen+2012    |
-    +--------+----------+--------+-----------+-----------+-----------------+
-
-    $ rocks taxonomies.scheme 42
-    0    Bus-DeMeo
-    1    Bus-DeMeo
-    2          Bus
-    3       Tholen
-    Name: scheme, dtype: object
-
-.. _name_resolution:
-
-Name Resolution
-===============
-
-
-
-.. _commands:
-
-More commands
+Data Analysis
 =============
 
-rocks docs
-----------
-
-Open this documentation in a new browser tab.
-
-.. _cli_id:
-
-
-rocks status
-------------
-
-Echo the number of cached :term:`ssoCards<ssoCard>` and checks if any are
-outdated. Offers to update outdated cards. Offers to update the
-:term:`asteroid name-number index<Asteroid name-number index>`. Further,
-retrieves the current :term:`ssoCard` structure template from :term:`SsODNet`.
-
-
-.. _rock_class:
-
-The ``python`` Package
-======================
-
-``rocks`` provides object-oriented access to the data stored in :term:`ssoCards <ssoCard>` and
-:term:`datacloud catalogues<Datacloud Catalogue>`. The implementation focuses on ease-of-access and speed: all attributes are accessible via the common dot notation, and queries to
-:term:`SsODNet` are run asynchronously.
-
-The public API only consists of two functions and one class:
-
-
-- ``rocks.Rock``: each ``Rock`` represents one asteroid and contains the data of its :term:`ssoCard`
-
-- ``rocks.rocks()``: a wrapper around ``rocks.identify()`` and ``rocks.Rock`` to read in the data of many asteroids
-
-.. _rock_class:
-
-The ``Rock`` class
-==================
-
-The ``Rock`` class is used to inspect the parameters of a single
-asteroid. It is the (iron) core of the ``rocks`` package.
-
-Creating a ``Rock`` instance
-----------------------------
-
-``Rocks`` are created by passing the name, number, or :term:`SsODNet ID` of the asteroid that they should represent.
+To build an analysis around the asteroid data compiled in SsODNet, ``rocks`` provides
+a ``python`` interface built around the ``Rock`` class. Each ``Rock`` object
+represents an asteroid. They are created by passing an :term:`identifier <Identifier>`,
+which is then resolved and the data corresponding to the asteroid is retrieved.
 
 .. code-block:: python
 
-    >>> from rocks import Rock
-    >>> ceres = Rock(1)
+    >>> import rocks
+    >>> ceres = rocks.Rock(1)
     >>> ceres
     Rock(number=1, name='Ceres')
-    >>> vesta = Rock("1807 FA")
+    >>> vesta = rocks.Rock("1807 FA")
     >>> vesta
     Rock(number=4, name='Vesta')
 
-Access of ssoCard parameters
-----------------------------
+.. admonition:: Hint
+   :class: tip
 
-During instantiation, the asteroid properties are retrieved from ``SsODNet`` and assigned to the attributes following the structure of the ``ssoCard``.
+   Creating a large number of ``Rock`` objects can take a while if the requested data is not cached
+   on the computer. Using the ``rocks.rocks()`` function drastically speeds up the process by first requesting
+   all required data asynchronously from the SsODNet servers. See :ref:`this tutorial <rocksrocks>`.
+
+All :term:`ssoCard` parameters are then available via the dot notation. The same shortcuts
+as explained above are implemented.
 
 .. code-block:: python
 
-    >>> ceres.parameters.physical.taxonomy.class_
-    C
-    >>> vesta.parameters.dynamical.proper_elements.proper_semi_major_axis.value
+    >>> ceres.parameters.physical.taxonomy.class_.value
+    'C'
+    >>> ceres.taxonomy.class_.value
+    'C'
+    >>> ceres.a.value
     2.3615126
 
-Notice the ``.value`` suffix to retrieve the value of numerical parameters, just as in an ``ssoCard`` itself.
 
-To reduce the typing effort, the ``parameters`` and ``physical``/ ``dynamical``
-attributes can be skipped.
+.. admonition:: Hint
+   :class: tip
 
-.. code-block:: python
+   Errors in the :ref:`ssoCard` are given as upper and lower value. They are accessed as described above:
 
-   >>> vesta.parameters.physical.diameter
-   525.4
-   >>> vesta.diameter
-   525.4
+   .. code-block:: python
 
-More shortcuts are :ref:`given below<attribute_shortcuts>`. Feel free to suggest new ones by opening an issue on the `GitHub page <https://github.com/maxmahlke/rocks>`_.
+       >>> ceres.diameter.error.min_
+       0.4
+       >>> ceres.diameter.error.max_
+       -0.4
 
-Differences to the ``ssoCard`` structure arise in two cases:
+   To get the mean of the upper and lower error, you can use the ``error_`` attribute instead:
 
-- the ``ssoCard`` uses keywords which are protected in ``python``, such as the ``class`` keyword. These keywords have an underscore appended to them: ``class``, ``id``, ``min``, ``max``
+   .. code-block:: python
 
-- the ``ssoCard`` uses keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
-
- .. TODO Document the errors_ attribute of the Values class
+       >>> ceres.diameter.error_
+       0.4
 
 Access of ``datacloud`` tables
 ------------------------------
 
-The ``datacloud`` catalogues of an asteroid are not loaded by default when creating a
-``Rock`` instance, as each table requires an additional remote query. Tables can
-be requested using the ``datacloud`` argument instead.
-Single tables can be requested by passing the table name to the ``datacloud``.
+``datacloud`` catalogues of an asteroid are not loaded by default when creating
+a ``Rock`` instance, as each table requires an additional remote query. Tables
+are explicitly requested using the ``datacloud`` argument. Single tables can be
+requested by passing the :ref:`table name <parameter_names>` to the ``datacloud``.
 
 .. code-block:: python
 
-    >>> ceres = Rock(1, datacloud='masses')
+    >>> ceres = rocks.Rock(1, datacloud='masses')
 
 Multiple tables are retrieved by passing a list of table names.
 
 .. code-block:: python
 
-    >>> ceres = Rock(1, datacloud=['taxonomies', 'masses'])
+    >>> ceres = rocks.Rock(1, datacloud=['taxonomies', 'masses'])
     >>> ceres.taxonomies.class_
     ['G', 'C', 'C', 'C', 'C', 'G', 'C']
     >>> ceres.taxonomies.shortbib
@@ -402,13 +335,13 @@ Multiple tables are retrieved by passing a list of table names.
 
 .. _iterate_catalogues:
 
-From a ``python`` view, the catalogues are subclassed of the ``pandas.DataFrame``.
-As such, the catalogues are iterable and return a catalogue per entry in each iteration.
+Once ingested into the ``Rock`` object, each catalogue is essentially a ``pandas.DataFrame``,
+making operations such as accessing the catalogue values identical to the `standard pandas operations <https://pandas.pydata.org/docs/getting_started/intro_tutorials/03_subset_data.html>`_.
 
 .. code-block:: python
 
-    >>> vesta = Rock(4, datacloud="diamalbedo")
-    >>> for entry in vesta.diameters:
+    >>> vesta = rocks.Rock(4, datacloud="diamalbedo")
+    >>> for _, entry in vesta.diameters.iterrows():
             print(f"{entry.diameter:.1f}km, observed via {entry.method} by {entry.shortbib}")
 
     507.3km, observed via TE-IM by Drummond+1998
@@ -422,56 +355,6 @@ As such, the catalogues are iterable and return a catalogue per entry in each it
     562.6km, observed via NEATM by Alí-Lagoa+2018
     505.4km, observed via OCC by Herald+2019
     522.0km, observed via OCC by Herald+2019
-
-Other convenient ``DataFrame`` methods such as ``groupby`` are also available. The difference between the ``DataCloudDataFrame`` and the original ``DataFrame`` are two added methods for the former: ``weighted_average`` and ``plot``.
-
-
-The ``datacloud`` tables have slightly different names in ``rocks``.
-
-+-----------------+----------------------------+
-| datacloud Table | Attribute Name             |
-+-----------------+----------------------------+
-| aams            | ``aams``                   |
-+-----------------+----------------------------+
-| astdys          | ``astdys``                 |
-+-----------------+----------------------------+
-| astorb          | ``astorb``                 |
-+-----------------+----------------------------+
-| binarymp_tab    | ``binaries``               |
-+-----------------+----------------------------+
-| diamalbedo      | ``diamalbedo``             |
-+-----------------+----------------------------+
-| families        | ``families``               |
-+-----------------+----------------------------+
-| masses          | ``masses``                 |
-+-----------------+----------------------------+
-| mpcatobs        | ``mpc``                    |
-+-----------------+----------------------------+
-| pairs           | ``pairs``                  |
-+-----------------+----------------------------+
-| taxonomy        | ``taxonomies``             |
-+-----------------+----------------------------+
-
-Some attributes are called different in ``rocks`` than in the ``datacloud`` table:
-
-
-The ``datacloud`` tables have slightly different names in ``rocks``.
-
-+-----------------+----------------------------+
-| datacloud Table | Attribute Name             |
-+-----------------+----------------------------+
-| num             | ``number``                 |
-+-----------------+----------------------------+
-| sibling_num     | ``sibling_number``         |
-+-----------------+----------------------------+
-| id              | ``id_``                    |
-+-----------------+----------------------------+
-| lambda          | ``lambda_``                |
-+-----------------+----------------------------+
-| class           | ``class_``                 |
-+-----------------+----------------------------+
-| from           | ``from_``                   |
-+-----------------+----------------------------+
 
 Some observations in the catalogues might be preferred to others. For example, a
 taxonomical classification using a visible-near-infrared spectrum is more
@@ -497,56 +380,15 @@ otherwise.
 
 ``rocks`` offers an easy way to compute the weighted averages of the preferred property measurements, see for example: :ref:`what's the weighted average albedo of (6) Hebe?<weighted_average_scripted>`
 
-Special use-cases
------------------
-
-When passing the name or number, the asteroid is identified using
-``rocks.identify()``. If the SsODNet ID of the asteroid is
-provided, this check can be skipped by setting the ``skip_id_check`` argument to
-``True``. This saves time when creating many ``Rock`` instances in a loop, as demonstrated in the :ref:`Tutorials<Tutorials>`.
-
-.. code-block:: python
-
-    >>> mars_crosser_2016fj = Rock("2016_FJ", skip_id_check=True)
-
-The user can further provide their own custom ssoCard to populate the ``Rock`` attributes.
-The ``ssocard`` argument accepts a ``dict``\ ionary structure following the one of the
-original ssoCards. The easiest way to achieve this is to edit a real ssoCard from SsODNet
-and load it via the ``json`` module.
-
-.. code-block:: python
-
-    >>> import json
-    >>> import os
-    >>> with open("my_ssocard.json", "r") as file_:
-    >>>    data = json.load(file_)
-    >>> mars_crosser_2016fj = Rock("2016_FJ", ssocard=data["2016_FJ"])
-
-Creating many ``Rock``\ s
-=========================
-
-The ``rocks.rocks()`` function serves as a one-line replacement for a frequent approach: get a list of asteroid identifiers from a catalogue and create ``Rock`` instances from them.
-
-.. code-block:: python
-
-    >>> from rocks import rocks
-    >>> themis_family = [24, 62, 90, 104, 171, 222, 223, 316, 379,
-                         383, 468, 492, 515, 526, 767, 846]
-    >>> themis_family = rocks(themis_family)
-    >>> themis_family
-    [Rock(number=316, name='Goberta'), Rock(number=492, name='Gismonda'),
-    Rock(number=767, name='Bondia'), Rock(number=90, name='Antiope'), ... ]
-
-Accessing the properties can now be done with a loop or list comprehension.
-
-    >>> from collections import Counter
-    >>> themis_taxonomies = [t.taxonomy.class_ for t in themis_family]
-    >>> Counter(themis_taxonomies)
-    Counter({'C': 8, 'B': 2, 'Ch': 2, 'BU': 1, 'Xc': 1, 'Xk': 1, 'Cb': 1})
-
-Any property not present in the ssoCard of an asteroid is set to ``NaN``. This ensures that accessing attributes in a loop does not fail.
-
+Other use cases
+---------------
 
 .. _author:
 
-Author look-up to be implemented.
+Author and method look-up to be implemented.
+
+
+.. rubric:: Footnotes
+   :caption:
+
+.. [#f1] Feel free to suggest a new alias via the `GitHub issues page <https://github.com/maxmahlke/rocks/issues>`_ if you find yourself typing too much.
