@@ -392,14 +392,14 @@ class PhaseFunction(Parameter):
             ]
         )
 
-    def __repr__(self):
+    def __str__(self):
         observed = []
 
         for filter_ in ["generic_johnson_V", "misc_atlas_cyan", "misc_atlas_orange"]:
             entry = getattr(self, filter_)
             if not np.isnan(entry.H.value):
                 observed.append(
-                    rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
+                    rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  [{filter_}]"
                 )
         if observed:
             return "\n".join(observed)
