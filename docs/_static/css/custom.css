@@ -1,5 +1,8 @@
-@import 'redactor.css';  /* for Alabaster */
-
 a {
-    text-decoration: none
+    text-decoration: none;
+}
+
+.hxr-hoverxref {
+  border-bottom: 0px;
+  color: LightCoral;
 }

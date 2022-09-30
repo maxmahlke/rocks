@@ -96,9 +96,6 @@ html_show_copyright = False
 html_show_sphinx = False
 
 
-html_css_files = []
-
-
 html_theme_options = {
     "sidebar_hide_name": True,
     "navigation_with_keys": True,
@@ -127,6 +124,6 @@ html_theme_options = {
 
 # These paths are either relative to html_static_path
 # or fully qualified paths (eg. https://...)
-# html_css_files = [
-#     "css/custom.css",
-# ]
+html_css_files = [
+    "css/custom.css",
+]
