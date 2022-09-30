@@ -54,8 +54,8 @@ In addition, you can now import the ``rocks`` ``python`` package.
 
          >>> import rocks
 
-Optional but fun: Interactive Search
-====================================
+Optional: Interactive Search
+============================
 
 ``rocks`` provides an interactive search dialogue using the `fzf
 <https://github.com/junegunn/fzf/>`_  fuzzy-finder which is triggered if
@@ -100,4 +100,4 @@ explained in the `fzf documentation
 .. rubric:: Footnotes
    :caption:
 
-.. [#f1] Useful in cases such as for ``(229762) G!kun||'homdima``: Tpying ``gkun`` is sufficient to find the asteroid in the proposed list.
+.. [#f1] Useful in cases such as for ``(229762) G!kun||'homdima``: Typing ``gkun`` is sufficient to find the asteroid in the proposed list.
