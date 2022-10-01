@@ -155,6 +155,18 @@ def test_taxonomy(id_, exists):
 
 
 # ------
+# Metadata access
+def test_units():
+    """Verify unit access."""
+
+    rock = rocks.Rock(1)
+
+    assert rock.diameter.unit == "km"
+    assert rock.albedo.unit == ""
+    assert rock.thermal_inertia.unit == "J.s^{-1/2}.K^{-1}.m^{-2}"
+
+
+# ------
 # Shortcuts
 
 
