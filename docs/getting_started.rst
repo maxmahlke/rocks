@@ -54,6 +54,16 @@ In addition, you can now import the ``rocks`` ``python`` package.
 
          >>> import rocks
 
+We are actively developing ``rocks`` and `new versions
+<https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_ come out
+frequently. If you encounter a bug, a first step to resolve it is to
+:ref:`clear your cache directory <cache_directory>` and to update to the latest
+version using
+
+.. code-block:: bash
+
+   $ pip install -U space-rocks
+
 
 .. _install_fzf:
 
