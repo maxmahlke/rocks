@@ -10,6 +10,7 @@ import string
 import tarfile
 import urllib
 import warnings
+from functools import lru_cache
 
 import numpy as np
 import Levenshtein as lev
@@ -66,14 +67,14 @@ def get_unit(path_parameter: str) -> str:
     return unit
 
 
+@lru_cache
 def load_mappings():
     """Load SsODNet metadata mappings file from cache."""
-    if not rocks.MAPPINGS:
-        if not rocks.PATH_MAPPING.is_file():
-            retrieve_mappings()
+    if not rocks.PATH_MAPPING.is_file():
+        retrieve_mappings()
 
-        with open(rocks.PATH_MAPPING, "r") as file_:
-            rocks.MAPPINGS = json.load(file_)
+    with open(rocks.PATH_MAPPING, "r") as file_:
+        rocks.MAPPINGS = json.load(file_)
     return rocks.MAPPINGS
 
 
