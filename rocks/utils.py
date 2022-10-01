@@ -171,23 +171,6 @@ def retrieve_mappings():
     metadata = response.json()
     mappings = metadata["display"]
 
-    # Turn from flattened to nested dict
-    for path, value in mappings.copy().items():
-
-        parent = mappings
-        parameter = path.split(".")[-1]
-
-        for key in path.split("."):
-
-            if key in ["datacloud", "selection"]:
-                continue
-            elif key == parameter:
-                parent[key] = value
-            else:
-                parent = parent.setdefault(key, {})
-
-        del mappings[path]
-
     # Turn into nested dict
     with open(rocks.PATH_MAPPING, "w") as file_:
         json.dump(mappings, file_)

@@ -7,6 +7,12 @@ from rich import traceback
 # pretty-print tracebacks with rich
 traceback.install()
 
+# ------
+# Path definitions required throughout the code
+PATH_CACHE = Path.home() / ".cache/rocks"
+PATH_INDEX = PATH_CACHE / "index"
+PATH_MAPPING = PATH_CACHE / "mapping_aster-astorb.json"
+
 # rocks modules
 # rocks.plots is lazy-loaded as it is expensive
 from . import datacloud, ssodnet, utils, index
@@ -16,11 +22,6 @@ from .core import Rock
 from .core import rocks_ as rocks
 from .resolve import identify, id
 
-# ------
-# Path definitions required throughout the code
-PATH_CACHE = Path.home() / ".cache/rocks"
-PATH_INDEX = PATH_CACHE / "index"
-PATH_MAPPING = PATH_CACHE / "mapping_aster-astorb.json"
 
 # Dict to hold the asteroid name-number indices and mappings at runtime
 INDEX = {}
@@ -28,7 +29,7 @@ MAPPINGS = {}
 
 # ------
 # Welcome to rocks
-__version__ = "1.5.17"
+__version__ = "1.5.18"
 
 GREETING = rf"""
                 _

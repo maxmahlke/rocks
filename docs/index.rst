@@ -60,7 +60,7 @@ to common questions as the ones below. All data is cited and new observations ar
       What is the distribution of thermal inertias of known Barbarian asteroids?
 
 |br|
-:octicon:`database;1em` **Full**\ [#f2]_ **literature overview with** `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
+:octicon:`database;1em` **Complete**\ [#f2]_ **literature overview with** `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
 
 .. grid:: 2
 
@@ -138,75 +138,11 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
        9.384e+20
        >>> ceres.mass.error
        6.711e+17
-.. >>> ceres.mass.bibref[0].shortbib
-.. 'Russell+2016'
-.. >>> ceres = Rock("ceres", datacloud='taxonomies')      # add datacloud information
-.. >>> ceres.taxonomies.class_.values
-.. ['C', 'C', 'C', 'C', 'C', 'C', 'C', 'G', 'G']
-.. >>> ceres.taxonomies.shortbib.values
-.. ['Bus&Binzel+2002', 'Lazzaro+2004', 'Fornasier+2014b', 'DeMeo+2009', 'Sergeyev+2022', 'Mahlke+2022', 'Lazzaro+2004', 'Tholen+1989', 'Fornasier+2014b']
-
-
-
-.. Easy access of asteroid properties using the :ref:`Rock<rock_class>` class.
-.. $ rocks taxonomies Eos
-.. +---+--------+---------+--------+-----------+-----------+------------------+
-.. |   | class_ | complex | method | waverange | scheme    | shortbib         |
-.. +---+--------+---------+--------+-----------+-----------+------------------+
-.. | 1 | S      | S       | Phot   | VIS       | Tholen    | Tholen+1989      |
-.. | 2 | K      | K       | Spec   | VIS       | Bus       | Bus&Binzel+2002  |
-.. | 3 | K      | K       | Spec   | VIS       | Bus       | MotheDiniz+2005  |
-.. | 4 | K      | K       | Spec   | VISNIR    | Bus       | MotheDiniz+2008a |
-.. | 5 | K      | K       | Spec   | VISNIR    | Bus-DeMeo | Clark+2009       |
-.. | 6 | K      | K       | Spec   | VISNIR    | Bus-DeMeo | DeMeo+2009       |
-.. | 7 | K      | K       | Spec   | VISNIR    | Mahlke    | Mahlke+2022      |
-.. +---+--------+---------+--------+-----------+-----------+------------------+
-
-.. $ rocks masses Eos
-.. +---+-------------+-------------+---------------+---------+--------------+
-.. |   | mass        | err_mass_up | err_mass_down | method  | shortbib     |
-.. +---+-------------+-------------+---------------+---------+--------------+
-.. | 1 | 1.22125e+18 | 0.0         | 0.0           | EPHEM   | Folkner+2014 |
-.. | 2 | 2.39e+18    | 5.97e+17    | -5.97e+17     | DEFLECT | Goffin+2014  |
-.. | 3 | 1.04688e+18 | 5.16159e+17 | -5.16159e+17  | EPHEM   | Fienga+2019  |
-.. +---+-------------+-------------+---------------+---------+--------------+
-
-.. via the Command Line
-.. ====================
-
-.. Quick exploration of asteroid parameters using the ``rocks`` :ref:`command-line interface<cli>`.
-
-
-.. via a ``python`` script
-.. =======================
-
-
-
-.. **Disclaimer: The SsODNet service and its database are in an alpha version and
-.. under constant revision.
-.. The provided values and access methods may change
-.. without notice.**
-
-
-.. .. card:: Clickable Card (internal)
-..     :link: cards-clickable
-..     :link-type: ref
-
-..     What is the best estimate of the albedo of (221) Eos?
-
-.. .. card:: Clickable Card (internal)
-..     :link: cards-clickable
-..     :link-type: ref
-
-..     What is the best estimate of the albedo of (221) Eos?
-
-
-
 
 .. rubric:: Footnotes
    :caption:
 
-.. [#f1] Latest version: 1.5.18  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
+.. [#f1] Latest version: 1.6.0  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
 .. [#f2] That's what we are aiming for. Is there a data source you are missing? `Email us! <mailto:benoit.carry@oca.eu>`_
 
 .. toctree::

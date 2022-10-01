@@ -1,3 +1,9 @@
+# 1.6.0 - 2022-10-01
+- New access model for metadata attributes (format, description, symbol, label, and unit):
+  accessed dynamically and hidden in output (except for unit)
+- Fix phase_function output once again
+- Fix datacloud spin catalogue ingestion
+
 # 1.5.17 - 2022-09-30
 - Fix output of phase_functions, yarkovskys, and binaries datacloud catalogues
 - Change parameter echo method to regular 'print' as rich outputs '__repr__' instead of '__str__'
