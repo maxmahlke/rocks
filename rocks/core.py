@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
+import keyword
 from typing import List
 import warnings
 
@@ -57,21 +58,77 @@ ALIASES = {
     },
 }
 
-# The lowest level in the ssoCard tree is the Value
+
+def add_paths(cls, values, parent):
+    values["path"] = parent
+
+    for name, value in values.items():
+        if isinstance(value, (Parameter, FloatValue, StringValue, IntegerValue)):
+
+            if keyword.iskeyword(name.strip("_")):
+                name = name.strip("_")
+
+            value.path = f"{parent}.{name}"
+    return values
+
+
+# The lowest level in the ssoCard tree is the are the differnt Values and the Error
 class Error(pydantic.BaseModel):
     min_: float = pydantic.Field(np.nan, alias="min")
     max_: float = pydantic.Field(np.nan, alias="max")
 
 
-class Value(pydantic.BaseModel):
-    label: str = ""
-    format: str = ""
-    symbol: str = ""
-    description: str = ""
+# The second lowest level is the Parameter. Values inherit from Parameter.
+class Parameter(pydantic.BaseModel):
+
+    _label: str = pydantic.Field("", exclude=True)
+    _format: str = pydantic.Field("", exclude=True)
+    _symbol: str = pydantic.Field("", exclude=True)
+    _description: str = pydantic.Field("", exclude=True)
+    path: str = pydantic.Field("", exclude=True)
+
+    def __str__(self):
+        return self.json()
+
+    @property
+    def label(self):
+        return self._label
+
+    @label.getter
+    def label(self):
+        label = rocks.utils.load_mappings()[self.path]["label"]
+        return label
+
+    @property
+    def symbol(self):
+        return self._symbol
+
+    @symbol.getter
+    def symbol(self):
+        symbol = rocks.utils.load_mappings()[self.path]["symbol"]
+        return symbol
+
+    @property
+    def format(self):
+        return self._format
+
+    @format.getter
+    def format(self):
+        format = rocks.utils.load_mappings()[self.path]["format"]
+        return format
+
+    @property
+    def description(self):
+        return self._description
+
+    @description.getter
+    def description(self):
+        description = rocks.utils.load_mappings()[self.path]["description"]
+        return description
 
 
-class FloatValue(Value):
-    unit: str = ""
+class FloatValue(Parameter):
+    _unit: str = ""
     error: Error = Error(**{})  # min_ and max_ values
     value: float = np.nan
     error_: float = np.nan  # average of min_ and max_
@@ -91,6 +148,18 @@ class FloatValue(Value):
             return False
         return True
 
+    @property
+    def unit(self):
+        return self._unit
+
+    @unit.getter
+    def unit(self):
+        if "unit" in rocks.utils.load_mappings()[self.path]:
+            unit = rocks.utils.load_mappings()[self.path]["unit"]
+        else:
+            return ""
+        return unit
+
     @pydantic.root_validator(pre=True)
     def _compute_mean_error(cls, values):
 
@@ -103,8 +172,8 @@ class FloatValue(Value):
         return values
 
 
-class IntegerValue(Value):
-    unit: str = ""
+class IntegerValue(Parameter):
+    _unit: str = ""
     value: int = None
 
     def __str__(self):
@@ -114,9 +183,19 @@ class IntegerValue(Value):
     def __bool__(self):
         return bool(self.value)
 
+    @property
+    def unit(self):
+        return self._unit
 
-class StringValue(Value):
+    @unit.getter
+    def unit(self):
+        unit = rocks.utils.load_mappings()[self.path]["unit"]
+        return unit
+
+
+class StringValue(Parameter):
     value: str = ""
+    path: str = ""
 
     def __str__(self):
         return self.value
@@ -125,7 +204,7 @@ class StringValue(Value):
         return bool(self.value)
 
 
-class ListValue(Value):
+class ListValue(Parameter):
     value: list = []
 
     def __str__(self):
@@ -135,17 +214,7 @@ class ListValue(Value):
         return bool(self.value)
 
 
-# The second lowest level is the Parameter
-class Parameter(pydantic.BaseModel):
-
-    label: str = ""
-    description: str = ""
-
-    def __str__(self):
-        return self.json()
-
-
-# Other common branches are bibred, links and method
+# Other common branches are bibref, links and method
 class Method(Parameter):
     doi: str = ""
     name: str = ""
@@ -211,6 +280,10 @@ class OrbitalElements(Parameter):
     number_observation: FloatValue = FloatValue(**{})
     perihelion_argument: FloatValue = FloatValue(**{})
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.orbital_elements")
+
 
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
@@ -224,6 +297,10 @@ class ProperElements(Parameter):
     proper_frequency_mean_motion: FloatValue = FloatValue(**{})
     proper_frequency_nodal_longitude: FloatValue = FloatValue(**{})
     proper_frequency_perihelion_longitude: FloatValue = FloatValue(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
 
 class Family(Parameter):
@@ -240,6 +317,10 @@ class Family(Parameter):
         else:
             return "No family membership known."
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.family")
+
 
 class Pair(Parameter):
     age: FloatValue = FloatValue(**{})
@@ -247,11 +328,19 @@ class Pair(Parameter):
     sibling_name: StringValue = StringValue(**{})
     sibling_number: IntegerValue = IntegerValue(**{})
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.pair")
+
 
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     method: List[Method] = [Bibref(**{})]
     bibref: List[Bibref] = [Method(**{})]
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
 
 
 class Yarkovsky(Parameter):
@@ -264,6 +353,10 @@ class Yarkovsky(Parameter):
 
     def __str__(self):
         return "\n".join([self.A2.__str__(), self.dadt.__str__()])
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.yarkovsky")
 
 
 class DynamicalParameters(Parameter):
@@ -285,6 +378,8 @@ class Albedo(FloatValue):
     bibref: List[Bibref] = []
     method: List[Method] = []
 
+    path = "parameters.physical.albedo.albedo"
+
 
 class ColorEntry(Parameter):
     color: FloatValue = FloatValue(**{})
@@ -299,6 +394,10 @@ class ColorEntry(Parameter):
     delta_time: FloatValue = FloatValue(**{})
     id_filter_1: StringValue = StringValue(**{})
     id_filter_2: StringValue = StringValue(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.colors.<id>.color")
 
 
 class Color(Parameter):
@@ -328,10 +427,18 @@ class Color(Parameter):
     V_R: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-R")
     B_V: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="B-V")
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.colors")
+
 
 class Density(FloatValue):
     method: List[Method] = []
     bibref: List[Bibref] = []
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.density.density")
 
 
 class Diameter(FloatValue):
@@ -339,11 +446,19 @@ class Diameter(FloatValue):
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.diameter.diameter")
+
 
 class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.mass.mass")
 
 
 class Phase(Parameter):
@@ -405,6 +520,10 @@ class PhaseFunction(Parameter):
             return "\n".join(observed)
         return "No phase function on record."
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.phase_functions")
+
 
 class Spin(Parameter):
     t0: FloatValue = FloatValue(**{})
@@ -420,6 +539,10 @@ class Spin(Parameter):
     method: List[Method] = [Method(**{})]
     bibref: List[Bibref] = [Bibref(**{})]
     technique: StringValue = StringValue(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.spins")
 
 
 class Taxonomy(Parameter):
@@ -440,6 +563,10 @@ class Taxonomy(Parameter):
             return "No taxonomy on record."
         return self.class_.value
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.taxonomy")
+
 
 class ThermalInertia(FloatValue):
     dsun: FloatValue = FloatValue(**{})
@@ -447,11 +574,22 @@ class ThermalInertia(FloatValue):
     bibref: List[Bibref] = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(
+            cls, values, "parameters.physical.thermal_inertia.thermal_inertia"
+        )
+
 
 class AbsoluteMagnitude(FloatValue):
     G: FloatValue = FloatValue(**{})
     bibref: List[Bibref] = [Bibref(**{})]
-    links: LinksParameter = LinksParameter(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(
+            cls, values, "parameters.physical.absolute_magnitude.absolute_magnitude"
+        )
 
 
 class PhysicalParameters(Parameter):
