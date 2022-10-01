@@ -202,7 +202,13 @@ A complete list is given in the :ref:`appendix <parameter_aliases>`.\ [#f1]_
      'C'
 
    The complete list of parameters which require the suffix is given in the :ref:`appendix <need_suffix>`.
+   It contains all parameters for which the following evaluates to ``True``:
 
+   .. code-block:: python
+
+     >>> import keyword
+     >>> keyword.iskeyword('class')
+     True
 
 .. admonition:: Another Warning
    :class: warning
