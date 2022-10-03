@@ -67,7 +67,7 @@ def get_unit(path_parameter: str) -> str:
     return unit
 
 
-@lru_cache
+@lru_cache(maxsize=128)
 def load_mappings():
     """Load SsODNet metadata mappings file from cache."""
     if not rocks.PATH_MAPPING.is_file():
