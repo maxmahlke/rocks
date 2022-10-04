@@ -1,4 +1,7 @@
-# 1.6.0 - 2022-10-01
+# 1.6.1 - 2022-10-04
+- Fix in lru_cache call to work with python3.7
+
+# 1.6.0 - 2022-10-03
 - New access model for metadata attributes (format, description, symbol, label, and unit):
   accessed dynamically and hidden in output (except for unit)
 - Fix phase_function output once again
