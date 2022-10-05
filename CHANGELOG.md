@@ -1,4 +1,12 @@
 # 1.6.2 -
+- Parameters of different spin solutions are now accessible via the common dot notation:
+
+>>> import rocks
+>>> ceres = rocks.Rock(1)
+>>> periods = [solution.period for solution in ceres.spin]  # the verbose version
+>>> periods = ceres.spin.period  # the new, simpler version
+>>> period = ceres.spin[0].period  # period of only the first spin solution
+
 - Added shortcuts for equation-of-state vector
 
 # 1.6.1 - 2022-10-04

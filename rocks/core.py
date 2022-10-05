@@ -73,7 +73,12 @@ def add_paths(cls, values, parent):
             if keyword.iskeyword(name.strip("_")):
                 name = name.strip("_")
 
-            value.path = f"{parent}.{name}"
+            if any(
+                parameter in parent for parameter in ["color", "phase_function", "spin"]
+            ):
+                value.path = f"{parent}.<id>.{name}"
+            else:
+                value.path = f"{parent}.{name}"
     return values
 
 
