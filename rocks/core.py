@@ -677,7 +677,7 @@ class Rock(pydantic.BaseModel):
     mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
     mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
     pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
-    proper_elements: rocks.datacloud.Proper_elements = rocks.datacloud.Proper_elements(
+    proper_elements_: rocks.datacloud.Proper_elements = rocks.datacloud.Proper_elements(
         **{}
     )
     phase_functions: rocks.datacloud.Phase_function = rocks.datacloud.Phase_function(
