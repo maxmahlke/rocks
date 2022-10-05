@@ -110,8 +110,9 @@ class Parameter(pydantic.BaseModel):
 
     @symbol.getter
     def symbol(self):
-        symbol = rocks.utils.load_mappings()[self.path]["symbol"]
-        return symbol
+        if "symbol" in rocks.utils.load_mappings()[self.path]:
+            return rocks.utils.load_mappings()[self.path]["symbol"]
+        return ""
 
     @property
     def format(self):
@@ -119,8 +120,9 @@ class Parameter(pydantic.BaseModel):
 
     @format.getter
     def format(self):
-        format = rocks.utils.load_mappings()[self.path]["format"]
-        return format
+        if "format" in rocks.utils.load_mappings()[self.path]:
+            return rocks.utils.load_mappings()[self.path]["format"]
+        return ""
 
     @property
     def description(self):
@@ -128,8 +130,9 @@ class Parameter(pydantic.BaseModel):
 
     @description.getter
     def description(self):
-        description = rocks.utils.load_mappings()[self.path]["description"]
-        return description
+        if "description" in rocks.utils.load_mappings()[self.path]:
+            return rocks.utils.load_mappings()[self.path]["description"]
+        return ""
 
 
 class FloatValue(Parameter):
@@ -160,10 +163,8 @@ class FloatValue(Parameter):
     @unit.getter
     def unit(self):
         if "unit" in rocks.utils.load_mappings()[self.path]:
-            unit = rocks.utils.load_mappings()[self.path]["unit"]
-        else:
-            return ""
-        return unit
+            return rocks.utils.load_mappings()[self.path]["unit"]
+        return ""
 
     @pydantic.root_validator(pre=True)
     def _compute_mean_error(cls, values):
