@@ -207,9 +207,6 @@ class StringValue(Parameter):
 class ListValue(Parameter):
     value: list = []
 
-    def __str__(self):
-        return self.value
-
     def __bool__(self):
         return bool(self.value)
 
