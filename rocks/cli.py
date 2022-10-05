@@ -331,13 +331,14 @@ def echo():
         else:
             value = rocks.utils.rgetattr(rock, param)
 
-            if isinstance(value, rocks.core.SpinList):
-                if verbose:
-                    for entry in value:
-                        rich.print_json(entry.json(), sort_keys=True)
-                else:
-                    for entry in value:
-                        rich.print(entry)
+            if isinstance(value, rocks.core.ListWithAttributes):
+                # if verbose:
+                #     for entry in value:
+                #         rich.print_json(entry.json(), sort_keys=True)
+                # else:
+                #     for entry in value:
+                #         rich.print(entry)
+                rich.print(value)
 
             else:
                 if verbose:

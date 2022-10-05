@@ -2,7 +2,7 @@
 """Implement the Rock class and other core rocks functionality."""
 import datetime as dt
 import keyword
-from typing import List
+from typing import List, Generator
 import warnings
 
 import numpy as np
@@ -98,6 +98,7 @@ class Parameter(pydantic.BaseModel):
     path: str = pydantic.Field("", exclude=True)
 
     def __str__(self):
+        breakpoint()
         return self.json()
 
     @property
@@ -206,7 +207,7 @@ class IntegerValue(Parameter):
 
 class StringValue(Parameter):
     value: str = ""
-    path: str = ""
+    path: str = pydantic.Field("", exclude=True)
 
     def __str__(self):
         return self.value
@@ -246,24 +247,43 @@ class LinksParameter(Parameter):
 
 
 # And a special class for the Spin list
-class SpinList(list):
+class ListWithAttributes(list):
     """Subclass of <list> with a custom __str__ for the Spin parameters."""
 
-    def __init__(self, list_):
+    def __init__(self, values):
         """Convert the list items to Spin instances."""
 
-        if list_:  # spin list is populated
-            list_ = [Spin(**entry) for entry in list_]
+        if isinstance(values, Generator):
+            values = list(values)
+
+        if values:  # is the list of parameters populated?
+            if isinstance(values[0], dict):  # are we instantiating the parameter class
+                if values:
+                    list_ = [type(values[0])(**entry) for entry in values]
+                else:
+                    list_ = [type(values[0])(**{})]  # ensure its never empty
+            else:
+                list_ = values
         else:
-            list_ = [Spin(**{})]  # ensure it's never empty
+            list_ = []
 
         return super().__init__(list_)
 
-    def __str__(self) -> str:
-        return "\n".join(entry.json() for entry in self)
-
-    def __bool__(self) -> bool:
-        return any(np.isfinite(entry.period.value) for entry in self)
+    def __getattr__(self, name):
+        """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
+        # If it's a user attribute, we handle it here
+        if not name.startswith("__"):
+            if self:
+                if hasattr(self[0], name):
+                    return ListWithAttributes(
+                        # type(getattr(self[0], name)),
+                        [getattr(solution, name) for solution in self]
+                    )
+                else:
+                    raise AttributeError(f"Parameter does not have attribute {name}")
+            else:
+                return []
+        raise AttributeError
 
 
 # ------
@@ -274,7 +294,7 @@ class OrbitalElements(Parameter):
     ceu: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     author: StringValue = StringValue(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     ceu_rate: FloatValue = FloatValue(**{})
     ref_epoch: FloatValue = FloatValue(**{})
     inclination: FloatValue = FloatValue(**{})
@@ -291,6 +311,10 @@ class OrbitalElements(Parameter):
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.orbital_elements")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class ProperElements(Parameter):
@@ -452,11 +476,15 @@ class Density(FloatValue):
 class Diameter(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = [Method(**{})]
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.diameter.diameter")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Mass(FloatValue):
@@ -502,6 +530,7 @@ class PhaseFunction(Parameter):
 
         if name in ALIASES["phase_function"].keys():
             return getattr(self, ALIASES["phase_function"][name])
+        raise AttributeError
 
     def __bool__(self):
         return any(
@@ -602,7 +631,7 @@ class AbsoluteMagnitude(FloatValue):
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: SpinList = SpinList([])
+    spin: ListWithAttributes = [Spin(**{})]
     color: Color = pydantic.Field(Color(**{}), alias="colors")
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
@@ -616,7 +645,7 @@ class PhysicalParameters(Parameter):
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "spin", allow_reuse=True, pre=True
-    )(lambda list_: SpinList(list_))
+    )(lambda list_: ListWithAttributes([Spin(**element) for element in list_]))
 
 
 # ------
@@ -868,6 +897,9 @@ class Rock(pydantic.BaseModel):
 
         if name in ALIASES["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
+
+        if name in ALIASES["eq_state_vector"].values():
+            return getattr(self.parameters.eq_state_vector, name)
 
         # TODO This could be coded in a more abstract way
         # These are proper aliases
