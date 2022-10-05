@@ -1,3 +1,6 @@
+# 1.6.2 -
+- Added shortcuts for equation-of-state vector
+
 # 1.6.1 - 2022-10-04
 - Fix in lru_cache call to work with python3.7
 

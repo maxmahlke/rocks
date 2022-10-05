@@ -38,6 +38,11 @@ ALIASES = {
         "parameters.physical.taxonomy": "taxonomy",
         "parameters.physical.thermal_inertia": "thermal_inertia",
     },
+    "eq_state_vector": {
+        "parameters.eq_state_vector.ref_epoch": "ref_epoch",
+        "parameters.eq_state_vector.position": "position",
+        "parameters.eq_state_vector.velocity": "velocity",
+    },
     "orbital_elements": {
         "a": "semi_major_axis",
         "e": "eccentricity",
@@ -614,6 +619,10 @@ class EqStateVector(Parameter):
     ref_epoch: FloatValue = FloatValue(**{})
     position: ListValue = ListValue(**{})
     velocity: ListValue = ListValue(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.eq_state_vector")
 
 
 # ------
