@@ -139,10 +139,6 @@ async def _query_ssodnet(id_ssodnet, session):
 def _postprocess_ssocard(card):
     """Apply ssoCard structure improvements for pydantic deserialization."""
 
-    # ------
-    # Add metadata label, description, unity, format, and symbol to parameters
-    mappings = rocks.utils.load_mappings()
-
     def make_dict(values):
         """Turn lower-level dict values into dicts."""
         for key, value in values.items():
