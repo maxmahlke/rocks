@@ -97,10 +97,12 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
 
     # Local retrieval failed, do remote query
     card = await _query_ssodnet(id_ssodnet, session)
-    card = _postprocess_ssocard(card)
 
     # save to cache
     if card and card is not None:
+
+        card = _postprocess_ssocard(card)
+
         with open(PATH_CARD, "w") as file_card:
             json.dump(card, file_card)
 
@@ -133,6 +135,11 @@ async def _query_ssodnet(id_ssodnet, session):
         return {}
 
     response_json = await response.json()
+
+    if response_json:
+        warnings.warn(f"ssoCard query failed for ID: {id_ssodnet}")
+        return {}
+
     return response_json
 
 

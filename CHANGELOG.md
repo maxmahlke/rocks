@@ -1,7 +1,9 @@
+# 1.6.3 - 2022-10-
+- Fix bug in case ssoCard query returns null
+
 # 1.6.2 - 2022-10-05
 - Parameters of different spin solutions / bibref entries are now accessible via the common dot notation,
-  see https://rocks.readthedocs.io/en/latest/cli.html#bibliography-management-with-rocks
-  - '$ rocks diameter.bibref.shortbib pallas'
+  seversion 1.6.2e https://rocks.readthedocs.io/en/latest/cli.html#bibliography-management-with-rocks or '$ rocks diameter.bibref.shortbib pallas'
 - Added shortcuts for equation-of-state vector
 
 # 1.6.1 - 2022-10-04
