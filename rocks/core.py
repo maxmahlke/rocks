@@ -765,9 +765,9 @@ class Rock(pydantic.BaseModel):
         -------
         >>> from rocks import Rock
         >>> ceres = Rock('ceres')
-        >>> ceres.taxonomy.class_
+        >>> ceres.taxonomy.class_.value
         'C'
-        >>> ceres.taxonomy.shortbib
+        >>> ceres.taxonomy.shortbib.value
         'DeMeo+2009'
         >>> ceres.diameter.value
         848.4
@@ -824,6 +824,7 @@ class Rock(pydantic.BaseModel):
 
                 # Dynamically remove offending parts of the ssoCard
                 offending_part = ssocard
+                breakpoint()
 
                 location_list = error["loc"][:-1]
 
