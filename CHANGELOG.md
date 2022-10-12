@@ -1,5 +1,7 @@
 # 1.6.3 - 2022-10-12
+- Add nicer representation of colors '$ rocks color tina', '$ rocks color.g_i tina'
 - Fix bug in case ssoCard query returns null
+- Fix bug in bibref implementation
 
 # 1.6.2 - 2022-10-05
 - Parameters of different spin solutions / bibref entries are now accessible via the common dot notation,

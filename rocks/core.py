@@ -430,7 +430,7 @@ class ColorEntry(Parameter):
         if not np.isnan(self.color.value):
             if self.color.error.max_ == self.color.error.min_:
                 return rf"{self.color.value:.2f} +- {self.color.error.max_:.2f}  {self.bibref.shortbib}"
-            return rf"{self.color.value:.2f} + {self.color.error.max_:.2f} - {self.color.error.min_:.2f}  [{self.bibref.shortbib}]"
+            return rf"{self.color.value:.2f} + {self.color.error.max_:.2f} - {self.color.error.min_:.2f}  {self.bibref.shortbib}"
         return "No color on record in this filter."
 
     @pydantic.root_validator()
