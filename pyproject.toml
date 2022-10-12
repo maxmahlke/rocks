@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-rocks"
-version = "1.6.2"
+version = "1.6.3"
 description = "Python client for SsODNet data access."
 authors = ["Max Mahlke <max.mahlke@oca.eu>"]
 license = "MIT"

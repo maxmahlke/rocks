@@ -1,4 +1,4 @@
-# 1.6.3 - 2022-10-
+# 1.6.3 - 2022-10-12
 - Fix bug in case ssoCard query returns null
 
 # 1.6.2 - 2022-10-05
