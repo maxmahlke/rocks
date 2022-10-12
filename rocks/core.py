@@ -318,7 +318,7 @@ class OrbitalElements(Parameter):
 
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     lyapunov_time: FloatValue = FloatValue(**{})
     integration_time: FloatValue = FloatValue(**{})
     proper_eccentricity: FloatValue = FloatValue(**{})
@@ -336,7 +336,7 @@ class ProperElements(Parameter):
 
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
     family_name: StringValue = StringValue(**{})
     family_number: IntegerValue = IntegerValue(**{})
@@ -367,7 +367,7 @@ class Pair(Parameter):
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     method: List[Method] = [Bibref(**{})]
-    bibref: List[Bibref] = [Method(**{})]
+    bibref: ListWithAttributes = [Method(**{})]
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -379,7 +379,7 @@ class Yarkovsky(Parameter):
     A2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
     dadt: FloatValue = FloatValue(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
     def __str__(self):
@@ -406,7 +406,7 @@ class DynamicalParameters(Parameter):
 # Physical Value
 class Albedo(FloatValue):
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = []
+    bibref: ListWithAttributes = []
     method: List[Method] = []
 
     path = "parameters.physical.albedo.albedo"
@@ -417,7 +417,7 @@ class ColorEntry(Parameter):
     epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
-    bibref: List[Bibref] = []
+    bibref: ListWithAttributes = []
     facility: StringValue = StringValue(**{})
     observer: StringValue = StringValue(**{})
     phot_sys: StringValue = StringValue(**{})
@@ -426,9 +426,20 @@ class ColorEntry(Parameter):
     id_filter_1: StringValue = StringValue(**{})
     id_filter_2: StringValue = StringValue(**{})
 
+    def __str__(self):
+        if not np.isnan(self.color.value):
+            if self.color.error.max_ == self.color.error.min_:
+                return rf"{self.color.value:.2f} +- {self.color.error.max_:.2f}  {self.bibref.shortbib}"
+            return rf"{self.color.value:.2f} + {self.color.error.max_:.2f} - {self.color.error.min_:.2f}  [{self.bibref.shortbib}]"
+        return "No color on record in this filter."
+
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.colors.<id>.color")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Color(Parameter):
@@ -462,14 +473,55 @@ class Color(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.colors")
 
+    def __str__(self):
+        observed = []
+
+        for filter_ in [
+            "g_i",
+            "g_r",
+            "g_z",
+            "i_z",
+            "r_i",
+            "r_z",
+            "u_g",
+            "u_g",
+            "u_r",
+            "u_z",
+            "J_K",
+            "Y_J",
+            "Y_K",
+            "c_o",
+            "v_g",
+            "v_i",
+            "v_r",
+            "v_z",
+            "H_K",
+            "J_H",
+            "Y_H",
+            "u_v",
+            "V_I",
+            "V_R",
+            "B_V",
+        ]:
+            entry = getattr(self, filter_)
+            if not np.isnan(entry.color.value):
+                observed.append(rf"[{filter_}] {entry.color.value:.2f}")
+        if observed:
+            return "\n".join(observed)
+        return "No color on record."
+
 
 class Density(FloatValue):
     method: List[Method] = []
-    bibref: List[Bibref] = []
+    bibref: ListWithAttributes = []
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.density.density")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Diameter(FloatValue):
@@ -488,12 +540,16 @@ class Diameter(FloatValue):
 
 class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.mass.mass")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Phase(Parameter):
@@ -504,7 +560,7 @@ class Phase(Parameter):
     rms: FloatValue = FloatValue(**{})
     phase: Error = Error(**{})
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     facility: StringValue = StringValue(**{})
     name_filter: StringValue = StringValue(**{})
 
@@ -513,8 +569,12 @@ class Phase(Parameter):
 
     def __str__(self):
         if not np.isnan(self.H.value):
-            return rf"H: {self.H.value:.2f}  G1: {self.G1.value:.2f}  G2: {self.G2.value:.2f}  [{self.bibref[0].shortbib}]"
+            return rf"H: {self.H.value:.2f}  G1: {self.G1.value:.2f}  G2: {self.G2.value:.2f} {self.bibref.shortbib}"
         return "No phase function on record in this filter."
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class PhaseFunction(Parameter):
@@ -573,18 +633,22 @@ class Spin(Parameter):
     period: FloatValue = FloatValue(**{})
     obliquity: FloatValue = FloatValue(**{})
     method: List[Method] = [Method(**{})]
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     technique: StringValue = StringValue(**{})
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.spins")
 
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
 
 class Taxonomy(Parameter):
     links: LinksParameter = LinksParameter(**{})
     class_: StringValue = pydantic.Field(StringValue(**{}), alias="class")
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
     scheme: StringValue = StringValue(**{})
     complex: StringValue = StringValue(**{})
@@ -603,11 +667,15 @@ class Taxonomy(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.taxonomy")
 
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
 
 class ThermalInertia(FloatValue):
     dsun: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
     method: List[Method] = [Method(**{})]
 
     @pydantic.root_validator()
@@ -619,13 +687,17 @@ class ThermalInertia(FloatValue):
 
 class AbsoluteMagnitude(FloatValue):
     G: FloatValue = FloatValue(**{})
-    bibref: List[Bibref] = [Bibref(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(
             cls, values, "parameters.physical.absolute_magnitude.absolute_magnitude"
         )
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class PhysicalParameters(Parameter):
@@ -824,7 +896,6 @@ class Rock(pydantic.BaseModel):
 
                 # Dynamically remove offending parts of the ssoCard
                 offending_part = ssocard
-                breakpoint()
 
                 location_list = error["loc"][:-1]
 
