@@ -131,12 +131,12 @@ async def _query_ssodnet(id_ssodnet, session):
 
     if not response.ok:
         warnings.warn(f"ssoCard query failed for ID: {id_ssodnet}")
-        return {}
+        return None
 
     response_json = await response.json()
 
-    if response_json:
-        warnings.warn(f"ssoCard query failed for ID: {id_ssodnet}")
+    if response_json is None:
+        warnings.warn(f"ssoCard query returned empty ssoCard for ID: {id_ssodnet}")
         return None
 
     return response_json

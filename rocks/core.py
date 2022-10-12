@@ -98,7 +98,6 @@ class Parameter(pydantic.BaseModel):
     path: str = pydantic.Field("", exclude=True)
 
     def __str__(self):
-        breakpoint()
         return self.json()
 
     @property
