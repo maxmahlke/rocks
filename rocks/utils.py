@@ -462,4 +462,4 @@ def check_datasets(author):
     for category, datasets in ssodnet_biblio["ssodnet_biblio"]["datasets"].items():
         for dataset in datasets:
             if author.capitalize() in dataset["shortbib"]:
-                print(f"{dataset['shortbib']:>25} [{category}]")
+                print(f"  {dataset['shortbib']:<20} [{category}]")
