@@ -1,4 +1,4 @@
-# 1.6.4 - 2022-10
+# 1.6.4 - 2022-10-21
 - Add 'author' command to quickly check the presence of data from peer-reviewed article: '$ rocks author bowell'
 - bool(rocks.Rock(<id>).color.<filter>) is True if color.<filter>.value is finite
 
