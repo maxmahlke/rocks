@@ -171,7 +171,6 @@ Data Exploration
           >>> pallas.albedo.value
           0.1512
 
-.. _taxonomies:
 
 .. dropdown:: How do I get all the taxonomic classes proposed for Ceres?
 
@@ -329,12 +328,6 @@ SsODNet and ``rocks``
    :link-type: ref
 
    **Is the cached asteroid data out-of-date? How do I update it?**  :octicon:`chevron-right;1em`
-
-.. card::
-   :link: parameter_aliases
-   :link-type: ref
-
-   **Which parameters can be abbreviated?**  :octicon:`chevron-right;1em`
 
 .. card::
    :link: parameter_aliases

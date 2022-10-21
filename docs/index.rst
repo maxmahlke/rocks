@@ -65,14 +65,14 @@ to common questions as the ones below. All data is cited and new observations ar
 .. grid:: 2
 
     .. grid-item-card::
-      :link: datacloud
+      :link: masses_ceres
       :link-type: ref
 
-      What masses of ``(1) Ceres`` have been published? What are the measurement uncertainties and methods?
+      What masses of ``(1) Ceres`` have been published by whom?
 
 
     .. grid-item-card::
-      :link: taxonomies
+      :link: datacloud_example
       :link-type: ref
 
       What taxonomic classifications of ``(214) Aschera`` have been proposed over time?

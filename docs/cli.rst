@@ -9,6 +9,8 @@ Most operations in ``rocks`` can be executed both via the command line and the
 latter for a scripted data analysis. The available functions can generally be
 divided into *identification*, *data exploration*, and *data analysis*.
 
+.. _name_resolution:
+
 Identification
 ==============
 
@@ -131,6 +133,8 @@ The command line offers more functionality related to identification of asteroid
    Whitespace and capitalization are irrelevant for successful identification of the passed :term:`identifier <Identifier>`.
 
 
+.. _data_exploration:
+
 Data Exploration
 ================
 
@@ -217,11 +221,12 @@ A complete list is given in the :ref:`appendix <parameter_aliases>`.\ [#f1]_
    such as the name of colors (e.g. ``c-o``). In general, characters such
    as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names (e.g. ``c_o``).
 
-
 Both the best-estimates stored in the :term:`ssoCard` and the literature compilation
 of the parameters stored in the :term:`datacloud <Datacloud Catalogue>` are available for look-up.
 In general, best-estimates are returned if the parameter is specified in singular form (e.g. `albedo`)
 while all available data is returned for the plural form (e.g. `albedos`).
+
+.. _datacloud_example:
 
 .. tab-set::
 
@@ -233,6 +238,7 @@ while all available data is returned for the plural form (e.g. `albedos`).
            E
 
    .. tab-item:: Plural: datacloud
+        :selected:
 
         .. code-block:: sh
 
@@ -324,6 +330,7 @@ a ``Rock`` instance, as each table requires an additional remote query. Tables
 are explicitly requested using the ``datacloud`` argument. Single tables can be
 requested by passing the :ref:`table name <parameter_names>` to the ``datacloud``.
 
+
 .. code-block:: python
 
     >>> ceres = rocks.Rock(1, datacloud='masses')
@@ -370,15 +377,56 @@ the ``ssoCard`` does.  Catalogues have ``preferred`` attributes, which are lists
 containing ``True`` if the corresponding observation is preferred, and ``False``
 otherwise.
 
+.. _masses_ceres:
+
 .. code-block:: python
 
-    >>> ceres = Rock(1, datacloud='masses')
+    >>> ceres = rocks.Rock(1, datacloud='masses')
     >>> len(ceres.masses.mass)  # 20 observations of Ceres' mass in database
     20
-    >>> for obs in ceres.masses:
-          if obs.preferred:
-              print(f"Mass: {obs.mass}, Method: {obs.method}, from {obs.shortbib}")
-    Mass: 9.384e+20, Method: SPACE, from Russell+2016
+    >>> for i, obs in ceres.masses.iterrows():  # datacloud catalogues are pandas DataFrames
+    >>>   mean_error = (obs.err_mass_up + abs(obs.err_mass_do wn)) / 2
+    >>>   print(f"[{'X' if obs.preferred else ' '}] {obs.mass} +- {mean_error} [{obs.shortbib}, Method: {obs.method}]")
+    [ ] 8.27e+20 +- 3.78e+19 [Kuzmanoski+1996, Method: DEFLECT]
+    [ ] 8.73e+20 +- 7.96e+18 [Hilton+1999, Method: DEFLECT]
+    [ ] 9.04e+20 +- 1.39e+19 [Kova+2012, Method: DEFLECT]
+    [ ] 9.19e+20 +- 1.41e+19 [Sitarski+1995, Method: DEFLECT]
+    [ ] 9.29e+20 +- 1.79e+19 [Carpino+1996, Method: DEFLECT]
+    [ ] 9.29e+20 +- 3.68e+18 [Fienga+2013, Method: EPHEM]
+    [ ] 9.29e+20 +- 3.84e+18 [Fienga+2014, Method: EPHEM]
+    [ ] 9.31e+20 +- 6.46e+18 [Konopliv+2011, Method: EPHEM]
+    [ ] 9.32e+20 +- 9.32e+19 [Folkner+2009, Method: EPHEM]
+    [ ] 9.3483e+20 +- 5.967e+19 [Goffin1991, Method: DEFLECT]
+    [ ] 9.35e+20 +- 5.57e+18 [Konopliv+2006, Method: DEFLECT]
+    [ ] 9.35e+20 +- 5.97e+19 [Goffin+2001, Method: DEFLECT]
+    [ ] 9.35e+20 +- 7.96e+18 [Michalak+2000, Method: DEFLECT]
+    [ ] 9.38348e+20 +- 2.28689e+18 [Fienga+2019, Method: EPHEM]
+    [X] 9.384e+20 +- 1e+17 [Russell+2016, Method: SPACE]
+    [ ] 9.38e+20 +- 2.21e+18 [Viswanathan+2017, Method: EPHEM]
+    [ ] 9.394e+20 +- 1.312e+18 [Baer+2017, Method: EPHEM]
+    [ ] 9.39e+20 +- 1.57e+18 [Pitjeva+2013, Method: EPHEM]
+    [ ] 9.39e+20 +- 2.31e+18 [Fienga+2020, Method: EPHEM]
+    [ ] 9.39e+20 +- 5.97e+18 [Pitjeva+2010, Method: EPHEM]
+    [ ] 9.40797e+20 +- 0.0 [Folkner+2014, Method: EPHEM]
+    [ ] 9.41e+20 +- 5.69e+18 [Kuchynka+2013, Method: EPHEM]
+    [ ] 9.42e+20 +- 2.65e+18 [Zielenbach+2011, Method: DEFLECT]
+    [ ] 9.42e+20 +- 2.68e+18 [Zielenbach+2011, Method: DEFLECT]
+    [ ] 9.42e+20 +- 5.17e+18 [Kova+2007, Method: DEFLECT]
+    [ ] 9.44e+20 +- 5.97e+17 [Goffin+2014, Method: DEFLECT]
+    [ ] 9.45e+20 +- 3.98e+18 [Pitjeva+2004, Method: DEFLECT]
+    [ ] 9.45e+20 +- 4.18e+18 [Pitjeva+2005, Method: EPHEM]
+    [ ] 9.45e+20 +- 5.97e+18 [Baer+2008a, Method: DEFLECT]
+    [ ] 9.46366e+20 +- 5.5692e+18 [Fienga+2011, Method: EPHEM]
+    [ ] 9.46e+20 +- 1.43e+18 [Baer+2011, Method: DEFLECT]
+    [ ] 9.46e+20 +- 7.96e+17 [Fienga+2008, Method: EPHEM]
+    [ ] 9.47e+20 +- 4.57e+18 [Viateau+1998, Method: DEFLECT]
+    [ ] 9.4e+20 +- 3.1e+18 [Zielenbach+2011, Method: DEFLECT]
+    [ ] 9.52e+20 +- 4.63e+18 [Zielenbach+2011, Method: DEFLECT]
+    [ ] 9.52e+20 +- 7.76e+18 [Viateau+1997b, Method: DEFLECT]
+    [ ] 9.54e+20 +- 1.69e+19 [Sitarski+1992, Method: DEFLECT]
+    [ ] 9.55e+20 +- 4.38e+19 [Williams+1992, Method: DEFLECT]
+    [ ] 9.57e+20 +- 1.99e+18 [Pitjeva+2001, Method: DEFLECT]
+    [ ] 9.94e+20 +- 3.98e+19 [Viateau+1995, Method: DEFLECT]
 
 .. Note::
 
