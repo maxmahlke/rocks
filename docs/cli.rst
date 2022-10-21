@@ -525,7 +525,7 @@ Other use cases
 .. _author:
 
 The presence of data associated to peer-reviewed articles\ [#f2]_ in the SsODNet can be checked using the
-``author`` command by supplying the name of the first author.`
+``author`` command by supplying the name of the first author.
 
 .. code-block:: bash
 
