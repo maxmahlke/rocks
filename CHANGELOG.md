@@ -1,3 +1,7 @@
+# 1.6.4 - 2022-10
+- Add 'author' command to quickly check the presence of data from peer-reviewed article: '$ rocks author bowell'
+- bool(rocks.Rock(<id>).color.<filter>) is True if color.<filter>.value is finite
+
 # 1.6.3 - 2022-10-12
 - Add nicer representation of colors '$ rocks color tina', '$ rocks color.g_i tina'
 - Fix bug in case ssoCard query returns null

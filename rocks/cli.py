@@ -62,6 +62,14 @@ def docs():
 
 
 @cli_rocks.command()
+@click.argument("name", nargs=1)
+def author(name):
+    """Check presence of peer-rievewed article based on first-author name."""
+
+    rocks.utils.check_datasets(name)
+
+
+@cli_rocks.command()
 @click.argument("id_", nargs=-1)
 def id(id_):
     """Resolve the asteroid name and number from string input."""
@@ -103,7 +111,7 @@ def parameters():
     """Print the ssoCard structure and its description."""
 
     if not rocks.PATH_MAPPING.is_file():
-        rocks.utils.retrieve_mappings()
+        rocks.utils.retrieve_metadata("mappings")
 
     with open(rocks.PATH_MAPPING, "r") as file_:
         DESC = json.load(file_)
@@ -189,7 +197,7 @@ def status():
         elif decision == "2":
 
             # Update metadata
-            rocks.utils.retrieve_mappings()
+            rocks.utils.retrieve_metadata("mappings")
 
             # Update the cached data
             ids = [ssodnet_id for ssodnet_id in cached_cards]

@@ -11,7 +11,8 @@ traceback.install()
 # Path definitions required throughout the code
 PATH_CACHE = Path.home() / ".cache/rocks"
 PATH_INDEX = PATH_CACHE / "index"
-PATH_MAPPING = PATH_CACHE / "mapping_aster-astorb.json"
+PATH_MAPPING = PATH_CACHE / "metadata_aster.json"
+PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 
 # rocks modules
 # rocks.plots is lazy-loaded as it is expensive

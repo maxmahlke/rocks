@@ -71,7 +71,7 @@ def get_unit(path_parameter: str) -> str:
 def load_mappings():
     """Load SsODNet metadata mappings file from cache."""
     if not rocks.PATH_MAPPING.is_file():
-        retrieve_mappings()
+        retrieve_metadata("mappings")
 
     with open(rocks.PATH_MAPPING, "r") as file_:
         rocks.MAPPINGS = json.load(file_)
@@ -157,23 +157,39 @@ def weighted_average(catalogue, parameter):
 
 # ------
 # Misc
-def retrieve_mappings():
-    """Retrieve the mappings JSON from SsODNet to the cache directory."""
+def retrieve_metadata(which):
+    """Retrieve the metadata JSON files from SsODNet to the cache directory.
 
-    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/metadata_aster.json"
+    Parameter
+    ---------
+    which : str
+        Which metadata to retrieve. Choose from ['mappings', 'authors'].
+    """
+
+    if which not in ["mappings", "authors"]:
+        raise ValueError
+
+    URL = (
+        "https://ssp.imcce.fr/data/ssodnet_biblio.json"
+        if which == "authors"
+        else "https://ssp.imcce.fr/data/metadata_aster.json"
+    )
 
     response = requests.get(URL)
 
     if not response.ok:
-        warnings.error(f"Retrieving mappings file failed with URL:\n{URL}")
+        warnings.error(f"Retrieving {which} file failed with URL:\n{URL}")
         return
 
     metadata = response.json()
-    mappings = metadata["display"]
 
-    # Turn into nested dict
-    with open(rocks.PATH_MAPPING, "w") as file_:
-        json.dump(mappings, file_)
+    if which == "mappings":
+        metadata = metadata["display"]
+
+    PATH_OUT = rocks.PATH_AUTHORS if which == "authors" else rocks.PATH_MAPPING
+
+    with open(PATH_OUT, "w") as file_:
+        json.dump(metadata, file_)
 
 
 def cache_inventory():
@@ -432,3 +448,18 @@ def get_citation_from_mpc(name):
     citation = citation.find("br").next_sibling.next_sibling
     citation = citation.split("[")[0].strip().replace("  ", " ")
     return citation
+
+
+def check_datasets(author):
+    """Print dataset and publication matching 'author' as first-author name."""
+
+    if not rocks.PATH_AUTHORS.is_file():
+        rocks.utils.retrieve_metadata("authors")
+
+    with open(rocks.PATH_AUTHORS, "r") as file_:
+        ssodnet_biblio = json.load(file_)
+
+    for category, datasets in ssodnet_biblio["ssodnet_biblio"]["datasets"].items():
+        for dataset in datasets:
+            if author.capitalize() in dataset["shortbib"]:
+                print(f"{dataset['shortbib']:>25} [{category}]")
