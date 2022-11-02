@@ -1101,8 +1101,8 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
     """
 
     # Get IDs
-    if len(ids) == 1 or isinstance(ids, str):
-        ids = [rocks.identify(ids, return_id=True, progress=progress)[-1]]
+    if isinstance(ids, (float, int, str)) or len(ids) == 1:
+        ids = [resolve.identify(ids, return_id=True, progress=progress)[-1]]
 
     else:
         _, _, ids = zip(*rocks.identify(ids, return_id=True, progress=progress))
