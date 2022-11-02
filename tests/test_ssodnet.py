@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 import warnings
 
 import pytest
 import rocks
 
 
-@pytest.mark.parametrize("id_", ["Fortuna", "doesnotexist", "Ceres"])
+@pytest.mark.parametrize("id_", ["Ceres", "doesnotexist"])
 def test_get_ssoCard(id_):
     warnings.filterwarnings("ignore", "UserWarning")
     card = rocks.ssodnet.get_ssocard(id_)
