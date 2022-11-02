@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-"""Local and remote asteroid name resolution."""
+"""Local and remote asteroid name resolution for rocks."""
+
 import asyncio
 import pickle
 import re
@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from rich.progress import Progress
 
-import rocks
+from rocks import index
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
 nest_asyncio.apply()
@@ -164,7 +164,7 @@ def _local_lookup(id_):
 
     # Reduce ID and retrieve fitting index
     id_ = _reduce_id_for_local(id_)
-    INDEX = rocks.index.get_index_file(id_)
+    INDEX = index._get_index_file(id_)
 
     if id_ in INDEX:
         # Is the number included?
@@ -376,7 +376,7 @@ def _interactive():
     """
 
     # Load fuzzy index
-    LINES = rocks.index._load("fuzzy_index.pkl")
+    LINES = index._load("fuzzy_index.pkl")
 
     # Launch selection
     choice = rocks.cli._interactive(LINES)
@@ -385,5 +385,19 @@ def _interactive():
     return " ".join(choice.split()[1:])
 
 
-def id(*args, **kwargs):
-    return identify(*args, **kwargs)
+def get_citation_from_mpc(name):
+    """Query asteroid information from MPC and extract citation from HTML response."""
+
+    URL = f"https://minorplanetcenter.net/db_search/show_object?object_id={urllib.parse.quote_plus(str(name))}"
+
+    soup = BeautifulSoup(requests.get(URL).text, "html.parser")
+
+    citation = soup.find("div", {"id": "citation"})
+
+    if citation is None:
+        return None
+
+    # Extract citation and do minor formatting
+    citation = citation.find("br").next_sibling.next_sibling
+    citation = citation.split("[")[0].strip().replace("  ", " ")
+    return citation

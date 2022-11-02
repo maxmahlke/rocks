@@ -12,206 +12,6 @@ from rich.table import Table
 
 import rocks
 
-
-# ------
-# Definitions
-CATALOGUES = {
-    # the catalogues as defined by rocks
-    # rocks name :
-    #     attr_name : Rock.xyz
-    #     ssodnet_name : Name of catalogue in SsODNet
-    "albedos": {
-        "attr_name": "diamalbedo",
-        "ssodnet_name": "diamalbedo",
-        "print_columns": [
-            "albedo",
-            "err_albedo_up",
-            "diameter",
-            "err_albedo_down",
-            "err_diameter_up",
-            "err_diameter_down",
-            "method",
-            # "bibcode",
-            "shortbib",
-        ],
-    },
-    "astdys": {
-        "attr_name": "astdys",
-        "ssodnet_name": "astdys",
-        "print_columns": [
-            "H",
-            "ProperSemimajorAxis",
-            "ProperEccentricity",
-            "ProperInclination",
-            "ProperSinI",
-            "n",
-            "s",
-            "LCE",
-        ],
-    },
-    "astorb": {
-        "attr_name": "astorb",
-        "ssodnet_name": "astorb",
-        "print_columns": [
-            "H",
-            "G",
-            "B_V",
-            "IRAS_diameter",
-            "IRAS_class",
-            "semi_major_axis",
-            "eccentricity",
-            "inclination",
-        ],
-    },
-    "binarymp": {
-        "attr_name": "binaries",
-        "ssodnet_name": "binarymp",
-        "print_columns": [
-            "system_type",
-            "system_name",
-            "period",
-            "a",
-            "alpha",
-            "shortbib",
-        ],
-    },
-    "colors": {
-        "attr_name": "colors",
-        "ssodnet_name": "colors",
-        "print_columns": ["color", "value", "uncertainty", "phot_sys"],
-    },
-    "diamalbedo": {
-        "attr_name": "diamalbedo",
-        "ssodnet_name": "diamalbedo",
-        "print_columns": [
-            "albedo",
-            "err_albedo_up",
-            "err_albedo_down",
-            "diameter",
-            "err_diameter_up",
-            "err_diameter_down",
-            "method",
-            "bibcode",
-        ],
-    },
-    "diameters": {
-        "attr_name": "diamalbedo",
-        "ssodnet_name": "diamalbedo",
-        "print_columns": [
-            "albedo",
-            "err_albedo_up",
-            "err_albedo_down",
-            "diameter",
-            "err_diameter_up",
-            "err_diameter_down",
-            "method",
-            "bibcode",
-        ],
-    },
-    "families": {
-        "attr_name": "families",
-        "ssodnet_name": "families",
-        "print_columns": [
-            "family_number",
-            "family_name",
-            "family_status",
-            "membership",
-        ],
-    },
-    "masses": {
-        "attr_name": "masses",
-        "ssodnet_name": "masses",
-        "print_columns": ["mass", "err_mass_up", "err_mass_down", "method", "shortbib"],
-    },
-    "mpcatobs": {
-        "attr_name": "mpcatobs",
-        "ssodnet_name": "mpcatobs",
-        "print_columns": [
-            "packed_name",
-            "discovery",
-            "date_obs",
-            "ra_obs",
-            "dec_obs",
-            "mag",
-            "filter_",
-            "iau_code",
-        ],
-    },
-    "mpcorb": {
-        "attr_name": "mpcorb",
-        "ssodnet_name": "mpcorb",
-        "print_columns": [
-            "H",
-            "G",
-            "semi_major_axis",
-            "eccentricity",
-            "inclination",
-            "orbital_arc",
-        ],
-    },
-    "pairs": {
-        "attr_name": "pairs",
-        "ssodnet_name": "pairs",
-        "print_columns": ["sibling_number", "sibling_name", "delta_v", "membership"],
-    },
-    "phase_functions": {
-        "attr_name": "phase_functions",
-        "ssodnet_name": "phase_function",
-        "print_columns": [
-            "name_filter",
-            "H",
-            "G1",
-            "G2",
-            "phase_min",
-            "phase_max",
-            "shortbib",
-        ],
-    },
-    "spins": {
-        "attr_name": "spins",
-        "ssodnet_name": "spin",
-        "print_columns": ["period", "long_", "lat", "RA0", "DEC0", "Wp", "shortbib"],
-    },
-    "taxonomies": {
-        "attr_name": "taxonomies",
-        "ssodnet_name": "taxonomy",
-        "print_columns": [
-            "class_",
-            "complex",
-            "method",
-            "waverange",
-            "scheme",
-            "shortbib",
-        ],
-    },
-    "thermal_inertias": {
-        "attr_name": "thermal_inertias",
-        "ssodnet_name": "thermal_inertia",
-        "print_columns": [
-            "TI",
-            "err_TI_up",
-            "err_TI_down",
-            "dsun",
-            "method",
-            "shortbib",
-        ],
-    },
-    "yarkovskys": {
-        "attr_name": "yarkovskys",
-        "ssodnet_name": "yarkovsky",
-        "print_columns": [
-            "A2",
-            "err_A2",
-            "dadt",
-            "err_dadt",
-            "S",
-            "snr",
-            "method",
-            "shortbib",
-        ],
-    },
-}
-
 # ------
 # Pretty-printing
 def pretty_print(rock, catalogue, parameter):
@@ -1058,3 +858,78 @@ class Shape(Collection):
     radius_b: List[float] = [np.nan]
     radius_c: List[float] = [np.nan]
     selected: List[int] = [None]
+
+
+def weighted_average(catalogue, parameter):
+    """Computes weighted average of observable.
+
+    Parameters
+    ----------
+    observable : np.ndarray
+        Float values of observable
+    error : np.ndarray
+        Corresponding errors of observable.
+
+    Returns
+    -------
+    float
+        The weighted average.
+
+    float
+        The standard error of the weighted average.
+    """
+    catalogue = catalogue[catalogue[parameter] != 0]
+
+    values = catalogue[parameter]
+
+    if parameter in ["albedo", "diameter"]:
+        preferred = catalogue[f"preferred_{parameter}"]
+
+        if not any(preferred):
+            preferred = ~preferred
+
+        errors = catalogue[f"err_{parameter}_up"]
+    else:
+        preferred = catalogue["preferred"]
+        errors = catalogue[f"err_{parameter}"]
+
+    observable = np.array(values)[preferred]
+    error = np.array(errors)[preferred]
+
+    if all(np.isnan(value) for value in values) or all(
+        np.isnan(error) for error in errors
+    ):
+        warnings.warn(
+            f"{catalogue.name[0]}: The values or errors of property '{parameter}' are all NaN. Average failed."
+        )
+        return np.nan, np.nan
+
+    # If no data was passed (happens when no preferred entry in table)
+    if not observable.size:
+        return (np.nan, np.nan)
+
+    if len(observable) == 1:
+        return (observable[0], error[0])
+
+    if any(e == 0 for e in error):
+        weights = np.ones(observable.shape)
+        warnings.warn("Encountered zero in errors array. Setting all weights to 1.")
+    else:
+        # Compute normalized weights
+        weights = 1 / np.array(error) ** 2
+
+    # Compute weighted average and uncertainty
+    avg = np.average(observable, weights=weights)
+
+    # Kirchner Case II
+    # http://seismo.berkeley.edu/~kirchner/Toolkits/Toolkit_12.pdf
+    var_avg = (
+        len(observable)
+        / (len(observable) - 1)
+        * (
+            sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights)
+            - avg**2
+        )
+    )
+    std_avg = np.sqrt(var_avg / len(observable))
+    return avg, std_avg

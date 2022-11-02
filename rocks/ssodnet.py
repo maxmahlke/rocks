@@ -9,10 +9,9 @@ import aiohttp
 import json
 import numpy as np
 import pandas as pd
-from pydantic.utils import deep_update
 from rich.progress import Progress
 
-import rocks
+from rocks import cache
 
 
 def get_ssocard(id_ssodnet, progress=False, local=True):
@@ -88,7 +87,7 @@ async def _get_ssocard(id_ssodnet, progress_bar, progress, local):
 async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CARD = rocks.PATH_CACHE / f"{id_ssodnet}.json"
+    PATH_CARD = cache.PATH / f"{id_ssodnet}.json"
 
     if PATH_CARD.is_file() and local:
         with open(PATH_CARD, "r") as file_card:
@@ -307,7 +306,7 @@ async def _local_or_remote_catalogue(
 ):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CATALOGUE = rocks.PATH_CACHE / f"{id_ssodnet}_{catalogue}.json"
+    PATH_CATALOGUE = cache.PATH / f"{id_ssodnet}_{catalogue}.json"
 
     if PATH_CATALOGUE.is_file() and local:
         with open(PATH_CATALOGUE, "r") as file_card:
@@ -340,7 +339,7 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
     """Query quaero and parse result for a single object.
 
     Parameters
-    ==========
+    ----------
     id_ssodnet : str
         Asteroid ID from SsODNet.
     catalogue : str
@@ -349,7 +348,7 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
         asyncio session
 
     Returns
-    =======
+    -------
     dict
         SsODNet response as dict if successful. Empty if query failed.
     """

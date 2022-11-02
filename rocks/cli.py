@@ -15,8 +15,21 @@ import numpy as np
 import rich
 from rich import prompt
 from rich.console import Console
+from rich import traceback
 
-import rocks
+# pretty-print tracebacks with rich
+traceback.install()
+
+from rocks import core
+from rocks import cache
+from rocks import datacloud
+from rocks import definitions
+from rocks import index
+from rocks import resolve
+from rocks import Rock
+from rocks import rocks
+from rocks import ssodnet
+from rocks import __version__
 
 
 class AliasedGroup(click.Group):
@@ -49,7 +62,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(cls=AliasedGroup)
-@click.version_option(version=rocks.__version__, message="%(version)s")
+@click.version_option(version=__version__, message="%(version)s")
 def cli_rocks():
     """CLI for minor body exploration."""
     pass
@@ -65,8 +78,7 @@ def docs():
 @click.argument("name", nargs=1)
 def author(name):
     """Check presence of peer-rievewed article based on first-author name."""
-
-    rocks.utils.check_datasets(name)
+    metadata.find_author(name)
 
 
 @cli_rocks.command()
@@ -75,16 +87,16 @@ def id(id_):
     """Resolve the asteroid name and number from string input."""
 
     if not id_:
-        id_ = rocks.resolve._interactive()
+        id_ = resolve._interactive()
     else:
         id_ = id_[0]
 
-    name, number = rocks.identify(id_)  # type: ignore
+    name, number = resolve.identify(id_)  # type: ignore
 
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
     else:
-        rocks.utils.list_candidate_ssos(id_)
+        utils.list_candidate_ssos(id_)
 
 
 @cli_rocks.command()
@@ -93,16 +105,16 @@ def info(id_):
     """Print the ssoCard of an asteroid."""
 
     if not id_:
-        id_ = rocks.resolve._interactive()
+        id_ = resolve._interactive()
     else:
         id_ = id_[0]
 
-    _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
+    _, _, id_ = resolve.identify(id_, return_id=True)  # type: ignore
 
     if not isinstance(id_, str):
         sys.exit()
 
-    ssoCard = rocks.ssodnet.get_ssocard(id_)
+    ssoCard = ssodnet.get_ssocard(id_)
     rich.print(ssoCard)
 
 
@@ -110,10 +122,10 @@ def info(id_):
 def parameters():
     """Print the ssoCard structure and its description."""
 
-    if not rocks.PATH_MAPPING.is_file():
-        rocks.utils.retrieve_metadata("mappings")
+    if not metadata.PATH.is_file():
+        utils.retrieve_metadata("mappings")
 
-    with open(rocks.PATH_MAPPING, "r") as file_:
+    with open(metadata.PATH, "r") as file_:
         DESC = json.load(file_)
 
     rich.print(DESC)
@@ -125,37 +137,40 @@ def ids(id_):
     """Echo the aliases of an asteroid."""
 
     if not id_:
-        id_ = rocks.resolve._interactive()
+        id_ = resolve._interactive()
     else:
         id_ = id_[0]
 
-    name, number, ssodnetid = rocks.identify(id_, return_id=True)  # type: ignore
+    name, number, ssodnetid = identify(id_, return_id=True)  # type: ignore
 
     if name is None:
         sys.exit()
 
-    aliases = rocks.index.get_aliases(ssodnetid)
+    aliases = index.get_aliases(ssodnetid)
 
     rich.print(f"({number}) {name}, aka \n {aliases}")
 
 
 @cli_rocks.command()
-def status():
+@click.option(
+    "--clear",
+    "-c",
+    help="Don't ask, clear cached cards and update index.",
+    is_flag=True,
+)
+@click.option(
+    "--update", "-u", help="Don't ask, update cached cards and index.", is_flag=True
+)
+def status(clear, update):
     """Echo the status of the ssoCards and datacloud catalogues."""
 
     # ------
     # Echo inventory
+    cached_cards, cached_catalogues = cache.take_inventory()
+    date_index = index.get_modification_date()
 
-    # Get set of ssoCards and datacloud catalogues in cache
-    cached_cards, cached_catalogues = rocks.utils.cache_inventory()
-
-    # Get the modification date of the index
-    date_index = (rocks.PATH_INDEX / "1.pkl").stat().st_mtime
-    date_index = time.strftime("%d %b %Y", time.localtime(date_index))
-
-    # Print the findings
     rich.print(
-        f"""\nContents of {rocks.PATH_CACHE}:
+        f"""\nContents of {cache.PATH}:
 
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
@@ -164,17 +179,17 @@ def status():
 
     # ------
     # Echo update recommendations
-    latest_rocks = rocks.utils.retrieve_rocks_version()
+    rich.print("Checking if rocks is up-to-date..", end="")
 
-    if latest_rocks and tuple(map(int, latest_rocks.split("."))) > tuple(
-        map(int, rocks.__version__.split("."))
-    ):
+    if metadata.rocks_is_outdated():
         rich.print(
-            f"[red]The running [green]rocks[/green] version ({rocks.__version__}) is behind the "
+            f"\n[red]The running [green]rocks[/green] version ({__version__}) is behind the "
             f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]\n"
+            f"You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
         )
+    else:
         rich.print(
-            "You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
+            f"[green] the latest version ({__version__}) is installed.[/green]\n"
         )
 
     # Update or clear
@@ -192,32 +207,24 @@ def status():
 
         if decision == "1":
             rich.print("\nClearing the cached ssoCards and datacloud catalogues..")
-            rocks.utils.clear_cache()
+            cache.clear()
 
         elif decision == "2":
 
             # Update metadata
-            rocks.utils.retrieve_metadata("mappings")
-
-            # Update the cached data
-            ids = [ssodnet_id for ssodnet_id in cached_cards]
-
-            # Ensure that the IDs are current
-            rich.print("\n(1/3) Verifying the ID of the cached ssoCards..")
-            rocks.utils.confirm_identity(ids)
+            metadata.retrieve("mappings")
 
             # Update ssoCards
-            rich.print("\n(2/3) Updating the cached ssoCards..")
-            rocks.ssodnet.get_ssocard(ids, progress=True, local=False)
+            rich.print("\n(1/2) Updating the cached ssoCards..")
+            cache.update_cards(cached_cards)
 
-            # ------
             # Update datacloud catalogues
-            rich.print("\n(3/3) Updating the cached datacloud catalogues..")
-            rocks.utils.update_datacloud_catalogues(cached_catalogues)
+            rich.print("\n(2/2) Updating the cached datacloud catalogues..")
+            cache.update_catalogues(cached_catalogues)
 
         elif decision == "3":
             with Console().status("Observing all asteroids.. [~11GB]", spinner="earth"):
-                rocks.utils.cache_all_ssocards()
+                cache.retrieve_all_ssocards()
 
     # ------
     # Update asteroid name-number index
@@ -232,7 +239,7 @@ def status():
 
     if response == "1":
         click.echo()
-        rocks.index._build_index()
+        index._build_index()
 
 
 @cli_rocks.command()
@@ -241,11 +248,11 @@ def who(id_):
     """Get name citation of asteroid from MPC."""
 
     if not id_:
-        id_ = rocks.resolve._interactive()
+        id_ = resolve._interactive()
     else:
         id_ = id_[0]
 
-    name, number = rocks.identify(id_)
+    name, number = identify(id_)
 
     if name is None:
         sys.exit()
@@ -255,7 +262,7 @@ def who(id_):
     else:
         id_ = name
 
-    citation = rocks.utils.get_citation_from_mpc(id_)
+    citation = utils.get_citation_from_mpc(id_)
 
     if citation is None:
         rich.print(f"({number}) {name} has no citation attached to its name.")
@@ -318,28 +325,28 @@ def echo():
     ]
 
     # Check what datacloud properties we need
-    datacloud = [
+    catalogues = [
         p.split(".")[0]
         for p in parameter
-        if p.split(".")[0] in rocks.datacloud.CATALOGUES.keys()
+        if p.split(".")[0] in definitions.DATACLOUD.keys()
     ]
 
     # And let's go
-    rock = rocks.Rock(id_, datacloud=datacloud, suppress_errors=not verbose)
+    rock = Rock(id_, datacloud=catalogues, suppress_errors=not verbose)
 
     # Identifier could not be resolved
     if not rock.id_:
-        rocks.utils.list_candidate_ssos(id_)
+        index.list_candidate_ssos(id_)
         sys.exit()
 
     # Pretty-print the paramter
     for param in parameter:
-        if param in datacloud:
-            rocks.datacloud.pretty_print(rock, rocks.utils.rgetattr(rock, param), param)
+        if param in catalogues:
+            datacloud.pretty_print(rock, utils.rgetattr(rock, param), param)
         else:
-            value = rocks.utils.rgetattr(rock, param)
+            value = core.rgetattr(rock, param)
 
-            if isinstance(value, rocks.core.ListWithAttributes):
+            if isinstance(value, core.ListWithAttributes):
                 # if verbose:
                 #     for entry in value:
                 #         rich.print_json(entry.json(), sort_keys=True)
@@ -362,7 +369,7 @@ def echo():
                 )
                 sys.exit()
 
-            rocks.utils.rgetattr(rock, param).plot(param)
+            utils.rgetattr(rock, param).plot(param)
 
     # Avoid error message from click
     sys.exit()

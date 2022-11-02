@@ -1,5 +1,6 @@
-#!/usr/bin/env python
 """Implement the Rock class and other core rocks functionality."""
+
+from functools import reduce
 import datetime as dt
 import keyword
 from typing import List, Generator
@@ -10,58 +11,15 @@ import pandas as pd
 import pydantic
 import rich
 
-import rocks
+from rocks import definitions
+from rocks import datacloud
+from rocks import metadata
+from rocks import resolve
+from rocks import ssodnet
 
 
 # ------
 # ssoCard as pydantic model
-ALIASES = {
-    "dynamical": {
-        "parameters.dynamical.orbital_elements": "orbital_elements",
-        "parameters.dynamical.family": "family",
-        "parameters.dynamical.pair": "pair",
-        "parameters.dynamical.proper_elements": "proper_elements",
-        "parameters.dynamical.tisserand_parameter": "tisserand_parameter",
-        "parameters.dynamical.yarkovsky": "yarkovsky",
-    },
-    "physical": {
-        "D": "diameter",
-        "H": "absolute_magnitude",
-        "parameters.physical.absolute_magnitude": "absolute_magnitude",
-        "parameters.physical.albedo": "albedo",
-        "parameters.physical.colors": "color",
-        "parameters.physical.diameter": "diameter",
-        "parameters.physical.density": "density",
-        "parameters.physical.mass": "mass",
-        "parameters.physical.phase_function": "phase_function",
-        "parameters.physical.spin": "spin",
-        "parameters.physical.taxonomy": "taxonomy",
-        "parameters.physical.thermal_inertia": "thermal_inertia",
-    },
-    "eq_state_vector": {
-        "parameters.eq_state_vector.ref_epoch": "ref_epoch",
-        "parameters.eq_state_vector.position": "position",
-        "parameters.eq_state_vector.velocity": "velocity",
-    },
-    "orbital_elements": {
-        "a": "semi_major_axis",
-        "e": "eccentricity",
-        "i": "inclination",
-        "P": "orbital_period",
-    },
-    "proper_elements": {
-        "ap": "proper_semi_major_axis",
-        "ep": "proper_eccentricity",
-        "ip": "proper_inclination",
-        "sinip": "proper_sine_inclination",
-    },
-    "diamalbedo": ["albedos", "diameters"],
-    "phase_function": {
-        "V": "generic_johnson_V",
-        "cyan": "misc_atlas_cyan",
-        "orange": "misc_atlas_orange",
-    },
-}
 
 
 def add_paths(cls, values, parent):
@@ -106,7 +64,7 @@ class Parameter(pydantic.BaseModel):
 
     @label.getter
     def label(self):
-        label = rocks.utils.load_mappings()[self.path]["label"]
+        label = metadata.load_mappings()[self.path]["label"]
         return label
 
     @property
@@ -115,8 +73,8 @@ class Parameter(pydantic.BaseModel):
 
     @symbol.getter
     def symbol(self):
-        if "symbol" in rocks.utils.load_mappings()[self.path]:
-            return rocks.utils.load_mappings()[self.path]["symbol"]
+        if "symbol" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["symbol"]
         return ""
 
     @property
@@ -125,8 +83,8 @@ class Parameter(pydantic.BaseModel):
 
     @format.getter
     def format(self):
-        if "format" in rocks.utils.load_mappings()[self.path]:
-            return rocks.utils.load_mappings()[self.path]["format"]
+        if "format" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["format"]
         return ""
 
     @property
@@ -135,8 +93,8 @@ class Parameter(pydantic.BaseModel):
 
     @description.getter
     def description(self):
-        if "description" in rocks.utils.load_mappings()[self.path]:
-            return rocks.utils.load_mappings()[self.path]["description"]
+        if "description" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["description"]
         return ""
 
 
@@ -167,8 +125,8 @@ class FloatValue(Parameter):
 
     @unit.getter
     def unit(self):
-        if "unit" in rocks.utils.load_mappings()[self.path]:
-            return rocks.utils.load_mappings()[self.path]["unit"]
+        if "unit" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["unit"]
         return ""
 
     @pydantic.root_validator(pre=True)
@@ -200,7 +158,7 @@ class IntegerValue(Parameter):
 
     @unit.getter
     def unit(self):
-        unit = rocks.utils.load_mappings()[self.path]["unit"]
+        unit = metadata.load_mappings()[self.path]["unit"]
         return unit
 
 
@@ -590,8 +548,8 @@ class PhaseFunction(Parameter):
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
-        if name in ALIASES["phase_function"].keys():
-            return getattr(self, ALIASES["phase_function"][name])
+        if name in definitions.ALIASES["phase_function"].keys():
+            return getattr(self, definitions.ALIASES["phase_function"][name])
         raise AttributeError
 
     def __bool__(self):
@@ -776,29 +734,23 @@ class Rock(pydantic.BaseModel):
     ssocard: Ssocard = Ssocard(**{})
 
     # the catalogues
-    astorb: rocks.datacloud.Astorb = rocks.datacloud.Astorb(**{})
-    binaries: rocks.datacloud.Binarymp = rocks.datacloud.Binarymp(**{})
-    colors: rocks.datacloud.Colors = rocks.datacloud.Colors(**{})
-    densities: rocks.datacloud.Density = rocks.datacloud.Density(**{})
-    diamalbedo: rocks.datacloud.Diamalbedo = rocks.datacloud.Diamalbedo(**{})
-    families: rocks.datacloud.Families = rocks.datacloud.Families(**{})
-    masses: rocks.datacloud.Masses = rocks.datacloud.Masses(**{})
-    mpcatobs: rocks.datacloud.Mpcatobs = rocks.datacloud.Mpcatobs(**{})
-    mpcorb: rocks.datacloud.Mpcorb = rocks.datacloud.Mpcorb(**{})
-    pairs: rocks.datacloud.Pairs = rocks.datacloud.Pairs(**{})
-    proper_elements_: rocks.datacloud.Proper_elements = rocks.datacloud.Proper_elements(
-        **{}
-    )
-    phase_functions: rocks.datacloud.Phase_function = rocks.datacloud.Phase_function(
-        **{}
-    )
-    taxonomies: rocks.datacloud.Taxonomies = rocks.datacloud.Taxonomies(**{})
-    thermal_inertias: rocks.datacloud.Thermal_inertia = rocks.datacloud.Thermal_inertia(
-        **{}
-    )
-    shapes: rocks.datacloud.Shape = rocks.datacloud.Shape(**{})
-    spins: rocks.datacloud.Spin = rocks.datacloud.Spin(**{})
-    yarkovskys: rocks.datacloud.Yarkovsky = rocks.datacloud.Yarkovsky(**{})
+    astorb: datacloud.Astorb = datacloud.Astorb(**{})
+    binaries: datacloud.Binarymp = datacloud.Binarymp(**{})
+    colors: datacloud.Colors = datacloud.Colors(**{})
+    densities: datacloud.Density = datacloud.Density(**{})
+    diamalbedo: datacloud.Diamalbedo = datacloud.Diamalbedo(**{})
+    families: datacloud.Families = datacloud.Families(**{})
+    masses: datacloud.Masses = datacloud.Masses(**{})
+    mpcatobs: datacloud.Mpcatobs = datacloud.Mpcatobs(**{})
+    mpcorb: datacloud.Mpcorb = datacloud.Mpcorb(**{})
+    pairs: datacloud.Pairs = datacloud.Pairs(**{})
+    proper_elements_: datacloud.Proper_elements = datacloud.Proper_elements(**{})
+    phase_functions: datacloud.Phase_function = datacloud.Phase_function(**{})
+    taxonomies: datacloud.Taxonomies = datacloud.Taxonomies(**{})
+    thermal_inertias: datacloud.Thermal_inertia = datacloud.Thermal_inertia(**{})
+    shapes: datacloud.Shape = datacloud.Shape(**{})
+    spins: datacloud.Spin = datacloud.Spin(**{})
+    yarkovskys: datacloud.Yarkovsky = datacloud.Yarkovsky(**{})
 
     def __init__(
         self,
@@ -855,12 +807,12 @@ class Rock(pydantic.BaseModel):
         id_provided = id_
 
         if not skip_id_check:
-            _, _, id_ = rocks.identify(id_, return_id=True)  # type: ignore
+            _, _, id_ = resolve.identify(id_, return_id=True)  # type: ignore
 
         # Get ssoCard and datcloud catalogues
         if not pd.isnull(id_):
             if ssocard is None:
-                ssocard = rocks.ssodnet.get_ssocard(id_)
+                ssocard = ssodnet.get_ssocard(id_)
 
             if ssocard is None:
                 # Asteroid does not have an ssoCard
@@ -933,7 +885,7 @@ class Rock(pydantic.BaseModel):
                     catalogue = "diamalbedo"
 
                 try:
-                    catalogue_instance = rocks.datacloud.DataCloudDataFrame(
+                    catalogue_instance = datacloud.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
                     )
 
@@ -952,7 +904,7 @@ class Rock(pydantic.BaseModel):
                         delattr(getattr(self, catalogue), attribute)
 
                     # Let's try this again
-                    catalogue_instance = rocks.datacloud.DataCloudDataFrame(
+                    catalogue_instance = datacloud.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
                     )
 
@@ -966,36 +918,36 @@ class Rock(pydantic.BaseModel):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
         # These are shortcuts
-        if name in ALIASES["physical"].values():
+        if name in definitions.ALIASES["physical"].values():
             return getattr(self.parameters.physical, name)
 
-        if name in ALIASES["dynamical"].values():
+        if name in definitions.ALIASES["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
 
-        if name in ALIASES["eq_state_vector"].values():
+        if name in definitions.ALIASES["eq_state_vector"].values():
             return getattr(self.parameters.eq_state_vector, name)
 
         # TODO This could be coded in a more abstract way
         # These are proper aliases
-        if name in ALIASES["orbital_elements"].keys():
+        if name in definitions.ALIASES["orbital_elements"].keys():
             return getattr(
                 self.parameters.dynamical.orbital_elements,
-                ALIASES["orbital_elements"][name],
+                definitions.ALIASES["orbital_elements"][name],
             )
 
-        if name in ALIASES["proper_elements"].keys():
+        if name in definitions.ALIASES["proper_elements"].keys():
             return getattr(
                 self.parameters.dynamical.proper_elements,
-                ALIASES["proper_elements"][name],
+                definitions.ALIASES["proper_elements"][name],
             )
 
-        if name in ALIASES["physical"].keys():
+        if name in definitions.ALIASES["physical"].keys():
             return getattr(
                 self.parameters.physical,
-                ALIASES["physical"][name],
+                definitions.ALIASES["physical"][name],
             )
 
-        if name in ALIASES["diamalbedo"]:
+        if name in definitions.ALIASES["diamalbedo"]:
             return getattr(self, "diamalbedo")
 
         raise AttributeError(
@@ -1019,18 +971,18 @@ class Rock(pydantic.BaseModel):
         """Retrieve datacloud catalogue for asteroid and deserialize into
         pydantic model."""
 
-        if catalogue not in rocks.datacloud.CATALOGUES.keys():
+        if catalogue not in definitions.DATACLOUD.keys():
             raise ValueError(
                 f"Unknown datacloud catalogue name: '{catalogue}'"
-                f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
+                f"\nChoose from {definitions.DATACLOUD.keys()}"
             )
 
         # get the SsODNet catalogue and the Rock's attribute names
-        catalogue_attribute = rocks.datacloud.CATALOGUES[catalogue]["attr_name"]
-        catalogue_ssodnet = rocks.datacloud.CATALOGUES[catalogue]["ssodnet_name"]
+        catalogue_attribute = definitions.DATACLOUD[catalogue]["attr_name"]
+        catalogue_ssodnet = definitions.DATACLOUD[catalogue]["ssodnet_name"]
 
         # retrieve the catalogue
-        cat = rocks.ssodnet.get_datacloud_catalogue(id_, catalogue_ssodnet)
+        cat = ssodnet.get_datacloud_catalogue(id_, catalogue_ssodnet)
 
         if cat is None or not cat:
             return data
@@ -1105,12 +1057,10 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
         ids = [resolve.identify(ids, return_id=True, progress=progress)[-1]]
 
     else:
-        _, _, ids = zip(*rocks.identify(ids, return_id=True, progress=progress))
+        _, _, ids = zip(*resolve.identify(ids, return_id=True, progress=progress))
 
     # Load ssoCards asynchronously
-    rocks.ssodnet.get_ssocard(
-        [id_ for id_ in ids if not id_ is None], progress=progress
-    )
+    ssodnet.get_ssocard([id_ for id_ in ids if not id_ is None], progress=progress)
 
     if datacloud is not None:
 
@@ -1120,13 +1070,13 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
         # Load datacloud catalogues asynchronously
         for cat in datacloud:
 
-            if cat not in rocks.datacloud.CATALOGUES.keys():
+            if cat not in definitions.DATACLOUD.keys():
                 raise ValueError(
                     f"Unknown datacloud catalogue name: '{cat}'"
-                    f"\nChoose from {rocks.datacloud.CATALOGUES.keys()}"
+                    f"\nChoose from {definitions.DATACLOUD.keys()}"
                 )
 
-            rocks.ssodnet.get_datacloud_catalogue(
+            ssodnet.get_datacloud_catalogue(
                 [id_ for id_ in ids if not id_ is None], cat, progress=progress
             )
 
@@ -1143,3 +1093,14 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
     ]
 
     return rocks_
+
+
+# ------
+# ssoCard utility functions
+def rgetattr(obj, attr):
+    """Deep version of getattr. Retrieve nested attributes."""
+
+    def _getattr(obj, attr):
+        return getattr(obj, attr)
+
+    return reduce(_getattr, [obj] + attr.split("."))

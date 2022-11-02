@@ -1,19 +1,24 @@
-#!/usr/bin/env python
 """Asteroid name-number index functions for rocks."""
 
+from functools import lru_cache
 import pickle
 import pickletools
 import re
 import string
 import sys
 import typing
+import time
 
 import numpy as np
 import pandas as pd
 import rich
 from rich import progress
 
-import rocks
+from rocks import cache
+from rocks import __version__
+
+
+PATH = cache.PATH / "index"
 
 # ------
 # Building the index
@@ -250,7 +255,7 @@ def _write_to_cache(obj, filename):
         The output filename, relative to the index directory.
     """
 
-    with open(rocks.PATH_INDEX / filename, "wb") as file_:
+    with open(PATH / filename, "wb") as file_:
         obj_pickled = pickle.dumps(obj, protocol=4)
         file_.write(pickletools.optimize(obj_pickled))
 
@@ -296,8 +301,8 @@ def get_aliases(ssodnetid):
     return _load("aliases.pkl")[ssodnetid]
 
 
-def get_index_file(id_: typing.Union[int, str]) -> dict:
-    """Get absolute path to the index chunk where id_ is located.
+def _get_index_file(id_: typing.Union[int, str]) -> dict:
+    """Get part of the index where id_ is located.
 
     Parameters
     ----------
@@ -306,8 +311,8 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
 
     Returns
     -------
-    str
-        The absolute path to the index chunk.
+    dict
+        Part of the index.
     """
 
     # Is it numeric?
@@ -326,7 +331,7 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
         if id_[0] == "'":  # catch 'aylo'chaxnim
             which = f"{id_[0]}.pkl"
         else:
-            which = rocks.PATH_INDEX / f"{id_[0]}.pkl"
+            which = PATH / f"{id_[0]}.pkl"
 
     # Is it a designation?
     elif re.match(
@@ -343,20 +348,131 @@ def get_index_file(id_: typing.Union[int, str]) -> dict:
     # Should be in this one then
     else:
         which = "PLT.pkl"
-
-    if not which in rocks.INDEX:
-        rocks.INDEX[which] = _load(which)
-
-    return rocks.INDEX[which]
+    return _load(which)
 
 
+@lru_cache(None)
 def _load(which):
     """Load a pickled index file."""
-    if not (rocks.PATH_INDEX / which).exists():
+    if not (PATH / which).exists():
         rich.print(
             "The asteroid name-number index is malformed. Run '$ rocks status' to update it."
         )
         sys.exit()
 
-    with open(rocks.PATH_INDEX / which, "rb") as file_:
+    with open(PATH / which, "rb") as file_:
         return pickle.load(file_)
+
+
+def get_modification_date():
+    """Get modification date of index pickle files."""
+    date_index = (PATH / "1.pkl").stat().st_mtime
+    return time.strftime("%d %b %Y", time.localtime(date_index))
+
+
+def find_candidates(id_):
+    """Identify possible matches among all asteroid names based on Levenshtein distance.
+
+    Parameters
+    ----------
+    id_ : str
+        The user-provided asteroid identifier.
+
+    Returns
+    -------
+    list of tuple
+        The name-number pairs of possible matches.
+
+    Notes
+    -----
+    The matches are found using the Levenshtein distance metric.
+    """
+
+    # Get list of named asteroids
+    index_ = {}
+
+    for char in string.ascii_lowercase:
+        idx = get_index_file(char)
+        index_ = {**index_, **idx}
+
+    # Use Levenshtein distance to identify potential matches
+    candidates = []
+    max_distance = 1  # found by trial and error
+    id_ = resolve._reduce_id_for_local(id_)
+
+    for name in index_.keys():
+        distance = lev.distance(id_, name)
+
+        if distance <= max_distance:
+            candidates.append(index_[name][:-1])
+
+    # Sort by number
+    candidates = sorted(candidates, key=lambda x: x[1])
+    return candidates
+
+
+def list_candidate_ssos(id_):
+    """Propose matches for failed id queries based on Levenshtein distance if the passed identifier is a name.
+
+    Parameters
+    ----------
+    id_ : str
+        The passed asteroid identifier.
+
+    Note
+    ----
+    The proposed matches are printed to stdout.
+    """
+
+    # This only makes sense for named asteroids
+    if not re.match(r"^[A-Za-z ]*$", id_):
+        return
+
+    candidates = find_candidates(id_)
+
+    if candidates:
+        rich.print(
+            f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
+            f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
+        )
+
+        for name, number in candidates:
+            rich.print(f"{f'({number})':>8} {name}")
+
+
+def _ensure_index_exists():
+    """Ensure that the local index exists. Else, retrieve it."""
+
+    GREETING = rf"""
+                    _
+                   | |
+     _ __ ___   ___| | _____
+    | '__/ _ \ / __| |/ / __|
+    | | | (_) | (__|   <\__ \
+    |_|  \___/ \___|_|\_\___/
+
+    version: {__version__}
+    cache:   {cache.PATH}
+
+    It looks like this is the first time you run [green]rocks[/green].
+    Some metadata is required to be present in the cache directory.
+    [green]rocks[/green] will download it now.
+    """
+
+    if not PATH.is_dir():
+
+        # Cache directory is missing: first time running rocks
+        if not cache.PATH.is_dir():
+
+            rich.print(GREETING)
+            cache.PATH.mkdir(parents=True)
+
+        # Cache exists but index is missing
+        else:
+            rich.print(
+                "Could not find the local asteroid name-number index. Downloading it now..."
+            )
+
+        _build_index()
+
+        rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
