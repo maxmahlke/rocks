@@ -9,6 +9,7 @@ import sys
 import typing
 import time
 
+import Levenshtein as lev
 import numpy as np
 import pandas as pd
 import rich

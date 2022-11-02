@@ -387,6 +387,8 @@ def _interactive():
 
 def get_citation_from_mpc(name):
     """Query asteroid information from MPC and extract citation from HTML response."""
+    from bs4 import BeautifulSoup
+    import urllib
 
     URL = f"https://minorplanetcenter.net/db_search/show_object?object_id={urllib.parse.quote_plus(str(name))}"
 
