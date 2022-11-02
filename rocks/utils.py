@@ -9,8 +9,6 @@ import shutil
 import string
 import tarfile
 import urllib
-import warnings
-from functools import lru_cache
 
 import numpy as np
 import Levenshtein as lev
@@ -20,62 +18,6 @@ from rich.progress import track
 
 import rocks
 
-
-# ------
-# Simplify error messages
-def warning_on_one_line(message, category, filename, lineno, file=None, line=None):
-    if "rocks/" in filename:
-        return f"rocks: {message}\n"
-    else:
-        return f"{filename}:{lineno}: {category.__name__}: {message}\n"
-
-
-warnings.formatwarning = warning_on_one_line
-
-
-# ------
-# ssoCard utility functions
-def rgetattr(obj, attr):
-    """Deep version of getattr. Retrieve nested attributes."""
-
-    def _getattr(obj, attr):
-        return getattr(obj, attr)
-
-    return reduce(_getattr, [obj] + attr.split("."))
-
-
-def get_unit(path_parameter: str) -> str:
-    """Get unit from units JSON file.
-
-    Parameters
-    ----------
-    path_parameter : str
-        Path to the parameter in the mappings JSON tree.
-
-    Returns
-    -------
-    str
-        The unit of the requested parameter.
-    """
-    mappings = load_mappings()
-
-    if "unit" in mappings[path_parameter]:
-        unit = mappings[path_parameter]["unit"]
-    else:
-        unit = ""
-
-    return unit
-
-
-@lru_cache(maxsize=128)
-def load_mappings():
-    """Load SsODNet metadata mappings file from cache."""
-    if not rocks.PATH_MAPPING.is_file():
-        retrieve_metadata("mappings")
-
-    with open(rocks.PATH_MAPPING, "r") as file_:
-        rocks.MAPPINGS = json.load(file_)
-    return rocks.MAPPINGS
 
 
 # ------
