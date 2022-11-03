@@ -154,9 +154,7 @@ class IntegerValue(Parameter):
 
     @property
     def unit(self):
-        if "unit" in metadata.load_mappings()[self.path]:
-            return metadata.load_mappings()[self.path]["unit"]
-        return ""
+        return self._unit
 
     @unit.getter
     def unit(self):
@@ -304,7 +302,7 @@ class Family(Parameter):
     family_status: StringValue = StringValue(**{})
 
     def __str__(self):
-        if self.family_number is not None:
+        if self.family_number.value is not None:
             return f"({self.family_number}) {self.family_name}"
         else:
             return "No family membership known."
