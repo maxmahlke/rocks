@@ -160,8 +160,9 @@ class IntegerValue(Parameter):
 
     @unit.getter
     def unit(self):
-        unit = metadata.load_mappings()[self.path]["unit"]
-        return unit
+        if "unit" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["unit"]
+        return ""
 
 
 class StringValue(Parameter):
