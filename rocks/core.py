@@ -154,7 +154,9 @@ class IntegerValue(Parameter):
 
     @property
     def unit(self):
-        return self._unit
+        if "unit" in metadata.load_mappings()[self.path]:
+            return metadata.load_mappings()[self.path]["unit"]
+        return ""
 
     @unit.getter
     def unit(self):
