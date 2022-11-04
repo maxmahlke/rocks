@@ -102,3 +102,7 @@ regularly** (e.g. once a month) to ensure that the data is up-to-date:
    [0] No [1] Yes (1): 1
 
    Building index |---------------------------| 100%
+
+The command accepts two flags to skip the interactive prompts: the ``--clear`` or ``-c`` flag deletes
+the cached asteroid data but leaves the index in place. The ``--update`` or ``-u`` flag updates the cached
+asteroid data and updates the :term:`asteroid name-number index <Asteroid name-number index>`.
