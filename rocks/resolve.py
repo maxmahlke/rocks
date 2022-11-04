@@ -238,10 +238,13 @@ def _standardize_id_for_quaero(id_):
         except ValueError:
             pass
 
+        # Ensure that there is no suffix
+        id_ = id_.replace("_(Asteroid)", "")
+
         # Asteroid name
-        if re.match(r"^[A-Za-z ]*$", id_):
-            # guess correct capitalization
-            id_ = " ".join([sub.capitalize() for sub in id_.split(" ")])
+        if re.match(r"^[A-Za-z _]*$", id_):
+            # make case-independent
+            id_ = id_.lower()
 
         # Asteroid designation
         elif re.match(
