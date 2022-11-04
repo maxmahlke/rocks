@@ -6,21 +6,20 @@ from pathlib import Path
 import re
 
 import requests
+import rich
 
+from rocks import config
 from rocks import __version__
-
-PATH_MAPPINGS = Path.home() / ".cache/rocks/metadata_aster.json"
-PATH_AUTHORS = Path.home() / ".cache/rocks/ssodnet_biblio.json"
 
 
 @lru_cache(None)
 def load_mappings():
     """Load SsODNet metadata mappings file from cache."""
 
-    if not PATH_MAPPINGS.is_file():
+    if not config.PATH_MAPPINGS.is_file():
         retrieve("mappings")
 
-    with open(PATH_MAPPINGS, "r") as file_:
+    with open(config.PATH_MAPPINGS, "r") as file_:
         return json.load(file_)
 
 
@@ -53,7 +52,7 @@ def retrieve(which):
     if which == "mappings":
         metadata = metadata["display"]
 
-    PATH_OUT = PATH_AUTHORS if which == "authors" else PATH_MAPPINGS
+    PATH_OUT = config.PATH_AUTHORS if which == "authors" else config.PATH_MAPPINGS
 
     with open(PATH_OUT, "w") as file_:
         json.dump(metadata, file_)
@@ -64,11 +63,13 @@ def retrieve(which):
 def find_author(author):
     """Print dataset and publication matching 'author' as first-author name."""
 
-    if not PATH_AUTHORS.is_file():
-        retrieve_metadata("authors")
+    if not config.PATH_AUTHORS.is_file():
+        retrieve("authors")
 
-    with open(PATH_AUTHORS, "r") as file_:
+    with open(config.PATH_AUTHORS, "r") as file_:
         ssodnet_biblio = json.load(file_)
+
+    author_found = False
 
     for category, datasets in ssodnet_biblio["ssodnet_biblio"]["datasets"].items():
         for dataset in datasets:

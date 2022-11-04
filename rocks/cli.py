@@ -1,34 +1,22 @@
 #!/usr/bin/env python
 """rocks command line suite."""
 
-import json
-import keyword
+import re
 import sys
-import subprocess
 import shutil
-import textwrap
-import time
-import webbrowser
-
 import click
-import numpy as np
+
 import rich
-from rich import prompt
-from rich.console import Console
+
 from rich import traceback
 
 # pretty-print tracebacks with rich
 traceback.install()
 
-from rocks import core
-from rocks import cache
-from rocks import datacloud
-from rocks import definitions
+from rocks import config
 from rocks import index
+from rocks import metadata
 from rocks import resolve
-from rocks import Rock
-from rocks import rocks
-from rocks import ssodnet
 from rocks import __version__
 
 
@@ -65,12 +53,15 @@ class AliasedGroup(click.Group):
 @click.version_option(version=__version__, message="%(version)s")
 def cli_rocks():
     """CLI for minor body exploration."""
+    CLICKED = True
     pass
 
 
 @cli_rocks.command()
 def docs():
     """Open the rocks documentation in browser."""
+    import webbrowser
+
     webbrowser.open("https://rocks.readthedocs.io/en/latest/", new=2)
 
 
@@ -85,6 +76,7 @@ def author(name):
 @click.argument("id_", nargs=-1)
 def id(id_):
     """Resolve the asteroid name and number from string input."""
+    from rocks import resolve
 
     if not id_:
         id_ = resolve._interactive()
@@ -96,13 +88,14 @@ def id(id_):
     if isinstance(name, (str)):
         click.echo(f"({number}) {name}")
     else:
-        utils.list_candidate_ssos(id_)
+        list_candidate_ssos(id_)
 
 
 @cli_rocks.command()
 @click.argument("id_", nargs=-1)
 def info(id_):
     """Print the ssoCard of an asteroid."""
+    from rocks import ssodnet
 
     if not id_:
         id_ = resolve._interactive()
@@ -121,11 +114,12 @@ def info(id_):
 @cli_rocks.command()
 def parameters():
     """Print the ssoCard structure and its description."""
+    import json
 
-    if not metadata.PATH.is_file():
-        utils.retrieve_metadata("mappings")
+    if not config.PATH_MAPPINGS.is_file():
+        metadata.retrieve("mappings")
 
-    with open(metadata.PATH, "r") as file_:
+    with open(config.PATH_MAPPINGS, "r") as file_:
         DESC = json.load(file_)
 
     rich.print(DESC)
@@ -141,7 +135,7 @@ def ids(id_):
     else:
         id_ = id_[0]
 
-    name, number, ssodnetid = identify(id_, return_id=True)  # type: ignore
+    name, number, ssodnetid = resolve.identify(id_, return_id=True)  # type: ignore
 
     if name is None:
         sys.exit()
@@ -163,6 +157,9 @@ def ids(id_):
 )
 def status(clear, update):
     """Echo the status of the ssoCards and datacloud catalogues."""
+    from rich import prompt
+
+    from rocks import cache
 
     # ------
     # Echo inventory
@@ -170,7 +167,7 @@ def status(clear, update):
     date_index = index.get_modification_date()
 
     rich.print(
-        f"""\nContents of {cache.PATH}:
+        f"""\nContents of {config.PATH_CACHE}:
 
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
@@ -195,21 +192,25 @@ def status(clear, update):
     # Update or clear
     if cached_cards:
 
-        decision = prompt.Prompt.ask(
-            "Update or clear the cached ssoCards and datacloud catalogues?\n"
-            "[blue][0][/blue] Do nothing "
-            "[blue][1][/blue] Clear the cache "
-            "[blue][2][/blue] Update the data",
-            choices=["0", "1", "2", "3"],
-            show_choices=False,
-            default="1",
-        )
+        if not clear and not update:
 
-        if decision == "1":
+            decision = prompt.Prompt.ask(
+                "Update or clear the cached ssoCards and datacloud catalogues?\n"
+                "[blue][0][/blue] Do nothing "
+                "[blue][1][/blue] Clear the cache "
+                "[blue][2][/blue] Update the data",
+                choices=["0", "1", "2", "3"],
+                show_choices=False,
+                default="1",
+            )
+        else:
+            decision = "none"
+
+        if clear or decision == "1":
             rich.print("\nClearing the cached ssoCards and datacloud catalogues..")
             cache.clear()
 
-        elif decision == "2":
+        elif update or decision == "2":
 
             # Update metadata
             metadata.retrieve("mappings")
@@ -223,36 +224,44 @@ def status(clear, update):
             cache.update_catalogues(cached_catalogues)
 
         elif decision == "3":
+
+            from rich.console import Console
+
             with Console().status("Observing all asteroids.. [~11GB]", spinner="earth"):
                 cache.retrieve_all_ssocards()
 
     # ------
     # Update asteroid name-number index
-    response = prompt.Prompt.ask(
-        "\nUpdate the asteroid name-number index?\n"
-        "[blue][0][/blue] No "
-        "[blue][1][/blue] Yes",
-        choices=["0", "1"],
-        show_choices=False,
-        default="1",
-    )
+    if not clear and not update:
 
-    if response == "1":
-        click.echo()
-        index._build_index()
+        decision = prompt.Prompt.ask(
+            "\nUpdate the asteroid name-number index?\n"
+            "[blue][0][/blue] No "
+            "[blue][1][/blue] Yes",
+            choices=["0", "1"],
+            show_choices=False,
+            default="1",
+        )
+
+        if decision == "1":
+            click.echo()
+            index._build_index()
 
 
 @cli_rocks.command()
 @click.argument("id_", nargs=-1)
 def who(id_):
     """Get name citation of asteroid from MPC."""
+    import textwrap
+
+    import numpy as np
 
     if not id_:
         id_ = resolve._interactive()
     else:
         id_ = id_[0]
 
-    name, number = identify(id_)
+    name, number = resolve.identify(id_)
 
     if name is None:
         sys.exit()
@@ -262,7 +271,7 @@ def who(id_):
     else:
         id_ = name
 
-    citation = utils.get_citation_from_mpc(id_)
+    citation = resolve.get_citation_from_mpc(id_)
 
     if citation is None:
         rich.print(f"({number}) {name} has no citation attached to its name.")
@@ -282,6 +291,10 @@ def who(id_):
 
 def echo():
     """Echos asteroid parameter to command line. Optionally opens plot."""
+    import keyword
+
+    from rocks import core
+    from rocks import datacloud
 
     # Should we plot?
     for arg in ["-p", "--plot"]:
@@ -326,33 +339,25 @@ def echo():
 
     # Check what datacloud properties we need
     catalogues = [
-        p.split(".")[0]
-        for p in parameter
-        if p.split(".")[0] in definitions.DATACLOUD.keys()
+        p.split(".")[0] for p in parameter if p.split(".")[0] in config.DATACLOUD.keys()
     ]
 
     # And let's go
-    rock = Rock(id_, datacloud=catalogues, suppress_errors=not verbose)
+    rock = core.Rock(id_, datacloud=catalogues, suppress_errors=not verbose)
 
     # Identifier could not be resolved
     if not rock.id_:
-        index.list_candidate_ssos(id_)
+        list_candidate_ssos(id_)
         sys.exit()
 
     # Pretty-print the paramter
     for param in parameter:
         if param in catalogues:
-            datacloud.pretty_print(rock, utils.rgetattr(rock, param), param)
+            datacloud.pretty_print(rock, core.rgetattr(rock, param), param)
         else:
             value = core.rgetattr(rock, param)
 
             if isinstance(value, core.ListWithAttributes):
-                # if verbose:
-                #     for entry in value:
-                #         rich.print_json(entry.json(), sort_keys=True)
-                # else:
-                #     for entry in value:
-                #         rich.print(entry)
                 rich.print(value)
 
             else:
@@ -369,7 +374,7 @@ def echo():
                 )
                 sys.exit()
 
-            utils.rgetattr(rock, param).plot(param)
+            core.rgetattr(rock, param).plot(param)
 
     # Avoid error message from click
     sys.exit()
@@ -377,6 +382,7 @@ def echo():
 
 def _interactive(LINES):
     """Launch interactive selection using fzf."""
+    import subprocess
 
     PATH_EXECUTABLE = shutil.which("fzf")
 
@@ -412,3 +418,33 @@ def _interactive(LINES):
     except IndexError:  # no choice was made, c-c c-c
         sys.exit()
     return choice
+
+
+def list_candidate_ssos(id_):
+    """Propose matches for failed id queries based on Levenshtein distance if
+    the passed identifier is a name.
+
+    Parameters
+    ----------
+    id_ : str
+        The passed asteroid identifier.
+
+    Note
+    ----
+    The proposed matches are printed to stdout.
+    """
+
+    # This only makes sense for named asteroids
+    if not re.match(r"^[A-Za-z ]*$", id_):
+        return
+
+    candidates = index.find_candidates(id_)
+
+    if candidates:
+        rich.print(
+            f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
+            f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
+        )
+
+        for name, number in candidates:
+            rich.print(f"{f'({number})':>8} {name}")

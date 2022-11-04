@@ -1,5 +1,15 @@
 """Definitions concerning the ssoCard and datacloud representation in rocks."""
 
+from pathlib import Path
+
+
+PATH_CACHE = Path.home() / ".cache/rocks"
+
+PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
+PATH_INDEX = PATH_CACHE / "index"
+PATH_MAPPINGS = PATH_CACHE / "metadata_aster.json"
+
+
 # ------
 # ssoCard
 ALIASES = {

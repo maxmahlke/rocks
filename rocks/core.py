@@ -11,7 +11,7 @@ import pandas as pd
 import pydantic
 import rich
 
-from rocks import definitions
+from rocks import config
 from rocks import datacloud
 from rocks import metadata
 from rocks import resolve
@@ -549,8 +549,8 @@ class PhaseFunction(Parameter):
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
-        if name in definitions.ALIASES["phase_function"].keys():
-            return getattr(self, definitions.ALIASES["phase_function"][name])
+        if name in config.ALIASES["phase_function"].keys():
+            return getattr(self, config.ALIASES["phase_function"][name])
         raise AttributeError
 
     def __bool__(self):
@@ -919,36 +919,36 @@ class Rock(pydantic.BaseModel):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
         # These are shortcuts
-        if name in definitions.ALIASES["physical"].values():
+        if name in config.ALIASES["physical"].values():
             return getattr(self.parameters.physical, name)
 
-        if name in definitions.ALIASES["dynamical"].values():
+        if name in config.ALIASES["dynamical"].values():
             return getattr(self.parameters.dynamical, name)
 
-        if name in definitions.ALIASES["eq_state_vector"].values():
+        if name in config.ALIASES["eq_state_vector"].values():
             return getattr(self.parameters.eq_state_vector, name)
 
         # TODO This could be coded in a more abstract way
         # These are proper aliases
-        if name in definitions.ALIASES["orbital_elements"].keys():
+        if name in config.ALIASES["orbital_elements"].keys():
             return getattr(
                 self.parameters.dynamical.orbital_elements,
-                definitions.ALIASES["orbital_elements"][name],
+                config.ALIASES["orbital_elements"][name],
             )
 
-        if name in definitions.ALIASES["proper_elements"].keys():
+        if name in config.ALIASES["proper_elements"].keys():
             return getattr(
                 self.parameters.dynamical.proper_elements,
-                definitions.ALIASES["proper_elements"][name],
+                config.ALIASES["proper_elements"][name],
             )
 
-        if name in definitions.ALIASES["physical"].keys():
+        if name in config.ALIASES["physical"].keys():
             return getattr(
                 self.parameters.physical,
-                definitions.ALIASES["physical"][name],
+                config.ALIASES["physical"][name],
             )
 
-        if name in definitions.ALIASES["diamalbedo"]:
+        if name in config.ALIASES["diamalbedo"]:
             return getattr(self, "diamalbedo")
 
         raise AttributeError(
@@ -972,15 +972,15 @@ class Rock(pydantic.BaseModel):
         """Retrieve datacloud catalogue for asteroid and deserialize into
         pydantic model."""
 
-        if catalogue not in definitions.DATACLOUD.keys():
+        if catalogue not in config.DATACLOUD.keys():
             raise ValueError(
                 f"Unknown datacloud catalogue name: '{catalogue}'"
-                f"\nChoose from {definitions.DATACLOUD.keys()}"
+                f"\nChoose from {config.DATACLOUD.keys()}"
             )
 
         # get the SsODNet catalogue and the Rock's attribute names
-        catalogue_attribute = definitions.DATACLOUD[catalogue]["attr_name"]
-        catalogue_ssodnet = definitions.DATACLOUD[catalogue]["ssodnet_name"]
+        catalogue_attribute = config.DATACLOUD[catalogue]["attr_name"]
+        catalogue_ssodnet = config.DATACLOUD[catalogue]["ssodnet_name"]
 
         # retrieve the catalogue
         cat = ssodnet.get_datacloud_catalogue(id_, catalogue_ssodnet)
@@ -1071,10 +1071,10 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
         # Load datacloud catalogues asynchronously
         for cat in datacloud:
 
-            if cat not in definitions.DATACLOUD.keys():
+            if cat not in config.DATACLOUD.keys():
                 raise ValueError(
                     f"Unknown datacloud catalogue name: '{cat}'"
-                    f"\nChoose from {definitions.DATACLOUD.keys()}"
+                    f"\nChoose from {config.DATACLOUD.keys()}"
                 )
 
             ssodnet.get_datacloud_catalogue(

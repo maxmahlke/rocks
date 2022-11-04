@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from rich.progress import Progress
 
-from rocks import cache
+from rocks import config
 
 
 def get_ssocard(id_ssodnet, progress=False, local=True):
@@ -87,7 +87,7 @@ async def _get_ssocard(id_ssodnet, progress_bar, progress, local):
 async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CARD = cache.PATH / f"{id_ssodnet}.json"
+    PATH_CARD = config.PATH_CACHE / f"{id_ssodnet}.json"
 
     if PATH_CARD.is_file() and local:
         with open(PATH_CARD, "r") as file_card:
@@ -306,7 +306,7 @@ async def _local_or_remote_catalogue(
 ):
     """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
 
-    PATH_CATALOGUE = cache.PATH / f"{id_ssodnet}_{catalogue}.json"
+    PATH_CATALOGUE = config.PATH_CACHE / f"{id_ssodnet}_{catalogue}.json"
 
     if PATH_CATALOGUE.is_file() and local:
         with open(PATH_CATALOGUE, "r") as file_card:

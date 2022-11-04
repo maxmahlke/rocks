@@ -6,13 +6,13 @@ import re
 import tarfile
 
 import requests
+import rich
 
-from rocks import definitions
+from rocks import config
 from rocks import metadata
 from rocks import resolve
 from rocks import ssodnet
 
-PATH = Path.home() / ".cache/rocks"
 
 # ------
 # Functions for cache management
@@ -28,12 +28,12 @@ def clear():
     cards, catalogues = take_inventory()
 
     for card in cards:
-        (PATH / f"{card}.json").unlink()
+        (config.PATH_CACHE / f"{card}.json").unlink()
 
     for catalogue in catalogues:
-        (PATH / f"{'_'.join(catalogue)}.json").unlink()
+        (config.PATH_CACHE / f"{'_'.join(catalogue)}.json").unlink()
 
-    for path in [metadata.PATH_MAPPINGS, metadata.PATH_AUTHORS]:
+    for path in [config.PATH_MAPPINGS, config.PATH_AUTHORS]:
         if path.is_file():
             path.unlink()
 
@@ -50,7 +50,7 @@ def take_inventory():
     """
 
     # Get all JSONs in cache
-    cached_jsons = set(file_ for file_ in PATH.glob("*.json"))
+    cached_jsons = set(file_ for file_ in config.PATH_CACHE.glob("*.json"))
 
     cached_cards = []
     cached_catalogues = []
@@ -58,13 +58,11 @@ def take_inventory():
     for file_ in cached_jsons:
 
         # Is it metadata?
-        if file_ in [metadata.PATH_MAPPINGS, metadata.PATH_AUTHORS]:
+        if file_ in [config.PATH_MAPPINGS, config.PATH_AUTHORS]:
             continue
 
         # Datacloud catalogue or ssoCard?
-        if any(
-            cat["ssodnet_name"] in str(file_) for cat in definitions.DATACLOUD.values()
-        ):
+        if any(cat["ssodnet_name"] in str(file_) for cat in config.DATACLOUD.values()):
             *ssodnet_id, catalogue = file_.stem.split("_")
             ssodnet_id = "_".join(ssodnet_id)  # in case of provisional designation
         else:
@@ -123,7 +121,7 @@ def update_cards(ids):
         rich.print(f"{id_} is now known as {id_new}.")
 
         # Remove the outdated card
-        (PATH_CACHE / f"{id_j}.json").unlink()
+        (config.PATH_CACHE / f"{id_}.json").unlink()
 
     # Update all cards
     ssodnet.get_ssocard(ids, progress=True, local=False)
@@ -171,4 +169,4 @@ def retrieve_all_ssocards():
             continue
 
         member.path = member.path.split("/")[-1]
-        cards.extract(member, PATH_CACHE)
+        cards.extract(member, config.PATH_CACHE)

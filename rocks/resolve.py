@@ -13,6 +13,7 @@ import numpy as np
 import requests
 from rich.progress import Progress
 
+from rocks import cli
 from rocks import index
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
@@ -71,7 +72,7 @@ def identify(id_, return_id=False, local=True, progress=False):
 
     # ------
     # For a single name, try local lookup right away, async process has overhead
-    if len(id_) == 1:
+    if len(id_) == 1 and local:
 
         success, (name, number, ssodnet_id) = _local_lookup(id_[0])
 
@@ -131,10 +132,10 @@ async def _identify(id_, local, progress_bar, task):
 async def _resolve(id_, session, local, progress_bar, task):
     """Resolve the identifier locally or remotely."""
 
-    if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
-        warnings.warn("Received empty or NaN identifier.")
-        progress_bar.update(task, advance=1)
-        return (None, np.nan, None)
+    # if pd.isnull(id_) or not id_:  # covers None, np.nan, empty string
+    #     warnings.warn("Received empty or NaN identifier.")
+    #     progress_bar.update(task, advance=1)
+    #     return (None, np.nan, None)
 
     if local:
         success, (name, number, ssodnet_id) = _local_lookup(id_)
@@ -381,7 +382,7 @@ def _interactive():
     LINES = index._load("fuzzy_index.pkl")
 
     # Launch selection
-    choice = rocks.cli._interactive(LINES)
+    choice = cli._interactive(LINES)
 
     # Return asteroid name
     return " ".join(choice.split()[1:])

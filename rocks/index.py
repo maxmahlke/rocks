@@ -9,17 +9,14 @@ import sys
 import typing
 import time
 
-import Levenshtein as lev
 import numpy as np
-import pandas as pd
 import rich
 from rich import progress
 
-from rocks import cache
 from rocks import __version__
+from rocks import config
+from rocks import resolve
 
-
-PATH = cache.PATH / "index"
 
 # ------
 # Building the index
@@ -103,6 +100,8 @@ def _build_name_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+
+    import pandas as pd
 
     parts = string.ascii_lowercase  # first character of name
 
@@ -256,7 +255,7 @@ def _write_to_cache(obj, filename):
         The output filename, relative to the index directory.
     """
 
-    with open(PATH / filename, "wb") as file_:
+    with open(config.PATH_INDEX / filename, "wb") as file_:
         obj_pickled = pickle.dumps(obj, protocol=4)
         file_.write(pickletools.optimize(obj_pickled))
 
@@ -332,7 +331,7 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
         if id_[0] == "'":  # catch 'aylo'chaxnim
             which = f"{id_[0]}.pkl"
         else:
-            which = PATH / f"{id_[0]}.pkl"
+            which = config.PATH_INDEX / f"{id_[0]}.pkl"
 
     # Is it a designation?
     elif re.match(
@@ -355,19 +354,19 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
 @lru_cache(None)
 def _load(which):
     """Load a pickled index file."""
-    if not (PATH / which).exists():
+    if not (config.PATH_INDEX / which).exists():
         rich.print(
             "The asteroid name-number index is malformed. Run '$ rocks status' to update it."
         )
         sys.exit()
 
-    with open(PATH / which, "rb") as file_:
+    with open(config.PATH_INDEX / which, "rb") as file_:
         return pickle.load(file_)
 
 
 def get_modification_date():
     """Get modification date of index pickle files."""
-    date_index = (PATH / "1.pkl").stat().st_mtime
+    date_index = (config.PATH_INDEX / "1.pkl").stat().st_mtime
     return time.strftime("%d %b %Y", time.localtime(date_index))
 
 
@@ -388,12 +387,13 @@ def find_candidates(id_):
     -----
     The matches are found using the Levenshtein distance metric.
     """
+    from Levenshtein import distance
 
     # Get list of named asteroids
     index_ = {}
 
     for char in string.ascii_lowercase:
-        idx = get_index_file(char)
+        idx = _get_index_file(char)
         index_ = {**index_, **idx}
 
     # Use Levenshtein distance to identify potential matches
@@ -402,43 +402,14 @@ def find_candidates(id_):
     id_ = resolve._reduce_id_for_local(id_)
 
     for name in index_.keys():
-        distance = lev.distance(id_, name)
+        dist = distance(id_, name)
 
-        if distance <= max_distance:
+        if dist <= max_distance:
             candidates.append(index_[name][:-1])
 
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
     return candidates
-
-
-def list_candidate_ssos(id_):
-    """Propose matches for failed id queries based on Levenshtein distance if the passed identifier is a name.
-
-    Parameters
-    ----------
-    id_ : str
-        The passed asteroid identifier.
-
-    Note
-    ----
-    The proposed matches are printed to stdout.
-    """
-
-    # This only makes sense for named asteroids
-    if not re.match(r"^[A-Za-z ]*$", id_):
-        return
-
-    candidates = find_candidates(id_)
-
-    if candidates:
-        rich.print(
-            f"\nCould {'this' if len(candidates) == 1 else 'these'} be the "
-            f"{'rock' if len(candidates) == 1 else 'rocks'} you're looking for?"
-        )
-
-        for name, number in candidates:
-            rich.print(f"{f'({number})':>8} {name}")
 
 
 def _ensure_index_exists():
@@ -453,20 +424,20 @@ def _ensure_index_exists():
     |_|  \___/ \___|_|\_\___/
 
     version: {__version__}
-    cache:   {cache.PATH}
+    cache:   {config.PATH_CACHE}
 
     It looks like this is the first time you run [green]rocks[/green].
     Some metadata is required to be present in the cache directory.
     [green]rocks[/green] will download it now.
     """
 
-    if not PATH.is_dir():
+    if not config.PATH_INDEX.is_dir():
 
         # Cache directory is missing: first time running rocks
-        if not cache.PATH.is_dir():
+        if not config.PATH_CACHE.is_dir():
 
             rich.print(GREETING)
-            cache.PATH.mkdir(parents=True)
+            config.PATH_CACHE.mkdir(parents=True)
 
         # Cache exists but index is missing
         else:

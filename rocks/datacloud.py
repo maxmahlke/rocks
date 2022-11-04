@@ -121,7 +121,7 @@ class DataCloudDataFrame(pd.DataFrame):
 
     def weighted_average(self, parameter):
         """Compute the weighted average of the parameter using the preferred values only."""
-        return rocks.utils.weighted_average(self, parameter)
+        return weighted_average(self, parameter)
 
 
 class DataCloudSeries(pd.Series):
@@ -189,7 +189,7 @@ def get_preferred(name, parameter, ids):
     ssoCard = rocks.Rock(name)
 
     # Get selected parameters
-    link_selection = rocks.utils.rgetattr(ssoCard, f"{parameter}.links.selection")
+    link_selection = core.rgetattr(ssoCard, f"{parameter}.links.selection")
 
     if not link_selection:
         return [False for id_ in ids]

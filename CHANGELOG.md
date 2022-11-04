@@ -1,3 +1,8 @@
+# 1.6.5 - 2022-11-
+- Code refactored to optimize performance of CLI, e.g. $ rocks id is now 2x faster
+- identify() no longer accepts pd.Series to avoid heavy pandas import
+- Adding '--clear' and '--update' flags to $ rocks status
+
 # 1.6.4 - 2022-10-21
 - Add 'author' command to quickly check the presence of data from peer-reviewed article: '$ rocks author bowell'
 - bool(rocks.Rock(<id>).color.<filter>) is True if color.<filter>.value is finite
