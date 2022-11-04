@@ -5,7 +5,9 @@ __version__ = "1.6.4"
 
 import inspect
 
-if "rocks.cli" not in inspect.stack()[-1].code_context[0]:
+# Only define user API if rocks is not called via command line
+context = inspect.stack()[-1].code_context
+if context is None or "rocks.cli" not in context[0]:
 
     # Expose API to user
     from .core import Rock
