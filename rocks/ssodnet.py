@@ -11,7 +11,7 @@ import pandas as pd
 from rich.progress import Progress
 
 from rocks import config
-from rocks import logging
+from rocks.logging import logger
 
 
 def get_ssocard(id_ssodnet, progress=False, local=True):
@@ -44,7 +44,7 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
     elif isinstance(id_ssodnet, (set, tuple)):
         id_ssodnet = list(id_ssodnet)
     elif id_ssodnet is None:
-        logging.logger.warning(f"Received SsODNet ID of type {type(id_ssodnet)}.")
+        logger.warning(f"Received SsODNet ID of type {type(id_ssodnet)}.")
         return [(None, np.nan, None)]
     elif not isinstance(id_ssodnet, (list, np.ndarray)):
         raise TypeError(
@@ -129,15 +129,13 @@ async def _query_ssodnet(id_ssodnet, session):
     response = await session.request(method="GET", url=URL)
 
     if not response.ok:
-        logger.logger.warning(f"ssoCard query failed for ID: {id_ssodnet}")
+        logger.warning(f"ssoCard query failed for ID '{id_ssodnet}'")
         return None
 
     response_json = await response.json()
 
     if response_json is None:
-        logging.logger.warning(
-            f"ssoCard query returned empty ssoCard for ID: {id_ssodnet}"
-        )
+        logger.warning(f"ssoCard query returned empty ssoCard for ID '{id_ssodnet}'")
         return None
 
     return response_json
@@ -233,7 +231,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     elif isinstance(id_ssodnet, (set, tuple)):
         id_ssodnet = list(id_ssodnet)
     elif id_ssodnet is None:
-        logging.logger.warning(f"Received SsODNet ID of type {type(id_ssodnet)}.")
+        logger.warning(f"Received SsODNet ID of type {type(id_ssodnet)}.")
         return [(None, np.nan, None)]
     elif not isinstance(id_ssodnet, (list, np.ndarray)):
         raise TypeError(
@@ -362,9 +360,7 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
     response = await session.request(method="GET", url=URL)
 
     if not response.ok:
-        logging.logger.warning(
-            f"Catalogue query failed for ID: {id_ssodnet} - {catalogue}"
-        )
+        logger.warning(f"Catalogue query failed for ID: {id_ssodnet} - {catalogue}")
         return {"data": {id_ssodnet: {"datacloud": None}}}
 
     response_json = await response.json()

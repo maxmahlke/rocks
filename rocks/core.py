@@ -12,7 +12,7 @@ import rich
 
 from rocks import config
 from rocks import datacloud
-from rocks import logging
+from rocks.logging import logger
 from rocks import metadata
 from rocks import resolve
 from rocks import ssodnet
@@ -820,7 +820,7 @@ class Rock(pydantic.BaseModel):
                 # Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
 
-                logging.logger.error(
+                logger.error(
                     f"Error 404: missing ssoCard for {id_provided}. For help: \n"
                     "https://rocks.readthedocs.io/en/latest/tutorials.html#error-404"
                 )
@@ -1019,7 +1019,7 @@ class Rock(pydantic.BaseModel):
                 except TypeError:
                     break
 
-            logging.logger.warning(
+            logger.warning(
                 f"object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
                 f"\nPassed value: {value}"
             )

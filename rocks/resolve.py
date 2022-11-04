@@ -14,7 +14,7 @@ from rich.progress import Progress
 
 from rocks import cli
 from rocks import index
-from rocks import logging
+from rocks.logging import logger
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
 nest_asyncio.apply()
@@ -58,7 +58,7 @@ def identify(id_, return_id=False, local=True, progress=False):
     elif isinstance(id_, (set, range)):
         id_ = list(id_)
     elif id_ is None:
-        logging.logger.warning(f"Received id_ of type {type(id_)}.")
+        logger.warning(f"Received id_ of type {type(id_)}.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
@@ -67,7 +67,7 @@ def identify(id_, return_id=False, local=True, progress=False):
         )
 
     if not id_:
-        logging.logger.warning("Received empty list of identifiers.")
+        logger.warning("Received empty list of identifiers.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
 
     # ------
@@ -133,7 +133,7 @@ async def _resolve(id_, session, local, progress_bar, task):
     """Resolve the identifier locally or remotely."""
 
     if np.nan(id_) or not id_ or id is None:
-        logging.logger.warning("Received empty or NaN identifier.")
+        logger.warning("Received empty or NaN identifier.")
         progress_bar.update(task, advance=1)
         return (None, np.nan, None)
 
@@ -281,7 +281,7 @@ def _standardize_id_for_quaero(id_):
         else:
             pass
     else:
-        logging.logger.warning(
+        logger.warning(
             f"Did not understand type of id: {type(id_)}"
             "\nShould be integer, float, or string."
         )
@@ -321,11 +321,11 @@ async def _query_quaero(id_, session):
         return None
 
     if "data" not in response.keys():  # no match found
-        logging.logger.warning(f"Could not find match for id {id_}.")
+        logger.warning(f"Could not find match for id {id_}.")
         return False
 
     elif not response["data"]:  # empty response
-        logging.logger.warning(f"Could not find match for id {id_}.")
+        logger.warning(f"Could not find match for id {id_}.")
         return False
 
     return response
@@ -360,7 +360,7 @@ def _parse_quaero_response(data, id_):
             break
     else:
         # Unclear which match is correct.
-        logging.logger.warning(f"Could not find match for id {id_}.")
+        logger.warning(f"Could not find match for id {id_}.")
         return (None, np.nan, None)
 
     # Found match

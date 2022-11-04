@@ -11,7 +11,7 @@ import rich
 from rich.table import Table
 
 from rocks import core
-from rocks import logging
+from rocks.logging import logger
 
 # ------
 # Pretty-printing
@@ -900,7 +900,7 @@ def weighted_average(catalogue, parameter):
     if all(np.isnan(value) for value in values) or all(
         np.isnan(error) for error in errors
     ):
-        logging.logger.error(
+        logger.error(
             f"{catalogue.name[0]}: The values or errors of property '{parameter}' are all NaN. Average failed."
         )
         return np.nan, np.nan
@@ -914,9 +914,7 @@ def weighted_average(catalogue, parameter):
 
     if any(e == 0 for e in error):
         weights = np.ones(observable.shape)
-        logging.logger.debug(
-            "Encountered zero in errors array. Setting all weights to 1."
-        )
+        logger.debug("Encountered zero in errors array. Setting all weights to 1.")
     else:
         # Compute normalized weights
         weights = 1 / np.array(error) ** 2

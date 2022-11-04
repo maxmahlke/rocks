@@ -9,7 +9,7 @@ import requests
 import rich
 
 from rocks import config
-from rocks import logging
+from rocks.logging import logger
 from rocks import __version__
 
 
@@ -79,7 +79,7 @@ def find_author(author):
                 author_found = True
 
     if not author_found:
-        logging.logger.info(
+        logger.info(
             f"Could not find articles by '{author.capitalize()}' in SsODNet. You can email 'benoit.carry (at) oca.eu' if you are missing data."
         )
 
