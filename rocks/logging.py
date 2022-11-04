@@ -1,13 +1,9 @@
 import logging
-
 from rich.logging import RichHandler
 
-FORMAT = "[%(name)s] %(message)s"
-
 logging.basicConfig(
-    level=logging.ERROR,
-    format=FORMAT,
-    datefmt="[%X]",
+    level=logging.INFO,
+    format="[%(name)s] %(message)s",
     handlers=[RichHandler(rich_tracebacks=True, show_path=False, show_time=False)],
 )
 
