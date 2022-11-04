@@ -9,7 +9,8 @@ import sys
 import aiohttp
 import nest_asyncio
 import numpy as np
-import pandas as pd
+
+import requests
 from rich.progress import Progress
 
 from rocks import index
@@ -51,8 +52,6 @@ def identify(id_, return_id=False, local=True, progress=False):
     # Verify input
     if isinstance(id_, (str, int, float)):
         id_ = [id_]
-    elif isinstance(id_, pd.Series):
-        id_ = id_.to_list()
     elif isinstance(id_, np.ndarray):
         id_ = id_.tolist()
     elif isinstance(id_, (set, range)):
@@ -63,7 +62,7 @@ def identify(id_, return_id=False, local=True, progress=False):
     elif not isinstance(id_, (list, np.ndarray)):
         raise TypeError(
             f"Received id_ of type {type(id_)}, expected one of: "
-            "str, int, float, list, set, range, np.ndarray, pd.Series"
+            "str, int, float, list, set, range, np.ndarray"
         )
 
     if not id_:
