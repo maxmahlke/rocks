@@ -75,7 +75,9 @@ def find_author(author):
     for category, datasets in ssodnet_biblio["ssodnet_biblio"]["datasets"].items():
         for dataset in datasets:
             if author.capitalize() in dataset["shortbib"]:
-                print(f"  {dataset['shortbib']:<20} [{category}]")
+                rich.print(
+                    f" [magenta]{dataset['bibcode']}[/magenta]  {dataset['shortbib']:<20} [{category}]"
+                )
                 author_found = True
 
     if not author_found:
