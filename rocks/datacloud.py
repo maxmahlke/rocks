@@ -10,7 +10,8 @@ import pydantic
 import rich
 from rich.table import Table
 
-import rocks
+from rocks import core
+from rocks import logging
 
 # ------
 # Pretty-printing
@@ -186,7 +187,7 @@ def get_preferred(name, parameter, ids):
     """
 
     # Get ssoCard
-    ssoCard = rocks.Rock(name)
+    ssoCard = core.Rock(name)
 
     # Get selected parameters
     link_selection = core.rgetattr(ssoCard, f"{parameter}.links.selection")
@@ -899,7 +900,7 @@ def weighted_average(catalogue, parameter):
     if all(np.isnan(value) for value in values) or all(
         np.isnan(error) for error in errors
     ):
-        warnings.warn(
+        logging.logger.error(
             f"{catalogue.name[0]}: The values or errors of property '{parameter}' are all NaN. Average failed."
         )
         return np.nan, np.nan
@@ -913,7 +914,9 @@ def weighted_average(catalogue, parameter):
 
     if any(e == 0 for e in error):
         weights = np.ones(observable.shape)
-        warnings.warn("Encountered zero in errors array. Setting all weights to 1.")
+        logging.logger.debug(
+            "Encountered zero in errors array. Setting all weights to 1."
+        )
     else:
         # Compute normalized weights
         weights = 1 / np.array(error) ** 2

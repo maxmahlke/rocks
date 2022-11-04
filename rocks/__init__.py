@@ -16,8 +16,3 @@ if context is None or "rocks.cli" not in context[0]:
 
     # Alias id to identify
     id = identify
-
-
-# print(globals())
-# print("click" in globals())
-# print("CLICKED" in globals())

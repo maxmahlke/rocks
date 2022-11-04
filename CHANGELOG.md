@@ -2,6 +2,7 @@
 - Code refactored to optimize performance of CLI, e.g. $ rocks id is now 2x faster
 - identify() no longer accepts pd.Series to avoid heavy pandas import
 - Adding '--clear' and '--update' flags to $ rocks status
+- Switching from warnings to logging module
 
 # 1.6.4 - 2022-10-21
 - Add 'author' command to quickly check the presence of data from peer-reviewed article: '$ rocks author bowell'

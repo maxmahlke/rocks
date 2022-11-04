@@ -4,7 +4,6 @@ from functools import reduce
 import datetime as dt
 import keyword
 from typing import List, Generator
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -13,6 +12,7 @@ import rich
 
 from rocks import config
 from rocks import datacloud
+from rocks import logging
 from rocks import metadata
 from rocks import resolve
 from rocks import ssodnet
@@ -820,12 +820,9 @@ class Rock(pydantic.BaseModel):
                 # Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
 
-                rich.print(
-                    f"Error 404: missing ssoCard for [green]{id_provided}[/green]."
-                )
-                # This only gets printed once
-                warnings.warn(
-                    "See https://rocks.readthedocs.io/en/latest/tutorials.html#error-404 for help."
+                logging.logger.error(
+                    f"Error 404: missing ssoCard for {id_provided}. For help: \n"
+                    "https://rocks.readthedocs.io/en/latest/tutorials.html#error-404"
                 )
 
             else:
@@ -908,10 +905,6 @@ class Rock(pydantic.BaseModel):
                     catalogue_instance = datacloud.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
                     )
-
-                    # warnings.warn(
-                    #     f"Removed malformed attributes {to_drop} from datacloud catalogue {catalogue}"
-                    # )
 
                 setattr(self, catalogue, catalogue_instance)
 
@@ -1026,8 +1019,8 @@ class Rock(pydantic.BaseModel):
                 except TypeError:
                     break
 
-            rich.print(
-                f"[blue]Warning[/] [magenta]object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
+            logging.logger.warning(
+                f"object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
                 f"\nPassed value: {value}"
             )
 

@@ -9,6 +9,7 @@ import requests
 import rich
 
 from rocks import config
+from rocks import logging
 from rocks import __version__
 
 
@@ -78,8 +79,8 @@ def find_author(author):
                 author_found = True
 
     if not author_found:
-        rich.print(
-            f"Could not find articles by {author.capitalize()} in SsODNet. Please send an email to\n\tbenoit.carry (at) oca.eu\nif you are missing data."
+        logging.logger.info(
+            f"Could not find articles by '{author.capitalize()}' in SsODNet. You can email 'benoit.carry (at) oca.eu' if you are missing data."
         )
 
 
