@@ -74,6 +74,12 @@ def find_author(author):
         for dataset in datasets:
             if author.capitalize() in dataset["shortbib"]:
                 print(f"  {dataset['shortbib']:<20} [{category}]")
+                author_found = True
+
+    if not author_found:
+        rich.print(
+            f"Could not find articles by {author.capitalize()} in SsODNet. Please send an email to\n\tbenoit.carry (at) oca.eu\nif you are missing data."
+        )
 
 
 def rocks_is_outdated():
