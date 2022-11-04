@@ -4,14 +4,9 @@
 import re
 import sys
 import shutil
+
 import click
-
 import rich
-
-from rich import traceback
-
-# pretty-print tracebacks with rich
-traceback.install()
 
 from rocks import config
 from rocks import index
