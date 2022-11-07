@@ -10,6 +10,7 @@ import pydantic
 import rich
 from rich.table import Table
 
+from rocks import config
 from rocks import core
 from rocks.logging import logger
 
@@ -62,7 +63,7 @@ def pretty_print(rock, catalogue, parameter):
     )
 
     # The columns depend on the catalogue
-    columns = [""] + CATALOGUES[parameter]["print_columns"]
+    columns = [""] + config.DATACLOUD[parameter]["print_columns"]
 
     for c in columns:
         table.add_column(c)

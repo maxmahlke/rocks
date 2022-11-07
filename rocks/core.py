@@ -11,7 +11,7 @@ import pydantic
 import rich
 
 from rocks import config
-from rocks import datacloud
+from rocks import datacloud as dc
 from rocks.logging import logger
 from rocks import metadata
 from rocks import resolve
@@ -735,23 +735,23 @@ class Rock(pydantic.BaseModel):
     ssocard: Ssocard = Ssocard(**{})
 
     # the catalogues
-    astorb: datacloud.Astorb = datacloud.Astorb(**{})
-    binaries: datacloud.Binarymp = datacloud.Binarymp(**{})
-    colors: datacloud.Colors = datacloud.Colors(**{})
-    densities: datacloud.Density = datacloud.Density(**{})
-    diamalbedo: datacloud.Diamalbedo = datacloud.Diamalbedo(**{})
-    families: datacloud.Families = datacloud.Families(**{})
-    masses: datacloud.Masses = datacloud.Masses(**{})
-    mpcatobs: datacloud.Mpcatobs = datacloud.Mpcatobs(**{})
-    mpcorb: datacloud.Mpcorb = datacloud.Mpcorb(**{})
-    pairs: datacloud.Pairs = datacloud.Pairs(**{})
-    proper_elements_: datacloud.Proper_elements = datacloud.Proper_elements(**{})
-    phase_functions: datacloud.Phase_function = datacloud.Phase_function(**{})
-    taxonomies: datacloud.Taxonomies = datacloud.Taxonomies(**{})
-    thermal_inertias: datacloud.Thermal_inertia = datacloud.Thermal_inertia(**{})
-    shapes: datacloud.Shape = datacloud.Shape(**{})
-    spins: datacloud.Spin = datacloud.Spin(**{})
-    yarkovskys: datacloud.Yarkovsky = datacloud.Yarkovsky(**{})
+    astorb: dc.Astorb = dc.Astorb(**{})
+    binaries: dc.Binarymp = dc.Binarymp(**{})
+    colors: dc.Colors = dc.Colors(**{})
+    densities: dc.Density = dc.Density(**{})
+    diamalbedo: dc.Diamalbedo = dc.Diamalbedo(**{})
+    families: dc.Families = dc.Families(**{})
+    masses: dc.Masses = dc.Masses(**{})
+    mpcatobs: dc.Mpcatobs = dc.Mpcatobs(**{})
+    mpcorb: dc.Mpcorb = dc.Mpcorb(**{})
+    pairs: dc.Pairs = dc.Pairs(**{})
+    proper_elements_: dc.Proper_elements = dc.Proper_elements(**{})
+    phase_functions: dc.Phase_function = dc.Phase_function(**{})
+    taxonomies: dc.Taxonomies = dc.Taxonomies(**{})
+    thermal_inertias: dc.Thermal_inertia = dc.Thermal_inertia(**{})
+    shapes: dc.Shape = dc.Shape(**{})
+    spins: dc.Spin = dc.Spin(**{})
+    yarkovskys: dc.Yarkovsky = dc.Yarkovsky(**{})
 
     def __init__(
         self,
@@ -883,7 +883,7 @@ class Rock(pydantic.BaseModel):
                     catalogue = "diamalbedo"
 
                 try:
-                    catalogue_instance = datacloud.DataCloudDataFrame(
+                    catalogue_instance = dc.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
                     )
 
@@ -902,7 +902,7 @@ class Rock(pydantic.BaseModel):
                         delattr(getattr(self, catalogue), attribute)
 
                     # Let's try this again
-                    catalogue_instance = datacloud.DataCloudDataFrame(
+                    catalogue_instance = dc.DataCloudDataFrame(
                         data=getattr(self, catalogue).dict()
                     )
 
