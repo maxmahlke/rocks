@@ -132,10 +132,16 @@ async def _identify(id_, local, progress_bar, task):
 async def _resolve(id_, session, local, progress_bar, task):
     """Resolve the identifier locally or remotely."""
 
-    if np.nan(id_) or not id_ or id is None:
+    if not id_ or id is None:
         logger.warning("Received empty or NaN identifier.")
         progress_bar.update(task, advance=1)
         return (None, np.nan, None)
+
+    if not isinstance(id_, str):
+        if np.isnan(id_):
+            logger.warning("Received empty or NaN identifier.")
+            progress_bar.update(task, advance=1)
+            return (None, np.nan, None)
 
     if local:
         success, (name, number, ssodnet_id) = _local_lookup(id_)
