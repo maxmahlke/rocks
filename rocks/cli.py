@@ -158,15 +158,21 @@ def status(clear, update):
     # ------
     # Echo inventory
     cached_cards, cached_catalogues = cache.take_inventory()
-    date_index = index.get_modification_date()
 
+    try:
+        date_index = index.get_modification_date()
+    except FileNotFoundError:
+        date_index = None
     rich.print(
         f"""\nContents of {config.PATH_CACHE}:
 
         {len(cached_cards)} ssoCards
-        {len(cached_catalogues)} datacloud catalogues\n
-        Asteroid name-number index updated on {date_index}\n"""
+        {len(cached_catalogues)} datacloud catalogues\n"""
     )
+    if date_index:
+        rich.print(f"Asteroid name-number index updated on {date_index}\n")
+    else:
+        rich.print(f"Asteroid name-number index not present.")
 
     # ------
     # Echo update recommendations
