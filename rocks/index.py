@@ -141,6 +141,7 @@ def _build_designation_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+    import pandas as pd
 
     designations = set(
         red
@@ -189,6 +190,7 @@ def _build_palomar_transit_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+    import pandas as pd
 
     rest = set(
         red
@@ -226,6 +228,7 @@ def _build_fuzzy_searchable_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+    import pandas as pd
 
     LINES = []
 
@@ -270,6 +273,7 @@ def _retrieve_index_from_ssodnet():
     pd.DataFrame
         The formatted index.
     """
+    import pandas as pd
 
     # The gzipped index is exposed under this address
     URL_INDEX = "https://asterm.imcce.fr/public/ssodnet/sso_index.csv.gz"
