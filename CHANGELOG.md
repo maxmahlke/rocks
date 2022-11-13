@@ -1,3 +1,7 @@
+# 1.6.6 - 2022-11-13
+- Fixed bug in index-existence check on startup
+- Fixed missing imports in index creation routine
+
 # 1.6.5 - 2022-11-08
 - Code refactored to optimize performance of CLI, e.g. $ rocks id is now 2x faster
 - identify() no longer accepts pd.Series to avoid heavy pandas import

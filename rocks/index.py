@@ -16,6 +16,7 @@ from rich import progress
 from rocks import __version__
 from rocks import config
 from rocks import resolve
+from rocks.logging import logger
 
 
 # ------
@@ -142,6 +143,8 @@ def _build_designation_index(index):
         The formatted index from SsODNet.
     """
 
+    import pandas as pd
+
     designations = set(
         red
         for red in index.Reduced
@@ -164,7 +167,6 @@ def _build_designation_index(index):
 
         # Asteroids in this chunk
         part_index = index.loc[index.Reduced.isin(part_designations)]
-
         part_index = dict(
             zip(
                 part_index.Reduced,
@@ -189,6 +191,8 @@ def _build_palomar_transit_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+
+    import pandas as pd
 
     rest = set(
         red
@@ -226,6 +230,8 @@ def _build_fuzzy_searchable_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
+
+    import pandas as pd
 
     LINES = []
 
@@ -270,6 +276,8 @@ def _retrieve_index_from_ssodnet():
     pd.DataFrame
         The formatted index.
     """
+
+    import pandas as pd
 
     # The gzipped index is exposed under this address
     URL_INDEX = "https://asterm.imcce.fr/public/ssodnet/sso_index.csv.gz"
@@ -435,16 +443,14 @@ def _ensure_index_exists():
 
         # Cache directory is missing: first time running rocks
         if not config.PATH_CACHE.is_dir():
-
             rich.print(GREETING)
             config.PATH_CACHE.mkdir(parents=True)
 
         # Cache exists but index is missing
         else:
-            rich.print(
-                "Could not find the local asteroid name-number index. Downloading it now..."
-            )
+            logger.warning("The local asteroid name-number index is missing.")
 
+        config.PATH_INDEX.mkdir(parents=True)
         _build_index()
 
         rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
