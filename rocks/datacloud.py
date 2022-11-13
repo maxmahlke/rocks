@@ -723,6 +723,7 @@ class Spin(Collection):
         "DEC0",
         "err_RA0",
         "period",
+        "period_flag",
         "err_period",
         "err_long",
         "err_lat",
