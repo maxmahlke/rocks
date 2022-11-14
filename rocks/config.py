@@ -73,10 +73,7 @@ DATACLOUD = {
         "print_columns": [
             "albedo",
             "err_albedo_up",
-            "diameter",
             "err_albedo_down",
-            "err_diameter_up",
-            "err_diameter_down",
             "method",
             # "bibcode",
             "shortbib",
@@ -145,9 +142,6 @@ DATACLOUD = {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
         "print_columns": [
-            "albedo",
-            "err_albedo_up",
-            "err_albedo_down",
             "diameter",
             "err_diameter_up",
             "err_diameter_down",
