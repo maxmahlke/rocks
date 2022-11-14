@@ -980,7 +980,8 @@ class Rock(pydantic.BaseModel):
             return data
 
         # turn list of dict (catalogue entries) into dict of list
-        cat = {key: [c[key] if key in c else "" for c in cat] for key in cat[0].keys()}
+        keys = set().union(*(entry.keys() for entry in cat))
+        cat = {key: [c[key] if key in c else None for c in cat] for key in keys}
 
         # add 'preferred' attribute where applicable
         if catalogue_ssodnet in ["thermal_inertia", "taxonomy", "masses", "diamalbedo"]:
