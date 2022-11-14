@@ -214,6 +214,18 @@ DATACLOUD = {
             "shortbib",
         ],
     },
+    "shapes": {
+        "attr_name": "shapes",
+        "ssodnet_name": "shape",
+        "print_columns": [
+            "model_dbid",
+            "model_name",
+            "scaled",
+            "radius_a",
+            "radius_b",
+            "radius_c",
+        ],
+    },
     "spins": {
         "attr_name": "spins",
         "ssodnet_name": "spin",
