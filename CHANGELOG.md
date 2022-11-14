@@ -1,3 +1,6 @@
+# 1.6.7 - 2022-11-14
+- Fixed bug in datacloud entry ingestion (#14)
+
 # 1.6.6 - 2022-11-13
 - Fixed bug in index-existence check on startup
 - Fixed missing imports in index creation routine
