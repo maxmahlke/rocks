@@ -880,30 +880,22 @@ class Rock(pydantic.BaseModel):
                 if catalogue in ["diameters", "albedos"]:
                     catalogue = "diamalbedo"
 
-                try:
-                    catalogue_instance = dc.DataCloudDataFrame(
-                        data=getattr(self, catalogue).dict()
-                    )
+                # Ensure that all catalogue entries have the right length
+                catalogue_dict = getattr(self, catalogue).dict()
 
-                # Common occurence of
-                # ValueError: All arrays must be of the same length
-                # due to malformed datacloud catalogue
-                except ValueError:
-                    # Drop catalogue attributes with a single entry
-                    to_drop = []
+                REQUIRED_LENGTH = len(
+                    catalogue_dict["id_"]
+                )  # 'id_' should always have the right length
 
-                    for attribute, entries in getattr(self, catalogue).dict().items():
-                        if len(entries) == 1:
-                            to_drop.append(attribute)
+                for key, value in catalogue_dict.items():
+                    if len(value) == REQUIRED_LENGTH:
+                        continue
 
-                    for attribute in to_drop:
-                        delattr(getattr(self, catalogue), attribute)
+                    # Malformed entry, make all entries None
+                    catalogue_dict[key] = REQUIRED_LENGTH * value
 
-                    # Let's try this again
-                    catalogue_instance = dc.DataCloudDataFrame(
-                        data=getattr(self, catalogue).dict()
-                    )
-
+                # Instantiate catalogue and assign to Rock
+                catalogue_instance = dc.DataCloudDataFrame(data=catalogue_dict)
                 setattr(self, catalogue, catalogue_instance)
 
     def __getattr__(self, name):

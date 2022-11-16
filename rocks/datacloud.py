@@ -138,35 +138,35 @@ class DataCloudSeries(pd.Series):
 
 # ------
 # Validators
-def ensure_list(value):
-    """Ensure that parameters are always a list.
+# def ensure_list(value):
+#     """Ensure that parameters are always a list.
 
-    Further replaces all None values by empty dictionaries.
-    """
-    if isinstance(value, (dict, int, float, str)):
-        value = [value]
+#     Further replaces all None values by empty dictionaries.
+#     """
+#     if isinstance(value, (dict, int, float, str)):
+#         value = [value]
 
-    return value
-
-
-def ensure_int(value):
-    if isinstance(value, str):
-        return [int(value)]
-    return [int(v) if v else None for v in value]
+#     return value
 
 
-def empty_str_to_none(value):
-    for i, v in enumerate(value[:]):
-        if v == "":
-            value[i] = None
-    return value
+# def ensure_int(value):
+#     if isinstance(value, str):
+#         return [int(value)]
+#     return [int(v) if v else None for v in value]
 
 
-def empty_str_to_nan(value):
-    for i, v in enumerate(value[:]):
-        if v == "":
-            value[i] = np.nan
-    return value
+# def empty_str_to_none(value):
+#     for i, v in enumerate(value[:]):
+#         if v == "":
+#             value[i] = None
+#     return value
+
+
+# def empty_str_to_nan(value):
+#     for i, v in enumerate(value[:]):
+#         if v == "":
+#             value[i] = np.nan
+#     return value
 
 
 def get_preferred(name, parameter, ids):
