@@ -1,3 +1,6 @@
+# 1.6.8 - 2022-11-16
+- YA bug in datacloud entry ingestion (#15)
+
 # 1.6.7 - 2022-11-14
 - Fixed bug in datacloud entry ingestion (#14)
 
