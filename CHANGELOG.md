@@ -1,3 +1,6 @@
+# 1.6.9 - 2022-11-
+- rocks logger format is only applied to rocks logger, not to all modules
+
 # 1.6.8 - 2022-11-16
 - YA bug in datacloud entry ingestion (#15)
 

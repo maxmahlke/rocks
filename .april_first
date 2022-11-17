@@ -1,0 +1,8 @@
+To further ease the combination of Solar System science and python development,
+asteroid numbers in rocks are from now on zero-indexed:
+
+(0) Ceres
+(1) Pallas
+(2) Juno
+(3) Vesta
+[...]
