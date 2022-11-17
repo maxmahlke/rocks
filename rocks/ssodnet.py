@@ -54,19 +54,22 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
 
     # ---
     # Run async loop to get ssoCard
-    if len(id_ssodnet) == 1:
-        # No progress bar for single query
+    if not progress:
+        # Launching the progressbar in jupyter notebooks spams empty
+        # lines, so I'm not using the 'disable' argument of the Progress class
         loop = asyncio.get_event_loop()
         cards = loop.run_until_complete(_get_ssocard(id_ssodnet, None, None, local))
-        return cards[0]
 
-    with Progress(disable=not progress) as progress_bar:
+    else:
+        with Progress() as progress_bar:
+            progress = progress_bar.add_task("Getting ssoCards", total=len(id_ssodnet))
+            loop = asyncio.get_event_loop()
+            cards = loop.run_until_complete(
+                _get_ssocard(id_ssodnet, progress_bar, progress, local)
+            )
 
-        progress = progress_bar.add_task("Getting ssoCards", total=len(id_ssodnet))
-        loop = asyncio.get_event_loop()
-        cards = loop.run_until_complete(
-            _get_ssocard(id_ssodnet, progress_bar, progress, local)
-        )
+    if len(id_ssodnet) == 1:
+        cards = cards[0]
 
     return cards
 
@@ -256,25 +259,25 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     # Flatten input for easier calling
     id_catalogue = list(product(id_ssodnet, catalogue))
 
-    if len(id_catalogue) == 1:
+    if not progress:
         loop = asyncio.get_event_loop()
         catalogues = loop.run_until_complete(
             _get_datacloud_catalogue(id_catalogue, None, None, local)
         )[0]
-        return catalogues
 
-    with Progress(disable=not progress) as progress_bar:
+    else:
+        with Progress(disable=not progress) as progress_bar:
 
-        progress = progress_bar.add_task(
-            "Getting catalogues" if len(catalogue) > 1 else catalogue[0],
-            total=len(id_catalogue),
-        )
+            progress = progress_bar.add_task(
+                "Getting catalogues" if len(catalogue) > 1 else catalogue[0],
+                total=len(id_catalogue),
+            )
 
-        # Run async loop to get ssoCard
-        loop = asyncio.get_event_loop()
-        catalogues = loop.run_until_complete(
-            _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local)
-        )[0]
+            # Run async loop to get ssoCard
+            loop = asyncio.get_event_loop()
+            catalogues = loop.run_until_complete(
+                _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local)
+            )[0]
 
     return catalogues
 

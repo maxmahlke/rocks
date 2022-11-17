@@ -45,7 +45,7 @@ def retrieve(which):
     response = requests.get(URL)
 
     if not response.ok:
-        warnings.error(f"Retrieving {which} file failed with URL:\n{URL}")
+        logger.warning(f"Retrieving {which} file failed with URL:\n{URL}")
         return
 
     metadata = response.json()
