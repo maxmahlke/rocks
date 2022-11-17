@@ -14,6 +14,19 @@ from rocks import config
 from rocks.logging import logger
 
 
+def is_notebook() -> bool:
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == "ZMQInteractiveShell":
+            return True  # Jupyter notebook or qtconsole
+        elif shell == "TerminalInteractiveShell":
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
+
+
 def get_ssocard(id_ssodnet, progress=False, local=True):
     """Retrieve the ssoCard of one or many asteroids, using their SsODNet IDs.
 
@@ -54,6 +67,12 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
 
     # ---
     # Run async loop to get ssoCard
+    if len(id_ssodnet) == 1:
+        # No progress bar for single query
+        loop = asyncio.get_event_loop()
+        cards = loop.run_until_complete(_get_ssocard(id_ssodnet, None, None, local))
+        return cards[0]
+
     with Progress(disable=not progress) as progress_bar:
 
         progress = progress_bar.add_task("Getting ssoCards", total=len(id_ssodnet))
@@ -61,9 +80,6 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
         cards = loop.run_until_complete(
             _get_ssocard(id_ssodnet, progress_bar, progress, local)
         )
-
-    if len(id_ssodnet) == 1:
-        cards = cards[0]
 
     return cards
 
@@ -90,8 +106,10 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     PATH_CARD = config.PATH_CACHE / f"{id_ssodnet}.json"
 
     if PATH_CARD.is_file() and local:
+
+        _update_progress(progress_bar, progress)
+
         with open(PATH_CARD, "r") as file_card:
-            progress_bar.update(progress, advance=1)
             return json.load(file_card)
 
     # Local retrieval failed, do remote query
@@ -104,7 +122,8 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
         with open(PATH_CARD, "w") as file_card:
             json.dump(card, file_card)
 
-    progress_bar.update(progress, advance=1)
+    _update_progress(progress_bar, progress)
+
     return card
 
 
@@ -250,6 +269,13 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     # Flatten input for easier calling
     id_catalogue = list(product(id_ssodnet, catalogue))
 
+    if len(id_catalogue) == 1:
+        loop = asyncio.get_event_loop()
+        catalogues = loop.run_until_complete(
+            _get_datacloud_catalogue(id_catalogue, None, None, local)
+        )[0]
+        return catalogues
+
     with Progress(disable=not progress) as progress_bar:
 
         progress = progress_bar.add_task(
@@ -301,6 +327,11 @@ async def _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local):
     return results
 
 
+def _update_progress(progress_bar, progress):
+    if progress_bar is not None:
+        progress_bar.update(progress, advance=1)
+
+
 async def _local_or_remote_catalogue(
     id_ssodnet, catalogue, session, progress_bar, progress, local
 ):
@@ -309,8 +340,8 @@ async def _local_or_remote_catalogue(
     PATH_CATALOGUE = config.PATH_CACHE / f"{id_ssodnet}_{catalogue}.json"
 
     if PATH_CATALOGUE.is_file() and local:
+        _update_progress(progress_bar, progress)
         with open(PATH_CATALOGUE, "r") as file_card:
-            progress_bar.update(progress, advance=1)
             return json.load(file_card)
 
     # Local retrieval failed, do remote query
@@ -331,7 +362,7 @@ async def _local_or_remote_catalogue(
     with open(PATH_CATALOGUE, "w") as file_card:
         json.dump(cat, file_card)
 
-    progress_bar.update(progress, advance=1)
+    _update_progress(progress_bar, progress)
     return cat
 
 
