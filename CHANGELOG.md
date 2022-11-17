@@ -1,3 +1,6 @@
+# 1.6.10 - 2022-11-17
+- Fix retrieval of ssoCards
+
 # 1.6.9 - 2022-11-17
 - Fixed emtpy lines spam in jupyter notebook
 - rocks logger format is only applied to rocks logger, not to all modules
