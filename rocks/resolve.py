@@ -61,10 +61,14 @@ def identify(id_, return_id=False, local=True, progress=False):
         logger.warning(f"Received id_ of type {type(id_)}.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
     elif not isinstance(id_, (list, np.ndarray)):
-        raise TypeError(
-            f"Received id_ of type {type(id_)}, expected one of: "
-            "str, int, float, list, set, range, np.ndarray"
-        )
+
+        try:
+            id_ = id_.to_list()  # pandas Series
+        except AttributeError:
+            raise TypeError(
+                f"Received id_ of type {type(id_)}, expected one of: "
+                "str, int, float, list, set, range, np.ndarray"
+            )
 
     if not id_:
         logger.warning("Received empty list of identifiers.")
