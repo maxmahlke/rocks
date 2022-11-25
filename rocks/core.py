@@ -758,6 +758,7 @@ class Rock(pydantic.BaseModel):
         datacloud=None,
         skip_id_check=False,
         suppress_errors=False,
+        on_404="warning",
     ):
         """Identify a minor body  and retrieve its properties from SsODNet.
 
@@ -776,6 +777,8 @@ class Rock(pydantic.BaseModel):
             Default is False.
         suppress_errors: bool
             Do not print errors in the ssoCard. Default is False.
+        on_404: str
+            Action to take when encountering a 404 error. Choose from ["error", "warning", "ignore"].
 
         Returns
         -------
@@ -803,6 +806,11 @@ class Rock(pydantic.BaseModel):
         if isinstance(datacloud, str):
             datacloud = [datacloud]
 
+        if on_404 not in ["ignore", "warning", "error"]:
+            raise ValueError(
+                f"on_404 is {on_404}, expected one of ['ignore', 'warning' , 'error']."
+            )
+
         id_provided = id_
 
         if not skip_id_check:
@@ -818,10 +826,15 @@ class Rock(pydantic.BaseModel):
                 # Instantiate minimal ssoCard for meaningful error output.
                 ssocard = {"name": id_provided}
 
-                logger.error(
+                MESSAGE = (
                     f"Error 404: missing ssoCard for {id_provided}. For help: \n"
                     "https://rocks.readthedocs.io/en/latest/tutorials.html#error-404"
                 )
+
+                if on_404 == "warning":
+                    logger.error(MESSAGE)
+                elif on_404 == "error":
+                    raise ValueError(MESSAGE)
 
             else:
 
@@ -1011,7 +1024,9 @@ class Rock(pydantic.BaseModel):
             )
 
 
-def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
+def rocks_(
+    ids, datacloud=None, progress=False, suppress_errors=False, on_404="warning"
+):
     """Create multiple Rock instances.
 
     Parameters
@@ -1025,12 +1040,19 @@ def rocks_(ids, datacloud=None, progress=False, suppress_errors=False):
         Show progress of instantiation. Default is False.
     suppress_errors: bool
         Do not print errors in the ssoCard. Default is False.
+    on_404: str
+        Action to take when encountering a 404 error. Choose from ["error", "warning", "ignore"].
 
     Returns
     -------
     list of rocks.core.Rock
         A list of Rock instances
     """
+
+    if on_404 not in ["ignore", "warning", "error"]:
+        raise ValueError(
+            f"on_404 is {on_404}, expected one of ['ignore', 'warning' , 'error']."
+        )
 
     # Get IDs
     if isinstance(ids, (float, int, str)) or len(ids) == 1:

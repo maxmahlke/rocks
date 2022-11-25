@@ -81,7 +81,6 @@ def _build_number_index(index):
 
     # Find next 10,000 to largest number
     numbered = index[~pd.isna(index.Number)]
-
     parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
 
     for part in parts:
@@ -249,8 +248,6 @@ def _build_fuzzy_searchable_index(index):
 
     import pandas as pd
 
-    LINES = []
-
     index = index.sort_values(["Number", "Name"])
 
     no_number = pd.isna(index.Number)
@@ -269,18 +266,6 @@ def _build_fuzzy_searchable_index(index):
         line.encode(sys.getdefaultencoding()) + b"\n"
         for line in unnumbered.to_numpy().tolist()
     ]
-
-    # for _, row in index.sort_values(["Number", "Name"]).iterrows():
-
-    #     number = f"({int(row.Number)})" if not pd.isna(row.Number) else ""
-    #     name = row.Name
-
-    #     LINE = (
-    #         f"{number.ljust(9)} {name.ljust(20)}".encode(sys.getdefaultencoding())
-    #         + b"\n"
-    #     )
-
-    #     LINES.append(LINE)
 
     _write_to_cache(LINES, "fuzzy_index.pkl")
 
