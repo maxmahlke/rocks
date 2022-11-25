@@ -37,9 +37,7 @@ def _build_index():
         "[progress.description]{task.description}",
         progress.BarColumn(),
         "[progress.percentage]{task.percentage:>3.0f}%",
-    ) as progress_bar:
-
-        steps = progress_bar.add_task("Building index", total=len(tasks) + 1)
+    ) as pbar:
 
         # Initiate progress bar and retrieve index from SsODNet
         steps = pbar.add_task(
@@ -62,10 +60,9 @@ def _build_index_of_aliases(index):
         The formatted index from SsODNet.
     """
 
-    aliases = dict(
-        zip(index.SsODNetID, [aliases.split(";") for aliases in index.Aliases])
-    )
-
+    index.Aliases = index.Aliases.str.split(";")
+    index = index.set_index("SsODNetID")
+    aliases = index.Aliases.to_dict()
     _write_to_cache(aliases, "aliases.pkl")
 
 
@@ -78,19 +75,25 @@ def _build_number_index(index):
         The formatted index from SsODNet.
     """
 
+    import pandas as pd
+
     SIZE = 1e3  # Build chunks of 1k entries
 
     # Find next 10,000 to largest number
-    parts = np.arange(1, np.ceil(index.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
+    numbered = index[~pd.isna(index.Number)]
+
+    parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
 
     for part in parts:
 
-        part_index = index.loc[(part <= index.Number) & (index.Number < part + SIZE)]
+        part_index = numbered.loc[
+            (part <= numbered.Number) & (numbered.Number < part + SIZE)
+        ]
 
         part_index = dict(
             zip(
                 part_index.Number,
-                [[sso.Name, sso.SsODNetID] for _, sso in part_index.iterrows()],
+                part_index[["Name", "SsODNetID"]].to_numpy().tolist(),
             )
         )
 
@@ -110,6 +113,8 @@ def _build_name_index(index):
 
     parts = string.ascii_lowercase  # first character of name
 
+    index = index[~pd.isna(index.Number)]
+
     names = set(red for red in index.Reduced if re.match(r"^[a-z\'-]*$", red))
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
 
@@ -122,16 +127,10 @@ def _build_name_index(index):
                 "'aylo'chaxnim"
             )  # another edge case for the daughter of venus
         part_index = index.loc[index.Reduced.isin(names_subset)]
-
         part_index = dict(
             zip(
                 part_index.Reduced,
-                [
-                    [sso.Name, sso.SsODNetID]
-                    if pd.isna(sso.Number)
-                    else [sso.Name, sso.Number, sso.SsODNetID]
-                    for _, sso in part_index.iterrows()
-                ],
+                part_index[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
             )
         )
 
@@ -171,15 +170,22 @@ def _build_designation_index(index):
 
         # Asteroids in this chunk
         part_index = index.loc[index.Reduced.isin(part_designations)]
+
+        no_number = pd.isna(part_index.Number)
+        has_number = part_index[~no_number]
+        no_number = part_index[no_number]
+
         part_index = dict(
             zip(
-                part_index.Reduced,
-                [
-                    [sso.Name, sso.SsODNetID]
-                    if pd.isna(sso.Number)
-                    else [sso.Name, sso.Number, sso.SsODNetID]
-                    for _, sso in part_index.iterrows()
-                ],
+                has_number.Reduced,
+                has_number[["Name", "Number", "SsODNetID"]].values.tolist(),
+            )
+        )
+
+        part_index.update(
+            zip(
+                no_number.Reduced,
+                no_number[["Name", "SsODNetID"]].values.tolist(),
             )
         )
 
@@ -211,15 +217,21 @@ def _build_palomar_transit_index(index):
 
     part_index = index.loc[index.Reduced.isin(rest)]
 
+    no_number = pd.isna(part_index.Number)
+    has_number = part_index[~no_number]
+    no_number = part_index[no_number]
+
     part_index = dict(
         zip(
-            part_index.Reduced,
-            [
-                [sso.Name, sso.SsODNetID]
-                if pd.isna(sso.Number)
-                else [sso.Name, sso.Number, sso.SsODNetID]
-                for _, sso in part_index.iterrows()
-            ],
+            has_number.Reduced,
+            has_number[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
+        )
+    )
+
+    part_index.update(
+        zip(
+            no_number.Reduced,
+            no_number[["Name", "SsODNetID"]].to_numpy().tolist(),
         )
     )
 
@@ -239,17 +251,36 @@ def _build_fuzzy_searchable_index(index):
 
     LINES = []
 
-    for _, row in index.sort_values(["Number", "Name"]).iterrows():
+    index = index.sort_values(["Number", "Name"])
 
-        number = f"({int(row.Number)})" if not pd.isna(row.Number) else ""
-        name = row.Name
+    no_number = pd.isna(index.Number)
+    has_number = index[~no_number]
+    no_number = index[no_number]
 
-        LINE = (
-            f"{number.ljust(9)} {name.ljust(20)}".encode(sys.getdefaultencoding())
-            + b"\n"
-        )
+    numbered = (
+        "(" + has_number["Number"].astype(str) + ") " + has_number["Name"].astype(str)
+    )
+    unnumbered = "     " + no_number["Name"].astype(str)
+    LINES = [
+        line.encode(sys.getdefaultencoding()) + b"\n"
+        for line in numbered.to_numpy().tolist()
+    ]
+    LINES += [
+        line.encode(sys.getdefaultencoding()) + b"\n"
+        for line in unnumbered.to_numpy().tolist()
+    ]
 
-        LINES.append(LINE)
+    # for _, row in index.sort_values(["Number", "Name"]).iterrows():
+
+    #     number = f"({int(row.Number)})" if not pd.isna(row.Number) else ""
+    #     name = row.Name
+
+    #     LINE = (
+    #         f"{number.ljust(9)} {name.ljust(20)}".encode(sys.getdefaultencoding())
+    #         + b"\n"
+    #     )
+
+    #     LINES.append(LINE)
 
     _write_to_cache(LINES, "fuzzy_index.pkl")
 

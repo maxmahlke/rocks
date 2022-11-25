@@ -1,3 +1,7 @@
+# 1.6.11 - 2022-11
+- rocks.id and rocks.rocks support pd.Series input again
+- Faster index creation
+
 # 1.6.10 - 2022-11-17
 - Fix retrieval of ssoCards
 
