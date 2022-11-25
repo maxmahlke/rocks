@@ -24,13 +24,13 @@ from rocks.logging import logger
 def _build_index():
     """Build asteroid name-number index from SsODNet sso_index."""
 
-    tasks = [
-        _build_index_of_aliases,
-        _build_number_index,
-        _build_name_index,
-        _build_designation_index,
-        _build_palomar_transit_index,
-        _build_fuzzy_searchable_index,
+    tasks_descs = [
+        (_build_fuzzy_searchable_index, ":kiwi_fruit: Differentiating parent bodies"),
+        (_build_number_index, ":ringed_planet: Cleaning out resonances"),
+        (_build_name_index, ":waning_gibbous_moon: Gardening the regolith"),
+        (_build_designation_index, ":five:  Assigning numbers"),
+        (_build_palomar_transit_index, ":u6307: Composing name citations"),
+        (_build_index_of_aliases, ":comet: Index updated"),
     ]
 
     with progress.Progress(
@@ -41,12 +41,16 @@ def _build_index():
 
         steps = progress_bar.add_task("Building index", total=len(tasks) + 1)
 
+        # Initiate progress bar and retrieve index from SsODNet
+        steps = pbar.add_task(
+            ":telescope: Counting minor bodies", total=len(tasks_descs) + 1
+        )
         index = _retrieve_index_from_ssodnet()
-        progress_bar.update(steps, advance=1)
+        pbar.update(steps, description=f":telescope: Found {len(index):,} ", advance=1)
 
-        for task in tasks:
+        for task, desc in tasks_descs:
             task(index)
-            progress_bar.update(steps, advance=1)
+            pbar.update(steps, description=desc, advance=1)
 
 
 def _build_index_of_aliases(index):
