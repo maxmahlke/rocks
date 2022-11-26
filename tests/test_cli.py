@@ -39,17 +39,3 @@ def test_info():
     runner = CliRunner()
     result = runner.invoke(cli.cli_rocks, ["info", "Massalia"])
     assert result.exit_code == 0
-
-
-def test_albedo():
-    """Albedo display."""
-    runner = CliRunner()
-    result = runner.invoke(cli.cli_rocks, ["albedo", "10"])
-    assert "+-" in result.output  # should ensure that there is a value +- error
-
-
-#  def test_taxonomy():
-#  """Get taxonomic class. """
-#  runner = CliRunner()
-#  result = runner.invoke(cli.cli_rocks, ["taxonomy.class_", "Massalia"])
-#  assert result.output == "S"
