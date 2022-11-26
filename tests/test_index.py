@@ -6,12 +6,17 @@ from rocks import index
 def test_load_partial():
     """Load part of the index and look up asteroid."""
 
-    name = "massalia"
-    part = index._get_index_file("massalia")
+    for id_ in ["mette", "2012aa14", 230, 12301]:
+        partial = rocks.index._get_index_file(id_)
+        assert id_ in partial
 
-    assert "massalia" in part
 
+def test_index_parts():
+    """Test availability and readability of index."""
 
-def test_index_modification_date():
-    """Get the modification date of the index."""
-    index.get_modification_date()
+    # Availability
+    assert rocks.config.PATH_INDEX.is_dir()
+
+    # Readability
+    assert isinstance(index, dict)
+    assert id_ in index
