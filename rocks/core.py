@@ -896,9 +896,7 @@ class Rock(pydantic.BaseModel):
                 # Ensure that all catalogue entries have the right length
                 catalogue_dict = getattr(self, catalogue).dict()
 
-                REQUIRED_LENGTH = len(
-                    catalogue_dict["id_"]
-                )  # 'id_' should always have the right length
+                REQUIRED_LENGTH = max(len(val) for val in catalogue_dict.values())
 
                 for key, value in catalogue_dict.items():
                     if len(value) == REQUIRED_LENGTH:

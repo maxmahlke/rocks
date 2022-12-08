@@ -1,3 +1,6 @@
+# 1.6.12
+- More robust detection of malformed datacloud catalogues
+
 # 1.6.11 - 2022-11-30
 - rocks.id and rocks.rocks support pd.Series input again
 - Faster index creation (4min -> 1min, YMMV)
