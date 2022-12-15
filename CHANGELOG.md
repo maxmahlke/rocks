@@ -1,3 +1,6 @@
+# 1.6.13
+- Fix bug in mpcatobs datacloud catalogue
+
 # 1.6.12
 - More robust detection of malformed datacloud catalogues
 
