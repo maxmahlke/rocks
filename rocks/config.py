@@ -174,7 +174,7 @@ DATACLOUD = {
             "ra_obs",
             "dec_obs",
             "mag",
-            "filter_",
+            "filter",
             "iau_code",
         ],
     },

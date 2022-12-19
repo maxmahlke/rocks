@@ -1,7 +1,5 @@
-# 1.6.13
+# 1.6.12 - 2022-12-19
 - Fix bug in mpcatobs datacloud catalogue
-
-# 1.6.12
 - More robust detection of malformed datacloud catalogues
 
 # 1.6.11 - 2022-11-30

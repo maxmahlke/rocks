@@ -809,7 +809,7 @@ class Mpcatobs(Collection):
     ra_obs: List[Optional[float]] = [np.nan]
     dec_obs: List[Optional[float]] = [np.nan]
     mag: List[Optional[float]] = [np.nan]
-    filter_: List[Optional[str]] = [""]
+    filter: List[Optional[str]] = [""]
     note3: List[Optional[str]] = [""]
     note4: List[Optional[str]] = [""]
     iau_code: List[Optional[str]] = [""]
