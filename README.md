@@ -1,12 +1,25 @@
-![python version](https://img.shields.io/pypi/pyversions/space-rocks)
-![PyPI](https://img.shields.io/pypi/v/space-rocks) [![Documentation Status](https://readthedocs.org/projects/rocks/badge/?version=latest)](https://rocks.readthedocs.io/en/latest/?badge=latest) [![arXiv](https://img.shields.io/badge/arXiv-2209.10697-f9f107.svg)](https://arxiv.org/abs/2209.10697)
- [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<div align="center">
+  <a href="https://img.shields.io/pypi/pyversions/space-rocks">
+    <img src="https://img.shields.io/pypi/pyversions/space-rocks"/>
+  </a>
+  <a href="https://img.shields.io/pypi/v/space-rocks">
+    <img src="https://img.shields.io/pypi/v/space-rocks"/>
+  </a>
+  <a href="https://readthedocs.org/projects/rocks/badge/?version=latest">
+    <img src="https://readthedocs.org/projects/rocks/badge/?version=latest"/>
+  </a>
+  <a href="https://arxiv.org/abs/2209.10697">
+    <img src="https://img.shields.io/badge/arXiv-2209.10697-f9f107.svg"/>
+  </a>
+</div>
 
 <p align="center">
   <img width="260" src="https://raw.githubusercontent.com/maxmahlke/rocks/master/docs/_static/logo_rocks.svg">
 </p>
 
-[Features](#features) - [Install](#install) - [Documentation](#documentation)
+<p align="center">
+  <a href="https://github.com/maxmahlke/rocks#features"> Features </a> - <a href="https://github.com/maxmahlke/rocks#install"> Install </a> - <a href="https://github.com/maxmahlke/rocks#documentation"> Documentation </a>
+</p>
 
 *Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
 
