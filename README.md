@@ -1,3 +1,13 @@
+<p align="center">
+  <img width="260" src="https://raw.githubusercontent.com/maxmahlke/rocks/master/docs/_static/logo_rocks.svg">
+</p>
+
+<p align="center">
+  <a href="https://github.com/maxmahlke/rocks#features"> Features </a> - <a href="https://github.com/maxmahlke/rocks#install"> Install </a> - <a href="https://github.com/maxmahlke/rocks#documentation"> Documentation </a>
+</p>
+
+<br>
+
 <div align="center">
   <a href="https://img.shields.io/pypi/pyversions/space-rocks">
     <img src="https://img.shields.io/pypi/pyversions/space-rocks"/>
@@ -13,13 +23,7 @@
   </a>
 </div>
 
-<p align="center">
-  <img width="260" src="https://raw.githubusercontent.com/maxmahlke/rocks/master/docs/_static/logo_rocks.svg">
-</p>
-
-<p align="center">
-  <a href="https://github.com/maxmahlke/rocks#features"> Features </a> - <a href="https://github.com/maxmahlke/rocks#install"> Install </a> - <a href="https://github.com/maxmahlke/rocks#documentation"> Documentation </a>
-</p>
+<br>
 
 *Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
 
