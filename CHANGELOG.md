@@ -11,7 +11,7 @@
 - Fix retrieval of ssoCards
 
 # 1.6.9 - 2022-11-17
-- Fixed emtpy lines spam in jupyter notebook
+- Fixed empty lines spam in jupyter notebook
 - rocks logger format is only applied to rocks logger, not to all modules
 
 # 1.6.8 - 2022-11-16
@@ -42,8 +42,10 @@
 - Fix bug in bibref implementation
 
 # 1.6.2 - 2022-10-05
-- Parameters of different spin solutions / bibref entries are now accessible via the common dot notation,
-  seversion 1.6.2e https://rocks.readthedocs.io/en/latest/cli.html#bibliography-management-with-rocks or '$ rocks diameter.bibref.shortbib pallas'
+- Parameters of different spin solutions / bibref entries are now accessible via
+  the common dot notation, see version 1.6.2
+  https://rocks.readthedocs.io/en/latest/cli.html#bibliography-management-with-rocks
+  or '$ rocks diameter.bibref.shortbib pallas'
 - Added shortcuts for equation-of-state vector
 
 # 1.6.1 - 2022-10-04
