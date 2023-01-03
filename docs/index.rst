@@ -153,7 +153,8 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
    Home<self>
    Getting Started<getting_started>
    Available Data<ssodnet>
-   Usage<cli>
+   Basic Usage<cli>
+   credit
    tutorials
    appendix
    glossary
