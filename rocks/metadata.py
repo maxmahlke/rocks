@@ -2,7 +2,6 @@
 
 from functools import lru_cache
 import json
-from pathlib import Path
 import re
 
 import requests
@@ -91,8 +90,10 @@ def rocks_is_outdated():
 
     Returns
     -------
-    bool
-        True if the local version is below the one on GitHub, else False.
+    bool, str
+        True if the local version is below the one on GitHub, else
+        False. String contains latest version if outdated, else it's
+        empty.
     """
 
     URL = "https://github.com/maxmahlke/rocks/blob/master/pyproject.toml?raw=True"
@@ -100,10 +101,10 @@ def rocks_is_outdated():
     try:
         response = requests.get(URL, timeout=10)
     except requests.exceptions.ReadTimeout:
-        return ""
+        return (False, "")
 
     if not response.ok:
-        return False  # can't tell, assume it's ok
+        return (False, "")  # can't tell, assume it's ok
 
     version_remote = re.findall(r"\d+\.\d+[\.\d]*", response.text)[0]
     version_remote = tuple(map(int, version_remote.split(".")))
@@ -111,6 +112,6 @@ def rocks_is_outdated():
     version_local = tuple(map(int, __version__.split(".")))
 
     if version_remote > version_local:
-        return True
+        return (True, ".".join(str(v) for v in version_remote))
 
-    return False
+    return (False, "")

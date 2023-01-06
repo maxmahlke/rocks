@@ -172,10 +172,12 @@ def status(clear, update):
     # Echo update recommendations
     rich.print("Checking if rocks is up-to-date..", end="")
 
-    if metadata.rocks_is_outdated():
+    outdated, latest_rocks = metadata.rocks_is_outdated()
+
+    if outdated:
         rich.print(
             f"\n[red]The running [green]rocks[/green] version ({__version__}) is behind the "
-            f"latest version ({latest_rocks}). The ssoCard structure might have changed.[/red]\n"
+            f"latest version ({latest_rocks}).\nThe ssoCard structure might have changed.[/red]\n"
             f"You should run [green]$ pip install -U space-rocks[/green] and clear the cache directory.\n"
         )
     else:

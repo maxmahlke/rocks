@@ -1,3 +1,6 @@
+# 1.6.13 - 2023-01-06
+- Bugfix in outdated-rocks message
+
 # 1.6.12 - 2022-12-19
 - Fix bug in mpcatobs datacloud catalogue
 - More robust detection of malformed datacloud catalogues
