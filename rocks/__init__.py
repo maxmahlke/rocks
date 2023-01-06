@@ -6,7 +6,7 @@ from pathlib import Path
 from . import config
 
 # Welcome to rocks
-__version__ = "1.6.12"
+__version__ = "1.6.13"
 
 # Only define user API if rocks is not called via command line
 context = inspect.stack()[-1].code_context
