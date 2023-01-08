@@ -19,6 +19,20 @@ from rocks.logging import logger
 # Run asyncio nested for jupyter notebooks, GUIs, ...
 nest_asyncio.apply()
 
+def get_or_create_eventloop():
+    """ Enable asyncio to get the event loop in a thread other than the main thread
+
+    Returns
+    --------
+    out: asyncio.unix_events._UnixSelectorEventLoop
+    """
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
 
 def identify(id_, return_id=False, local=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
@@ -91,7 +105,7 @@ def identify(id_, return_id=False, local=True, progress=False):
     with Progress(disable=not progress) as progress_bar:
 
         task = progress_bar.add_task("Identifying rocks", total=len(id_))  # type: ignore
-        loop = asyncio.get_event_loop()
+        loop = get_or_create_eventloop()
         results = loop.run_until_complete(_identify(id_, local, progress_bar, task))
 
         # ------
