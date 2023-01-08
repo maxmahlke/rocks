@@ -1,3 +1,6 @@
+# 1.6.14 - 2023-01-08
+- Make rocks behave well in multithreaded applications (#18)
+
 # 1.6.13 - 2023-01-06
 - Bugfix in outdated-rocks message
 
