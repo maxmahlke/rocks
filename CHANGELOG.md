@@ -1,3 +1,7 @@
+# 1.6.15 - 2023-01-19
+- Expose the logging-level of rocks with the rocks.set_log_level function
+- Remove the suppress_errors argument of rocks.Rock and rocks.rocks -> use rocks.set_log_level instead
+
 # 1.6.14 - 2023-01-08
 - Make rocks behave well in multithreaded applications (#18)
 

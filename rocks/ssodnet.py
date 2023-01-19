@@ -14,6 +14,7 @@ from rocks import config
 from rocks.logging import logger
 from rocks.resolve import get_or_create_eventloop
 
+
 def get_ssocard(id_ssodnet, progress=False, local=True):
     """Retrieve the ssoCard of one or many asteroids, using their SsODNet IDs.
 

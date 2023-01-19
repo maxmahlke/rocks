@@ -341,6 +341,13 @@ SsODNet and ``rocks``
 
    **Which parameters can I open in a plot?** :octicon:`chevron-right;1em`
 
+.. dropdown:: I see too many ``WARNING``\s I don't care about. How do I change the verbosity of ``rocks``?
+
+   The ``rocks.set_log_level(LEVEL)`` function can be used to set the verbosity of ``rocks``. The default level
+   is ``INFO``, meaning that all messages with a priority of ``INFO`` or higher are printed. To see only the most relevant
+   information, you can use ``rocks.set_log_level("error")``.
+
+   See https://docs.python.org/3/library/logging.html#levels  for more information on the different levels.
 
 .. _error_404:
 
