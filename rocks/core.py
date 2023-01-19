@@ -757,7 +757,6 @@ class Rock(pydantic.BaseModel):
         ssocard=None,
         datacloud=None,
         skip_id_check=False,
-        suppress_errors=False,
         on_404="warning",
     ):
         """Identify a minor body  and retrieve its properties from SsODNet.
@@ -775,8 +774,6 @@ class Rock(pydantic.BaseModel):
         skip_id_check : bool
             Optional argument to prevent resolution of ID before getting ssoCard.
             Default is False.
-        suppress_errors: bool
-            Do not print errors in the ssoCard. Default is False.
         on_404: str
             Action to take when encountering a 404 error. Choose from ["error", "warning", "ignore"].
 
@@ -852,8 +849,7 @@ class Rock(pydantic.BaseModel):
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
 
-            if not suppress_errors:
-                self.__parse_error_message(message, id_, ssocard)
+            self.__parse_error_message(message, id_, ssocard)
 
             # Set the offending properties to None to allow for instantiation anyway
             for error in message.errors():
@@ -1023,7 +1019,7 @@ class Rock(pydantic.BaseModel):
 
 
 def rocks_(
-    ids, datacloud=None, progress=False, suppress_errors=False, on_404="warning"
+    ids, datacloud=None, progress=False, on_404="warning"
 ):
     """Create multiple Rock instances.
 
@@ -1036,8 +1032,6 @@ def rocks_(
         Default is no additional catalogues.
     progress : bool
         Show progress of instantiation. Default is False.
-    suppress_errors: bool
-        Do not print errors in the ssoCard. Default is False.
     on_404: str
         Action to take when encountering a 404 error. Choose from ["error", "warning", "ignore"].
 
@@ -1084,8 +1078,7 @@ def rocks_(
         Rock(
             id_,
             skip_id_check=True,
-            datacloud=datacloud,
-            suppress_errors=suppress_errors,
+            datacloud=datacloud
         )
         if not id_ is None
         else None
