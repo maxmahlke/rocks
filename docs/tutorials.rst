@@ -341,6 +341,8 @@ SsODNet and ``rocks``
 
    **Which parameters can I open in a plot?** :octicon:`chevron-right;1em`
 
+.. _set_log_level:
+
 .. dropdown:: I see too many ``WARNING``\s I don't care about. How do I change the verbosity of ``rocks``?
 
    The ``rocks.set_log_level(LEVEL)`` function can be used to set the verbosity of ``rocks``. The default level
