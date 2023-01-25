@@ -368,6 +368,10 @@ class Albedo(FloatValue):
 
     path = "parameters.physical.albedo.albedo"
 
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
 
 class ColorEntry(Parameter):
     color: FloatValue = FloatValue(**{})
@@ -643,6 +647,10 @@ class ThermalInertia(FloatValue):
         return add_paths(
             cls, values, "parameters.physical.thermal_inertia.thermal_inertia"
         )
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class AbsoluteMagnitude(FloatValue):
@@ -1018,9 +1026,7 @@ class Rock(pydantic.BaseModel):
             )
 
 
-def rocks_(
-    ids, datacloud=None, progress=False, on_404="warning"
-):
+def rocks_(ids, datacloud=None, progress=False, on_404="warning"):
     """Create multiple Rock instances.
 
     Parameters
@@ -1075,13 +1081,7 @@ def rocks_(
             )
 
     rocks_ = [
-        Rock(
-            id_,
-            skip_id_check=True,
-            datacloud=datacloud
-        )
-        if not id_ is None
-        else None
+        Rock(id_, skip_id_check=True, datacloud=datacloud) if not id_ is None else None
         for id_ in ids
     ]
 
