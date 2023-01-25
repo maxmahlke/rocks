@@ -1,3 +1,7 @@
+# 1.6.16 - 2023-01-25
+- Remove deprecated suppress_errors argument from CLI call (#19)
+- Make albedo.bibref a list of Bibref rather than a list of dict
+
 # 1.6.15 - 2023-01-19
 - Expose the logging-level of rocks with the rocks.set_log_level function
 - Remove the suppress_errors argument of rocks.Rock and rocks.rocks -> use rocks.set_log_level instead

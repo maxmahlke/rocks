@@ -10,6 +10,7 @@ import rich
 
 from rocks import config
 from rocks import index
+from rocks import logging
 from rocks import metadata
 from rocks import resolve
 from rocks import __version__
@@ -338,8 +339,12 @@ def echo():
         p.split(".")[0] for p in parameter if p.split(".")[0] in config.DATACLOUD.keys()
     ]
 
+    # Increase the default log level unless user requests verbose output
+    if not verbose:
+        logging.set_log_level("ERROR")
+
     # And let's go
-    rock = core.Rock(id_, datacloud=catalogues, suppress_errors=not verbose)
+    rock = core.Rock(id_, datacloud=catalogues)
 
     # Identifier could not be resolved
     if not rock.id_:
