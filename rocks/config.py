@@ -2,8 +2,9 @@
 
 from pathlib import Path
 
+from platformdirs import user_cache_dir
 
-PATH_CACHE = Path.home() / ".cache/rocks"
+PATH_CACHE = Path(user_cache_dir()) / "rocks"
 
 PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 PATH_INDEX = PATH_CACHE / "index"
