@@ -1,3 +1,13 @@
+# 1.7.0 - 2023-02-03
+- Improve compatibility with Mac, add compatibility with Windows. Use appdirs
+  package to use system-dependent cache directory:
+
+  Windows: ':\\Users\\$USER\\AppData\\Local\\rocks\\Cache'
+  Mac: '/Users/$USER/Library/Caches/rocks'
+  Linux: '$HOME/.cache/rocks'
+
+  Mac users of previous rocks versions can remove the '$HOME/.cache/rocks' directory.
+
 # 1.6.16 - 2023-01-25
 - Remove deprecated suppress_errors argument from CLI call (#19)
 - Make albedo.bibref a list of Bibref rather than a list of dict
