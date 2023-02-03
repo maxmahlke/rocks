@@ -135,7 +135,7 @@ DATACLOUD = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "bibcode",
+            "shortbib",
         ],
     },
     "diameters": {
@@ -146,7 +146,7 @@ DATACLOUD = {
             "err_diameter_up",
             "err_diameter_down",
             "method",
-            "bibcode",
+            "shortbib",
         ],
     },
     "families": {
