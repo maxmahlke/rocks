@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from appdirs import user_cache_dir
+from platformdirs import user_cache_dir
 
 PATH_CACHE = Path(user_cache_dir()) / "rocks"
 
