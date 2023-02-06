@@ -353,6 +353,12 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
             index_number = 1
         which = f"{index_number}.pkl"
 
+        if not (config.PATH_INDEX / which).exists():
+            logger.error(
+                f"The provided number '{id_}' is larger than the largest number of any asteroid."
+            )
+            sys.exit()
+
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
 
@@ -383,7 +389,7 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
 def _load(which):
     """Load a pickled index file."""
     if not (config.PATH_INDEX / which).exists():
-        rich.print(
+        logger.error(
             "The asteroid name-number index is malformed. Run '$ rocks status' to update it."
         )
         sys.exit()

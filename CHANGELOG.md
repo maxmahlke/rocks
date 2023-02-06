@@ -1,6 +1,7 @@
 # 1.7.1 -
 - Remove lines where albedo|diameter are NaN when querying albedos|diameters on
   command line
+- Differentiate between malformed index and request for asteroid number larger than the maximum number of all asteroids
 
 # 1.7.0 - 2023-02-03
 - Improve compatibility with Mac, add compatibility with Windows. Use appdirs
