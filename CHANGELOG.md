@@ -1,3 +1,7 @@
+# 1.7.1 -
+- Remove lines where albedo|diameter are NaN when querying albedos|diameters on
+  command line
+
 # 1.7.0 - 2023-02-03
 - Improve compatibility with Mac, add compatibility with Windows. Use appdirs
   package to use system-dependent cache directory:

@@ -40,8 +40,10 @@ def pretty_print(rock, catalogue, parameter):
     # Create table to echo
     if parameter in ["diameters", "albedos"]:
         if parameter == "diameters":
+            catalogue = catalogue.dropna(subset=["diameters"])
             preferred = catalogue.preferred_diameter
         elif parameter == "albedos":
+            catalogue = catalogue.dropna(subset=["albedo"])
             preferred = catalogue.preferred_albedo
     elif hasattr(catalogue, "preferred"):
         preferred = catalogue.preferred
@@ -97,7 +99,7 @@ def pretty_print(rock, catalogue, parameter):
             style = "bold green" if pref else "white"
 
         table.add_row(
-            *[str(catalogue[c][i]) if c else str(i + 1) for c in columns],
+            *[str(catalogue[c].values[i]) if c else str(i + 1) for c in columns],
             style=style,
         )
 
