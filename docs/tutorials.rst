@@ -65,7 +65,7 @@ Identification
 
        .. code-block:: python
 
-          data["name"], data["number"] = *zip(rocks.id(data["designation"]))
+          data["name"], data["number"] = zip(*rocks.id(data["designation"]))
 
       .. tab-item:: Command Line
 
