@@ -1,4 +1,5 @@
-# 1.7.1 -
+# 1.7.1 - 2023-02-08
+- Inform about malformed ssoCard at debug rather than warning level
 - Remove lines where albedo|diameter are NaN when querying albedos|diameters on
   command line
 - Differentiate between malformed index and request for asteroid number larger than the maximum number of all asteroids

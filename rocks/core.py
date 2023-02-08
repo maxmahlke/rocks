@@ -293,7 +293,7 @@ class ProperElements(Parameter):
 
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
     family_name: StringValue = StringValue(**{})
     family_number: IntegerValue = IntegerValue(**{})
@@ -308,6 +308,10 @@ class Family(Parameter):
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.family")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Pair(Parameter):
@@ -1020,7 +1024,7 @@ class Rock(pydantic.BaseModel):
                 except TypeError:
                     break
 
-            logger.warning(
+            logger.debug(
                 f"object:{id_}[/] Invalid value for {'.'.join([str(e) for e in error['loc']])}"
                 f"\nPassed value: {value}"
             )
