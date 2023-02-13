@@ -1,3 +1,7 @@
+# 1.7.3 -
+- Add boolean property for families: bool(rocks.Rock(1).family) is True if
+  family.name is not ""
+
 # 1.7.2 - 2023-02-13
 - Update rich dependency requirement to make rocks compatible with classy
 

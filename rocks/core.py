@@ -305,6 +305,9 @@ class Family(Parameter):
         else:
             return "No family membership known."
 
+    def __bool__(self):
+        return bool(self.family_name)
+
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.family")
