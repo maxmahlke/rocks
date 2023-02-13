@@ -1,3 +1,6 @@
+# 1.7.2 - 2023-02-13
+- Update rich dependency requirement to make rocks compatible with classy
+
 # 1.7.1 - 2023-02-08
 - Inform about malformed ssoCard at debug rather than warning level
 - Remove lines where albedo|diameter are NaN when querying albedos|diameters on
