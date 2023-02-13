@@ -14,6 +14,8 @@ from rocks import config
 from rocks.logging import logger
 from rocks.resolve import get_or_create_eventloop
 
+URL_SSODNET = "https://ssp.imcce.fr"
+
 
 def get_ssocard(id_ssodnet, progress=False, local=True):
     """Retrieve the ssoCard of one or many asteroids, using their SsODNet IDs.
@@ -134,7 +136,7 @@ async def _query_ssodnet(id_ssodnet, session):
         SsODNet response as dict if successful. Empty if query failed.
     """
 
-    URL = f"https://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q={id_ssodnet}"
+    URL = f"{URL_SSODNET}/webservices/ssodnet/api/ssocard.php?q={id_ssodnet}"
 
     response = await session.request(method="GET", url=URL)
 
@@ -375,7 +377,7 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
         SsODNet response as dict if successful. Empty if query failed.
     """
     URL = (
-        f"https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:{id_ssodnet}"
+        f"{URL_SSODNET}/webservices/ssodnet/api/datacloud.php?-name=id:{id_ssodnet}"
         f"&-resource={catalogue}&-mime=json&-from=rocks"
     )
 
