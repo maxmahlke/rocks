@@ -1,4 +1,4 @@
-# 1.7.3 -
+# 1.7.3 - 2023-02-20
 - Fix column name in diameters echo (#20)
 - Add boolean property for families: bool(rocks.Rock(1).family) is True if
   family.name is not ""
