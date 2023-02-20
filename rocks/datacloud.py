@@ -40,7 +40,7 @@ def pretty_print(rock, catalogue, parameter):
     # Create table to echo
     if parameter in ["diameters", "albedos"]:
         if parameter == "diameters":
-            catalogue = catalogue.dropna(subset=["diameters"])
+            catalogue = catalogue.dropna(subset=["diameter"])
             preferred = catalogue.preferred_diameter
         elif parameter == "albedos":
             catalogue = catalogue.dropna(subset=["albedo"])
