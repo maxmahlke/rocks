@@ -345,11 +345,11 @@ async def _query_quaero(id_, session):
         return None
 
     if "data" not in response.keys():  # no match found
-        logger.warning(f"Could not find match for id {id_}.")
+        logger.error(f"Could not find match for id {id_}.")
         return False
 
     elif not response["data"]:  # empty response
-        logger.warning(f"Could not find match for id {id_}.")
+        logger.error(f"Could not find match for id {id_}.")
         return False
 
     return response
