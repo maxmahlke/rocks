@@ -388,6 +388,8 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
 @lru_cache(None)
 def _load(which):
     """Load a pickled index file."""
+    _ensure_index_exists()
+
     if not (config.PATH_INDEX / which).exists():
         logger.error(
             "The asteroid name-number index is malformed. Run '$ rocks status' to update it."

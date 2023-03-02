@@ -156,6 +156,8 @@ def status(clear, update):
 
     from rocks import cache
 
+    index._ensure_index_exists()
+
     # ------
     # Echo inventory
     cached_cards, cached_catalogues = cache.take_inventory()

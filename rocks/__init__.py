@@ -20,9 +20,3 @@ if context is None or "rocks.cli" not in context[0]:
 
     # Alias id to identify
     id = identify
-
-# Ensure the asteroid name-number index exists
-if not config.PATH_INDEX.is_dir():
-    from . import index
-
-    index._ensure_index_exists()
