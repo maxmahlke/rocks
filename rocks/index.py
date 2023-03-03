@@ -465,18 +465,18 @@ def _ensure_index_exists():
     [green]rocks[/green] will download it now.
     """
 
-    if not config.PATH_INDEX.is_dir():
+    # Cache directory is missing: first time running rocks
+    if not config.PATH_CACHE.is_dir():
+        rich.print(GREETING)
+        config.PATH_CACHE.mkdir(parents=True)
 
-        # Cache directory is missing: first time running rocks
-        if not config.PATH_CACHE.is_dir():
-            rich.print(GREETING)
-            config.PATH_CACHE.mkdir(parents=True)
+    # Cache exists but index is missing
+    else:
+        logger.warning(
+            "The local asteroid name-number index is missing. Downloading it now."
+        )
 
-        # Cache exists but index is missing
-        else:
-            logger.warning("The local asteroid name-number index is missing.")
+    config.PATH_INDEX.mkdir(parents=True)
+    _build_index()
 
-        config.PATH_INDEX.mkdir(parents=True)
-        _build_index()
-
-        rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
+    rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
