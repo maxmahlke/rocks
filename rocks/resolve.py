@@ -13,14 +13,16 @@ import requests
 from rich.progress import Progress
 
 from rocks import cli
+from rocks import config
 from rocks import index
 from rocks.logging import logger
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
 nest_asyncio.apply()
 
+
 def get_or_create_eventloop():
-    """ Enable asyncio to get the event loop in a thread other than the main thread
+    """Enable asyncio to get the event loop in a thread other than the main thread
 
     Returns
     --------
@@ -33,6 +35,7 @@ def get_or_create_eventloop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             return asyncio.get_event_loop()
+
 
 def identify(id_, return_id=False, local=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
@@ -62,6 +65,10 @@ def identify(id_, return_id=False, local=True, progress=False):
     Name resolution is first attempted locally, then remotely via quaero. If
     the asteroid is unnumbered, its number is np.nan.
     """
+
+    # Ensure the asteroid name-number index exists
+    if not config.PATH_INDEX.is_dir():
+        index._ensure_index_exists()
 
     # ------
     # Verify input
