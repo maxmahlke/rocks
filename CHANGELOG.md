@@ -1,3 +1,6 @@
+# 1.7.4 - 2023-03-03
+- Move index check from init to into name resolution module as proposed in #21
+
 # 1.7.3 - 2023-02-20
 - Fix column name in diameters echo (#20)
 - Add boolean property for families: bool(rocks.Rock(1).family) is True if
