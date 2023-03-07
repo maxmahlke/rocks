@@ -1,4 +1,4 @@
-# 1.7.4 - 2023-03-03
+# 1.7.4 - 2023-03-05
 - Move index check from init to into name resolution module as proposed in #21
 
 # 1.7.3 - 2023-02-20
