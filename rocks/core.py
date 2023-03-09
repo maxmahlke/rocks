@@ -914,7 +914,7 @@ class Rock(pydantic.BaseModel):
                         continue
 
                     # Malformed entry, make all entries None
-                    catalogue_dict[key] = REQUIRED_LENGTH * value
+                    catalogue_dict[key] = REQUIRED_LENGTH * [None]
 
                 # Instantiate catalogue and assign to Rock
                 catalogue_instance = dc.DataCloudDataFrame(data=catalogue_dict)

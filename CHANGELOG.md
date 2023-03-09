@@ -1,3 +1,6 @@
+# 1.7.5 - 2023-03-09
+- Change type of spins.period_flag to reflect upstream change
+
 # 1.7.4 - 2023-03-05
 - Move index check from init to into name resolution module as proposed in #21
 
