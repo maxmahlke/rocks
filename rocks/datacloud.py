@@ -8,11 +8,11 @@ import numpy as np
 import pandas as pd
 import pydantic
 import rich
-from rich.table import Table
 
 from rocks import config
 from rocks import core
 from rocks.logging import logger
+
 
 # ------
 # Pretty-printing
@@ -28,6 +28,8 @@ def pretty_print(rock, catalogue, parameter):
     parameter : str
         The name of the user-requested parameter to echo.
     """
+    from rich.table import Table
+
     if len(catalogue) == 1 and pd.isna(catalogue.number[0]):
         print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
         return
@@ -77,7 +79,6 @@ def pretty_print(rock, catalogue, parameter):
 
     # Add rows to table, styling by preferred-state of entry
     for i, pref in enumerate(preferred):
-
         if parameter in ["diamalbedos"]:
             if pref:
                 if (
@@ -216,6 +217,7 @@ def get_preferred(name, parameter, ids):
 # ------
 # SsODNet catalogues as pydantic model
 # https://ssp.imcce.fr/data/ssodnet_datacloud.sql
+
 
 # Metacatalogues
 class Collection(pydantic.BaseModel):
