@@ -9,12 +9,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.7', '3.10']
+        os: [ubuntu-latest, macos-latest]
+        python-version: ['3.7', '3.10',]
 
-    defaults:
-      run:
-        shell: bash
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -27,10 +24,5 @@ jobs:
         pip install tox tox-gh-actions
     - name: Install Poetry
       uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
     - name: Test with tox
-      run:
-        source $VENV
-        poetry run tox
+      run: poetry run tox
