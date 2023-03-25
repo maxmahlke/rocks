@@ -24,6 +24,8 @@ from rocks.logging import logger
 def _build_index():
     """Build asteroid name-number index from SsODNet sso_index."""
 
+    config.PATH_INDEX.mkdir(exist_ok=True, parents=True)
+
     tasks_descs = [
         (_build_fuzzy_searchable_index, ":kiwi_fruit: Differentiating parent bodies"),
         (_build_number_index, ":ringed_planet: Cleaning out resonances"),
@@ -38,7 +40,6 @@ def _build_index():
         progress.BarColumn(),
         "[progress.percentage]{task.percentage:>3.0f}%",
     ) as pbar:
-
         # Initiate progress bar and retrieve index from SsODNet
         steps = pbar.add_task(
             ":telescope: Counting minor bodies", total=len(tasks_descs) + 1
@@ -84,7 +85,6 @@ def _build_number_index(index):
     parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
 
     for part in parts:
-
         part_index = numbered.loc[
             (part <= numbered.Number) & (numbered.Number < part + SIZE)
         ]
@@ -118,7 +118,6 @@ def _build_name_index(index):
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
 
     for part in parts:
-
         names_subset = set(name for name in names if name.startswith(part))
 
         if part == "a":
@@ -164,7 +163,6 @@ def _build_designation_index(index):
     ]
 
     for part in parts:
-
         part_designations = set(desi for desi in designations if desi.startswith(part))
 
         # Asteroids in this chunk
@@ -361,7 +359,6 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
 
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
-
         if id_[0] == "'":  # catch 'aylo'chaxnim
             which = f"{id_[0]}.pkl"
         else:
