@@ -1,6 +1,11 @@
 import rocks
 
 
+def test_build_index():
+    """Build the asteroid name-number index."""
+    rocks.index._build_index()
+
+
 def test_load_partial():
     """Load part of the index and look up asteroid."""
 
