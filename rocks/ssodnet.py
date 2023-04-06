@@ -80,7 +80,6 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
 async def _get_ssocard(id_ssodnet, progress_bar, progress, local):
     """Get ssoCard asynchronously. First attempt local lookup, then query SsODNet."""
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
-
         tasks = [
             asyncio.ensure_future(
                 _local_or_remote(i, session, progress_bar, progress, local)
@@ -99,7 +98,6 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     PATH_CARD = config.PATH_CACHE / f"{id_ssodnet}.json"
 
     if PATH_CARD.is_file() and local:
-
         _update_progress(progress_bar, progress)
 
         with open(PATH_CARD, "r") as file_card:
@@ -191,7 +189,6 @@ def _postprocess_ssocard(card):
     spin_solutions = []
 
     for key, spin in spins.items():
-
         # spin entries have integer ids
         if not key.isnumeric():
             continue
@@ -270,7 +267,6 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
 
     else:
         with Progress(disable=not progress) as progress_bar:
-
             progress = progress_bar.add_task(
                 "Getting catalogues" if len(catalogue) > 1 else catalogue[0],
                 total=len(id_catalogue),
@@ -305,7 +301,6 @@ async def _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local):
     is empty.
     """
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
-
         tasks = [
             asyncio.ensure_future(
                 _local_or_remote_catalogue(
@@ -343,7 +338,13 @@ async def _local_or_remote_catalogue(
 
     # Always save the result, even if catalogue is empty
     if cat is not None:
-        cat = cat[0]["datacloud"]
+        try:
+            cat = cat[0]["datacloud"]
+        except (IndexError, KeyError):
+            logger.error(
+                f"Catalogue '{catalogue}' for '{id_ssodnet}' got an invalid response from datacloud."
+            )
+            cat = {}
         if catalogue in cat:
             cat = cat[catalogue]
         else:

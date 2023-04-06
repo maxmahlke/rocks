@@ -1,3 +1,6 @@
+# 1.7.6 - 2023-
+- Catch invalid datacloud response when querying catalogues
+
 # 1.7.5 - 2023-03-09
 - Change type of spins.period_flag to reflect upstream change
 
