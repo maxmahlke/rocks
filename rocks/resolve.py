@@ -82,7 +82,6 @@ def identify(id_, return_id=False, local=True, progress=False):
         logger.warning(f"Received id_ of type {type(id_)}.")
         return (None, np.nan) if not return_id else (None, np.nan, None)  # type: ignore
     elif not isinstance(id_, (list, np.ndarray)):
-
         try:
             id_ = id_.to_list()  # pandas Series
         except AttributeError:
@@ -98,7 +97,6 @@ def identify(id_, return_id=False, local=True, progress=False):
     # ------
     # For a single name, try local lookup right away, async process has overhead
     if len(id_) == 1 and local:
-
         success, (name, number, ssodnet_id) = _local_lookup(id_[0])
 
         if success:
@@ -110,7 +108,6 @@ def identify(id_, return_id=False, local=True, progress=False):
     # ------
     # Run asynchronous event loop for name resolution
     with Progress(disable=not progress) as progress_bar:
-
         task = progress_bar.add_task("Identifying rocks", total=len(id_))  # type: ignore
         loop = get_or_create_eventloop()
         results = loop.run_until_complete(_identify(id_, local, progress_bar, task))
@@ -143,7 +140,6 @@ async def _identify(id_, local, progress_bar, task):
     """Establish the asynchronous HTTP session and launch the name resolution."""
 
     async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout()) as session:
-
         tasks = [
             asyncio.ensure_future(_resolve(i, session, local, progress_bar, task))
             for i in id_
@@ -284,7 +280,6 @@ def _standardize_id_for_quaero(id_):
             r"(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))",
             id_,
         ):
-
             # Ensure whitespace between year and id_
             id_ = re.sub(r"[\W_]+", "", id_)
             ind = re.search(r"[A18920]{1,2}[0-9]{2}", id_).end()  # type: ignore
@@ -298,7 +293,6 @@ def _standardize_id_for_quaero(id_):
 
         # Palomar-Leiden / Transit
         elif re.match(r"^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$", id_):
-
             # Ensure whitespace
             id_ = re.sub(r"[ _]+", "", id_)
             id_ = f"{id_[:4]} {id_[4:]}"
@@ -352,11 +346,11 @@ async def _query_quaero(id_, session):
         return None
 
     if "data" not in response.keys():  # no match found
-        logger.error(f"Could not find match for id {id_}.")
+        logger.error(f"Could not identify '{id_}'.")
         return False
 
     elif not response["data"]:  # empty response
-        logger.error(f"Could not find match for id {id_}.")
+        logger.error(f"Could not identify '{id_}'.")
         return False
 
     return response
@@ -391,7 +385,7 @@ def _parse_quaero_response(data, id_):
             break
     else:
         # Unclear which match is correct.
-        logger.warning(f"Could not find match for id {id_}.")
+        logger.warning(f"Could not identify '{id_}'.")
         return (None, np.nan, None)
 
     # Found match
