@@ -25,8 +25,6 @@
 
 <br>
 
-*Disclaimer: The SsODNet service and its database are in an alpha version and under constant revision. The provided values and access methods may change without notice.*
-
 ## Features
 
 Explore asteroid data on the command-line...
