@@ -1,4 +1,5 @@
 # 1.7.6 - 2023-
+- Update ssoCard format for ssoCard version 1.1.0
 - Catch invalid datacloud response when querying catalogues
 
 # 1.7.5 - 2023-03-09

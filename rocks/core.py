@@ -25,7 +25,6 @@ def add_paths(cls, values, parent):
 
     for name, value in values.items():
         if isinstance(value, (Parameter, FloatValue, StringValue, IntegerValue)):
-
             if keyword.iskeyword(name.strip("_")):
                 name = name.strip("_")
 
@@ -46,7 +45,6 @@ class Error(pydantic.BaseModel):
 
 # The second lowest level is the Parameter. Values inherit from Parameter.
 class Parameter(pydantic.BaseModel):
-
     _label: str = pydantic.Field("", exclude=True)
     _format: str = pydantic.Field("", exclude=True)
     _symbol: str = pydantic.Field("", exclude=True)
@@ -129,7 +127,6 @@ class FloatValue(Parameter):
 
     @pydantic.root_validator(pre=True)
     def _compute_mean_error(cls, values):
-
         if "error" in values:
             if "min" in values["error"] and "max" in values["error"]:
                 values["error_"] = np.mean(
@@ -184,9 +181,12 @@ class Method(Parameter):
     doi: str = ""
     name: str = ""
     year: int = None
+    label: str = ""
     title: str = ""
+    source: str = ""
     bibcode: str = ""
     shortbib: str = ""
+    description: str = ""
 
 
 class Bibref(Parameter):
@@ -261,8 +261,10 @@ class OrbitalElements(Parameter):
     node_longitude: FloatValue = FloatValue(**{})
     orbital_period: FloatValue = FloatValue(**{})
     semi_major_axis: FloatValue = FloatValue(**{})
+    aphelion_distance: FloatValue = FloatValue(**{})
     number_observation: FloatValue = FloatValue(**{})
     perihelion_argument: FloatValue = FloatValue(**{})
+    perihelion_distance: FloatValue = FloatValue(**{})
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -291,6 +293,16 @@ class ProperElements(Parameter):
         return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
 
+class SourceRegions(Parameter):
+    hun: FloatValue = FloatValue(**{})
+    nu6: FloatValue = FloatValue(**{})
+    pho: FloatValue = FloatValue(**{})
+    mm31: FloatValue = FloatValue(**{})
+    mm21: FloatValue = FloatValue(**{})
+    method: List[Method] = [Method(**{})]
+    links: LinksParameter = LinksParameter(**{})
+
+
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
@@ -317,6 +329,23 @@ class Family(Parameter):
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
+class MOID(Parameter):
+    mercury: FloatValue = pydantic.Field(FloatValue(**{}), alias="Mercury")
+    venus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Venus")
+    emb: FloatValue = pydantic.Field(FloatValue(**{}), alias="EMB")
+    mars: FloatValue = pydantic.Field(FloatValue(**{}), alias="Mars")
+    jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
+    saturn: FloatValue = pydantic.Field(FloatValue(**{}), alias="Saturn")
+    uranus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Uranus")
+    neptune: FloatValue = pydantic.Field(FloatValue(**{}), alias="Neptune")
+    method: List[Method] = [Method(**{})]
+    links: LinksParameter = LinksParameter(**{})
+
+    @pydantic.root_validator()
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.MOID")
+
+
 class Pair(Parameter):
     age: FloatValue = FloatValue(**{})
     distance: FloatValue = FloatValue(**{})
@@ -330,8 +359,11 @@ class Pair(Parameter):
 
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
-    method: List[Method] = [Bibref(**{})]
-    bibref: ListWithAttributes = [Method(**{})]
+    saturn: FloatValue = pydantic.Field(FloatValue(**{}), alias="Saturn")
+    uranus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Uranus")
+    neptune: FloatValue = pydantic.Field(FloatValue(**{}), alias="Neptune")
+    method: List[Method] = [Method(**{})]
+    bibref: ListWithAttributes = [Bibref(**{})]
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -355,8 +387,10 @@ class Yarkovsky(Parameter):
 
 
 class DynamicalParameters(Parameter):
+    moid: MOID = MOID(**{})
     pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
     family: Family = Family(**{})
+    source_regions: SourceRegions = SourceRegions(**{})
     tisserand_parameter: TisserandParameter = TisserandParameter(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
@@ -601,11 +635,13 @@ class Spin(Parameter):
     DEC0: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     long_: FloatValue = pydantic.Field(FloatValue(**{}), alias="long")
+    bibref: ListWithAttributes = [Bibref(**{})]
+    method: List[Method] = [Method(**{})]
     period: FloatValue = FloatValue(**{})
     obliquity: FloatValue = FloatValue(**{})
-    method: List[Method] = [Method(**{})]
-    bibref: ListWithAttributes = [Bibref(**{})]
     technique: StringValue = StringValue(**{})
+    technique: StringValue = StringValue(**{})
+    period_type: StringValue = StringValue(**{})
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -849,7 +885,6 @@ class Rock(pydantic.BaseModel):
                     raise ValueError(MESSAGE)
 
             else:
-
                 if datacloud is not None:
                     for catalogue in datacloud:
                         ssocard = self.__add_datacloud_catalogue(
@@ -863,12 +898,10 @@ class Rock(pydantic.BaseModel):
         try:
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
-
             self.__parse_error_message(message, id_, ssocard)
 
             # Set the offending properties to None to allow for instantiation anyway
             for error in message.errors():
-
                 # Dynamically remove offending parts of the ssoCard
                 offending_part = ssocard
 
@@ -889,7 +922,6 @@ class Rock(pydantic.BaseModel):
                             except KeyError:
                                 pass
                 else:
-
                     for location in error["loc"][:-1]:
                         offending_part = offending_part[location]
 
@@ -900,7 +932,6 @@ class Rock(pydantic.BaseModel):
         # Convert the retrieve datacloud catalogues into DataCloudDataFrame objects
         if datacloud is not None:
             for catalogue in datacloud:
-
                 if catalogue in ["diameters", "albedos"]:
                     catalogue = "diamalbedo"
 
@@ -1070,13 +1101,11 @@ def rocks_(ids, datacloud=None, progress=False, on_404="warning"):
     ssodnet.get_ssocard([id_ for id_ in ids if not id_ is None], progress=progress)
 
     if datacloud is not None:
-
         if isinstance(datacloud, str):
             datacloud = [datacloud]
 
         # Load datacloud catalogues asynchronously
         for cat in datacloud:
-
             if cat not in config.DATACLOUD.keys():
                 raise ValueError(
                     f"Unknown datacloud catalogue name: '{cat}'"
