@@ -181,12 +181,10 @@ class Method(Parameter):
     doi: str = ""
     name: str = ""
     year: int = None
-    label: str = ""
     title: str = ""
     source: str = ""
     bibcode: str = ""
     shortbib: str = ""
-    description: str = ""
 
 
 class Bibref(Parameter):
