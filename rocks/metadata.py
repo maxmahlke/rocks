@@ -3,6 +3,7 @@
 from functools import lru_cache
 import json
 import re
+import unicodedata
 
 import requests
 import rich
@@ -73,7 +74,7 @@ def find_author(author):
 
     for category, datasets in ssodnet_biblio["ssodnet_biblio"]["datasets"].items():
         for dataset in datasets:
-            if author.capitalize() in dataset["shortbib"]:
+            if author.capitalize() in remove_diacritics(dataset["shortbib"]):
                 rich.print(
                     f" [magenta]{dataset['bibcode']}[/magenta]  {dataset['shortbib']:<20} [{category}]"
                 )
@@ -83,6 +84,27 @@ def find_author(author):
         logger.info(
             f"Could not find articles by '{author.capitalize()}' in SsODNet. You can email 'benoit.carry (at) oca.eu' if you are missing data."
         )
+
+
+def remove_diacritics(text):
+    """Remove accents from characters for a wider search.
+
+    Parameters
+    ----------
+    text : str
+        The text to strip the accents from.
+
+    Returns
+    -------
+    str
+        The accent-free string.
+
+    Notes
+    -----
+    Merci to https://stackoverflow.com/a/35783136
+    """
+    normalized = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in normalized if unicodedata.category(c) != "Mn")
 
 
 def rocks_is_outdated():

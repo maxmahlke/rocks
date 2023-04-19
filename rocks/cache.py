@@ -126,6 +126,10 @@ def update_cards(ids):
     # Update all cards
     ssodnet.get_ssocard(ids, progress=True, local=False)
 
+    # Update metadata and authors
+    for which in ["authors", "mappings"]:
+        metadata.retrieve(which)
+
 
 def update_catalogues(cached_catalogues):
     """Update the cached datacloud catalogues.
