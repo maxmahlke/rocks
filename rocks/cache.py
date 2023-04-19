@@ -149,6 +149,8 @@ def retrieve_all_ssocards():
 
     Warning: This will slow down the '$ rocks status' command considerably.
     """
+    import shutil
+    from rich.progress import track
 
     # Retrieve archive of ssoCards
     PATH_ARCHIVE = "/tmp/ssoCard-latest.tar.gz"
