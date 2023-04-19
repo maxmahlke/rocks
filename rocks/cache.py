@@ -56,7 +56,6 @@ def take_inventory():
     cached_catalogues = []
 
     for file_ in cached_jsons:
-
         # Is it metadata?
         if file_ in [config.PATH_MAPPINGS, config.PATH_AUTHORS]:
             continue
@@ -113,7 +112,6 @@ def update_cards(ids):
 
     # Did any ID change?
     for id_, id_new in zip(ids, ids_new):
-
         if id_ == id_new:
             continue
 
@@ -142,7 +140,6 @@ def update_catalogues(cached_catalogues):
 
     # Update catalogues on a per-type basis
     for catalogue in set(catalogues[1] for catalogues in cached_catalogues):
-
         ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
         ssodnet.get_datacloud_catalogue(ids, catalogue, local=False, progress=True)
 
@@ -168,7 +165,6 @@ def retrieve_all_ssocards():
     members = cards.getmembers()
 
     for member in track(members, total=len(members), description="Unpacking ssoCards"):
-
         if not member.name.endswith(".json"):
             continue
 
