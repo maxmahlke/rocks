@@ -352,9 +352,15 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
         which = f"{index_number}.pkl"
 
         if not (config.PATH_INDEX / which).exists():
-            logger.error(
-                f"The provided number '{id_}' is larger than the largest number of any asteroid."
-            )
+
+            if id_ > 1e6:
+                logger.error(
+                    f"The provided number {id_} is larger than the largest number of any asteroid."
+                )
+            else:
+                logger.error(
+                    f"Could not resolve asteroid number {id_}. The index may be broken, run \n'$ rocks status --update' to update it."
+                )
             sys.exit()
 
     # Is it a name?
@@ -397,7 +403,10 @@ def _load(which):
 
 def get_modification_date():
     """Get modification date of index pickle files."""
-    date_index = (config.PATH_INDEX / "1.pkl").stat().st_mtime
+    check_file = config.PATH_INDEX / "1.pkl"
+    if not check_file.is_file():
+        return "[red][Index is broken, update it.][/red]"
+    date_index = check_file.stat().st_mtime
     return time.strftime("%d %b %Y", time.localtime(date_index))
 
 
