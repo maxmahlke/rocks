@@ -565,6 +565,7 @@ class Phase(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: ListWithAttributes = [Bibref(**{})]
     facility: StringValue = StringValue(**{})
+    technique: StringValue = StringValue(**{})
     name_filter: StringValue = StringValue(**{})
 
     def __bool__(self):
@@ -583,6 +584,8 @@ class Phase(Parameter):
 class PhaseFunction(Parameter):
     # Generic
     generic_johnson_V: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
+    # Gaia
+    gaia_gaia3_g: Phase = pydantic.Field(Phase(**{}), alias="GAIA/GAIA3.G")
     # ATLAS
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
@@ -599,6 +602,7 @@ class PhaseFunction(Parameter):
             [
                 np.isfinite(getattr(self, filter_).H.value)
                 for filter_ in [
+                    "gaia_gaia3_g",
                     "generic_johnson_V",
                     "misc_atlas_cyan",
                     "misc_atlas_orange",
@@ -609,7 +613,12 @@ class PhaseFunction(Parameter):
     def __str__(self):
         observed = []
 
-        for filter_ in ["generic_johnson_V", "misc_atlas_cyan", "misc_atlas_orange"]:
+        for filter_ in [
+            "gaia_gaia3_g",
+            "generic_johnson_V",
+            "misc_atlas_cyan",
+            "misc_atlas_orange",
+        ]:
             entry = getattr(self, filter_)
             if not np.isnan(entry.H.value):
                 observed.append(

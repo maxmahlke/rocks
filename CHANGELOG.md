@@ -1,8 +1,8 @@
 # 1.7.6 - 2023-04-21
 - Update ssoCard format for ssoCard version 1.1.0
-- Catch invalid datacloud response when querying catalogues
 - Update the metadata and dataset JSONs when choosing 'update' in '$ rocks status'
 - Strip diacritics from author search when running '$ rocks author'
+- Catch invalid datacloud response when querying catalogues
 - Catch malformed index when running rocks status
 
 # 1.7.5 - 2023-03-09
