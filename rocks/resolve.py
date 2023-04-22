@@ -235,7 +235,11 @@ def _reduce_id_for_local(id_):
     except ValueError:
         pass
 
-    # Name or designation
+    # -> Name or designation
+
+    # Strip leading and trailing whitespace
+    id_ = id_.strip()
+
     return id_.replace("_(Asteroid)", "").replace("_", "").replace(" ", "").lower()
 
 
@@ -257,6 +261,9 @@ def _standardize_id_for_quaero(id_):
         return int(id_)
 
     elif isinstance(id_, str):
+        # Strip leading and trailing whitespace
+        id_ = id_.strip()
+
         # String id_. Perform some regex tests to make sure it's well formatted
 
         # Asteroid number

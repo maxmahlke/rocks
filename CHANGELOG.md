@@ -1,3 +1,6 @@
+# 1.7.7
+- Name resolution strip leading/trailing whitespace from identfier
+
 # 1.7.6 - 2023-04-21
 - Update ssoCard format for ssoCard version 1.1.0
 - Update the metadata and dataset JSONs when choosing 'update' in '$ rocks status'
