@@ -1,5 +1,6 @@
-# 1.7.7
+# 1.7.7 - 2023-04-24
 - Name resolution strip leading/trailing whitespace from identfier
+- Promote mal-formed ssoCard error message
 
 # 1.7.6 - 2023-04-21
 - Update ssoCard format for ssoCard version 1.1.0
