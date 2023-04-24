@@ -918,11 +918,6 @@ class Rock(pydantic.BaseModel):
                 ):
                     for property_ in ["taxonomy", "spin"]:
                         if property_ in location_list:
-                            # these are lists instead of dicts and the indices are flipped
-                            # eg taxonomy bibref 0 becomes taxonomy 0 bibref
-                            idx = location_list.index(property_)
-                            entry, idx_list = location_list[idx + 1 : idx + 3]
-
                             try:
                                 del ssocard["parameters"]["physical"][property_]
                             except KeyError:
