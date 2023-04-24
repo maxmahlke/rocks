@@ -8,7 +8,6 @@ from typing import List, Generator
 import numpy as np
 import pandas as pd
 import pydantic
-import rich
 
 from rocks import config
 from rocks import datacloud as dc
