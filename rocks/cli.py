@@ -242,6 +242,7 @@ def status(clear, update):
 
         if decision == "1":
             click.echo()
+            index._build_index()
     if update:
         index._build_index()
 
