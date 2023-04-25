@@ -17,6 +17,7 @@ data/unit-template_aster-astorb.json
 data/compute_index_and_publish.sh
 data/ssocards
 .april_first
+rocks.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
