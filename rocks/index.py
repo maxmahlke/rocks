@@ -466,9 +466,8 @@ def _ensure_index_exists():
     version: {__version__}
     cache:   {config.PATH_CACHE}
 
-    It looks like this is the first time you run [green]rocks[/green].
-    Some metadata is required to be present in the cache directory.
-    [green]rocks[/green] will download it now.
+    It looks like this is the first time you run [green]rocks[/green]. Some
+    metadata is required to run. [green]rocks[/green] will download it now.
     """
 
     # Cache directory is missing: first time running rocks

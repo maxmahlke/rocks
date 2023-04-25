@@ -1059,7 +1059,7 @@ class Rock(pydantic.BaseModel):
                 except TypeError:
                     break
 
-            logger.warning(
+            logger.debug(
                 f"{id_}: Invalid value for {'.'.join([str(e) for e in error['loc']])}"
             )
             logger.debug(f"Passed value: {value}")
