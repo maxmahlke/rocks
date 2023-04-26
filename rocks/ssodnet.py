@@ -387,7 +387,6 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
     response = await session.request(method="GET", url=URL)
 
     if not response.ok:
-        # logger.warning(f"Catalogue query failed for ID: {id_ssodnet} - {catalogue}")
         return {"data": {id_ssodnet: {"datacloud": None}}}
 
     response_json = await response.json()
