@@ -345,6 +345,8 @@ async def _local_or_remote_catalogue(
                 f"Catalogue '{catalogue}' for '{id_ssodnet}' got an invalid response from datacloud."
             )
             cat = {}
+            _update_progress(progress_bar, progress)
+            return cat
         if catalogue in cat:
             cat = cat[catalogue]
         else:
@@ -385,7 +387,7 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
     response = await session.request(method="GET", url=URL)
 
     if not response.ok:
-        logger.warning(f"Catalogue query failed for ID: {id_ssodnet} - {catalogue}")
+        # logger.warning(f"Catalogue query failed for ID: {id_ssodnet} - {catalogue}")
         return {"data": {id_ssodnet: {"datacloud": None}}}
 
     response_json = await response.json()
