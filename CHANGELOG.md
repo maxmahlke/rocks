@@ -1,3 +1,7 @@
+# 1.7.8
+- Add Johnson R filter to phase functions entries
+- No longer storing invalid datacloud responses
+
 # 1.7.7 - 2023-04-24
 - Name resolution strip leading/trailing whitespace from identfier
 - Promote mal-formed ssoCard error message

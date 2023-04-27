@@ -583,8 +583,9 @@ class Phase(Parameter):
 class PhaseFunction(Parameter):
     # Generic
     generic_johnson_V: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
+    generic_johnson_R: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.R")
     # Gaia
-    gaia_gaia3_g: Phase = pydantic.Field(Phase(**{}), alias="GAIA/GAIA3.G")
+    gaia_gaia3_G: Phase = pydantic.Field(Phase(**{}), alias="GAIA/GAIA3.G")
     # ATLAS
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
@@ -601,7 +602,8 @@ class PhaseFunction(Parameter):
             [
                 np.isfinite(getattr(self, filter_).H.value)
                 for filter_ in [
-                    "gaia_gaia3_g",
+                    "gaia_gaia3_G",
+                    "generic_johnson_R",
                     "generic_johnson_V",
                     "misc_atlas_cyan",
                     "misc_atlas_orange",
@@ -613,7 +615,8 @@ class PhaseFunction(Parameter):
         observed = []
 
         for filter_ in [
-            "gaia_gaia3_g",
+            "gaia_gaia3_G",
+            "generic_johnson_R",
             "generic_johnson_V",
             "misc_atlas_cyan",
             "misc_atlas_orange",
