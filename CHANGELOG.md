@@ -1,4 +1,4 @@
-# 1.7.8
+# 1.7.8 - 2023-05-04
 - Add Johnson R filter to phase functions entries
 - No longer storing invalid datacloud responses
 
