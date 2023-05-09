@@ -1,3 +1,6 @@
+# 1.7.9
+- Make all ssoCard bibref properties ListWithAttributes
+
 # 1.7.8 - 2023-05-04
 - Add Johnson R filter to phase functions entries
 - No longer storing invalid datacloud responses

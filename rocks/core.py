@@ -193,6 +193,9 @@ class Bibref(Parameter):
     bibcode: str = ""
     shortbib: str = ""
 
+    def __bool__(self):
+        return bool(self.shortbib)
+
 
 class LinksParameter(Parameter):
     datacloud: str = ""
@@ -247,7 +250,7 @@ class OrbitalElements(Parameter):
     ceu: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     author: StringValue = StringValue(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     ceu_rate: FloatValue = FloatValue(**{})
     ref_epoch: FloatValue = FloatValue(**{})
     inclination: FloatValue = FloatValue(**{})
@@ -274,7 +277,7 @@ class OrbitalElements(Parameter):
 
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     lyapunov_time: FloatValue = FloatValue(**{})
     integration_time: FloatValue = FloatValue(**{})
     proper_eccentricity: FloatValue = FloatValue(**{})
@@ -360,7 +363,7 @@ class TisserandParameter(Parameter):
     uranus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Uranus")
     neptune: FloatValue = pydantic.Field(FloatValue(**{}), alias="Neptune")
     method: List[Method] = [Method(**{})]
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -372,7 +375,7 @@ class Yarkovsky(Parameter):
     A2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
     dadt: FloatValue = FloatValue(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
     def __str__(self):
@@ -401,7 +404,7 @@ class DynamicalParameters(Parameter):
 # Physical Value
 class Albedo(FloatValue):
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = []
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = []
 
     path = "parameters.physical.albedo.albedo"
@@ -416,7 +419,7 @@ class ColorEntry(Parameter):
     epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
-    bibref: ListWithAttributes = []
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     facility: StringValue = StringValue(**{})
     observer: StringValue = StringValue(**{})
     phot_sys: StringValue = StringValue(**{})
@@ -515,7 +518,7 @@ class Color(Parameter):
 
 class Density(FloatValue):
     method: List[Method] = []
-    bibref: ListWithAttributes = []
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -529,7 +532,7 @@ class Density(FloatValue):
 class Diameter(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     method: List[Method] = [Method(**{})]
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
@@ -542,7 +545,7 @@ class Diameter(FloatValue):
 
 class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
     @pydantic.root_validator()
@@ -562,7 +565,7 @@ class Phase(Parameter):
     rms: FloatValue = FloatValue(**{})
     phase: Error = Error(**{})
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     facility: StringValue = StringValue(**{})
     technique: StringValue = StringValue(**{})
     name_filter: StringValue = StringValue(**{})
@@ -644,7 +647,7 @@ class Spin(Parameter):
     DEC0: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     long_: FloatValue = pydantic.Field(FloatValue(**{}), alias="long")
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
     period: FloatValue = FloatValue(**{})
     obliquity: FloatValue = FloatValue(**{})
@@ -664,7 +667,7 @@ class Spin(Parameter):
 class Taxonomy(Parameter):
     links: LinksParameter = LinksParameter(**{})
     class_: StringValue = pydantic.Field(StringValue(**{}), alias="class")
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
     scheme: StringValue = StringValue(**{})
     complex: StringValue = StringValue(**{})
@@ -691,7 +694,7 @@ class Taxonomy(Parameter):
 class ThermalInertia(FloatValue):
     dsun: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
     @pydantic.root_validator()
@@ -707,7 +710,7 @@ class ThermalInertia(FloatValue):
 
 class AbsoluteMagnitude(FloatValue):
     G: FloatValue = FloatValue(**{})
-    bibref: ListWithAttributes = [Bibref(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
