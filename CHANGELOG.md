@@ -1,4 +1,5 @@
-# 1.7.9
+# 1.8 - 2023-05-25
+- Support python3.11
 - Make all ssoCard bibref properties ListWithAttributes
 
 # 1.7.8 - 2023-05-04
