@@ -1,3 +1,6 @@
+# 1.8.1 - 2023-05-25
+- Fix install bug by providing numpy version markers
+
 # 1.8 - 2023-05-25
 - Support python3.11
 - Make all ssoCard bibref properties ListWithAttributes
