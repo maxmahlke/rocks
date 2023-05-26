@@ -1,5 +1,6 @@
 # 1.8.2
 - Alias query is now done remotely via quaero. Removing the alias index, it's slow and heavy.
+- Speed up index creation using multiprocessing
 
 # 1.8.1 - 2023-05-25
 - Fix install bug by providing numpy version markers

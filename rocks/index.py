@@ -95,7 +95,7 @@ def _build_index():
             )
 
 
-def _build_number_index(index):
+def _build_number_index(index, pbar, task_id):
     """Build the number -> name,SsODNetID index parts.
 
     Parameters
@@ -111,8 +111,9 @@ def _build_number_index(index):
     # Find next 10,000 to largest number
     numbered = index[~pd.isna(index.Number)]
     parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
+    pbar[task_id] = {"progress": 0, "total": len(parts)}
 
-    for part in parts:
+    for i, part in enumerate(parts):
         part_index = numbered.loc[
             (part <= numbered.Number) & (numbered.Number < part + SIZE)
         ]
@@ -126,8 +127,10 @@ def _build_number_index(index):
 
         _write_to_cache(part_index, f"{part}.pkl")
 
+        pbar[task_id] = {"progress": i + 1, "total": len(parts)}
 
-def _build_name_index(index):
+
+def _build_name_index(index, pbar, task_id):
     """Build the reduced -> number,SsODNetID index.
 
     Parameters
@@ -139,13 +142,14 @@ def _build_name_index(index):
     import pandas as pd
 
     parts = string.ascii_lowercase  # first character of name
+    pbar[task_id] = {"progress": 0, "total": len(parts)}
 
     index = index[~pd.isna(index.Number)]
 
     names = set(red for red in index.Reduced if re.match(r"^[a-z\'-]*$", red))
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
 
-    for part in parts:
+    for i, part in enumerate(parts):
         names_subset = set(name for name in names if name.startswith(part))
 
         if part == "a":
@@ -161,9 +165,10 @@ def _build_name_index(index):
         )
 
         _write_to_cache(part_index, f"{part}.pkl")
+        pbar[task_id] = {"progress": i + 1, "total": len(parts)}
 
 
-def _build_designation_index(index):
+def _build_designation_index(index, pbar, task_id):
     """Build the designation -> name,number,SsODNetID index.
 
     Parameters
@@ -171,31 +176,9 @@ def _build_designation_index(index):
     index : pd.DataFrame
         The formatted index from SsODNet.
     """
-
     import pandas as pd
 
-    designations = set(
-        red
-        for red in index.Reduced
-        if re.match(
-            r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
-            r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
-            red,
-        )
-    )
-    max_year = max([int(year[2:4]) for year in designations if year.startswith("20")])
-    parts = [
-        "18",
-        "19",
-        *[f"20{year:02}" for year in range(0, max_year + 1)],
-    ]
-
-    for part in parts:
-        part_designations = set(desi for desi in designations if desi.startswith(part))
-
-        # Asteroids in this chunk
-        part_index = index.loc[index.Reduced.isin(part_designations)]
-
+    def _convert_part(part, part_index):
         no_number = pd.isna(part_index.Number)
         has_number = part_index[~no_number]
         no_number = part_index[no_number]
@@ -216,8 +199,37 @@ def _build_designation_index(index):
 
         _write_to_cache(part_index, f"d{part}.pkl")
 
+    designations = set(
+        red
+        for red in index.Reduced
+        if re.match(
+            r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
+            r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
+            red,
+        )
+    )
 
-def _build_palomar_transit_index(index):
+    index = index[index.Reduced.isin(designations)]
+
+    # treat 18xx and 19xx separately
+    part_18 = index.Reduced.str.startswith("18")
+    pbar[task_id] = {"progress": 1, "total": 26}
+    part_19 = index.Reduced.str.startswith("19")
+    pbar[task_id] = {"progress": 2, "total": 26}
+
+    _convert_part("18", index[part_18])
+    _convert_part("19", index[part_19])
+
+    index = index[(~part_18) & (~part_19)]
+
+    # now divide by year
+    index["parts"] = index.Reduced.str[:4]
+    for i, (part, part_index) in enumerate(index.groupby("parts")):
+        _convert_part(part, part_index)
+        pbar[task_id] = {"progress": i + 3, "total": 26}
+
+
+def _build_palomar_transit_index(index, pbar, task_id):
     """Build the reduced -> name,number,SsODNetID index for anything that is not
     a name and not a designation.
 
@@ -229,6 +241,7 @@ def _build_palomar_transit_index(index):
 
     import pandas as pd
 
+    pbar[task_id] = {"progress": 1, "total": 2}
     rest = set(
         red
         for red in index.Reduced
@@ -261,9 +274,10 @@ def _build_palomar_transit_index(index):
     )
 
     _write_to_cache(part_index, "PLT.pkl")
+    pbar[task_id] = {"progress": 2, "total": 2}
 
 
-def _build_fuzzy_searchable_index(index):
+def _build_fuzzy_searchable_index(index, pbar, task_id):
     """Merge name, number and SsODNet ID of all entries to fuzzy-searchable lines.
 
     Parameters
@@ -273,6 +287,8 @@ def _build_fuzzy_searchable_index(index):
     """
 
     import pandas as pd
+
+    pbar[task_id] = {"progress": 1, "total": 2}
 
     index = index.sort_values(["Number", "Name"])
 
@@ -294,6 +310,7 @@ def _build_fuzzy_searchable_index(index):
     ]
 
     _write_to_cache(LINES, "fuzzy_index.pkl")
+    pbar[task_id] = {"progress": 2, "total": 2}
 
 
 def _write_to_cache(obj, filename):
