@@ -30,9 +30,8 @@ def _build_index():
         (_build_fuzzy_searchable_index, ":kiwi_fruit: Differentiating parent bodies"),
         (_build_number_index, ":ringed_planet: Cleaning out resonances"),
         (_build_name_index, ":waning_gibbous_moon: Gardening the regolith"),
-        (_build_designation_index, ":five:  Assigning numbers"),
-        (_build_palomar_transit_index, ":u6307: Composing name citations"),
-        (_build_index_of_aliases, ":comet: Index updated"),
+        (_build_designation_index, ":u6307: Composing name citations"),
+        (_build_palomar_transit_index, ":comet: Index updated"),
     ]
 
     with progress.Progress(
@@ -50,21 +49,6 @@ def _build_index():
         for task, desc in tasks_descs:
             task(index)
             pbar.update(steps, description=desc, advance=1)
-
-
-def _build_index_of_aliases(index):
-    """Create the SsODNetID -> aliases index.
-
-    Parameters
-    ----------
-    index : pd.DataFrame
-        The formatted index from SsODNet.
-    """
-
-    index.Aliases = index.Aliases.str.split(";")
-    index = index.set_index("SsODNetID")
-    aliases = index.Aliases.to_dict()
-    _write_to_cache(aliases, "aliases.pkl")
 
 
 def _build_number_index(index):
@@ -311,22 +295,6 @@ def _retrieve_index_from_ssodnet():
     return index
 
 
-def get_aliases(ssodnetid):
-    """Return the aliases of the passed reduced identifier.
-
-    Parameters
-    ----------
-    ssodnetid :  str
-        The SsODNetID of the asteroid to alias.
-
-    Returns
-    -------
-    list
-        The list of aliases of the asteroid.
-    """
-    return _load("aliases.pkl")[ssodnetid]
-
-
 def _get_index_file(id_: typing.Union[int, str]) -> dict:
     """Get part of the index where id_ is located.
 
@@ -352,7 +320,6 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
         which = f"{index_number}.pkl"
 
         if not (config.PATH_INDEX / which).exists():
-
             if id_ > 1e6:
                 logger.error(
                     f"The provided number {id_} is larger than the largest number of any asteroid."

@@ -37,7 +37,7 @@ def get_or_create_eventloop():
             return asyncio.get_event_loop()
 
 
-def identify(id_, return_id=False, local=True, progress=False):
+def identify(id_, return_id=False, return_aliases=False, local=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 
     Parameters
@@ -46,6 +46,9 @@ def identify(id_, return_id=False, local=True, progress=False):
         One or more identifying names or numbers to resolve.
     return_id : bool
         Return the SsODNet ID of the asteroid as third member of
+        the tuple. Default is False.
+    return_list : bool
+        Return the known aliases of the asteroid as third member of
         the tuple. Default is False.
     local : bool
         Try resolving the name locally first. Default is True.
@@ -127,8 +130,13 @@ def identify(id_, return_id=False, local=True, progress=False):
 
     # ------
     # Verify the output format
-    if not return_id:
+    if not return_id and not return_aliases:
         results = [r[:2] for r in results]
+    else:
+        if return_id:
+            results = [r[:3] for r in results]
+        else:
+            results = [r[:2] + tuple(r[-1]) for r in results]
 
     if len(id_) == 1:  # type: ignore
         results = results[0]
@@ -398,7 +406,7 @@ def _parse_quaero_response(data, id_):
     # Found match
     numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]
     number = min(numeric) if numeric else np.nan
-    return (match["name"], number, match["id"])
+    return (match["name"], number, match["id"], match["aliases"])
 
 
 def _interactive():

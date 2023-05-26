@@ -20,7 +20,6 @@ class AliasedGroup(click.Group):
     """Click group with custom default mode implementation."""
 
     def get_command(self, ctx, cmd_name):
-
         # ------
         # Resolve known commands
 
@@ -130,12 +129,10 @@ def ids(id_):
     else:
         id_ = id_[0]
 
-    name, number, ssodnetid = resolve.identify(id_, return_id=True)  # type: ignore
+    name, number, *aliases = resolve.identify(id_, return_aliases=True, local=False)  # type: ignore
 
     if name is None:
         sys.exit()
-
-    aliases = index.get_aliases(ssodnetid)
 
     rich.print(f"({number}) {name}, aka \n {aliases}")
 
@@ -188,9 +185,7 @@ def status(clear, update):
 
     # Update or clear
     if cached_cards:
-
         if not clear and not update:
-
             decision = prompt.Prompt.ask(
                 "Update or clear the cached ssoCards and datacloud catalogues?\n"
                 "[blue][0][/blue] Do nothing "
@@ -208,7 +203,6 @@ def status(clear, update):
             cache.clear()
 
         elif update or decision == "2":
-
             # Update metadata
             metadata.retrieve("mappings")
 
@@ -221,7 +215,6 @@ def status(clear, update):
             cache.update_catalogues(cached_catalogues)
 
         elif decision == "3":
-
             from rich.console import Console
 
             with Console().status("Observing all asteroids.. [~11GB]", spinner="earth"):
@@ -230,7 +223,6 @@ def status(clear, update):
     # ------
     # Update asteroid name-number index
     if not clear and not update:
-
         decision = prompt.Prompt.ask(
             "\nUpdate the asteroid name-number index?\n"
             "[blue][0][/blue] No "
@@ -297,7 +289,6 @@ def echo():
 
     # Should we plot?
     for arg in ["-p", "--plot"]:
-
         if arg in sys.argv:
             sys.argv.remove(arg)
 
@@ -308,7 +299,6 @@ def echo():
 
     # Verbose output?
     for arg in ["-v", "--verbose"]:
-
         if arg in sys.argv:
             sys.argv.remove(arg)
 
