@@ -332,6 +332,9 @@ def _retrieve_index_from_ssodnet():
     # There are some spurious spaces in the column headers
     index = index.rename(columns={c: c.replace(" ", "") for c in index.columns})
 
+    # Don't need other columns
+    index = index[["Name", "Number", "SsODNetID", "Reduced"]]
+
     # We use NaNs instead of 0 for unnumbered objects
     index.loc[index["Number"] == 0, "Number"] = np.nan
     index["Number"] = index["Number"].astype("Int64")
