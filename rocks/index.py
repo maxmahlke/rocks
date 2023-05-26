@@ -1,6 +1,8 @@
 """Asteroid name-number index functions for rocks."""
 
+from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache
+import multiprocessing
 import pickle
 import pickletools
 import re
@@ -11,7 +13,7 @@ import time
 
 import numpy as np
 import rich
-from rich import progress
+from rich import console, progress
 
 from rocks import __version__
 from rocks import config
@@ -28,27 +30,69 @@ def _build_index():
 
     tasks_descs = [
         (_build_fuzzy_searchable_index, ":kiwi_fruit: Differentiating parent bodies"),
-        (_build_number_index, ":ringed_planet: Cleaning out resonances"),
-        (_build_name_index, ":waning_gibbous_moon: Gardening the regolith"),
-        (_build_designation_index, ":u6307: Composing name citations"),
-        (_build_palomar_transit_index, ":comet: Index updated"),
+        (_build_number_index, ":broom: Gardening regolith"),
+        (_build_name_index, ":ringed_planet: Cleaning out resonances"),
+        (_build_designation_index, ":earth_africa: Populating near-Earth space"),
+        (_build_palomar_transit_index, ":horse:  Separating Trojans"),
     ]
+
+    # ------
+    # Retrieve index while showing spinner
+    console = Console()
+    with console.status("Searching for minor bodies...", spinner="dots8Bit"):
+        index = _retrieve_index_from_ssodnet()
+
+    # ------
+    # Process index with multiple process
+
+    N_WORKERS = 5  # number of processes to launch
 
     with progress.Progress(
         "[progress.description]{task.description}",
         progress.BarColumn(),
         "[progress.percentage]{task.percentage:>3.0f}%",
     ) as pbar:
-        # Initiate progress bar and retrieve index from SsODNet
-        steps = pbar.add_task(
-            ":telescope: Counting minor bodies", total=len(tasks_descs) + 1
-        )
-        index = _retrieve_index_from_ssodnet()
-        pbar.update(steps, description=f":telescope: Found {len(index):,} ", advance=1)
+        futures = []
 
-        for task, desc in tasks_descs:
-            task(index)
-            pbar.update(steps, description=desc, advance=1)
+        with multiprocessing.Manager() as manager:
+            _progress = manager.dict()
+            overall_progress_task = pbar.add_task(
+                f"Processing {len(index):,} minor bodies..."
+            )
+
+            with ProcessPoolExecutor(max_workers=N_WORKERS) as executor:
+                for task, desc in tasks_descs:  # iterate over the jobs we need to run
+                    task_id = pbar.add_task(desc, visible=True)
+                    futures.append(executor.submit(task, index, _progress, task_id))
+
+                # monitor the progress:
+                while (n_finished := sum([future.done() for future in futures])) < len(
+                    futures
+                ):
+                    pbar.update(
+                        overall_progress_task, completed=n_finished, total=len(futures)
+                    )
+                    for task_id, update_data in _progress.items():
+                        latest = update_data["progress"]
+                        total = update_data["total"]
+                        # update the progress bar for this task:
+                        pbar.update(
+                            task_id,
+                            completed=latest,
+                            total=total,
+                            visible=latest < total,
+                        )
+
+                # raise any errors:
+                for future in futures:
+                    future.result()
+
+            pbar.update(
+                overall_progress_task,
+                completed=len(futures),
+                total=len(futures),
+                description="All done",
+            )
 
 
 def _build_number_index(index):
