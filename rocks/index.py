@@ -38,8 +38,8 @@ def _build_index():
 
     # ------
     # Retrieve index while showing spinner
-    console = Console()
-    with console.status("Searching for minor bodies...", spinner="dots8Bit"):
+    c = console.Console()
+    with c.status("Searching for minor bodies...", spinner="dots8Bit"):
         index = _retrieve_index_from_ssodnet()
 
     # ------
