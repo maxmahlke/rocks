@@ -29,11 +29,11 @@ def _build_index():
     config.PATH_INDEX.mkdir(exist_ok=True, parents=True)
 
     tasks_descs = [
-        (_build_fuzzy_searchable_index, ":kiwi_fruit: Differentiating parent bodies"),
-        (_build_number_index, ":broom: Gardening regolith"),
-        (_build_name_index, ":ringed_planet: Cleaning out resonances"),
-        (_build_designation_index, ":earth_africa: Populating near-Earth space"),
-        (_build_palomar_transit_index, ":horse:  Separating Trojans"),
+        (_build_fuzzy_searchable_index, f"[dim]{'Differentiating Parent Bodies':>36}"),
+        (_build_number_index, f"[dim]{'Gardening Regolith':>36}"),
+        (_build_name_index, f"[dim]{'Clearing out Resonances':>36}"),
+        (_build_designation_index, f"[dim]{'Populating near-Earth Space':>36}"),
+        (_build_palomar_transit_index, f"[dim]{'Separating Trojans':>36}"),
     ]
 
     # ------
