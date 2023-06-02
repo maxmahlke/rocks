@@ -1,4 +1,4 @@
-# 1.8.2
+# 1.8.2 - 2023-06-02
 - Alias query is now done remotely via quaero. Removing the alias index, it's slow and heavy.
 - Speed up index creation using multiprocessing
 
