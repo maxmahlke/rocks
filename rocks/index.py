@@ -44,7 +44,6 @@ def _build_index():
 
     # ------
     # Process index with multiple process
-
     N_WORKERS = 5  # number of processes to launch
 
     with progress.Progress(
@@ -65,23 +64,27 @@ def _build_index():
                     task_id = pbar.add_task(desc, visible=True)
                     futures.append(executor.submit(task, index, _progress, task_id))
 
-                # monitor the progress:
-                while (n_finished := sum([future.done() for future in futures])) < len(
-                    futures
-                ):
+                # monitor the progress
+                n_finished = 0
+                while n_finished < len(futures):
+
+                    # Update overall bar
                     pbar.update(
                         overall_progress_task, completed=n_finished, total=len(futures)
                     )
                     for task_id, update_data in _progress.items():
                         latest = update_data["progress"]
                         total = update_data["total"]
-                        # update the progress bar for this task:
+
+                        # update the progress bar for task
                         pbar.update(
                             task_id,
                             completed=latest,
                             total=total,
                             visible=latest < total,
                         )
+                    # see if we're done
+                    n_finished = sum([future.done() for future in futures])
 
                 # raise any errors:
                 for future in futures:
@@ -91,7 +94,7 @@ def _build_index():
                 overall_progress_task,
                 completed=len(futures),
                 total=len(futures),
-                description="All done",
+                description="All done!",
             )
 
 
