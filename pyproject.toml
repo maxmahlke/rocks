@@ -33,6 +33,7 @@ sphinx_design = "^0.3.0"
 beautifulsoup4 = "^4.11.1"
 platformdirs = "^2.6.2"
 rapidfuzz = "^3"
+sphinx-hoverxref = {version = "*", optional = true}
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-redactor-theme", "sphinx-hoverxref"]
