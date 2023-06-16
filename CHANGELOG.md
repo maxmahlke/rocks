@@ -1,4 +1,8 @@
-# 1.8.4
+# 1.8.4 - 2023-06-16
+- Add 'Rock.get_parameter' method which accepts string values to look up parameters:
+      rocks.Rock(1).get_parameter('taxonomy.class_.value')
+  Good for iterating over many parameters.
+
 - Fix parameter shortcut and unit look-up for MOIDs
 
 # 1.8.3 - 2023-06-16
