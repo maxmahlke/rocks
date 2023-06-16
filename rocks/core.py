@@ -1084,6 +1084,10 @@ class Rock(pydantic.BaseModel):
             )
             logger.debug(f"Passed value: {value}")
 
+    def get_parameter(self, param: str):
+        """Get the parameter of a Rock by passing the name as a string."""
+        return rgetattr(self, param)
+
 
 def rocks_(ids, datacloud=None, progress=False, on_404="warning"):
     """Create multiple Rock instances.
