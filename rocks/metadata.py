@@ -21,7 +21,20 @@ def load_mappings():
         retrieve("mappings")
 
     with open(config.PATH_MAPPINGS, "r") as file_:
-        return json.load(file_)
+        mappings = json.load(file_)
+
+        # There are different capitalizations in MOIDs between rocks
+        # and ssodnet. Ensure that the units are found anyway
+        # This conversion is also done when retrieving the mappings,
+        # the code here ensures compatibility with outdated mappings files
+        # Remove in October 2023
+        mappings = {
+            k.lower(): {i.lower(): j for i, j in v.items()}
+            if isinstance(v, dict)
+            else v
+            for k, v in mappings.items()
+        }
+        return mappings
 
 
 def retrieve(which):
@@ -52,6 +65,13 @@ def retrieve(which):
 
     if which == "mappings":
         metadata = metadata["display"]
+
+        metadata = {
+            k.lower(): {i.lower(): j for i, j in v.items()}
+            if isinstance(v, dict)
+            else v
+            for k, v in metadata.items()
+        }
 
     PATH_OUT = config.PATH_AUTHORS if which == "authors" else config.PATH_MAPPINGS
 

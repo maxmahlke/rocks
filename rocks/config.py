@@ -17,6 +17,7 @@ ALIASES = {
     "dynamical": {
         "parameters.dynamical.orbital_elements": "orbital_elements",
         "parameters.dynamical.family": "family",
+        "parameters.dynamical.moid": "moid",
         "parameters.dynamical.pair": "pair",
         "parameters.dynamical.proper_elements": "proper_elements",
         "parameters.dynamical.tisserand_parameter": "tisserand_parameter",

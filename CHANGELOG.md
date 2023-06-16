@@ -1,3 +1,6 @@
+# 1.8.4
+- Fix parameter shortcut and unit look-up for MOIDs
+
 # 1.8.3 - 2023-06-16
 - Rename min/max error levels from min_/max_ to min/max. These terms are not python keywords.
 

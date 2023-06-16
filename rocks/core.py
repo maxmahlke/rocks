@@ -357,7 +357,7 @@ class MOID(Parameter):
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.dynamical.MOID")
+        return add_paths(cls, values, "parameters.dynamical.moid")
 
 
 class Pair(Parameter):
