@@ -38,8 +38,22 @@ def add_paths(cls, values, parent):
 
 # The lowest level in the ssoCard tree is the are the differnt Values and the Error
 class Error(pydantic.BaseModel):
-    min_: float = pydantic.Field(np.nan, alias="min")
-    max_: float = pydantic.Field(np.nan, alias="max")
+    min: float = np.nan
+    max: float = np.nan
+
+    @property
+    def min_(self):
+        logger.warning(
+            "Use 'max' and 'min' to access the errors. The 'max_' and 'min_' attributes will soon be removed."
+        )
+        return self.min
+
+    @property
+    def max_(self):
+        logger.warning(
+            "Use 'max' and 'min' to access the errors. The 'max_' and 'min_' attributes will soon be removed."
+        )
+        return self.max
 
 
 # The second lowest level is the Parameter. Values inherit from Parameter.
@@ -95,19 +109,19 @@ class Parameter(pydantic.BaseModel):
 
 class FloatValue(Parameter):
     _unit: str = ""
-    error: Error = Error(**{})  # min_ and max_ values
+    error: Error = Error(**{})  # min and max values
     value: float = np.nan
-    error_: float = np.nan  # average of min_ and max_
+    error_: float = np.nan  # average of min and max
 
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
 
         format = self.format.strip("%")
 
-        if abs(self.error.min_) == abs(self.error.max_):
-            return f"{self.value:{format}} +- {self.error.max_:{format}} {self.unit}"
+        if abs(self.error.min) == abs(self.error.max):
+            return f"{self.value:{format}} +- {self.error.max:{format}} {self.unit}"
         else:
-            return f"{self.value:{format}} +- ({self.error.max_:{format}}, {self.error.min_:{format}}) {self.unit}"
+            return f"{self.value:{format}} +- ({self.error.max:{format}}, {self.error.min:{format}}) {self.unit}"
 
     def __bool__(self):
         if np.isnan(self.value):
@@ -433,9 +447,9 @@ class ColorEntry(Parameter):
 
     def __str__(self):
         if not np.isnan(self.color.value):
-            if self.color.error.max_ == self.color.error.min_:
-                return rf"{self.color.value:.2f} +- {self.color.error.max_:.2f}  {self.bibref.shortbib}"
-            return rf"{self.color.value:.2f} + {self.color.error.max_:.2f} - {self.color.error.min_:.2f}  {self.bibref.shortbib}"
+            if self.color.error.max == self.color.error.min:
+                return rf"{self.color.value:.2f} +- {self.color.error.max:.2f}  {self.bibref.shortbib}"
+            return rf"{self.color.value:.2f} + {self.color.error.max:.2f} - {self.color.error.min:.2f}  {self.bibref.shortbib}"
         return "No color on record in this filter."
 
     @pydantic.root_validator()

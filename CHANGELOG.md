@@ -1,3 +1,6 @@
+# 1.8.3
+- Rename min/max error levels from min_/max_ to min/max. These terms are not python keywords.
+
 # 1.8.2 - 2023-06-02
 - Alias query is now done remotely via quaero. Removing the alias index, it's slow and heavy.
 - Speed up index creation using multiprocessing
