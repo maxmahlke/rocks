@@ -11,7 +11,7 @@ quickly. Do you have a good example to add? Post it in an issue on `GitHub
 
 For more extended examples, check out the jupyter notebooks:
 
-`Basic Usage <https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/rocks_basic_usage.ipynb>`_ - `Simple and Advanced Bibliography Management <https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/literature.ipynb>`_.
+`Basic Usage <https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/rocks_basic_usage.ipynb>`_ - `Bibliography Management <https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/literature.ipynb>`_.
 
 Identification
 --------------

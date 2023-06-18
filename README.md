@@ -80,4 +80,4 @@ Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.
 
 For a quick overview, check out the jupyter notebooks:
 
-[Basic Usage](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/rocks_basic_usage.ipynb) - [Simple and Advanced Bibliography Management](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/literature.ipynb)
+[Basic Usage](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/rocks_basic_usage.ipynb) - [Bibliography Management](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/literature.ipynb)
