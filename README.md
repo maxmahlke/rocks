@@ -77,3 +77,7 @@ The minimum required `python` version is 3.7.
 Check out the documentation at [rocks.readthedocs.io](https://rocks.readthedocs.io/en/latest/) or run
 
      $ rocks docs
+
+For a quick overview, check out the jupyter notebooks:
+
+[Basic Usage](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/rocks_basic_usage.ipynb) - [Simple and Advanced Bibliography Management](https://github.com/maxmahlke/rocks/blob/master/docs/tutorials/literature.ipynb)
