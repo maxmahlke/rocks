@@ -61,7 +61,10 @@ def take_inventory():
             continue
 
         # Datacloud catalogue or ssoCard?
-        if any(cat["ssodnet_name"] in str(file_) for cat in config.DATACLOUD.values()):
+        if any(
+            str(file_).startswith(cat["ssodnet_name"])
+            for cat in config.DATACLOUD.values()
+        ):
             *ssodnet_id, catalogue = file_.stem.split("_")
             ssodnet_id = "_".join(ssodnet_id)  # in case of provisional designation
         else:
