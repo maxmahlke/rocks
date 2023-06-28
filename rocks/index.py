@@ -511,7 +511,7 @@ def _echo_recently_named(old, new):
 
     for number_old, name_old in old.items():
         name_old = name_old[0]
-        if number_old in new_numbers:
+        if number_old in new:
             name_new = new[number_old][0]
             if name_old != name_new:
                 changed.append(f"\t({number_old}) {name_old} -> {name_new}")

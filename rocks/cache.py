@@ -62,7 +62,7 @@ def take_inventory():
 
         # Datacloud catalogue or ssoCard?
         if any(
-            str(file_).startswith(cat["ssodnet_name"])
+            file_.stem.endswith("_" + cat["ssodnet_name"])
             for cat in config.DATACLOUD.values()
         ):
             *ssodnet_id, catalogue = file_.stem.split("_")
