@@ -518,11 +518,12 @@ def _echo_recently_named(old, new):
 
     if changed:
         rich.print(
-            f"\n{len(changed)} asteroid{'s have' if len(changed) > 1 else ' has'} recently been named."
+            f"\n{len(changed)} asteroid{'s have' if len(changed) > 1 else ' has'} recently been named.",
+            end="\n" if len(changed) <= 10 else "",
         )
 
         if len(changed) > 10:
-            rich.print("Here are 10 random ones:")
+            rich.print(" Here are 10 random ones:")
             changed = random.sample(changed, 10)
 
         for change in changed:
