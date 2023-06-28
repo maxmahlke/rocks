@@ -5,6 +5,7 @@ from functools import lru_cache
 import multiprocessing
 import pickle
 import pickletools
+import random
 import re
 import string
 import sys
@@ -37,6 +38,10 @@ def _build_index():
     ]
 
     # ------
+    # Load current index of numbered asteroids to track recently named asteroids
+    old = _load_all_number_indices()
+
+    # ------
     # Retrieve index while showing spinner
     c = console.Console()
     with c.status("Searching for minor bodies...", spinner="dots8Bit"):
@@ -67,7 +72,6 @@ def _build_index():
                 # monitor the progress
                 n_finished = 0
                 while n_finished < len(futures):
-
                     # Update overall bar
                     pbar.update(
                         overall_progress_task, completed=n_finished, total=len(futures)
@@ -96,6 +100,10 @@ def _build_index():
                 total=len(futures),
                 description="All done!",
             )
+
+    # Compare old to new numbers to find recently named asteroids
+    new = _load_all_number_indices()
+    _echo_recently_named(old, new)
 
 
 def _build_number_index(index, pbar, task_id):
@@ -484,6 +492,41 @@ def find_candidates(id_):
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
     return candidates
+
+
+def _load_all_number_indices():
+    """Load all parts of the number index and return the merged dictionary."""
+    numbers = {}
+
+    for part in config.PATH_INDEX.glob("*.pkl"):
+        if part.stem.isnumeric():
+            part = _load(part)
+            numbers.update(part)
+    return numbers
+
+
+def _echo_recently_named(old, new):
+    """Echo the recently named asteroids."""
+    changed = []
+
+    for number_old, name_old in old.items():
+        name_old = name_old[0]
+        if number_old in new_numbers:
+            name_new = new[number_old][0]
+            if name_old != name_new:
+                changed.append(f"\t({number_old}) {name_old} -> {name_new}")
+
+    if changed:
+        rich.print(
+            f"\n{len(changed)} asteroid{'s have' if len(changed) > 1 else ' has'} recently been named."
+        )
+
+        if len(changed) > 10:
+            rich.print("Here are 10 random ones:")
+            changed = random.sample(changed, 10)
+
+        for change in changed:
+            rich.print(change)
 
 
 def _ensure_index_exists():
