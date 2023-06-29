@@ -280,6 +280,22 @@ def who(id_):
     )
 
 
+@cli_rocks.command()
+def recent():
+    """Echo recently named asteroids."""
+
+    if not (config.PATH_INDEX / "recent.pkl").is_file():
+        rich.print(
+            "No changes in the asteroid name-number index have been identified so far."
+        )
+        sys.exit()
+
+    changed = index._load("recent.pkl")
+
+    for number, name_old, name_new in changed:
+        rich.print(f"    ({number}) {name_old:<10} -> ({number}) {name_new:<10}")
+
+
 def echo():
     """Echos asteroid parameter to command line. Optionally opens plot."""
     import keyword

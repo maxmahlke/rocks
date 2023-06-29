@@ -5,7 +5,6 @@ from functools import lru_cache
 import multiprocessing
 import pickle
 import pickletools
-import random
 import re
 import string
 import sys
@@ -103,7 +102,7 @@ def _build_index():
 
     # Compare old to new numbers to find recently named asteroids
     new = _load_all_number_indices()
-    _echo_recently_named(old, new)
+    _save_recently_named(old, new)
 
 
 def _build_number_index(index, pbar, task_id):
@@ -505,8 +504,8 @@ def _load_all_number_indices():
     return numbers
 
 
-def _echo_recently_named(old, new):
-    """Echo the recently named asteroids."""
+def _save_recently_named(old, new):
+    """Save the recently named asteroids to file."""
     changed = []
 
     for number_old, name_old in old.items():
@@ -514,20 +513,18 @@ def _echo_recently_named(old, new):
         if number_old in new:
             name_new = new[number_old][0]
             if name_old != name_new:
-                changed.append(f"\t({number_old}) {name_old} -> {name_new}")
+                changed.append([number_old, name_old, name_new])
 
     if changed:
+        _write_to_cache(changed, "recent.pkl")
+
         rich.print(
             f"\n{len(changed)} asteroid{'s have' if len(changed) > 1 else ' has'} recently been named.",
-            end="\n" if len(changed) <= 10 else "",
+            end="",
         )
-
-        if len(changed) > 10:
-            rich.print(" Here are 10 random ones:")
-            changed = random.sample(changed, 10)
-
-        for change in changed:
-            rich.print(change)
+        rich.print(
+            f" Run '$ rocks recent' to echo the change{'s' if len(changed) > 1 else ''}."
+        )
 
 
 def _ensure_index_exists():
