@@ -1,5 +1,5 @@
-# 1.8.5 - 2023-06-
-- Echo recently named asteroids when updating index
+# 1.8.5 - 2023-06-29
+- Add '$ rocks recent' command to echo recently named asteroids after updating index
 - Fix bug in inventory function
 
 # 1.8.4 - 2023-06-16
