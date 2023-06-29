@@ -446,7 +446,7 @@ def get_modification_date():
     """Get modification date of index pickle files."""
     check_file = config.PATH_INDEX / "1.pkl"
     if not check_file.is_file():
-        return "[red][Index is broken, update it.][/red]"
+        return "[red][No Index Found][/red]"
     date_index = check_file.stat().st_mtime
     return time.strftime("%d %b %Y", time.localtime(date_index))
 

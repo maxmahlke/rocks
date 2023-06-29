@@ -286,7 +286,7 @@ def recent():
 
     if not (config.PATH_INDEX / "recent.pkl").is_file():
         rich.print(
-            "No changes in the asteroid name-number index have been identified so far."
+            "No changes in the asteroid name-number index have been tracked so far."
         )
         sys.exit()
 
