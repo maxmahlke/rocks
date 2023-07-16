@@ -1,9 +1,7 @@
 """Local and remote asteroid name resolution for rocks."""
 
 import asyncio
-import pickle
 import re
-import sys
 
 import aiohttp
 import nest_asyncio

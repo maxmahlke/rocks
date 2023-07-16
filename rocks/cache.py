@@ -1,8 +1,6 @@
 """Cache management for rocks."""
 
 import json
-from pathlib import Path
-import re
 import tarfile
 
 import requests
