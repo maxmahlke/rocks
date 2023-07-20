@@ -95,6 +95,24 @@ Identification
 
         Not possible. If you think it should be, open a feature request on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
 
+.. dropdown:: How can I identify an asteroid using its NAIF ID?
+
+   .. tab-set::
+
+      NAIF IDs are not stored in the local asteroid name-number index due to the ambiguity with ordinary asteroid numbers.
+      You can still identify asteroids using their NAIF IDs by skipping the local look-up and forcing a quaero query.
+
+      .. tab-item:: python
+
+        >>> rocks.id(2000001)
+        ERROR    [rocks] The provided number 2000001 is larger than the largest number of any asteroid.
+        >>> rocks.id(2000001, local=False)
+        (Ceres, 1)
+
+      .. tab-item:: Command Line
+
+      Not possible.
+
 .. dropdown:: What asteroids are in the SDSS MOC1?
 
    The script below shows the typical workflow of downloading a database of
