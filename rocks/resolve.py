@@ -34,7 +34,7 @@ def get_or_create_eventloop():
             asyncio.set_event_loop(loop)
             return asyncio.get_event_loop()
 
-
+# TODO: Use singledispatch to simplify the function call and return structure
 def identify(id_, return_id=False, return_aliases=False, local=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
 

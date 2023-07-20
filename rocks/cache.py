@@ -144,7 +144,6 @@ def update_catalogues(cached_catalogues):
         ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
         ssodnet.get_datacloud_catalogue(ids, catalogue, local=False, progress=True)
 
-
 def retrieve_all_ssocards():
     """Retrieves all ssoCards and stores them in the cache directory.
 
