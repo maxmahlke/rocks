@@ -34,6 +34,7 @@ def get_or_create_eventloop():
             asyncio.set_event_loop(loop)
             return asyncio.get_event_loop()
 
+
 # TODO: Use singledispatch to simplify the function call and return structure
 def identify(id_, return_id=False, return_aliases=False, local=True, progress=False):
     """Resolve names and numbers of one or more minor bodies using identifiers.
@@ -134,7 +135,16 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
         if return_id:
             results = [r[:3] for r in results]
         else:
-            results = [r[:2] + tuple(r[-1]) for r in results]
+            return_ = []
+
+            for result in results:
+                if result[-1] is not None:
+                    aliases = tuple(result[-1])
+                else:
+                    # alias look-up failed
+                    aliases = results[-1]
+                return_.append(result[:2] + aliases)
+            results = return_
 
     if len(id_) == 1:  # type: ignore
         results = results[0]
