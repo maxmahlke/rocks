@@ -195,7 +195,13 @@ DATACLOUD = {
     "pairs": {
         "attr_name": "pairs",
         "ssodnet_name": "pairs",
-        "print_columns": ["sibling_number", "sibling_name", "delta_v", "membership"],
+        "print_columns": [
+            "sibling_number",
+            "sibling_name",
+            "distance",
+            "age",
+            "method",
+        ],
     },
     "phase_functions": {
         "attr_name": "phase_functions",

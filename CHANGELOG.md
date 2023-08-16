@@ -1,3 +1,7 @@
+# 1.8.6 -
+- Fix output of pairs datacloud table
+- Catch failed alias look-up in `$ rocks ids` call
+
 # 1.8.5 - 2023-06-29
 - Add '$ rocks recent' command to echo recently named asteroids after updating index
 - Fix bug in inventory function
