@@ -1,4 +1,5 @@
 # 1.8.6 -
+- Fix type of bibref in yarkovsky and proper_elements
 - Fix output of pairs datacloud table
 - Catch failed alias look-up in `$ rocks ids` call
 

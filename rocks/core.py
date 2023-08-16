@@ -306,6 +306,10 @@ class ProperElements(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
 
 class SourceRegions(Parameter):
     hun: FloatValue = FloatValue(**{})
@@ -398,6 +402,10 @@ class Yarkovsky(Parameter):
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.yarkovsky")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class DynamicalParameters(Parameter):
