@@ -380,6 +380,7 @@ class Pair(Parameter):
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     saturn: FloatValue = pydantic.Field(FloatValue(**{}), alias="Saturn")
