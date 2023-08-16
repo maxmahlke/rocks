@@ -276,7 +276,7 @@ class OrbitalElements(Parameter):
     orbital_period: FloatValue = FloatValue(**{})
     semi_major_axis: FloatValue = FloatValue(**{})
     aphelion_distance: FloatValue = FloatValue(**{})
-    number_observation: FloatValue = FloatValue(**{})
+    number_observation: IntegerValue = IntegerValue(**{})
     perihelion_argument: FloatValue = FloatValue(**{})
     perihelion_distance: FloatValue = FloatValue(**{})
 
@@ -410,10 +410,12 @@ class Yarkovsky(Parameter):
 
 class DynamicalParameters(Parameter):
     moid: MOID = MOID(**{})
-    pair: Pair = pydantic.Field(Pair(**{}), alias="pairs")
+    pair: Pair = pydantic.Field(Pair(**{}), alias="pair")
     family: Family = Family(**{})
     source_regions: SourceRegions = SourceRegions(**{})
-    tisserand_parameter: TisserandParameter = TisserandParameter(**{})
+    tisserand_parameter: TisserandParameter = pydantic.Field(
+        TisserandParameter(**{}), alias="tisserand_parameters"
+    )
     yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
     orbital_elements: OrbitalElements = OrbitalElements(**{})

@@ -1,5 +1,6 @@
-# 1.8.6 -
-- Fix type of bibref in yarkovsky and proper_elements
+# 1.8.6 - 2023-08-16
+- Fix access of tisserand_parameter and pair
+- Fix bibref type in yarkovsky and proper_elements
 - Fix output of pairs datacloud table
 - Catch failed alias look-up in `$ rocks ids` call
 
