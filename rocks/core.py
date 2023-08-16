@@ -369,11 +369,16 @@ class Pair(Parameter):
     distance: FloatValue = FloatValue(**{})
     sibling_name: StringValue = StringValue(**{})
     sibling_number: IntegerValue = IntegerValue(**{})
+    method: List[Method] = [Method(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.pair")
 
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
@@ -386,6 +391,10 @@ class TisserandParameter(Parameter):
     @pydantic.root_validator()
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.validator(
+        "bibref", allow_reuse=True, pre=True
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class Yarkovsky(Parameter):

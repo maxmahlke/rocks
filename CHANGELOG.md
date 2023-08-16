@@ -1,3 +1,7 @@
+# 1.8.7 - 2023-08-16
+- Add bibref and method to pair
+- Fix bibref type of tisserand_parameter
+
 # 1.8.6 - 2023-08-16
 - Fix access of tisserand_parameter and pair
 - Fix bibref type in yarkovsky and proper_elements
