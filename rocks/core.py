@@ -1129,6 +1129,13 @@ def rocks_(ids, datacloud=None, progress=False, on_404="warning"):
     list of rocks.core.Rock
         A list of Rock instances
     """
+    if isinstance(ids, pd.DataFrame):
+        if "sso_id" not in ids.columns or "sso_number" not in ids.columns:
+            raise ValueError(
+                "If passing a pd.DataFrame, it has to be (a subset of) the ssoBFT."
+            )
+        ids = ids.sort_values("sso_number")
+        return rocks_(ids.sso_id)
 
     if on_404 not in ["ignore", "warning", "error"]:
         raise ValueError(
@@ -1161,12 +1168,12 @@ def rocks_(ids, datacloud=None, progress=False, on_404="warning"):
                 [id_ for id_ in ids if not id_ is None], cat, progress=progress
             )
 
-    rocks_ = [
+    result = [
         Rock(id_, skip_id_check=True, datacloud=datacloud) if not id_ is None else None
         for id_ in ids
     ]
 
-    return rocks_
+    return result
 
 
 # ------
