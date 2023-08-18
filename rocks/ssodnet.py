@@ -2,14 +2,18 @@
 """Implement SsODNet:Datacloud queries."""
 
 import asyncio
+from functools import partial
 from itertools import product
+from urllib.request import Request, urlopen
+
 
 import aiohttp
 import json
 import numpy as np
 import pandas as pd
-from rich.progress import Progress
+from rich.progress import BarColumn, DownloadColumn, Progress, TextColumn
 
+from rocks import bft
 from rocks import config
 from rocks.logging import logger
 from rocks.resolve import get_or_create_eventloop
@@ -391,3 +395,31 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
 
     response_json = await response.json()
     return response_json
+
+
+# ------
+# Get ssoBFT
+def _get_bft():
+    """Retrieve the ssoBFT in parquet format to cache."""
+    URL = f"{URL_SSODNET}/data/ssoBFT-latest.parquet"
+
+    progress = Progress(
+        TextColumn("{task.fields[desc]}"), BarColumn(bar_width=None), DownloadColumn()
+    )
+
+    # ------
+    # Launch download
+    with progress:
+        request = Request(URL)
+        response = urlopen(request)
+
+        task = progress.add_task(
+            "download",
+            desc="Downloading ssoBFT",
+            total=int(response.info()["Content-length"]),
+        )
+
+        with open(bft.PATH, "wb") as file:
+            for data in iter(partial(response.read, 32768), b""):
+                file.write(data)
+                progress.update(task, advance=len(data))
