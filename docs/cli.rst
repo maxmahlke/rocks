@@ -468,45 +468,6 @@ To get the advantages of the ``Rock`` class, you can pass any subset of the ssoB
     ...
    ]
 
-Other use cases
-===============
-
-.. _author:
-
-The presence of data associated to peer-reviewed articles\ [#f2]_ in the SsODNet can be checked using the
-``author`` command by supplying the name of the first author.
-
-.. code-block:: bash
-
-  $ rocks author müller                                                                       master
-    Müller+2011b  [DiamAlbedo]
-    Müller+2017b  [DiamAlbedo]
-    Müller+2017a  [DiamAlbedo]
-    Müller+2010   [DiamAlbedo]
-    Müller+2014   [DiamAlbedo]
-    Müller+2004a  [DiamAlbedo]
-    Müller+2004b  [DiamAlbedo]
-    Müller+2011a  [DiamAlbedo]
-    Müller+2012   [DiamAlbedo]
-    Müller+2013   [DiamAlbedo]
-    Müller+2011   [Spin models]
-    Müller+2013   [Spin models]
-    Müller+2017a  [Spin models]
-    Müller+2017b  [Spin models]
-    Müller+1998   [Thermal properties]
-    Müller2007    [Thermal properties]
-    Müller+2010   [Thermal properties]
-    Müller+2014   [Thermal properties]
-    Müller+2011a  [Thermal properties]
-    Müller+2012   [Thermal properties]
-    Müller+2013   [Thermal properties]
-    Müller+2017b  [Thermal properties]
-
-If you spot a missing data source or would like to submit recently published data to SsODNet,
-please send an email to benoit.carry (at) oca.eu.
-
 .. rubric:: Footnotes
-   :caption:
 
 .. [#f1] Feel free to suggest a new alias via the `GitHub issues page <https://github.com/maxmahlke/rocks/issues>`_ if you find yourself typing too much.
-.. [#f2] SsODNet only contains data which has been published in a peer-reviewed article.
