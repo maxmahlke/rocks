@@ -151,7 +151,9 @@ def status(clear, update):
     """Echo the status of the ssoCards and datacloud catalogues."""
     from rich import prompt
 
+    from rocks import bft
     from rocks import cache
+    from rocks import ssodnet
 
     # ------
     # Echo inventory
@@ -161,9 +163,10 @@ def status(clear, update):
     rich.print(
         f"""\nContents of {config.PATH_CACHE}:
 
+        {'1 ssoBFT' if bft.PATH.is_file() else ''}
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
-        Asteroid name-number index updated on {date_index}\n"""
+        Index updated on:  {date_index}\n"""
     )
 
     # ------
@@ -190,10 +193,11 @@ def status(clear, update):
                 "Update or clear the cached ssoCards and datacloud catalogues?\n"
                 "[blue][0][/blue] Do nothing "
                 "[blue][1][/blue] Clear the cache "
-                "[blue][2][/blue] Update the data",
-                choices=["0", "1", "2", "3"],
+                "[blue][2][/blue] Update the data "
+                "[blue][3][/blue] Download the BFT",
+                choices=["0", "1", "2", "3", "4"],
                 show_choices=False,
-                default="1",
+                default="0",
             )
         else:
             decision = "none"
@@ -215,7 +219,7 @@ def status(clear, update):
             cache.update_catalogues(cached_catalogues)
 
         elif decision == "3":
-            rich.print("\n")
+            rich.print("")
             ssodnet._get_bft()
 
         elif decision == "4":
