@@ -84,12 +84,12 @@ Identification
 
       .. tab-item:: Command Line
 
-       .. code-block:: bash
+        .. code-block:: bash
 
-         $ rocks ids aschera
-         (214) Aschera, aka
-           ['1880 DB', '1903 SE', '1947 BP', '1948 JE', '1949 QG2', '1949 SX1', '1950 XH', '1953 OO',
-            '2000214', 'I80D00B', 'J03S00E', 'J47B00P', 'J48J00E', 'J49Q02G', 'J49S01X', 'J50X00H', 'J53O00O']
+          $ rocks ids aschera
+          (214) Aschera, aka
+            ['1880 DB', '1903 SE', '1947 BP', '1948 JE', '1949 QG2', '1949 SX1', '1950 XH', '1953 OO',
+             '2000214', 'I80D00B', 'J03S00E', 'J47B00P', 'J48J00E', 'J49Q02G', 'J49S01X', 'J50X00H', 'J53O00O']
 
       .. tab-item:: python
 
@@ -97,10 +97,10 @@ Identification
 
 .. dropdown:: How can I identify an asteroid using its NAIF ID?
 
-   .. tab-set::
+   NAIF IDs are not stored in the local asteroid name-number index due to the ambiguity with ordinary asteroid numbers.
+   You can still identify asteroids using their NAIF IDs by skipping the local look-up and forcing a quaero query.
 
-      NAIF IDs are not stored in the local asteroid name-number index due to the ambiguity with ordinary asteroid numbers.
-      You can still identify asteroids using their NAIF IDs by skipping the local look-up and forcing a quaero query.
+   .. tab-set::
 
       .. tab-item:: python
 
@@ -111,7 +111,7 @@ Identification
 
       .. tab-item:: Command Line
 
-      Not possible.
+        Not possible.
 
 .. dropdown:: What asteroids are in the SDSS MOC1?
 

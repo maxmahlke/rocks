@@ -202,6 +202,5 @@ The following parameters need an ``_``-suffix when accessing them using the ``py
    ['class', 'from', 'id', 'lambda', 'long', 'max', 'min', 'type']
 
 .. rubric:: Footnotes
-   :caption:
 
 .. [#f1] I agree, it looks terrible.

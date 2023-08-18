@@ -98,6 +98,5 @@ explained in the `fzf documentation
    Terms highlighted in :coral:`light red` in the text show the term definition when placing the cursor on top.
 
 .. rubric:: Footnotes
-   :caption:
 
 .. [#f1] Useful in cases such as for ``(229762) G!kun||'homdima``: Typing ``gkun`` is sufficient to find the asteroid in the proposed list.
