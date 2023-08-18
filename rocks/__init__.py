@@ -9,6 +9,7 @@ __version__ = "1.8.7"
 context = inspect.stack()[-1].code_context
 if context is None or "rocks.cli" not in context[0]:
     # Expose API to user
+    from .bft import load_bft
     from .core import Rock
     from .core import rocks_ as rocks
     from .resolve import identify

@@ -215,6 +215,10 @@ def status(clear, update):
             cache.update_catalogues(cached_catalogues)
 
         elif decision == "3":
+            rich.print("\n")
+            ssodnet._get_bft()
+
+        elif decision == "4":
             from rich.console import Console
 
             with Console().status("Observing all asteroids.. [~11GB]", spinner="earth"):
