@@ -6,6 +6,7 @@ import tarfile
 import requests
 import rich
 
+from rocks import bft
 from rocks import config
 from rocks import metadata
 from rocks import resolve
@@ -31,7 +32,7 @@ def clear():
     for catalogue in catalogues:
         (config.PATH_CACHE / f"{'_'.join(catalogue)}.json").unlink()
 
-    for path in [config.PATH_MAPPINGS, config.PATH_AUTHORS]:
+    for path in [config.PATH_MAPPINGS, config.PATH_AUTHORS, bft.PATH]:
         if path.is_file():
             path.unlink()
 
@@ -143,6 +144,7 @@ def update_catalogues(cached_catalogues):
     for catalogue in set(catalogues[1] for catalogues in cached_catalogues):
         ids = [id_ for id_, cat in cached_catalogues if cat == catalogue]
         ssodnet.get_datacloud_catalogue(ids, catalogue, local=False, progress=True)
+
 
 def retrieve_all_ssocards():
     """Retrieves all ssoCards and stores them in the cache directory.
