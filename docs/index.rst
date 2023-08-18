@@ -60,7 +60,7 @@ to common questions as the ones below. All data is cited and new observations ar
       What is the distribution of thermal inertias of known Barbarian asteroids?
 
 |br|
-:octicon:`database;1em` **Complete**\ [#f2]_ **literature overview with** `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_.
+:octicon:`database;1em` **Complete**\ [#f2]_ **literature overview with** `datacloud <https://ssp.imcce.fr/webservices/ssodnet/api/datacloud/>`_ **and the** `ssoBFT <https://ssp.imcce.fr/webservices/ssodnet/api/ssobft/>`_.
 
 .. grid:: 2
 
@@ -70,12 +70,17 @@ to common questions as the ones below. All data is cited and new observations ar
 
       What masses of ``(1) Ceres`` have been published by whom?
 
-
     .. grid-item-card::
-      :link: datacloud_example
+      :link: bft_example
       :link-type: ref
 
-      What taxonomic classifications of ``(214) Aschera`` have been proposed over time?
+      Two lines for one table of ~720,000,000 minor body parameters.
+
+    .. .. grid-item-card::
+    ..   :link: datacloud_example
+    ..   :link-type: ref
+    ..
+    ..   What taxonomic classifications of ``(214) Aschera`` have been proposed over time?
 
 |br|
 :octicon:`zap;1em` **And more!**

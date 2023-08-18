@@ -434,6 +434,40 @@ otherwise.
 
 ``rocks`` offers an easy way to compute the weighted averages of the preferred property measurements, see for example: :ref:`what's the weighted average albedo of (6) Hebe?<weighted_average_scripted>`
 
+.. _bft_example:
+
+Access of ``ssoBFT``
+--------------------
+
+The `ssoBFT <https://ssp.imcce.fr/webservices/ssodnet/api/ssobft/>`_ contains all best-estimate parameters
+of all known minor bodies in SsODNet. It aggregates 591 of about 1,200,000 objects. For quick execution times, `rocks`
+stores the ``parquet`` version (~600MB) of the ssoBFT in the cache directory when it is first requested
+via the ``rocks.load_bft()`` function. The returned table is a ``pandas`` ``DataFrame`` and enables quick sample selection
+via minor body parameters.
+
+
+.. code-block:: python
+
+   >>> import rocks
+   >>> bft = rocks.load_bft()
+   >>> family_eos = bft[bft['family.family_name'] == 'Eos']
+   >>> family_eos['albedo.value'].mean()
+   0.12367009372337404
+
+To get the advantages of the ``Rock`` class, you can pass any subset of the ssoBFT to ``rocks.rocks``:
+
+.. code-block:: python
+
+   >>> family_hermione = bft[bft['family.family_name'] == 'hermione']  # pd.DataFrame
+   >>> family_hermione = rocks.rocks(family_hermione)  # list of Rock instances
+   >>> family_hermione
+   [Rock(number=121, name='Hermione'),
+    Rock(number=168, name='Sibylla'),
+    Rock(number=2634, name='James Bradley'),
+    Rock(number=4003, name='Schumann'),
+    ...
+   ]
+
 Other use cases
 ===============
 
