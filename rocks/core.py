@@ -58,10 +58,10 @@ class Error(pydantic.BaseModel):
 
 # The second lowest level is the Parameter. Values inherit from Parameter.
 class Parameter(pydantic.BaseModel):
-    _label: str = pydantic.Field("", exclude=True)
-    _format: str = pydantic.Field("", exclude=True)
-    _symbol: str = pydantic.Field("", exclude=True)
-    _description: str = pydantic.Field("", exclude=True)
+    label_: str = pydantic.Field("", exclude=True)
+    format_: str = pydantic.Field("", exclude=True)
+    symbol_: str = pydantic.Field("", exclude=True)
+    description_: str = pydantic.Field("", exclude=True)
     path: str = pydantic.Field("", exclude=True)
 
     def __str__(self):
@@ -69,7 +69,7 @@ class Parameter(pydantic.BaseModel):
 
     @property
     def label(self):
-        return self._label
+        return self.label_
 
     @label.getter
     def label(self):
@@ -78,7 +78,7 @@ class Parameter(pydantic.BaseModel):
 
     @property
     def symbol(self):
-        return self._symbol
+        return self.symbol_
 
     @symbol.getter
     def symbol(self):
@@ -88,7 +88,7 @@ class Parameter(pydantic.BaseModel):
 
     @property
     def format(self):
-        return self._format
+        return self.format_
 
     @format.getter
     def format(self):
@@ -98,7 +98,7 @@ class Parameter(pydantic.BaseModel):
 
     @property
     def description(self):
-        return self._description
+        return self.description_
 
     @description.getter
     def description(self):
