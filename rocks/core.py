@@ -288,6 +288,9 @@ class OrbitalElements(Parameter):
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
@@ -309,6 +312,9 @@ class ProperElements(Parameter):
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class SourceRegions(Parameter):
@@ -346,6 +352,9 @@ class Family(Parameter):
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class MOID(Parameter):
     mercury: FloatValue = pydantic.Field(FloatValue(**{}), alias="Mercury")
@@ -380,6 +389,9 @@ class Pair(Parameter):
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class TisserandParameter(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
@@ -396,6 +408,9 @@ class TisserandParameter(Parameter):
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Yarkovsky(Parameter):
@@ -416,6 +431,9 @@ class Yarkovsky(Parameter):
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", allow_reuse=True, pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class DynamicalParameters(Parameter):
