@@ -64,12 +64,12 @@ def load_bft(lite=False):
 
     if lite:
         if not PATH_LITE.is_file():
-            _build_lite()
+            build_lite()
         return pd.read_parquet(PATH_LITE)
     return pd.read_parquet(PATH)
 
 
-def _build_lite():
+def build_lite():
     """Build the lite version of the ssoBFT."""
     bft = pd.read_parquet(PATH)
     lite = bft[LITE_COLUMNS]
