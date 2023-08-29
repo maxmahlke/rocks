@@ -454,7 +454,7 @@ via minor body parameters.
    >>> family_eos['albedo.value'].mean()
    0.12367009372337404
 
-To get the advantages of the ``Rock`` class, you can pass any subset of the ssoBFT to ``rocks.rocks``:
+To get the advantages of the ``Rock`` class, you can pass any subset of the ssoBFT to ``rocks.rocks``. To get all asteroids in the family of (121) Hermione:
 
 .. code-block:: python
 
@@ -467,6 +467,34 @@ To get the advantages of the ``Rock`` class, you can pass any subset of the ssoB
     Rock(number=4003, name='Schumann'),
     ...
    ]
+
+Or all asteroids in the Vesta family larger than 5km in diameter and with a taxonomic classification:
+
+.. code-block:: python
+
+   >>> subset_vesta = bft[(bft['family.family_name'] == 'Vesta') & (bft['diameter.value'] > 5) & (~pd.isna(bft['taxonomy.class']))]
+   >>> subset_vesta = rocks.rocks(subset_vesta)  # list of 82 Rocks
+
+The valid column names for the selection are given on the `ssoBFT API <https://ssp.imcce.fr/webservices/ssodnet/api/ssobft/>`_ page.
+
+BFT Lite
+++++++++
+
+The BFT is a large, sparse table containing many columns that
+you might not need routinely. To reduce its size in memory and the time to load it, you can create a "lite" version which contains a sensible subset
+of columns. This lite version is created and cached when using
+
+.. code-block:: python
+
+   >>> bft = rocks.load_bft(lite=True)
+
+You can define your own subset of columns in the lite version by setting the ``rocks.bft.LITE_COLUMNS`` to the list of the selected columns' names.
+To rebuild a cached lite table, use ``rocks.bft.build_lite()``:
+
+.. code-block:: python
+
+   >>> rocks.bft.LITE_COLUMNS = ['sso_number', 'diameter.value', 'mass.value', 'taxonomy.class', 'family.family_status']
+   >>> rocks.bft.build_lite()  # to rebuild the lite table with the selected columns
 
 .. rubric:: Footnotes
 

@@ -1,3 +1,6 @@
+# 1.8.8 - 2023-08-29
+- Add BFT support: `rocks.load_bft()` and more, see documentation
+
 # 1.8.7 - 2023-08-16
 - Add bibref and method to pair
 - Fix bibref type of tisserand_parameter
