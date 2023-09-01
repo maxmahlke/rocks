@@ -1,3 +1,6 @@
+# 1.8.9
+- Fix bug which prevented updating phase_function datacloud catalogues
+
 # 1.8.8 - 2023-08-29
 - Add BFT support: `rocks.load_bft()` and more, see documentation
 
