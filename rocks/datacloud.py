@@ -720,6 +720,9 @@ class Spin(Collection):
     method: List[Optional[str]] = [""]
     iddataset: List[Optional[str]] = [""]
 
+    # pydantic does not like attributes with "model_" prefix
+    model_config = pydantic.ConfigDict(protected_namespaces=())
+
 
 class Yarkovsky(Collection):
     """Database of Sso Yarkovsky accelerations"""
@@ -841,6 +844,8 @@ class Shape(Collection):
     radius_b: List[Optional[float]] = [np.nan]
     radius_c: List[Optional[float]] = [np.nan]
     selected: List[Optional[int]] = [None]
+
+    model_config = pydantic.ConfigDict(protected_namespaces=())
 
 
 def weighted_average(catalogue, parameter):
