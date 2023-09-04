@@ -148,6 +148,9 @@ class FloatValue(Parameter):
 
         return values
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class IntegerValue(Parameter):
     _unit: str = ""
@@ -280,7 +283,7 @@ class OrbitalElements(Parameter):
     perihelion_argument: FloatValue = FloatValue(**{})
     perihelion_distance: FloatValue = FloatValue(**{})
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.orbital_elements")
 
@@ -305,7 +308,7 @@ class ProperElements(Parameter):
     proper_frequency_nodal_longitude: FloatValue = FloatValue(**{})
     proper_frequency_perihelion_longitude: FloatValue = FloatValue(**{})
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
@@ -344,7 +347,7 @@ class Family(Parameter):
     def __bool__(self):
         return bool(self.family_name)
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.family")
 
@@ -368,7 +371,7 @@ class MOID(Parameter):
     method: List[Method] = [Method(**{})]
     links: LinksParameter = LinksParameter(**{})
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.moid")
 
@@ -381,7 +384,7 @@ class Pair(Parameter):
     method: List[Method] = [Method(**{})]
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.pair")
 
@@ -401,7 +404,7 @@ class TisserandParameter(Parameter):
     method: List[Method] = [Method(**{})]
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
 
@@ -424,7 +427,7 @@ class Yarkovsky(Parameter):
     def __str__(self):
         return "\n".join([self.A2.__str__(), self.dadt.__str__()])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.yarkovsky")
 
@@ -459,11 +462,14 @@ class Albedo(FloatValue):
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = []
 
-    path = "parameters.physical.albedo.albedo"
+    path: str = "parameters.physical.albedo.albedo"
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class ColorEntry(Parameter):
@@ -490,13 +496,16 @@ class ColorEntry(Parameter):
             return rf"{self.color.value:.2f} + {self.color.error.max:.2f} - {self.color.error.min:.2f}  {self.bibref.shortbib}"
         return "No color on record in this filter."
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.colors.<id>.color")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Color(Parameter):
@@ -526,7 +535,7 @@ class Color(Parameter):
     V_R: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-R")
     B_V: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="B-V")
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.colors")
 
@@ -567,12 +576,15 @@ class Color(Parameter):
             return "\n".join(observed)
         return "No color on record."
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class Density(FloatValue):
     method: List[Method] = []
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.density.density")
 
@@ -586,7 +598,7 @@ class Diameter(FloatValue):
     method: List[Method] = [Method(**{})]
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.diameter.diameter")
 
@@ -594,13 +606,16 @@ class Diameter(FloatValue):
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.mass.mass")
 
@@ -633,6 +648,9 @@ class Phase(Parameter):
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class PhaseFunction(Parameter):
@@ -685,9 +703,12 @@ class PhaseFunction(Parameter):
             return "\n".join(observed)
         return "No phase function on record."
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.phase_functions")
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Spin(Parameter):
@@ -707,13 +728,16 @@ class Spin(Parameter):
     technique: StringValue = StringValue(**{})
     period_type: StringValue = StringValue(**{})
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.spins")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class Taxonomy(Parameter):
@@ -734,13 +758,16 @@ class Taxonomy(Parameter):
             return "No taxonomy on record."
         return self.class_.value
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.taxonomy")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class ThermalInertia(FloatValue):
@@ -749,7 +776,7 @@ class ThermalInertia(FloatValue):
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(
             cls, values, "parameters.physical.thermal_inertia.thermal_inertia"
@@ -759,12 +786,15 @@ class ThermalInertia(FloatValue):
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 class AbsoluteMagnitude(FloatValue):
     G: FloatValue = FloatValue(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(
             cls, values, "parameters.physical.absolute_magnitude.absolute_magnitude"
@@ -773,6 +803,9 @@ class AbsoluteMagnitude(FloatValue):
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
         "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class PhysicalParameters(Parameter):
@@ -793,6 +826,9 @@ class PhysicalParameters(Parameter):
         lambda list_: ListWithAttributes([Spin(**element) for element in list_])
     )
 
+    class Config:
+        arbitrary_types_allowed = True
+
 
 # ------
 # Equation of state
@@ -801,7 +837,7 @@ class EqStateVector(Parameter):
     position: ListValue = ListValue(**{})
     velocity: ListValue = ListValue(**{})
 
-    @pydantic.model_validator(mode="after")
+    @pydantic.model_validator(mode="before")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.eq_state_vector")
 
