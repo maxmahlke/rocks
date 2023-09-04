@@ -285,7 +285,7 @@ class OrbitalElements(Parameter):
         return add_paths(cls, values, "parameters.dynamical.orbital_elements")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -310,7 +310,7 @@ class ProperElements(Parameter):
         return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -349,7 +349,7 @@ class Family(Parameter):
         return add_paths(cls, values, "parameters.dynamical.family")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -386,7 +386,7 @@ class Pair(Parameter):
         return add_paths(cls, values, "parameters.dynamical.pair")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -406,7 +406,7 @@ class TisserandParameter(Parameter):
         return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -429,7 +429,7 @@ class Yarkovsky(Parameter):
         return add_paths(cls, values, "parameters.dynamical.yarkovsky")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
     class Config:
@@ -462,7 +462,7 @@ class Albedo(FloatValue):
     path = "parameters.physical.albedo.albedo"
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -495,7 +495,7 @@ class ColorEntry(Parameter):
         return add_paths(cls, values, "parameters.physical.colors.<id>.color")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -577,7 +577,7 @@ class Density(FloatValue):
         return add_paths(cls, values, "parameters.physical.density.density")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -591,7 +591,7 @@ class Diameter(FloatValue):
         return add_paths(cls, values, "parameters.physical.diameter.diameter")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -605,7 +605,7 @@ class Mass(FloatValue):
         return add_paths(cls, values, "parameters.physical.mass.mass")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -631,7 +631,7 @@ class Phase(Parameter):
         return "No phase function on record in this filter."
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -712,7 +712,7 @@ class Spin(Parameter):
         return add_paths(cls, values, "parameters.physical.spins")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -739,7 +739,7 @@ class Taxonomy(Parameter):
         return add_paths(cls, values, "parameters.physical.taxonomy")
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -756,7 +756,7 @@ class ThermalInertia(FloatValue):
         )
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -771,7 +771,7 @@ class AbsoluteMagnitude(FloatValue):
         )
 
     _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", allow_reuse=True, pre=True
+        "bibref", pre=True
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -789,9 +789,9 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "spin", allow_reuse=True, pre=True
-    )(lambda list_: ListWithAttributes([Spin(**element) for element in list_]))
+    _convert_list_to_parameterlist: classmethod = pydantic.validator("spin", pre=True)(
+        lambda list_: ListWithAttributes([Spin(**element) for element in list_])
+    )
 
 
 # ------

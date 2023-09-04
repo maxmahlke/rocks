@@ -539,13 +539,13 @@ class Diamalbedo(Collection):
     preferred_diameter: List[bool] = [False]
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred_albedo", pre=True, allow_reuse=True)
+    @pydantic.validator("preferred_albedo", pre=True)
     def select_preferred(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.albedo", values["id_"]
         )
 
-    @pydantic.validator("preferred_diameter", pre=True, allow_reuse=True)
+    @pydantic.validator("preferred_diameter", pre=True)
     def select_preferred(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.diameter", values["id_"]
