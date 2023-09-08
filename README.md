@@ -6,8 +6,6 @@
   <a href="https://github.com/maxmahlke/rocks#features"> Features </a> - <a href="https://github.com/maxmahlke/rocks#install"> Install </a> - <a href="https://github.com/maxmahlke/rocks#documentation"> Documentation </a>
 </p>
 
-<br>
-
 <div align="center">
   <a href="https://img.shields.io/pypi/pyversions/space-rocks">
     <img src="https://img.shields.io/pypi/pyversions/space-rocks"/>
@@ -23,7 +21,6 @@
   </a>
 </div>
 
-<br>
 
 ## Features
 
