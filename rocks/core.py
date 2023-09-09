@@ -64,6 +64,8 @@ class Parameter(pydantic.BaseModel):
     description_: str = pydantic.Field("", exclude=True)
     path: str = pydantic.Field("", exclude=True)
 
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
     def __str__(self):
         return self.json()
 
@@ -113,6 +115,8 @@ class FloatValue(Parameter):
     value: float = np.nan
     error_: float = np.nan  # average of min and max
 
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
+
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
 
@@ -147,9 +151,6 @@ class FloatValue(Parameter):
                 )
 
         return values
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class IntegerValue(Parameter):
@@ -287,12 +288,12 @@ class OrbitalElements(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.orbital_elements")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    # TODO: The _convert_list_to_parameterlist validator and class Config could
+    # be inherited from the Parameter class instead of defining them for each
+    # parameter
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class ProperElements(Parameter):
@@ -312,12 +313,9 @@ class ProperElements(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.proper_elements")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class SourceRegions(Parameter):
@@ -351,12 +349,9 @@ class Family(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.family")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class MOID(Parameter):
@@ -388,12 +383,9 @@ class Pair(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.pair")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class TisserandParameter(Parameter):
@@ -408,12 +400,9 @@ class TisserandParameter(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Yarkovsky(Parameter):
@@ -431,12 +420,9 @@ class Yarkovsky(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.yarkovsky")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class DynamicalParameters(Parameter):
@@ -464,12 +450,9 @@ class Albedo(FloatValue):
 
     path: str = "parameters.physical.albedo.albedo"
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class ColorEntry(Parameter):
@@ -500,12 +483,9 @@ class ColorEntry(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.colors.<id>.color")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Color(Parameter):
@@ -576,9 +556,6 @@ class Color(Parameter):
             return "\n".join(observed)
         return "No color on record."
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class Density(FloatValue):
     method: List[Method] = []
@@ -588,8 +565,8 @@ class Density(FloatValue):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.density.density")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -602,12 +579,9 @@ class Diameter(FloatValue):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.diameter.diameter")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Mass(FloatValue):
@@ -619,8 +593,8 @@ class Mass(FloatValue):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.mass.mass")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
@@ -645,12 +619,9 @@ class Phase(Parameter):
             return rf"H: {self.H.value:.2f}  G1: {self.G1.value:.2f}  G2: {self.G2.value:.2f} {self.bibref.shortbib}"
         return "No phase function on record in this filter."
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class PhaseFunction(Parameter):
@@ -707,9 +678,6 @@ class PhaseFunction(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.phase_functions")
 
-    class Config:
-        arbitrary_types_allowed = True
-
 
 class Spin(Parameter):
     t0: FloatValue = FloatValue(**{})
@@ -732,12 +700,9 @@ class Spin(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.spins")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Taxonomy(Parameter):
@@ -762,12 +727,9 @@ class Taxonomy(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.taxonomy")
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class ThermalInertia(FloatValue):
@@ -782,12 +744,9 @@ class ThermalInertia(FloatValue):
             cls, values, "parameters.physical.thermal_inertia.thermal_inertia"
         )
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class AbsoluteMagnitude(FloatValue):
@@ -800,12 +759,9 @@ class AbsoluteMagnitude(FloatValue):
             cls, values, "parameters.physical.absolute_magnitude.absolute_magnitude"
         )
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator(
-        "bibref", pre=True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class PhysicalParameters(Parameter):
@@ -822,12 +778,9 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _convert_list_to_parameterlist: classmethod = pydantic.validator("spin", pre=True)(
-        lambda list_: ListWithAttributes([Spin(**element) for element in list_])
-    )
-
-    class Config:
-        arbitrary_types_allowed = True
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "spin", mode="before"
+    )(lambda list_: ListWithAttributes([Spin(**element) for element in list_]))
 
 
 # ------
@@ -848,9 +801,6 @@ class Parameters(Parameter):
     physical: PhysicalParameters = PhysicalParameters(**{})
     dynamical: DynamicalParameters = DynamicalParameters(**{})
     eq_state_vector: EqStateVector = EqStateVector(**{})
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class Ssocard(Parameter):

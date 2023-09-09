@@ -139,39 +139,6 @@ class DataCloudSeries(pd.Series):
         return DataCloudDataFrame
 
 
-# ------
-# Validators
-# def ensure_list(value):
-#     """Ensure that parameters are always a list.
-
-#     Further replaces all None values by empty dictionaries.
-#     """
-#     if isinstance(value, (dict, int, float, str)):
-#         value = [value]
-
-#     return value
-
-
-# def ensure_int(value):
-#     if isinstance(value, str):
-#         return [int(value)]
-#     return [int(v) if v else None for v in value]
-
-
-# def empty_str_to_none(value):
-#     for i, v in enumerate(value[:]):
-#         if v == "":
-#             value[i] = None
-#     return value
-
-
-# def empty_str_to_nan(value):
-#     for i, v in enumerate(value[:]):
-#         if v == "":
-#             value[i] = np.nan
-#     return value
-
-
 def get_preferred(name, parameter, ids):
     """Get the preferred values for this catalogue from the ssoCard of the object.
 
@@ -539,19 +506,19 @@ class Diamalbedo(Collection):
     preferred_diameter: List[bool] = [False]
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred_albedo", pre=True)
+    @pydantic.field_validator("preferred_albedo", mode="after")
     def select_preferred_albedo(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.albedo", values["id_"]
         )
 
-    @pydantic.validator("preferred_diameter", pre=True)
+    @pydantic.field_validator("preferred_diameter", mode="after")
     def select_preferred_diameter(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.diameter", values["id_"]
         )
 
-    @pydantic.validator("preferred", pre=True)
+    @pydantic.field_validator("preferred", mode="after")
     def preferred_albedo_or_diameter(cls, _, values):
         return [
             True if pref_alb or pref_diam else False
@@ -576,7 +543,7 @@ class Masses(Collection):
 
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred", pre=True)
+    @pydantic.field_validator("preferred", mode="after")
     def select_preferred(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.mass", values["id_"]
@@ -600,7 +567,7 @@ class Taxonomies(Collection):
 
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred", pre=True)
+    @pydantic.field_validator("preferred", mode="before")
     def select_preferred(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.taxonomy", values["id_"]
@@ -757,7 +724,7 @@ class Thermal_inertia(Collection):
 
     preferred: List[bool] = [False]
 
-    @pydantic.validator("preferred", pre=True)
+    @pydantic.field_validator("preferred", mode="after")
     def select_preferred(cls, _, values):
         return get_preferred(
             values["name"][0], "parameters.physical.thermal_inertia", values["id_"]
