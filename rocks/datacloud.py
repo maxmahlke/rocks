@@ -509,13 +509,13 @@ class Diamalbedo(Collection):
     @pydantic.field_validator("preferred_albedo", mode="after")
     def select_preferred_albedo(cls, _, values):
         return get_preferred(
-            values["name"][0], "parameters.physical.albedo", values["id_"]
+            values.data["name"][0], "parameters.physical.albedo", values.data["id_"]
         )
 
     @pydantic.field_validator("preferred_diameter", mode="after")
     def select_preferred_diameter(cls, _, values):
         return get_preferred(
-            values["name"][0], "parameters.physical.diameter", values["id_"]
+            values.data["name"][0], "parameters.physical.diameter", values.data["id_"]
         )
 
     @pydantic.field_validator("preferred", mode="after")
@@ -523,7 +523,7 @@ class Diamalbedo(Collection):
         return [
             True if pref_alb or pref_diam else False
             for pref_alb, pref_diam in zip(
-                values["preferred_albedo"], values["preferred_diameter"]
+                values.data["preferred_albedo"], values.data["preferred_diameter"]
             )
         ]
 
@@ -546,7 +546,7 @@ class Masses(Collection):
     @pydantic.field_validator("preferred", mode="after")
     def select_preferred(cls, _, values):
         return get_preferred(
-            values["name"][0], "parameters.physical.mass", values["id_"]
+            values.data["name"][0], "parameters.physical.mass", values.data["id_"]
         )
 
 
@@ -570,7 +570,7 @@ class Taxonomies(Collection):
     @pydantic.field_validator("preferred", mode="before")
     def select_preferred(cls, _, values):
         return get_preferred(
-            values["name"][0], "parameters.physical.taxonomy", values["id_"]
+            values.data["name"][0], "parameters.physical.taxonomy", values.data["id_"]
         )
 
 
@@ -727,7 +727,9 @@ class Thermal_inertia(Collection):
     @pydantic.field_validator("preferred", mode="after")
     def select_preferred(cls, _, values):
         return get_preferred(
-            values["name"][0], "parameters.physical.thermal_inertia", values["id_"]
+            values.data["name"][0],
+            "parameters.physical.thermal_inertia",
+            values.data["id_"],
         )
 
 
