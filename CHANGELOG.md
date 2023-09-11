@@ -1,4 +1,5 @@
-# 1.8.9
+# 1.8.9 - 2023-09-11
+- Move to pydantic v2
 - Fix bug which prevented updating phase_function datacloud catalogues
 
 # 1.8.8 - 2023-08-29

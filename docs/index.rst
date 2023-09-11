@@ -146,7 +146,7 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
 
 .. rubric:: Footnotes
 
-.. [#f1] Latest version: 1.8.8  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
+.. [#f1] Latest version: 1.8.9  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
 .. [#f2] That's what we are aiming for. Is there a data source you are missing? `Email us! <mailto:benoit.carry@oca.eu>`_
 
 .. toctree::
