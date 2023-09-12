@@ -37,10 +37,6 @@ def _build_index():
     ]
 
     # ------
-    # Load current index of numbered asteroids to track recently named asteroids
-    old = _load_all_number_indices()
-
-    # ------
     # Retrieve index while showing spinner
     c = console.Console()
     with c.status("Searching for minor bodies...", spinner="dots8Bit"):
@@ -99,10 +95,6 @@ def _build_index():
                 total=len(futures),
                 description="All done!",
             )
-
-    # Compare old to new numbers to find recently named asteroids
-    new = _load_all_number_indices()
-    _save_recently_named(old, new)
 
 
 def _build_number_index(index, pbar, task_id):
@@ -491,40 +483,6 @@ def find_candidates(id_):
     # Sort by number
     candidates = sorted(candidates, key=lambda x: x[1])
     return candidates
-
-
-def _load_all_number_indices():
-    """Load all parts of the number index and return the merged dictionary."""
-    numbers = {}
-
-    for part in config.PATH_INDEX.glob("*.pkl"):
-        if part.stem.isnumeric():
-            part = _load(part)
-            numbers.update(part)
-    return numbers
-
-
-def _save_recently_named(old, new):
-    """Save the recently named asteroids to file."""
-    changed = []
-
-    for number_old, name_old in old.items():
-        name_old = name_old[0]
-        if number_old in new:
-            name_new = new[number_old][0]
-            if name_old != name_new:
-                changed.append([number_old, name_old, name_new])
-
-    if changed:
-        _write_to_cache(changed, "recent.pkl")
-
-        rich.print(
-            f"\n{len(changed)} asteroid{'s have' if len(changed) > 1 else ' has'} recently been named.",
-            end="",
-        )
-        rich.print(
-            f" Run '$ rocks recent' to echo the change{'s' if len(changed) > 1 else ''}."
-        )
 
 
 def _ensure_index_exists():
