@@ -6,6 +6,7 @@ import sys
 import shutil
 
 import click
+import pandas as pd
 import rich
 
 from rocks import config
@@ -292,16 +293,13 @@ def who(id_):
 def recent():
     """Echo recently named asteroids."""
 
-    if not (config.PATH_INDEX / "recent.pkl").is_file():
+    recent = pd.read_json("https://www.wgsbn-iau.org/files/json/latest.json")
+
+    for _, row in recent.iterrows():
+        rich.print(f"({row.mp_number}) {row['name']:<10}")
         rich.print(
-            "No changes in the asteroid name-number index have been tracked so far."
+            f"    [dim]{row.citation[:100].replace('  ', ' ')}[...][/dim]", end="\n\n"
         )
-        sys.exit()
-
-    changed = index._load("recent.pkl")
-
-    for number, name_old, name_new in changed:
-        rich.print(f"    ({number}) {name_old:<10} -> ({number}) {name_new:<10}")
 
 
 def echo():
