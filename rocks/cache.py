@@ -56,7 +56,7 @@ def take_inventory():
 
     for file_ in cached_jsons:
         # Is it metadata?
-        if file_ in [config.PATH_MAPPINGS, config.PATH_AUTHORS]:
+        if file_ in [config.PATH_MAPPINGS, config.PATH_AUTHORS, config.PATH_CITATIONS]:
             continue
 
         # Datacloud catalogue or ssoCard?
@@ -126,7 +126,7 @@ def update_cards(ids):
     ssodnet.get_ssocard(ids, progress=True, local=False)
 
     # Update metadata and authors
-    for which in ["authors", "mappings"]:
+    for which in ["authors", "mappings", "citations"]:
         metadata.retrieve(which)
 
 

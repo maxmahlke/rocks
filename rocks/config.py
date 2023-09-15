@@ -9,6 +9,7 @@ PATH_CACHE = Path(user_cache_dir()) / "rocks"
 PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 PATH_INDEX = PATH_CACHE / "index"
 PATH_MAPPINGS = PATH_CACHE / "metadata_aster.json"
+PATH_CITATIONS = PATH_CACHE / "citations.json"
 
 
 # ------

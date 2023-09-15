@@ -254,8 +254,6 @@ def who(id_):
     """Get name citation of asteroid from MPC."""
     import textwrap
 
-    import numpy as np
-
     if not id_:
         id_ = resolve._interactive()
     else:
@@ -266,12 +264,7 @@ def who(id_):
     if name is None:
         sys.exit()
 
-    if not np.isnan(number):
-        id_ = number
-    else:
-        id_ = name
-
-    citation = resolve.get_citation_from_mpc(id_)
+    citation = metadata.get_citation(number)
 
     if citation is None:
         rich.print(f"({number}) {name} has no citation attached to its name.")

@@ -7,7 +7,6 @@ import aiohttp
 import nest_asyncio
 import numpy as np
 
-import requests
 from rich.progress import Progress
 
 from rocks import cli
@@ -434,23 +433,3 @@ def _interactive():
 
     # Return asteroid name
     return " ".join(choice.split()[1:])
-
-
-def get_citation_from_mpc(name):
-    """Query asteroid information from MPC and extract citation from HTML response."""
-    from bs4 import BeautifulSoup
-    import urllib
-
-    URL = f"https://minorplanetcenter.net/db_search/show_object?object_id={urllib.parse.quote_plus(str(name))}"
-
-    soup = BeautifulSoup(requests.get(URL).text, "html.parser")
-
-    citation = soup.find("div", {"id": "citation"})
-
-    if citation is None:
-        return None
-
-    # Extract citation and do minor formatting
-    citation = citation.find("br").next_sibling.next_sibling
-    citation = citation.split("[")[0].strip().replace("  ", " ")
-    return citation
