@@ -31,7 +31,7 @@ def pretty_print(rock, catalogue, parameter):
     from rich.table import Table
 
     if len(catalogue) == 1 and pd.isna(catalogue.number[0]):
-        print(f"No {parameter} on record for ({rock.number}) {rock.name}.")
+        rich.print(f"No {parameter} on record for {rock.name}.")
         return
 
     # Sort catalogue by year of reference
