@@ -1,3 +1,7 @@
+# 1.8.10
+- Get list of recently named asteroids from WGSBN instead of comparing indices
+- Store citations in cache to increase look-up speed
+
 # 1.8.9 - 2023-09-11
 - Move to pydantic v2
 - Fix bug which prevented updating phase_function datacloud catalogues
