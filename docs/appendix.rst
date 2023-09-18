@@ -201,6 +201,49 @@ The following parameters need an ``_``-suffix when accessing them using the ``py
 
    ['class', 'from', 'id', 'lambda', 'long', 'max', 'min', 'type']
 
+.. _lite_columns:
+
+BFT Columns
+-----------
+
+The list of columns loaded by default from the BFT:
+
+.. code-block:: python
+
+  COLUMNS = [
+      "sso_id",
+      "sso_number",
+      "sso_name",
+      "sso_class",
+      "orbital_elements.semi_major_axis.value",
+      "orbital_elements.eccentricity.value",
+      "orbital_elements.inclination.value",
+      "orbital_elements.orbital_period.value",
+      "orbital_elements.perihelion_distance.value",
+      "proper_elements.proper_semi_major_axis.value",
+      "proper_elements.proper_eccentricity.value",
+      "proper_elements.proper_inclination.value",
+      "proper_elements.proper_sine_inclination.value",
+      "family.family_number",
+      "family.family_name",
+      "pair.sibling_number",
+      "pair.sibling_name",
+      "pair.distance",
+      "pair.age.value",
+      "yarkovsky.dadt.value",
+      "yarkovsky.A2.value",
+      "yarkovsky.S",
+      "albedo.value",
+      "absolute_magnitude.value",
+      "density.value",
+      "diameter.value",
+      "mass.value",
+      "taxonomy.class",
+      "taxonomy.complex",
+      "thermal_inertia.value",
+      "spins.1.period.value",
+  ]
+
 .. rubric:: Footnotes
 
 .. [#f1] I agree, it looks terrible.

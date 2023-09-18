@@ -477,24 +477,32 @@ Or all asteroids in the Vesta family larger than 5km in diameter and with a taxo
 
 The valid column names for the selection are given on the `ssoBFT API <https://ssp.imcce.fr/webservices/ssodnet/api/ssobft/>`_ page.
 
-BFT Lite
-++++++++
+Column Selection
+++++++++++++++++
 
-The BFT is a large, sparse table containing many columns that
-you might not need routinely. To reduce its size in memory and the time to load it, you can create a "lite" version which contains a sensible subset
-of columns. This lite version is created and cached when using
+The BFT is a large, sparse table containing many columns that you might not
+need routinely. On some machines, loading the entire table may further exceed
+the memory size and lead to crashes.
 
-.. code-block:: python
-
-   >>> bft = rocks.load_bft(lite=True)
-
-You can define your own subset of columns in the lite version by setting the ``rocks.bft.LITE_COLUMNS`` to the list of the selected columns' names.
-To rebuild a cached lite table, use ``rocks.bft.build_lite()``:
+To reduce its size in memory and the time to load it, ``rocks`` by default
+only loads a :ref:`subset of the available columns<lite_columns>`.
+You can define your own subset of columns by setting
+``rocks.bft.COLUMNS`` to the list of the desired columns
 
 .. code-block:: python
 
-   >>> rocks.bft.LITE_COLUMNS = ['sso_number', 'diameter.value', 'mass.value', 'taxonomy.class', 'family.family_status']
-   >>> rocks.bft.build_lite()  # to rebuild the lite table with the selected columns
+   >>> rocks.bft.COLUMNS = ['sso_number', 'diameter.value', 'mass.value', 'taxonomy.class', 'family.family_status']
+   >>> rocks.load_bft()  # loads rocks.bft.COLUMNS by default
+
+Alternatively, you can directly pass the list to the ``columns`` keyword argument:
+
+   >>> rocks.load_bft(columns=['sso_number', 'diameter.value', 'mass.value', 'taxonomy.class', 'family.family_status'])
+
+You can request the full table using the ``full`` keyword argument (though it's not recommended):
+
+.. code-block:: python
+
+   >>> bft = rocks.load_bft(full=True)
 
 .. rubric:: Footnotes
 
