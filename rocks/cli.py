@@ -164,9 +164,9 @@ def status(clear, update):
     rich.print(
         f"""\nContents of {config.PATH_CACHE}:
 
-        {'1 ssoBFT' if bft.PATH.is_file() else ''}
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
+        {'1 ssoBFT' if bft.PATH.is_file() else ''}
         Index updated on:  {date_index}\n"""
     )
 

@@ -129,9 +129,6 @@ def update_cards(ids):
     if bft.PATH.is_file():
         ssodnet._get_bft()
 
-        if bft.PATH_LITE.is_file():
-            bft.build_lite()
-
     # Update metadata and authors
     for which in ["authors", "mappings", "citations"]:
         metadata.retrieve(which)

@@ -5,9 +5,8 @@ from rocks import config
 from rocks import ssodnet
 
 PATH = config.PATH_CACHE / "ssoBFT-latest.parquet"
-PATH_LITE = config.PATH_CACHE / "ssoBFT-latest-lite.parquet"
 
-LITE_COLUMNS = [
+COLUMNS = [
     "sso_id",
     "sso_number",
     "sso_name",
@@ -42,13 +41,16 @@ LITE_COLUMNS = [
 ]
 
 
-def load_bft(lite=False):
+def load_bft(full=False, columns=None):
     """Load the BFT from the cache or optionally from remote.
 
     Parameters
     ----------
-    lite : bool
-        Return the lite version of the ssoBFT. Default is False.
+    full : bool
+        Return the full version of the ssoBFT. Default is False.
+    columns : list of str
+        Load the specified list of columns. Default is None, in which case
+        the value of rocks.bft.COLUMNS is used.
 
     Returns
     -------
@@ -62,15 +64,7 @@ def load_bft(lite=False):
         else:
             return None
 
-    if lite:
-        if not PATH_LITE.is_file():
-            build_lite()
-        return pd.read_parquet(PATH_LITE)
-    return pd.read_parquet(PATH)
+    if full:
+        return pd.read_parquet(PATH)
 
-
-def build_lite():
-    """Build the lite version of the ssoBFT."""
-    bft = pd.read_parquet(PATH)
-    lite = bft[LITE_COLUMNS]
-    lite.to_parquet(PATH_LITE)
+    return pd.read_parquet(PATH, columns=COLUMNS if columns is None else columns)

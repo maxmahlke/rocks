@@ -404,7 +404,7 @@ def _get_bft():
     URL = f"{URL_SSODNET}/data/ssoBFT-latest.parquet"
 
     progress = Progress(
-        TextColumn("{task.fields[desc]}"), BarColumn(bar_width=None), DownloadColumn()
+        TextColumn("{task.fields[desc]}"), BarColumn(), DownloadColumn()
     )
 
     # ------
