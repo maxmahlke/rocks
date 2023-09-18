@@ -125,6 +125,13 @@ def update_cards(ids):
     # Update all cards
     ssodnet.get_ssocard(ids, progress=True, local=False)
 
+    # Update ssoBFT if present
+    if bft.PATH.is_file():
+        ssodnet._get_bft()
+
+        if bft.PATH_LITE.is_file():
+            bft.build_lite()
+
     # Update metadata and authors
     for which in ["authors", "mappings", "citations"]:
         metadata.retrieve(which)

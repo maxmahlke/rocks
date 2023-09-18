@@ -193,9 +193,9 @@ def status(clear, update):
             decision = prompt.Prompt.ask(
                 "Update or clear the cached ssoCards and datacloud catalogues?\n"
                 "[blue][0][/blue] Do nothing "
-                "[blue][1][/blue] Clear the cache "
-                "[blue][2][/blue] Update the data "
-                "[blue][3][/blue] Download the BFT",
+                "[blue][1][/blue] Clear cache "
+                "[blue][2][/blue] Update data "
+                "[blue][3][/blue] Download ssoBFT",
                 choices=["0", "1", "2", "3", "4"],
                 show_choices=False,
                 default="0",

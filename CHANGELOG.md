@@ -1,6 +1,7 @@
 # 1.8.10
 - Get list of recently named asteroids from WGSBN instead of comparing indices
 - Store citations in cache to increase look-up speed
+- Update the (lite)BFT when selecting 'Update data' option in `$ rocks status`
 
 # 1.8.9 - 2023-09-11
 - Move to pydantic v2
