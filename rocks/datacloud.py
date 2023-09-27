@@ -667,7 +667,7 @@ class Spin(Collection):
     name: List[Optional[str]] = [""]
     model_dbid: List[Optional[str]] = [""]
     model_name: List[Optional[str]] = [""]
-    model_id: List[Optional[str]] = [""]
+    model_id: List[Optional[int]] = [None]
     t0: List[Optional[float]] = [np.nan]
     W0: List[Optional[float]] = [np.nan]
     Wp: List[Optional[float]] = [np.nan]
@@ -677,7 +677,7 @@ class Spin(Collection):
     err_DEC0: List[Optional[float]] = [np.nan]
     period: List[Optional[float]] = [np.nan]
     err_period: List[Optional[float]] = [np.nan]
-    period_flag: List[Optional[str]] = [""]
+    period_flag: List[Optional[int]] = [None]
     period_type: List[Optional[str]] = [""]
     long_: List[Optional[float]] = pydantic.Field([np.nan], alias="long")
     lat: List[Optional[float]] = [np.nan]
