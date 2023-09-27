@@ -1,8 +1,9 @@
-# 1.8.10
+# 1.8.10 - 2023-09-27
 - Load a smaller version of BFT by default by using a column subset
 - Update the BFT when selecting 'Update data' option in `$ rocks status`
 - Get list of recently named asteroids from WGSBN instead of comparing indices
 - Store citations in cache to increase look-up speed
+- Fix types of Spins datacloud catalogue
 
 # 1.8.9 - 2023-09-11
 - Move to pydantic v2
