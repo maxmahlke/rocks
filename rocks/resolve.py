@@ -105,6 +105,9 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
                 return (name, number)
             else:
                 return (name, number, ssodnet_id)
+        else:
+            # Local lookup just failed, no need to try it again
+            local = False
 
     # ------
     # Run asynchronous event loop for name resolution
