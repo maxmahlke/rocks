@@ -386,14 +386,10 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
         which = f"{index_number}.pkl"
 
         if not (config.PATH_INDEX / which).exists():
-            if id_ > 1e6:
-                logger.error(
-                    f"The provided number {id_} is larger than the largest number of any asteroid."
-                )
-            else:
-                logger.error(
-                    f"Could not resolve asteroid number {id_}. The index may be broken, run \n'$ rocks status --update' to update it."
-                )
+            logger.error(
+                f"Could not resolve asteroid number {id_}. Either the number is "
+                "larger than that of any asteroid or the rocks index is outdated."
+            )
             sys.exit()
 
     # Is it a name?
