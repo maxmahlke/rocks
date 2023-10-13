@@ -386,11 +386,11 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
         which = f"{index_number}.pkl"
 
         if not (config.PATH_INDEX / which).exists():
-            logger.error(
+            logger.warning(
                 f"Could not resolve asteroid number {id_}. Either the number is "
                 "larger than that of any asteroid or the rocks index is outdated."
             )
-            sys.exit()
+            return {}
 
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
