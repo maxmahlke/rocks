@@ -41,21 +41,25 @@ COLUMNS = [
 ]
 
 
-def load_bft(full=False, columns=None):
+def load_bft(full=False, **kwargs):
     """Load the BFT from the cache or optionally from remote.
 
     Parameters
     ----------
     full : bool
         Return the full version of the ssoBFT. Default is False.
-    columns : list of str
-        Load the specified list of columns. Default is None, in which case
-        the value of rocks.bft.COLUMNS is used.
+    kwargs
+        Passed on to pd.read_parquet
 
     Returns
     -------
     pd.DataFrame
         The ssoBFT.
+
+    Notes
+    -----
+    By default, only the subset of columns defined in rocks.bft.COLUMNS is
+    loaded.
     """
 
     if not PATH.is_file():
@@ -64,7 +68,7 @@ def load_bft(full=False, columns=None):
         else:
             return None
 
-    if full:
-        return pd.read_parquet(PATH)
+    if "columns" not in kwargs and not full:
+        kwargs["columns"] = COLUMNS
 
-    return pd.read_parquet(PATH, columns=COLUMNS if columns is None else columns)
+    return pd.read_parquet(PATH, **kwargs)

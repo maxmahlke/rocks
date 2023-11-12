@@ -1,5 +1,9 @@
+# 1.8.12 -
+- load_bft now passes kwargs to read_parquet
+- rocks no longer exits if the index is malformed
+
 # 1.8.11 - 2023-10-13
-- rocks no longer silently exits when a number look-up fails
+- rocks no longer exits if a number look-up fails
 
 # 1.8.10 - 2023-09-27
 - Load a smaller version of BFT by default by using a column subset

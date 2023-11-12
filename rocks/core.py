@@ -35,6 +35,7 @@ def add_paths(cls, instance, parent):
                 value.path = f"{parent}.{name}"
     return instance
 
+
 # The lowest level in the ssoCard tree is the are the differnt Values and the Error
 class Error(pydantic.BaseModel):
     min: float = np.nan
@@ -867,7 +868,7 @@ class Rock(pydantic.BaseModel):
             Identifying asteroid name, designation, or number
         ssocard : dict
             Optional argument providing a dictionary to use as ssoCard.
-            Default is empty dictionary, triggering the query of an ssoCard.
+            Default is None, triggering the query of an ssoCard.
         datacloud : list of str
             Optional list of additional catalogues to retrieve from datacloud.
             Default is no additional catalogues.
