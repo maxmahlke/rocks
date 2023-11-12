@@ -422,9 +422,9 @@ def _load(which):
     """Load a pickled index file."""
     if not (config.PATH_INDEX / which).exists():
         logger.error(
-            "The asteroid name-number index is malformed. Run '$ rocks status' to update it."
+            "The asteroid name-number index is malformed. Run '$ rocks status' to rebuild it."
         )
-        sys.exit()
+        return {}
 
     with open(config.PATH_INDEX / which, "rb") as file_:
         return pickle.load(file_)
