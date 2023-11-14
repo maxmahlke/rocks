@@ -1,0 +1,6 @@
+furo
+jinja2
+sphinx-hoverxref
+sphinx-redactor-theme
+sphinx_copybutton
+sphinx_design
