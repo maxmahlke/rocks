@@ -1,6 +1,8 @@
 # 1.8.12 -
 - load_bft now passes kwargs to read_parquet
-- rocks no longer exits if the index is malformed
+- rocks no longer exits if the index is malformed (#27)
+- Fix bug in datacloud table display (#28)
+- Add work-around for invalid period_flag type (#28)
 
 # 1.8.11 - 2023-10-13
 - rocks no longer exits if a number look-up fails

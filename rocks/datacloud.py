@@ -29,7 +29,7 @@ def pretty_print(rock, catalogue, parameter):
     """
     from rich.table import Table
 
-    if len(catalogue) == 1 and pd.isna(catalogue.number[0]):
+    if len(catalogue) == 1 and pd.isna(catalogue["name"][0]):
         rich.print(f"No {parameter} on record for {rock.name}.")
         return
 
@@ -676,7 +676,6 @@ class Spin(Collection):
     err_DEC0: List[Optional[float]] = [np.nan]
     period: List[Optional[float]] = [np.nan]
     err_period: List[Optional[float]] = [np.nan]
-    # NOTE: period_flag type should be str only, current datacloud issue
     period_flag: List[Optional[Union[str, int]]] = [""]
     period_type: List[Optional[str]] = [""]
     long_: List[Optional[float]] = pydantic.Field([np.nan], alias="long")
@@ -883,10 +882,7 @@ def weighted_average(catalogue, parameter):
     var_avg = (
         len(observable)
         / (len(observable) - 1)
-        * (
-            sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights)
-            - avg**2
-        )
+        * (sum(w * o**2 for w, o in zip(weights, observable)) / sum(weights) - avg**2)
     )
     std_avg = np.sqrt(var_avg / len(observable))
     return avg, std_avg
