@@ -1,5 +1,6 @@
 # 1.8.13
 - Add more readable output for spin queries (#25)
+- Remove upper python version limit
 
 # 1.8.12 - 2023-11-14
 - load_bft now passes kwargs to read_parquet
