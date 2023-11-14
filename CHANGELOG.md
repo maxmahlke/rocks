@@ -1,3 +1,6 @@
+# 1.8.13
+- Add more readable output for spin queries (#25)
+
 # 1.8.12 - 2023-11-14
 - load_bft now passes kwargs to read_parquet
 - rocks no longer exits if the index is malformed (#27)

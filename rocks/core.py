@@ -693,12 +693,16 @@ class Spin(Parameter):
     period: FloatValue = FloatValue(**{})
     obliquity: FloatValue = FloatValue(**{})
     technique: StringValue = StringValue(**{})
-    technique: StringValue = StringValue(**{})
     period_type: StringValue = StringValue(**{})
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.spins")
+
+    def __str__(self):
+        if not np.isnan(self.period.value):
+            return f"{self.period.value:.2f}{self.period.unit} [{self.technique.value}, {self.bibref.shortbib[0]}]"
+        return "No spin on record."
 
     _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
         "bibref", mode="before"

@@ -366,7 +366,11 @@ def echo():
             value = core.rgetattr(rock, param)
 
             if isinstance(value, core.ListWithAttributes):
-                rich.print(value)
+                if param == "spin" and not verbose:
+                    for v in value:
+                        print(v)  # uses __str__
+                else:
+                    rich.print(value)  # uses __repr__
 
             else:
                 if verbose:
