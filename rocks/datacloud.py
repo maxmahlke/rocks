@@ -676,6 +676,7 @@ class Spin(Collection):
     err_DEC0: List[Optional[float]] = [np.nan]
     period: List[Optional[float]] = [np.nan]
     err_period: List[Optional[float]] = [np.nan]
+    # NOTE: period_flag type should be str only, current datacloud issue
     period_flag: List[Optional[Union[str, int]]] = [""]
     period_type: List[Optional[str]] = [""]
     long_: List[Optional[float]] = pydantic.Field([np.nan], alias="long")
