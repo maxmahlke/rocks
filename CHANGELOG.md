@@ -1,3 +1,8 @@
+# 1.9
+- Make cache directory configurable using the ``ROCKS_CACHE_DIR`` environment variable
+- Add cache-less mode where all queries are done via SsODNet and no result is stored
+- Add more reasonable timeouts for asynchronous queries
+
 # 1.8.13 - 2023-11-16
 - Add more readable output for spin queries (#25)
 - Remove upper python version limit
