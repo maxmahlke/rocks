@@ -58,12 +58,15 @@ def pretty_print(rock, catalogue, parameter):
         caption = None
 
     table = Table(
-        header_style="bold blue",
-        box=rich.box.SQUARE,
+        box=rich.box.ASCII2,
+        header_style="dim",
         footer_style="dim",
-        title=f"({rock.number}) {rock.name}",
+        title_style="dim",
+        caption_style="dim",
         caption=caption,
     )
+
+    table.title = f"({rock.number}) {rock.name}"
 
     # The columns depend on the catalogue
     columns = [""] + config.DATACLOUD[parameter]["print_columns"]
@@ -91,12 +94,12 @@ def pretty_print(rock, catalogue, parameter):
                 ):
                     style = "bold blue"
                 else:
-                    style = "bold green"
+                    style = "bold"
             else:
                 style = "white"
 
         else:
-            style = "bold green" if pref else "white"
+            style = "bold" if pref else "dim"
 
         table.add_row(
             *[str(catalogue[c].values[i]) if c else str(i + 1) for c in columns],
