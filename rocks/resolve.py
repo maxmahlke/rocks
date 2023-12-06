@@ -366,7 +366,10 @@ async def _query_quaero(id_, session):
         "limit": 100,
     }
 
-    response = await session.request(method="GET", url=url, params=params)
+    try:
+        response = await session.request(method="GET", url=url, params=params)
+    except aiohttp.client_exceptions.ClientConnectorError:
+        return None
 
     try:
         response = await response.json(content_type=None)
