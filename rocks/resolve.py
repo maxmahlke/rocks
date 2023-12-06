@@ -15,7 +15,10 @@ from rocks import index
 from rocks.logging import logger
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
-nest_asyncio.apply()
+try:
+    nest_asyncio.apply()
+except RuntimeError:
+    pass
 
 
 def get_or_create_eventloop():

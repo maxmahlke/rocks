@@ -1,6 +1,3 @@
-import pytest
-
-
 def pytest_collection_modifyitems(items):
     """Ensure that the build-index test is executed first if it is among the tests to run."""
 

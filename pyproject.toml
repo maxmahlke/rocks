@@ -54,7 +54,7 @@ pytest-cov = "^4.0.0"
 pytest-sugar = "^0.9.6"
 
 [tool.pytest.ini_options]
-addopts = "-v --cov=rocks --cov-report html"
+addopts = "-v --cov=rocks --cov-report html --html=tests/report.html"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
