@@ -14,6 +14,7 @@ import time
 import numpy as np
 import rich
 from rich import console, progress
+from rich.prompt import Confirm
 
 from rocks import __version__
 from rocks import config
@@ -493,15 +494,28 @@ def _ensure_index_exists():
     |_|  \___/ \___|_|\_\___/
 
     version: {__version__}
-    cache:   {config.PATH_CACHE}
 
-    It looks like this is the first time you run [green]rocks[/green]. Some
-    metadata is required to run. [green]rocks[/green] will download it now.
+    It looks like this is the first time you run [green]rocks[/green]. By storing some
+    data on your machine, [green]rocks[/green] can run much faster. You can set the location
+    of this directory using the [dim]ROCKS_CACHE_DIR[/dim] environment variable.
     """
 
     # Cache directory is missing: first time running rocks
     if not config.PATH_CACHE.is_dir():
         rich.print(GREETING)
+
+        use_cache = Confirm.ask(
+            f"    Use cache directory [[dim]{config.PATH_CACHE}[/dim]]?"
+        )
+
+        if not use_cache:
+            rich.print(
+                "\n    Not using a cache. Set [dim]ROCKS_CACHE_DIR='no-cache'[/dim] to make this\n"
+                "    decision permanent.\n"
+            )
+            config.CACHELESS = True
+            return
+
         config.PATH_CACHE.mkdir(parents=True)
 
     # Cache exists but index is missing

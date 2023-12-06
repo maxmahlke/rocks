@@ -59,6 +59,9 @@ def get_ssocard(id_ssodnet, progress=False, local=True):
             "str, list, np.ndarray, pd.Series"
         )
 
+    if config.CACHELESS:
+        local = False
+
     # ---
     # Run async loop to get ssoCard
     if not progress:
@@ -101,7 +104,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
 
     PATH_CARD = config.PATH_CACHE / f"{id_ssodnet}.json"
 
-    if PATH_CARD.is_file() and local:
+    if PATH_CARD.is_file() and local and not config.CACHELESS:
         _update_progress(progress_bar, progress)
 
         with open(PATH_CARD, "r") as file_card:
@@ -109,16 +112,14 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
 
     # Local retrieval failed, do remote query
     card = await _query_ssodnet(id_ssodnet, session)
+    card = _postprocess_ssocard(card)
 
     # save to cache
-    if card is not None:
-        card = _postprocess_ssocard(card)
-
+    if card is not None and not config.CACHELESS:
         with open(PATH_CARD, "w") as file_card:
             json.dump(card, file_card)
 
     _update_progress(progress_bar, progress)
-
     return card
 
 
@@ -263,6 +264,9 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     # Flatten input for easier calling
     id_catalogue = list(product(id_ssodnet, catalogue))
 
+    if config.CACHELESS:
+        local = False
+
     if not progress:
         loop = get_or_create_eventloop()
         catalogues = loop.run_until_complete(
@@ -358,9 +362,9 @@ async def _local_or_remote_catalogue(
     else:
         cat = {}
 
-    # save to cache
-    with open(PATH_CATALOGUE, "w") as file_card:
-        json.dump(cat, file_card)
+    if not config.CACHELESS:
+        with open(PATH_CATALOGUE, "w") as file_card:
+            json.dump(cat, file_card)
 
     _update_progress(progress_bar, progress)
     return cat

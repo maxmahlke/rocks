@@ -19,24 +19,17 @@ from rocks import __version__
 def load_mappings():
     """Load SsODNet metadata mappings file from cache."""
 
-    if not config.PATH_MAPPINGS.is_file():
-        retrieve("mappings")
+    if config.CACHELESS or not config.PATH_MAPPINGS.is_file():
+        mappings = retrieve("mappings")
+    else:
+        with open(config.PATH_MAPPINGS, "r") as file_:
+            mappings = json.load(file_)
 
-    with open(config.PATH_MAPPINGS, "r") as file_:
-        mappings = json.load(file_)
+    if not config.PATH_MAPPINGS.is_file() and not config.CACHELESS:
+        with open(config.PATH_MAPPINGS, "w") as file_:
+            json.dump(mappings, file_)
 
-        # There are different capitalizations in MOIDs between rocks
-        # and ssodnet. Ensure that the units are found anyway
-        # This conversion is also done when retrieving the mappings,
-        # the code here ensures compatibility with outdated mappings files
-        # Remove in October 2023
-        mappings = {
-            k.lower(): {i.lower(): j for i, j in v.items()}
-            if isinstance(v, dict)
-            else v
-            for k, v in mappings.items()
-        }
-        return mappings
+    return mappings
 
 
 def retrieve(which):
@@ -78,11 +71,7 @@ def retrieve(which):
             else v
             for k, v in metadata.items()
         }
-
-    PATH_OUT = config.PATH_AUTHORS if which == "authors" else config.PATH_MAPPINGS
-
-    with open(PATH_OUT, "w") as file_:
-        json.dump(metadata, file_)
+    return metadata
 
 
 # ------
@@ -90,11 +79,15 @@ def retrieve(which):
 def find_author(author):
     """Print dataset and publication matching 'author' as first-author name."""
 
-    if not config.PATH_AUTHORS.is_file():
-        retrieve("authors")
+    if not config.PATH_AUTHORS.is_file() or config.CACHELESS:
+        ssodnet_biblio = retrieve("authors")
+    else:
+        with open(config.PATH_AUTHORS, "r") as file_:
+            ssodnet_biblio = json.load(file_)
 
-    with open(config.PATH_AUTHORS, "r") as file_:
-        ssodnet_biblio = json.load(file_)
+    if not config.PATH_AUTHORS.is_file() and not config.CACHELESS:
+        with open(config.PATH_AUTHORS, "w") as file_:
+            json.dump(ssodnet_biblio, file_)
 
     author_found = False
 

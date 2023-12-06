@@ -62,13 +62,17 @@ def load_bft(full=False, **kwargs):
     loaded.
     """
 
-    if not PATH.is_file():
+    if not PATH.is_file() and not config.CACHELESS:
         if prompt.Confirm.ask("The ssoBFT is not in the cache. Download it [~600MB]?"):
             ssodnet._get_bft()
         else:
             return None
 
+    if config.CACHELESS:
+        URL = f"{ssodnet.URL_SSODNET}/data/ssoBFT-latest.parquet"
+
     if "columns" not in kwargs and not full:
         kwargs["columns"] = COLUMNS
 
-    return pd.read_parquet(PATH, **kwargs)
+    LOAD = PATH if not config.CACHELESS else URL
+    return pd.read_parquet(LOAD, **kwargs)

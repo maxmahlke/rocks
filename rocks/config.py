@@ -1,10 +1,18 @@
 """Definitions concerning the ssoCard and datacloud representation in rocks."""
 
+import os
 from pathlib import Path
 
 from platformdirs import user_cache_dir
 
-PATH_CACHE = Path(user_cache_dir()) / "rocks"
+# Cache Directory
+CACHELESS = False  # by default, use cache
+
+if "ROCKS_CACHE_DIR" in os.environ:
+    CACHELESS = os.environ["ROCKS_CACHE_DIR"] == "no-cache"
+    PATH_CACHE = Path(os.environ["ROCKS_CACHE_DIR"]).expanduser().absolute()
+else:
+    PATH_CACHE = Path(user_cache_dir()) / "rocks"
 
 PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 PATH_INDEX = PATH_CACHE / "index"

@@ -71,7 +71,7 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
     """
 
     # Ensure the asteroid name-number index exists
-    if not config.PATH_INDEX.is_dir():
+    if not config.PATH_INDEX.is_dir() and not config.CACHELESS:
         index._ensure_index_exists()
 
     # ------
@@ -100,6 +100,9 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
 
     # ------
     # For a single name, try local lookup right away, async process has overhead
+    if config.CACHELESS:
+        local = False
+
     if len(id_) == 1 and local:
         success, (name, number, ssodnet_id) = _local_lookup(id_[0])
 
