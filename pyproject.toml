@@ -49,6 +49,7 @@ sphinx-hoverxref = {version = "*", optional = true}
 jinja2 = {version = "<3.1", optional = true}
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
+pytest-html = ">4.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest-sugar = "^0.9.6"
