@@ -133,7 +133,14 @@ DATACLOUD = {
     "colors": {
         "attr_name": "colors",
         "ssodnet_name": "colors",
-        "print_columns": ["color", "value", "uncertainty", "phot_sys"],
+        "print_columns": [
+            "color",
+            "value",
+            "uncertainty",
+            "phot_sys",
+            "observer",
+            "delta_time",
+        ],
     },
     "diamalbedo": {
         "attr_name": "diamalbedo",

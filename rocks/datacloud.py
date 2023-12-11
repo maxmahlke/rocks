@@ -747,14 +747,21 @@ class Colors(Collection):
     uncertainty: List[Optional[float]] = [np.nan]
     facility: List[Optional[str]] = [""]
     observer: List[Optional[str]] = [""]
-    epoch: List[Optional[str]] = [""]
-    delta_time: List[Optional[str]] = [""]
+    epoch: List[Optional[float]] = [""]
+    delta_time: List[Optional[float]] = [""]
     color_type: List[Optional[str]] = [""]
     id_filter_1: List[Optional[str]] = [""]
     id_filter_2: List[Optional[str]] = [""]
     phot_sys: List[Optional[str]] = [""]
     selection: List[Optional[int]] = [None]
     iddataset: List[Optional[int]] = [None]
+
+    @pydantic.model_validator(mode="before")
+    def _convert_to_str(cls, values):
+        if "observer" in values:
+            values["observer"] = [str(o) for o in values["observer"]]
+
+        return values
 
 
 class Density(Collection):

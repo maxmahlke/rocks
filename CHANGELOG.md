@@ -1,4 +1,7 @@
-# 1.9
+# 1.9.1 - 2023-12-11
+- Fix types of datacloud colors properties
+
+# 1.9 - 2023-12-06
 - Make cache directory configurable using the ``ROCKS_CACHE_DIR`` environment variable
 - Add cache-less mode (`ROCKS_CACHE_DIR='no-cache'`) where all queries are done via SsODNet and no result is stored
 - Add more reasonable timeouts for asynchronous queries
