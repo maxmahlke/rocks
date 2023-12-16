@@ -203,6 +203,9 @@ def status(clear, update):
         else:
             decision = "none"
 
+        if decision == "0":
+            sys.exit()
+
         if clear or decision == "1":
             rich.print("\nClearing the cached ssoCards and datacloud catalogues..")
             cache.clear()
