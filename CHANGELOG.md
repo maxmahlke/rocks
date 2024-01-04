@@ -1,6 +1,3 @@
-# 1.9.2 -
-- Actually exit `rocks status` dialogue if `0` is selected
-
 # 1.9.1 - 2023-12-11
 - Fix types of datacloud colors properties
 

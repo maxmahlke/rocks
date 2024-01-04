@@ -192,7 +192,7 @@ def status(clear, update):
         if not clear and not update:
             decision = prompt.Prompt.ask(
                 "Update or clear the cached ssoCards and datacloud catalogues?\n"
-                "[blue][0][/blue] Do nothing "
+                "[blue][0][/blue] No "
                 "[blue][1][/blue] Clear cache "
                 "[blue][2][/blue] Update data "
                 "[blue][3][/blue] Download ssoBFT",
@@ -202,9 +202,6 @@ def status(clear, update):
             )
         else:
             decision = "none"
-
-        if decision == "0":
-            sys.exit()
 
         if clear or decision == "1":
             rich.print("\nClearing the cached ssoCards and datacloud catalogues..")
