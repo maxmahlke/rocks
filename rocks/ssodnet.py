@@ -142,7 +142,10 @@ async def _query_ssodnet(id_ssodnet, session):
 
     URL = f"{URL_SSODNET}/webservices/ssodnet/api/ssocard.php?q={id_ssodnet}"
 
-    response = await session.request(method="GET", url=URL)
+    try:
+        response = await session.request(method="GET", url=URL)
+    except aiohttp.client_exceptions.ClientConnectorCertificateError:
+        return None
 
     if not response.ok:
         logger.warning(f"ssoCard query failed for ID '{id_ssodnet}'")
