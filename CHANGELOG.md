@@ -1,3 +1,6 @@
+# 1.9.2 -
+- Fix display of empty datacloud catalogues
+
 # 1.9.1 - 2023-12-11
 - Fix types of datacloud colors properties
 

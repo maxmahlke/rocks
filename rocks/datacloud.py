@@ -29,7 +29,7 @@ def pretty_print(rock, catalogue, parameter):
     """
     from rich.table import Table
 
-    if len(catalogue) == 1 and pd.isna(catalogue["name"][0]):
+    if len(catalogue) == 1 and not catalogue["name"][0]:
         rich.print(f"No {parameter} on record for {rock.name}.")
         return
 
