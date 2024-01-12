@@ -18,7 +18,7 @@ from rocks import config
 from rocks.logging import logger
 from rocks.resolve import get_or_create_eventloop
 
-if "ROCKS_URL_SSODNET " in os.environ:
+if "ROCKS_URL_SSODNET" in os.environ:
     URL_SSODNET = os.environ["ROCKS_URL_SSODNET"]
 else:
     URL_SSODNET = "https://ssp.imcce.fr"
