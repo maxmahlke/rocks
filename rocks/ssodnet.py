@@ -4,8 +4,8 @@
 import asyncio
 from functools import partial
 from itertools import product
+import os
 from urllib.request import Request, urlopen
-
 
 import aiohttp
 import json
@@ -18,7 +18,10 @@ from rocks import config
 from rocks.logging import logger
 from rocks.resolve import get_or_create_eventloop
 
-URL_SSODNET = "https://ssp.imcce.fr"
+if "ROCKS_URL_SSODNET " in os.environ:
+    URL_SSODNET = os.environ["ROCKS_URL_SSODNET"]
+else:
+    URL_SSODNET = "https://ssp.imcce.fr"
 
 
 def get_ssocard(id_ssodnet, progress=False, local=True):

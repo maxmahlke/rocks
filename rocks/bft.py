@@ -4,7 +4,7 @@ from rich import prompt
 from rocks import config
 from rocks import ssodnet
 
-PATH = config.PATH_CACHE / "ssoBFT-latest.parquet"
+PATH = config.PATH_CACHE / "ssoBFT-latest_Asteroid.parquet"
 
 COLUMNS = [
     "sso_id",

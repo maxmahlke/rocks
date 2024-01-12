@@ -14,11 +14,14 @@ if "ROCKS_CACHE_DIR" in os.environ:
 else:
     PATH_CACHE = Path(user_cache_dir()) / "rocks"
 
-PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 PATH_INDEX = PATH_CACHE / "index"
-PATH_MAPPINGS = PATH_CACHE / "metadata_aster.json"
 PATH_CITATIONS = PATH_CACHE / "citations.json"
+PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 
+if "ROCKS_PATH_MAPPINGS" in os.environ:
+    PATH_MAPPINGS = Path(os.environ["ROCKS_PATH_MAPPINGS"]).expanduser().absolute()
+else:
+    PATH_MAPPINGS = PATH_CACHE / "metadata_sso.json"
 
 # ------
 # ssoCard

@@ -160,7 +160,7 @@ def retrieve_all_ssocards():
     # Retrieve archive of ssoCards
     PATH_ARCHIVE = "/tmp/ssoCard-latest.tar.gz"
 
-    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/ssoCard-latest.tar.bz2"
+    URL = "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard/ssoCard-latest_Asteroid.tar.bz2"
 
     response = requests.get(URL, stream=True)
 
