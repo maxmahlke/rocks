@@ -129,11 +129,15 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
         ]
 
         if idx_failed:
+            # avoid repeating error messages
+            level = logger.level
+            logger.setLevel("CRITICAL")
             results = np.array(results)
             results[idx_failed] = loop.run_until_complete(
                 _identify(np.array(id_)[idx_failed], local, progress_bar, task)
             )
             results = results.tolist()
+            logger.setLevel(level)
 
     # ------
     # Verify the output format
@@ -372,6 +376,7 @@ async def _query_quaero(id_, session):
     try:
         response = await session.request(method="GET", url=url, params=params)
     except aiohttp.client_exceptions.ClientConnectorError:
+        logger.error(f"Failed to establish connection to {url}")
         return None
 
     try:
