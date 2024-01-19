@@ -12,6 +12,7 @@ import rich
 
 from rocks import config
 from rocks.logging import logger
+from rocks import ssodnet
 from rocks import __version__
 
 
@@ -51,7 +52,7 @@ def retrieve(which):
         return
 
     FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_aster"
-    URL = f"https://ssp.imcce.fr/data/{FILENAME}.json"
+    URL = f"{ssodnet.URL_SSODNET}/data/{FILENAME}.json"
 
     # Retrieve requested file from SsODNet
     response = requests.get(URL)
