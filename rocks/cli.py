@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """rocks command line suite."""
 
+import os
 import re
 import sys
 import shutil
@@ -14,6 +15,7 @@ from rocks import index
 from rocks import logging
 from rocks import metadata
 from rocks import resolve
+from rocks import ssodnet
 from rocks import __version__
 
 
@@ -293,6 +295,39 @@ def recent():
         rich.print(
             f"    [dim]{row.citation[:100].replace('  ', ' ')}[...][/dim]", end="\n\n"
         )
+
+
+@cli_rocks.command(hidden=True)
+def debug():
+    """Echo rocks configuration variables"""
+
+    rich.print("--- cache")
+    rich.print(f"using cache: {not config.CACHELESS}")
+    rich.print(f"cache directory: {config.PATH_CACHE}")
+
+    rocks_cache_dir_set = "ROCKS_CACHE_DIR" in os.environ
+    rich.print(f"ROCKS_CACHE_DIR set: {rocks_cache_dir_set}")
+
+    if rocks_cache_dir_set:
+        rich.print(f"ROCKS_CACHE_DIR value: {os.environ['ROCKS_CACHE_DIR']}")
+
+    rich.print("\n--- metadata")
+    rich.print(f"metadata path: {config.PATH_MAPPINGS}")
+
+    path_mappings_set = "ROCKS_PATH_MAPPINGS" in os.environ
+    rich.print(f"ROCKS_PATH_MAPPINGS set: {path_mappings_set}")
+
+    if path_mappings_set:
+        rich.print(f"ROCKS_PATH_MAPPINGS value: {os.environ['ROCKS_PATH_MAPPINGS']}")
+
+    rich.print("\n--- ssodnet")
+    rich.print(f"url ssodnet: {ssodnet.URL_SSODNET}")
+
+    url_ssodnet_set = "ROCKS_URL_SSODNET" in os.environ
+    rich.print(f"ROCKS_URL_SSODNET set: {url_ssodnet_set}")
+
+    if url_ssodnet_set:
+        rich.print(f"ROCKS_URL_SSODNET value: {os.environ['ROCKS_URL_SSODNET']}")
 
 
 def echo():
