@@ -21,7 +21,7 @@ PATH_AUTHORS = PATH_CACHE / "ssodnet_biblio.json"
 if "ROCKS_PATH_MAPPINGS" in os.environ:
     PATH_MAPPINGS = Path(os.environ["ROCKS_PATH_MAPPINGS"]).expanduser().absolute()
 else:
-    PATH_MAPPINGS = PATH_CACHE / "metadata_aster.json"
+    PATH_MAPPINGS = PATH_CACHE / "metadata_sso.json"
 
 # ------
 # ssoCard

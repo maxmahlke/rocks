@@ -51,7 +51,7 @@ def retrieve(which):
         _retrieve_citations()
         return
 
-    FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_aster"
+    FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_sso"
     URL = f"{ssodnet.URL_SSODNET}/data/{FILENAME}.json"
 
     # Retrieve requested file from SsODNet
