@@ -111,15 +111,8 @@ def info(id_):
 @cli_rocks.command()
 def parameters():
     """Print the ssoCard structure and its description."""
-    import json
-
-    if not config.PATH_MAPPINGS.is_file():
-        metadata.retrieve("mappings")
-
-    with open(config.PATH_MAPPINGS, "r") as file_:
-        DESC = json.load(file_)
-
-    rich.print(DESC)
+    mappings = metadata.load_mappings()
+    rich.print(mappings)
 
 
 @cli_rocks.command(hidden=True)
