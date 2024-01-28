@@ -66,3 +66,8 @@ def test_remote_resolution(id_, expected):
     np.testing.assert_equal(name_local, name_expected)
     np.testing.assert_equal(number_local, number_expected)
     np.testing.assert_equal(id_local, id_expected)
+
+def test_comet_remote(id_, expected):
+    """Testing cometary designation resolution. Should be merged with other tests."""
+
+    "P/Schwassmann-Wachmann"
