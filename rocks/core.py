@@ -159,7 +159,7 @@ class IntegerValue(Parameter):
 
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
-        return f"{self.value:{self.format.strip('%')}}{self.unit}"
+        return f"{self.value:{self.format.strip('%')}} {self.unit}"
 
     def __bool__(self):
         return bool(self.value)
@@ -279,10 +279,10 @@ class OrbitalElements(Parameter):
     node_longitude: FloatValue = FloatValue(**{})
     orbital_period: FloatValue = FloatValue(**{})
     semi_major_axis: FloatValue = FloatValue(**{})
-    aphelion_distance: FloatValue = FloatValue(**{})
+    apoapsis_distance: FloatValue = FloatValue(**{})
     number_observation: IntegerValue = IntegerValue(**{})
-    perihelion_argument: FloatValue = FloatValue(**{})
-    perihelion_distance: FloatValue = FloatValue(**{})
+    periapsis_argument: FloatValue = FloatValue(**{})
+    periapsis_distance: FloatValue = FloatValue(**{})
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
@@ -388,7 +388,7 @@ class Pair(Parameter):
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
-class TisserandParameter(Parameter):
+class TisserandParameters(Parameter):
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     saturn: FloatValue = pydantic.Field(FloatValue(**{}), alias="Saturn")
     uranus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Uranus")
@@ -398,7 +398,7 @@ class TisserandParameter(Parameter):
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.dynamical.tisserand_parameter")
+        return add_paths(cls, values, "parameters.dynamical.tisserand_parameters")
 
     _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
         "bibref", mode="before"
@@ -406,8 +406,8 @@ class TisserandParameter(Parameter):
 
 
 class Yarkovsky(Parameter):
-    S: FloatValue = FloatValue(**{})
-    A2: FloatValue = FloatValue(**{})
+    s: FloatValue = FloatValue(**{})
+    a2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
     dadt: FloatValue = FloatValue(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
@@ -430,9 +430,7 @@ class DynamicalParameters(Parameter):
     pair: Pair = pydantic.Field(Pair(**{}), alias="pair")
     family: Family = Family(**{})
     source_regions: SourceRegions = SourceRegions(**{})
-    tisserand_parameter: TisserandParameter = pydantic.Field(
-        TisserandParameter(**{}), alias="tisserand_parameters"
-    )
+    tisserand_parameters: TisserandParameters = TisserandParameters(**{})
     yarkovsky: Yarkovsky = Yarkovsky(**{})
     proper_elements: ProperElements = ProperElements(**{})
     orbital_elements: OrbitalElements = OrbitalElements(**{})
@@ -824,7 +822,7 @@ class Rock(pydantic.BaseModel):
     # the basics
     id_: str = pydantic.Field("", alias="id")
     name: str
-    type_: str = pydantic.Field("", alias="type")
+    type: str = ""
     class_: str = pydantic.Field("", alias="class")
     number: int = None
     parent: str = ""
