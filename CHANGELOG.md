@@ -1,5 +1,6 @@
 # 1.9.2 -
 - Fix display of empty datacloud catalogues
+- Sort mpcatobs by date_obs when printing
 
 # 1.9.1 - 2023-12-11
 - Fix types of datacloud colors properties

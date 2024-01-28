@@ -189,6 +189,8 @@ DATACLOUD = {
         "attr_name": "mpcatobs",
         "ssodnet_name": "mpcatobs",
         "print_columns": [
+            "name",
+            "number",
             "packed_name",
             "discovery",
             "date_obs",

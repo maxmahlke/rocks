@@ -51,6 +51,9 @@ def pretty_print(rock, catalogue, parameter):
     else:
         preferred = [False for _ in range(len(catalogue))]
 
+    if parameter == "mpcatobs":
+        catalogue = catalogue.sort_values("date_obs")
+
     # Only show the caption if there is a preferred entry
     if any(preferred):
         caption = "Green: preferred entry"
@@ -806,6 +809,10 @@ class Mpcatobs(Collection):
     vgs_y: List[Optional[float]] = [np.nan]
     vgs_z: List[Optional[float]] = [np.nan]
     iddataset: List[Optional[int]] = [None]
+
+    @pydantic.field_validator("iau_code", mode="before")
+    def ensure_str(cls, values, _):
+        return [str(v) for v in values]
 
 
 class Shape(Collection):
