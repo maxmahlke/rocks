@@ -32,7 +32,7 @@ ALIASES = {
         "parameters.dynamical.moid": "moid",
         "parameters.dynamical.pair": "pair",
         "parameters.dynamical.proper_elements": "proper_elements",
-        "parameters.dynamical.tisserand_parameter": "tisserand_parameter",
+        "parameters.dynamical.tisserand_parameters": "tisserand_parameters",
         "parameters.dynamical.yarkovsky": "yarkovsky",
     },
     "physical": {
