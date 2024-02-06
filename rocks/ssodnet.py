@@ -107,7 +107,7 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
 
     PATH_CARD = config.PATH_CACHE / f"{id_ssodnet}.json"
 
-    if PATH_CARD.is_file() and local and not config.CACHELESS:
+    if PATH_CARD.is_file() and local:
         _update_progress(progress_bar, progress)
 
         with open(PATH_CARD, "r") as file_card:
