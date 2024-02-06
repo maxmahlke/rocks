@@ -63,7 +63,7 @@ def load_bft(full=False, **kwargs):
     """
 
     if not PATH.is_file() and not config.CACHELESS:
-        if prompt.Confirm.ask("The ssoBFT is not in the cache. Download it [~600MB]?"):
+        if prompt.Confirm.ask("The ssoBFT is not in the cache. Download it [~430MB]?"):
             ssodnet._get_bft()
         else:
             return None
