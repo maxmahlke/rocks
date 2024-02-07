@@ -65,12 +65,22 @@ def retrieve(which):
     if which == "mappings":
         metadata = metadata["display"]
 
+        # TODO: Add targeted metadata name conversion: currently causing trouble for
+        # A2 / a2 in yarkovsky
         metadata = {
             k.lower(): {i.lower(): j for i, j in v.items()}
             if isinstance(v, dict)
             else v
             for k, v in metadata.items()
         }
+
+    # HACK: Remove after ssodnet branch merge - 2024-02-07
+    metadata["parameters.dynamical.yarkovsky.A2"] = metadata[
+        "parameters.dynamical.yarkovsky.a2"
+    ]
+    metadata["parameters.dynamical.yarkovsky.S"] = metadata[
+        "parameters.dynamical.yarkovsky.s"
+    ]
     return metadata
 
 
