@@ -1,5 +1,6 @@
 # 1.9.2 - 2024-02-07
-- Fix yarkovsky metadata look-up
+- Fix yarkovsky metadata lookup
+- Do not fail silently when quaero connection times out
 
 # 1.9.1 - 2023-12-11
 - Fix types of datacloud colors properties
