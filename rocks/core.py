@@ -327,6 +327,14 @@ class SourceRegions(Parameter):
     method: List[Method] = [Method(**{})]
     links: LinksParameter = LinksParameter(**{})
 
+    def __str__(self):
+        return "\n".join(
+            [
+                f"{region}: {getattr(self, region).value:.2%}"
+                for region in ["hun", "nu6", "pho", "mm31", "mm21"]
+            ]
+        )
+
 
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
