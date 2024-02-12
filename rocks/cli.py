@@ -398,13 +398,17 @@ def echo():
                     for v in value:
                         print(v)  # uses __str__
                 else:
-                    rich.print(value)  # uses __repr__
+                    rich.print(value)  # uses __rich__
 
             else:
                 if verbose:
                     rich.print_json(value.json(), sort_keys=True)
                 else:
-                    print(value)
+                    from rich.console import Console
+                    from rich.theme import Theme
+
+                    console = Console(theme=Theme({"repr.number": ""}))
+                    console.print(value)
 
         if plot:
             if param not in datacloud:

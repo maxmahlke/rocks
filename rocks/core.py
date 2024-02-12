@@ -36,6 +36,26 @@ def add_paths(cls, instance, parent):
     return instance
 
 
+def _build_rich_repr(obj, params: dict) -> str:
+    """Build repr for rich output of parameter on console.
+
+    Parameters
+    ----------
+    obj : object
+        The parameter class instance.
+    params : dict
+        Dict of parameters to echo with parameter attribute name : parameter repr structure.
+
+    Returns
+    -------
+    str
+        The parameter repr.
+    """
+    return "\n".join(
+        f"{repr:>9} {getattr(obj, prop).__rich__()}" for prop, repr in params.items()
+    )
+
+
 # The lowest level in the ssoCard tree is the are the differnt Values and the Error
 class Error(pydantic.BaseModel):
     min: float = np.nan
@@ -120,12 +140,18 @@ class FloatValue(Parameter):
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
 
+        if np.isnan(self.value):
+            return "[dim]unknown[/dim]"
+
         format = self.format.strip("%")
 
         if abs(self.error.min) == abs(self.error.max):
             return f"{self.value:{format}} +- {self.error.max:{format}} {self.unit}"
         else:
             return f"{self.value:{format}} +- ({self.error.max:{format}}, {self.error.min:{format}}) {self.unit}"
+
+    def __rich__(self):
+        return self.__str__()
 
     def __bool__(self):
         if np.isnan(self.value):
@@ -159,7 +185,10 @@ class IntegerValue(Parameter):
 
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
-        return f"{self.value:{self.format.strip('%')}} {self.unit}"
+        if self.unit:
+            return f"{self.value:{self.format.strip('%')}} {self.unit}"
+        else:
+            return f"{self.value:{self.format.strip('%')}}"
 
     def __bool__(self):
         return bool(self.value)
@@ -259,6 +288,10 @@ class ListWithAttributes(list):
                 return []
         raise AttributeError
 
+    def __rich__(self):
+        if isinstance(self[0], Bibref):
+            return " ".join(ref.shortbib for ref in self)
+
 
 # ------
 # Dynamical parameters
@@ -327,6 +360,14 @@ class SourceRegions(Parameter):
     method: List[Method] = [Method(**{})]
     links: LinksParameter = LinksParameter(**{})
 
+    def __str__(self):
+        return "\n".join(
+            [
+                f"{region}: {getattr(self, region).value:.2%}"
+                for region in ["hun", "nu6", "pho", "mm31", "mm21"]
+            ]
+        )
+
 
 class Family(Parameter):
     links: LinksParameter = LinksParameter(**{})
@@ -336,7 +377,7 @@ class Family(Parameter):
     family_number: IntegerValue = IntegerValue(**{})
     family_status: StringValue = StringValue(**{})
 
-    def __str__(self):
+    def __rich__(self):
         if self.family_number.value is not None:
             return f"({self.family_number}) {self.family_name}"
         else:
@@ -413,8 +454,11 @@ class Yarkovsky(Parameter):
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
-    def __str__(self):
-        return "\n".join([self.A2.__str__(), self.dadt.__str__()])
+    def __rich__(self):
+        return _build_rich_repr(
+            self,
+            {"a2": "a2", "dadt": "da/dt", "s": "s", "snr": "snr"},
+        )
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):

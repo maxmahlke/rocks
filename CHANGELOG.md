@@ -1,4 +1,10 @@
-# 1.9.2 -
+# 1.9.3 - 2024-02-08
+- Add shortcut for source_regions
+- Add custom output for source_regions
+
+# 1.9.2 - 2024-02-07
+- Fix yarkovsky metadata lookup
+- Do not fail silently when quaero connection times out
 - Fix display of empty datacloud catalogues
 - Sort mpcatobs by date_obs when printing
 

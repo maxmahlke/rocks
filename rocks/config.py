@@ -34,6 +34,7 @@ ALIASES = {
         "parameters.dynamical.proper_elements": "proper_elements",
         "parameters.dynamical.tisserand_parameters": "tisserand_parameters",
         "parameters.dynamical.yarkovsky": "yarkovsky",
+        "parameters.dynamical.source_regions": "source_regions",
     },
     "physical": {
         "D": "diameter",
