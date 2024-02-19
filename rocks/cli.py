@@ -377,6 +377,8 @@ def echo():
     # Increase the default log level unless user requests verbose output
     if not verbose:
         logging.set_log_level("ERROR")
+    else:
+        logging.set_log_level("DEBUG")
 
     # And let's go
     rock = core.Rock(id_, datacloud=catalogues)
