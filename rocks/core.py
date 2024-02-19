@@ -877,6 +877,7 @@ class Rock(pydantic.BaseModel):
     number: int = None
     parent: str = ""
     system: str = ""
+    filename: str = ""
 
     # the heart
     parameters: Parameters = Parameters(**{})
@@ -995,6 +996,11 @@ class Rock(pydantic.BaseModel):
         else:
             # Something failed. Instantiate minimal ssoCard for meaningful error output.
             ssocard = {"name": id_provided}
+
+        # Add filename attribute
+        ssocard["filename"] = "".join(
+            char.lower() for char in ssocard["name"] if char.isalnum()
+        )
 
         # Deserialize the asteroid data
         try:
