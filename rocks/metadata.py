@@ -22,6 +22,8 @@ def load_mappings():
 
     if config.CACHELESS or not config.PATH_MAPPINGS.is_file():
         mappings = retrieve("mappings")
+        if mappings is None:
+            return
     else:
         with open(config.PATH_MAPPINGS, "r") as file_:
             mappings = json.load(file_)
@@ -53,13 +55,14 @@ def retrieve(which):
 
     FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_sso"
     URL = f"{ssodnet.URL_SSODNET}/data/{FILENAME}.json"
+    logger.debug(URL)
 
     # Retrieve requested file from SsODNet
     response = requests.get(URL)
 
     if not response.ok:
         logger.warning(f"Retrieving {which} file failed with URL:\n{URL}")
-        return
+        return None
 
     metadata = response.json()
 

@@ -95,8 +95,10 @@ class Parameter(pydantic.BaseModel):
 
     @label.getter
     def label(self):
-        label = metadata.load_mappings()[self.path]["label"]
-        return label
+        mappings = metadata.load_mappings()
+        if "label" in mappings[self.path]:
+            return mappings[self.path]["label"]
+        return ""
 
     @property
     def symbol(self):
@@ -104,8 +106,9 @@ class Parameter(pydantic.BaseModel):
 
     @symbol.getter
     def symbol(self):
-        if "symbol" in metadata.load_mappings()[self.path]:
-            return metadata.load_mappings()[self.path]["symbol"]
+        mappings = metadata.load_mappings()
+        if "symbol" in mappings[self.path]:
+            return mappings[self.path]["symbol"]
         return ""
 
     @property
@@ -114,8 +117,9 @@ class Parameter(pydantic.BaseModel):
 
     @format.getter
     def format(self):
-        if "format" in metadata.load_mappings()[self.path]:
-            return metadata.load_mappings()[self.path]["format"]
+        mappings = metadata.load_mappings()
+        if mappings and "format" in mappings[self.path]:
+            return mappings[self.path]["format"]
         return ""
 
     @property
@@ -124,8 +128,9 @@ class Parameter(pydantic.BaseModel):
 
     @description.getter
     def description(self):
-        if "description" in metadata.load_mappings()[self.path]:
-            return metadata.load_mappings()[self.path]["description"]
+        mappings = metadata.load_mappings()
+        if mappings and "description" in mappings[self.path]:
+            return mappings[self.path]["description"]
         return ""
 
 
@@ -164,8 +169,9 @@ class FloatValue(Parameter):
 
     @unit.getter
     def unit(self):
-        if "unit" in metadata.load_mappings()[self.path]:
-            return metadata.load_mappings()[self.path]["unit"]
+        mappings = metadata.load_mappings()
+        if mappings and "unit" in mappings[self.path]:
+            return mappings[self.path]["unit"]
         return ""
 
     @pydantic.model_validator(mode="before")
