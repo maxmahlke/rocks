@@ -150,6 +150,9 @@ class FloatValue(Parameter):
 
         format = self.format.strip("%")
 
+        if np.isnan(self.error.min) and np.isnan(self.error.max):
+            return f"{self.value:{format}} {self.unit}"
+
         if abs(self.error.min) == abs(self.error.max):
             return f"{self.value:{format}} +- {self.error.max:{format}} {self.unit}"
         else:
@@ -907,6 +910,8 @@ class Rock(pydantic.BaseModel):
     shapes: dc.Shape = dc.Shape(**{})
     spins: dc.Spin = dc.Spin(**{})
     yarkovskys: dc.Yarkovsky = dc.Yarkovsky(**{})
+
+    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(
         self,
