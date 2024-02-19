@@ -144,6 +144,7 @@ async def _query_ssodnet(id_ssodnet, session):
     """
 
     URL = f"{URL_SSODNET}/webservices/ssodnet/api/ssocard.php?q={id_ssodnet}"
+    logger.debug(URL)
 
     try:
         response = await session.request(method="GET", url=URL)
@@ -230,7 +231,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
     progress : bool
         Show progressbar. Default is False.
     local : bool
-        If False, forces the remote query of the ssoCard. Default is True.
+        If False, forces the remote query of the datacloud catalogue. Default is True.
 
     Returns
     -------
@@ -287,7 +288,7 @@ def get_datacloud_catalogue(id_ssodnet, catalogue, progress=False, local=True):
                 total=len(id_catalogue),
             )
 
-            # Run async loop to get ssoCard
+            # Run async loop to get datacloud catalogue
             loop = get_or_create_eventloop()
             catalogues = loop.run_until_complete(
                 _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local)
@@ -306,7 +307,7 @@ async def _get_datacloud_catalogue(id_catalogue, progress_bar, progress, local):
     progress : bool or tdqm.std.tqdm
         If progress is True, this is a progress bar instance. Else, it's False.
     local : bool
-        If False, forces the remote query of the ssoCard. Default is True.
+        If False, forces the remote query of the datacloud catalogue. Default is True.
 
     Returns
     -------
@@ -338,7 +339,7 @@ def _update_progress(progress_bar, progress):
 async def _local_or_remote_catalogue(
     id_ssodnet, catalogue, session, progress_bar, progress, local
 ):
-    """Check for presence of ssoCard in cache directory. Else, query from SsODNet."""
+    """Check for presence of datacloud catalogue in cache directory. Else, query from SsODNet."""
 
     PATH_CATALOGUE = config.PATH_CACHE / f"{id_ssodnet}_{catalogue}.json"
 
