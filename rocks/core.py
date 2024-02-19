@@ -620,6 +620,7 @@ class Density(FloatValue):
 
 class Diameter(FloatValue):
     links: LinksParameter = LinksParameter(**{})
+    ratio: FloatValue = FloatValue(**{})
     method: List[Method] = [Method(**{})]
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
@@ -634,6 +635,7 @@ class Diameter(FloatValue):
 
 class Mass(FloatValue):
     links: LinksParameter = LinksParameter(**{})
+    ratio: FloatValue = FloatValue(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
@@ -878,6 +880,7 @@ class Rock(pydantic.BaseModel):
     parent: str = ""
     system: str = ""
     filename: str = ""
+    siblings: [str] = [None]
 
     # the heart
     parameters: Parameters = Parameters(**{})
