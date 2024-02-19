@@ -85,6 +85,16 @@ def retrieve(which):
     metadata["parameters.dynamical.yarkovsky.S"] = metadata[
         "parameters.dynamical.yarkovsky.s"
     ]
+    # HACK: This can be removed after a targeted metadata name conversion was implemented
+    metadata["parameters.physical.phase_functions.<id>.H"] = metadata[
+        "parameters.physical.phase_functions.<id>.h"
+    ]
+    metadata["parameters.physical.phase_functions.<id>.G1"] = metadata[
+        "parameters.physical.phase_functions.<id>.g1"
+    ]
+    metadata["parameters.physical.phase_functions.<id>.G2"] = metadata[
+        "parameters.physical.phase_functions.<id>.g2"
+    ]
     return metadata
 
 

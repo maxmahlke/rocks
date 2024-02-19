@@ -199,6 +199,9 @@ class IntegerValue(Parameter):
         else:
             return f"{self.value:{self.format.strip('%')}}"
 
+    def __rich__(self):
+        return self.__str__()
+
     def __bool__(self):
         return bool(self.value)
 
@@ -219,6 +222,9 @@ class StringValue(Parameter):
 
     def __str__(self):
         return self.value
+
+    def __rich__(self):
+        return self.__str__()
 
     def __bool__(self):
         return bool(self.value)
@@ -362,20 +368,32 @@ class ProperElements(Parameter):
 
 class SourceRegions(Parameter):
     hun: FloatValue = FloatValue(**{})
+    jfc: FloatValue = FloatValue(**{})
     nu6: FloatValue = FloatValue(**{})
     pho: FloatValue = FloatValue(**{})
     mm31: FloatValue = FloatValue(**{})
     mm21: FloatValue = FloatValue(**{})
+    mm52: FloatValue = FloatValue(**{})
     method: List[Method] = [Method(**{})]
     links: LinksParameter = LinksParameter(**{})
 
-    def __str__(self):
-        return "\n".join(
-            [
-                f"{region}: {getattr(self, region).value:.2%}"
-                for region in ["hun", "nu6", "pho", "mm31", "mm21"]
-            ]
+    def __rich__(self):
+        return _build_rich_repr(
+            self,
+            {
+                "hun": "Hungaria",
+                "nu6": "nu6",
+                "pho": "Phocaea",
+                "mm31": "MMR 3:1",
+                "mm21": "MMR 2:1",
+                "mm52": "MMR 5:2",
+                "jfc": "JFC",
+            },
         )
+
+    @pydantic.model_validator(mode="after")
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.dynamical.source_regions")
 
 
 class Family(Parameter):
@@ -423,11 +441,23 @@ class MOID(Parameter):
 
 class Pair(Parameter):
     age: FloatValue = FloatValue(**{})
+    links: LinksParameter = LinksParameter(**{})
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
+    method: List[Method] = [Method(**{})]
     distance: FloatValue = FloatValue(**{})
     sibling_name: StringValue = StringValue(**{})
     sibling_number: IntegerValue = IntegerValue(**{})
-    method: List[Method] = [Method(**{})]
-    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
+
+    def __rich__(self):
+        return _build_rich_repr(
+            self,
+            {
+                "age": "age",
+                "distance": "distance",
+                "sibling_name": "sibling_name",
+                "sibling_number": "sibling_number",
+            },
+        )
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
@@ -460,6 +490,7 @@ class Yarkovsky(Parameter):
     a2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
     dadt: FloatValue = FloatValue(**{})
+    links: LinksParameter = LinksParameter(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     method: List[Method] = [Method(**{})]
 
@@ -676,6 +707,10 @@ class Phase(Parameter):
         "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
+    @pydantic.model_validator(mode="after")
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.phase_functions")
+
 
 class PhaseFunction(Parameter):
     # Generic
@@ -883,7 +918,7 @@ class Rock(pydantic.BaseModel):
     parent: str = ""
     system: str = ""
     filename: str = ""
-    siblings: [str] = [None]
+    siblings: list = []
 
     # the heart
     parameters: Parameters = Parameters(**{})
@@ -910,8 +945,6 @@ class Rock(pydantic.BaseModel):
     shapes: dc.Shape = dc.Shape(**{})
     spins: dc.Spin = dc.Spin(**{})
     yarkovskys: dc.Yarkovsky = dc.Yarkovsky(**{})
-
-    model_config = pydantic.ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(
         self,
