@@ -194,6 +194,8 @@ class IntegerValue(Parameter):
 
     def __str__(self):
         """Print value of numerical parameter including errors and unit if available."""
+        if self.value is None:
+            return "None"
         if self.unit:
             return f"{self.value:{self.format.strip('%')}} {self.unit}"
         else:
@@ -640,6 +642,7 @@ class Color(Parameter):
 
 
 class Density(FloatValue):
+    links: LinksParameter = LinksParameter(**{})
     method: List[Method] = []
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
