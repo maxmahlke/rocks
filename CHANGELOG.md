@@ -1,3 +1,6 @@
+# 1.9.4 - 2024-02-26
+- Bugfix in quaero index parsing routine
+
 # 1.9.3 - 2024-02-08
 - Add shortcut for source_regions
 - Add custom output for source_regions
