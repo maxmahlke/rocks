@@ -352,6 +352,9 @@ def _retrieve_index_from_ssodnet():
     # There are some spurious spaces in the column headers
     index = index.rename(columns={c: c.replace(" ", "") for c in index.columns})
 
+    # For now
+    index = index[index["Type"].isin(["Asteroid", "Dwarf Planet"])]
+
     # Don't need other columns
     index = index[["Name", "Number", "SsODNetID", "Reduced"]]
 
