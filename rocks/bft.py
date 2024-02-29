@@ -15,7 +15,7 @@ COLUMNS = [
     "orbital_elements.eccentricity.value",
     "orbital_elements.inclination.value",
     "orbital_elements.orbital_period.value",
-    "orbital_elements.perihelion_distance.value",
+    "orbital_elements.periapsis_distance.value",
     "proper_elements.proper_semi_major_axis.value",
     "proper_elements.proper_eccentricity.value",
     "proper_elements.proper_inclination.value",
