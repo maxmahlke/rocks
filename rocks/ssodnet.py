@@ -413,7 +413,8 @@ async def _query_datacloud(id_ssodnet, catalogue, session):
 # Get ssoBFT
 def _get_bft():
     """Retrieve the ssoBFT in parquet format to cache."""
-    URL = f"{URL_SSODNET}/data/ssoBFT-latest.parquet"
+    URL = f"{URL_SSODNET}/data/ssoBFT-latest_Asteroid.parquet"
+    logger.debug(URL)
 
     progress = Progress(
         TextColumn("{task.fields[desc]}"), BarColumn(), DownloadColumn()

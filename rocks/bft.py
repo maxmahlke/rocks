@@ -63,13 +63,13 @@ def load_bft(full=False, **kwargs):
     """
 
     if not PATH.is_file() and not config.CACHELESS:
-        if prompt.Confirm.ask("The ssoBFT is not in the cache. Download it [~430MB]?"):
+        if prompt.Confirm.ask("The ssoBFT is not in the cache. Download it [~550MB]?"):
             ssodnet._get_bft()
         else:
             return None
 
     if config.CACHELESS:
-        URL = f"{ssodnet.URL_SSODNET}/data/ssoBFT-latest.parquet"
+        URL = f"{ssodnet.URL_SSODNET}/data/ssoBFT-latest_Asteroid.parquet"
 
     if "columns" not in kwargs and not full:
         kwargs["columns"] = COLUMNS
