@@ -1,5 +1,9 @@
-# 1.9.4
+# 1.9.5 - 2024-02-29
+- Many minor updates to align with upstream changes - SsODNet now supports natural satellites
 - Add new `filename` attribute to `Rock` class
+
+# 1.9.4 - 2024-02-26
+- Bugfix in quaero index parsing routine
 
 # 1.9.3 - 2024-02-08
 - Add shortcut for source_regions
