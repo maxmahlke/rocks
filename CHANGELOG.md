@@ -1,3 +1,7 @@
+# 1.9.6 - 2024-02-29
+- Update ssoBFT URL
+- Update 'perihelion' -> 'periapsis' in BFT Lite scheme
+
 # 1.9.5 - 2024-02-29
 - Many minor updates to align with upstream changes - SsODNet now supports natural satellites
 - Add new `filename` attribute to `Rock` class
