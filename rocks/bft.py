@@ -75,4 +75,8 @@ def load_bft(full=False, **kwargs):
         kwargs["columns"] = COLUMNS
 
     LOAD = PATH if not config.CACHELESS else URL
-    return pd.read_parquet(LOAD, **kwargs)
+    bft = pd.read_parquet(LOAD, **kwargs)
+
+    if "sso_number" in bft.columns:
+        bft["sso_number"] = bft["sso_number"].astype("Int64")
+    return bft
