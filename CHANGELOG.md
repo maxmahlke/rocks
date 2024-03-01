@@ -1,3 +1,8 @@
+# 1.9.7 - 2024-03-01
+- Drop support for python3.7
+- 'sso_number' column in BFT is now of type Int64
+- Fix metadata name conversion bug
+
 # 1.9.6 - 2024-02-29
 - Update ssoBFT URL
 - Update 'perihelion' -> 'periapsis' in BFT Lite scheme
