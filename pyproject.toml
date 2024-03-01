@@ -11,7 +11,7 @@ repository = "https://github.com/maxmahlke/rocks.git"
 packages = [{'include' = 'rocks'}]
 
 [tool.poetry.dependencies]
-python = ">=3.7.1"
+python = ">=3.8"
 numpy = [
     {version = ">=1.24", python = "^3.11"},
     {version = ">=1.21", python = ">=3.7,<3.11"},
