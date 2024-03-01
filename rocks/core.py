@@ -759,11 +759,14 @@ class PhaseFunction(Parameter):
             entry = getattr(self, filter_)
             if not np.isnan(entry.H.value):
                 observed.append(
-                    rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  [{filter_}]"
+                    rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
                 )
         if observed:
             return "\n".join(observed)
         return "No phase function on record."
+
+    def __rich__(self):
+        return self.__str__()
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
