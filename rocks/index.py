@@ -280,6 +280,52 @@ def _build_palomar_transit_index(index, pbar, task_id):
     pbar[task_id] = {"progress": 2, "total": 2}
 
 
+def _build_comet_index(index, pbar, task_id):
+    """Build the comet SsODNetID index.
+
+    Parameters
+    ----------
+    index : pd.DataFrame
+        The formatted index from SsODNet.
+    """
+    pbar[task_id] = {"progress": 1, "total": 2}
+
+    index = index[index.Type.isin(["Comet"])]
+
+    index = dict(
+        zip(
+            index.Reduced,
+            index[["Name", "Number", "Aliases"]].to_numpy().tolist(),
+        )
+    )
+
+    _write_to_cache(index, f"comets.pkl")
+    pbar[task_id] = {"progress": 2, "total": 2}
+
+
+def _build_satellite_index(index, pbar, task_id):
+    """Build the natural satellite SsODNetID index.
+
+    Parameters
+    ----------
+    index : pd.DataFrame
+        The formatted index from SsODNet.
+    """
+    pbar[task_id] = {"progress": 1, "total": 2}
+
+    index = index[index.Type.isin(["Satellite"])]
+
+    index = dict(
+        zip(
+            index.Reduced,
+            index[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
+        )
+    )
+
+    _write_to_cache(index, f"comets.pkl")
+    pbar[task_id] = {"progress": 2, "total": 2}
+
+
 def _build_fuzzy_searchable_index(index, pbar, task_id):
     """Merge name, number and SsODNet ID of all entries to fuzzy-searchable lines.
 
