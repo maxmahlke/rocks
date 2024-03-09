@@ -346,7 +346,18 @@ def _build_fuzzy_searchable_index(index, pbar, task_id):
     no_number = index[no_number]
 
     numbered = (
-        "(" + has_number["Number"].astype(str) + ") " + has_number["Name"].astype(str)
+        has_number["Number"].apply(lambda number: f"({number}) ".rjust(13)).astype(str)
+        + has_number["Name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
+        + "\u001b[2m ["
+        + has_number["Type"].astype(str)
+        + "]\u001b[0m"
+    )
+    unnumbered = (
+        "".rjust(13)
+        + no_number["Name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
+        + "\u001b[2m ["
+        + no_number["Type"].astype(str)
+        + "]\u001b[0m"
     )
     unnumbered = "     " + no_number["Name"].astype(str)
     LINES = [
