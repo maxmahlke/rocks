@@ -35,6 +35,8 @@ def _build_index():
         (_build_name_index, f"[dim]{'Clearing out Resonances':>36}"),
         (_build_designation_index, f"[dim]{'Populating near-Earth Space':>36}"),
         (_build_palomar_transit_index, f"[dim]{'Separating Trojans':>36}"),
+        (_build_comet_index, f"[dim]{'Activating Comets':>36}"),
+        (_build_satellite_index, f"[dim]{'Distributing Natural Satellites':>36}"),
     ]
 
     # ------
@@ -99,7 +101,7 @@ def _build_index():
 
 
 def _build_number_index(index, pbar, task_id):
-    """Build the number -> name,SsODNetID index parts.
+    """Build the number -> name SsODNetID index parts.
 
     Parameters
     ----------
@@ -112,7 +114,9 @@ def _build_number_index(index, pbar, task_id):
     SIZE = 1e3  # Build chunks of 1k entries
 
     # Find next 10,000 to largest number
-    numbered = index[~pd.isna(index.Number)]
+    numbered = index[
+        (~pd.isna(index.Number)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+    ]
     parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
     pbar[task_id] = {"progress": 0, "total": len(parts)}
 
@@ -134,7 +138,7 @@ def _build_number_index(index, pbar, task_id):
 
 
 def _build_name_index(index, pbar, task_id):
-    """Build the reduced -> number,SsODNetID index.
+    """Build the reduced -> number SsODNetID index.
 
     Parameters
     ----------
@@ -147,7 +151,9 @@ def _build_name_index(index, pbar, task_id):
     parts = string.ascii_lowercase  # first character of name
     pbar[task_id] = {"progress": 0, "total": len(parts)}
 
-    index = index[~pd.isna(index.Number)]
+    index = index[
+        (~pd.isna(index.Number)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+    ]
 
     names = set(red for red in index.Reduced if re.match(r"^[a-z\'-]*$", red))
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
@@ -172,7 +178,7 @@ def _build_name_index(index, pbar, task_id):
 
 
 def _build_designation_index(index, pbar, task_id):
-    """Build the designation -> name,number,SsODNetID index.
+    """Build the designation -> name,number SsODNetID index.
 
     Parameters
     ----------
@@ -212,7 +218,10 @@ def _build_designation_index(index, pbar, task_id):
         )
     )
 
-    index = index[index.Reduced.isin(designations)]
+    index = index[
+        (index.Reduced.isin(designations))
+        & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+    ]
 
     # treat 18xx and 19xx separately
     part_18 = index.Reduced.str.startswith("18")
@@ -256,7 +265,9 @@ def _build_palomar_transit_index(index, pbar, task_id):
         and not re.match(r"^[a-z\'-]*$", red)
     )
 
-    part_index = index.loc[index.Reduced.isin(rest)]
+    part_index = index.loc[
+        (index.Reduced.isin(rest)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+    ]
 
     no_number = pd.isna(part_index.Number)
     has_number = part_index[~no_number]
@@ -408,12 +419,6 @@ def _retrieve_index_from_ssodnet():
 
     # There are some spurious spaces in the column headers
     index = index.rename(columns={c: c.replace(" ", "") for c in index.columns})
-
-    # For now
-    index = index[index["Type"].isin(["Asteroid", "Dwarf Planet"])]
-
-    # Don't need other columns
-    index = index[["Name", "Number", "SsODNetID", "Reduced"]]
 
     # We use NaNs instead of 0 for unnumbered objects
     index.loc[index["Number"] == 0, "Number"] = np.nan
