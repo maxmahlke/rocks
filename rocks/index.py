@@ -242,7 +242,7 @@ def _build_designation_index(index, pbar, task_id):
 
 
 def _build_palomar_transit_index(index, pbar, task_id):
-    """Build the reduced -> name,number,SsODNetID index for anything that is not
+    """Build the reduced -> name,number SsODNetID index for anything that is not
     a name and not a designation.
 
     Parameters
@@ -333,7 +333,7 @@ def _build_satellite_index(index, pbar, task_id):
         )
     )
 
-    _write_to_cache(index, f"comets.pkl")
+    _write_to_cache(index, f"satellites.pkl")
     pbar[task_id] = {"progress": 2, "total": 2}
 
 
@@ -370,7 +370,6 @@ def _build_fuzzy_searchable_index(index, pbar, task_id):
         + no_number["Type"].astype(str)
         + "]\u001b[0m"
     )
-    unnumbered = "     " + no_number["Name"].astype(str)
     LINES = [
         line.encode(sys.getdefaultencoding()) + b"\n"
         for line in numbered.to_numpy().tolist()
@@ -427,20 +426,31 @@ def _retrieve_index_from_ssodnet():
     return index
 
 
-def _get_index_file(id_: typing.Union[int, str]) -> dict:
+def _get_index_file(id_: typing.Union[int, str], type_: str) -> dict:
     """Get part of the index where id_ is located.
 
     Parameters
     ----------
     id_ : str, int
         The asteroid identifier.
+    type_: str
+        The type of the minor body. Choose one of ['Asteroid', 'Comet', 'Satellite'].
+        Default is None, which includes asteroids (and dwarf planets).
 
     Returns
     -------
     dict
         Part of the index.
+
+        {type: {index of type}}
     """
 
+    # Satellites and comets?
+    if type_ in ["Satellite", "Comet"]:
+        which = f"{type_.lower()}s.pkl"
+        return _load(which)
+
+    # -> Asteroid or Dwarf Planet
     # Is it numeric?
     if isinstance(id_, int):
         index_range = np.arange(1, int(1e6), int(1e3))
@@ -488,7 +498,7 @@ def _load(which):
     """Load a pickled index file."""
     if not (config.PATH_INDEX / which).exists():
         logger.error(
-            "The asteroid name-number index is malformed. Run '$ rocks status' to rebuild it."
+            "The minor body index is malformed. Run '$ rocks status' to rebuild it."
         )
         return {}
 
@@ -528,7 +538,7 @@ def find_candidates(id_):
     index_ = {}
 
     for char in string.ascii_lowercase:
-        idx = _get_index_file(char)
+        idx = _get_index_file(char, type_="Asteroid")
         index_ = {**index_, **idx}
 
     # Use Levenshtein distance to identify potential matches

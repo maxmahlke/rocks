@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Test rocks.resolve module. """
+"""Test rocks.resolve module."""
 
 import asyncio
 import json
