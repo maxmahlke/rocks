@@ -41,7 +41,7 @@ COLUMNS = [
 ]
 
 
-def load_bft(full=False, **kwargs):
+def load_bft(full=False, **kwargs) -> pd.DataFrame:
     """Load the BFT from the cache or optionally from remote.
 
     Parameters
