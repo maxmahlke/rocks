@@ -13,6 +13,7 @@ import rich
 from rocks import config
 from rocks import index
 from rocks import logging
+from rocks.logging import logger
 from rocks import metadata
 from rocks import resolve
 from rocks import ssodnet
@@ -80,11 +81,19 @@ def id(id_):
     else:
         id_ = id_[0]
 
-    name, number = resolve.identify(id_)  # type: ignore
+    # Keep track of if we found a match
+    found = False
+    logger.addFilter(lambda s: not re.match("Could not identify", s.getMessage()))
 
-    if isinstance(name, (str)):
-        click.echo(f"({number}) {name}")
-    else:
+    for type_ in ["Asteroid", "Comet", "Satellite"]:
+        name, number = resolve.identify(id_, type_=type_)  # type: ignore
+
+        if isinstance(name, (str)):
+            rich.print(f"[dim] \[{type_}] [/dim]".rjust(25) + f"({number}) {name}")
+            found = True
+
+    if not found:
+        logger.error(f"could not identify '{id_}'.")
         list_candidate_ssos(id_)
 
 
@@ -225,10 +234,10 @@ def status(clear, update):
                 cache.retrieve_all_ssocards()
 
     # ------
-    # Update asteroid name-number index
+    # Update minor body index
     if not clear and not update:
         decision = prompt.Prompt.ask(
-            "\nUpdate the asteroid name-number index?\n"
+            "\nUpdate the minor body index?\n"
             "[blue][0][/blue] No "
             "[blue][1][/blue] Yes",
             choices=["0", "1"],
