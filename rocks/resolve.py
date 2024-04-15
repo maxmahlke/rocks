@@ -13,6 +13,7 @@ from rocks import cli
 from rocks import config
 from rocks import index
 from rocks.logging import logger
+from rocks.resolve import quaero
 
 # Run asyncio nested for jupyter notebooks, GUIs, ...
 try:
@@ -35,114 +36,6 @@ def get_or_create_eventloop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             return asyncio.get_event_loop()
-
-
-# TODO: Use singledispatch to simplify the function call and return structure
-def identify(id_, type_=None, local=True, progress=False):
-    """Resolve names and numbers of one or more minor bodies using identifiers.
-
-    Parameters
-    ----------
-    id_ : str, int, float, list, range, set, np.ndarray, pd.Series
-        One or more identifying names or numbers to resolve.
-    type_: str
-        The type of the minor body. Choose one of ['Asteroid', 'Comet', 'Satellite'].
-        Default is None, which includes asteroids (and dwarf planets).
-    local : bool
-        Try resolving the name locally first. Default is True.
-    progress : bool
-        Show progress bar. Default is False.
-
-    Returns
-    -------
-    tuple, list of tuple : (str, int, str), (None, np.nan, None)
-        List containing len(id_) tuples. Each tuple contains the minor body's
-        name and number. If the resolution failed, the values are None for name
-        and SsODNet and np.nan for the number. If a single identifier is
-        resolved, a tuple is returned.
-    """
-
-    # Ensure the asteroid name-number index exists
-    if not config.PATH_INDEX.is_dir() and not config.CACHELESS:
-        index._ensure_index_exists()
-
-    type_ = "Asteroid" if type_ is None else type_
-
-    if type_ not in ["Asteroid", "Comet", "Satellite", "Dwarf Planet"]:
-        raise ValueError("'type_' must one of: 'Asteroid', 'Comet', 'Satellite'")
-
-    # ------
-    # Verify input
-    if isinstance(id_, (str, int, float)):
-        id_ = [id_]
-    elif isinstance(id_, np.ndarray):
-        id_ = id_.tolist()
-    elif isinstance(id_, (set, range)):
-        id_ = list(id_)
-    elif id_ is None:
-        logger.warning(f"Received id_ of type {type(id_)}.")
-        return (None, np.nan)
-    elif not isinstance(id_, (list, np.ndarray)):
-        try:
-            id_ = id_.to_list()  # pandas Series
-        except AttributeError:
-            raise TypeError(
-                f"Received id_ of type {type(id_)}, expected one of: "
-                "str, int, float, list, set, range, np.ndarray"
-            )
-
-    if not id_:
-        logger.warning("Received empty list of identifiers.")
-        return (None, np.nan)
-
-    # ------
-    # For a single name, try local lookup right away, async process has overhead
-    if config.CACHELESS:
-        local = False
-
-    if len(id_) == 1 and local:
-        success, (name, number) = _local_lookup(id_[0], type_)
-
-        if success:
-            return (name, number)
-        else:
-            # Local lookup just failed, no need to try it again
-            local = False
-
-    # ------
-    # Run asynchronous event loop for name resolution
-    with Progress(disable=not progress) as progress_bar:
-        task = progress_bar.add_task("Identifying rocks", total=len(id_))  # type: ignore
-        loop = get_or_create_eventloop()
-        results = loop.run_until_complete(
-            _identify(id_, type_, local, progress_bar, task)
-        )
-
-        # ------
-        # Check if any failed due to 502 and rerun them
-        idx_failed = [
-            i for i, result in enumerate(results) if result == (None, None, None)
-        ]
-
-        if idx_failed:
-            # avoid repeating error messages
-            level = logger.level
-            logger.setLevel("CRITICAL")
-            results = np.array(results)
-            results[idx_failed] = loop.run_until_complete(
-                _identify(np.array(id_)[idx_failed], type_, local, progress_bar, task)
-            )
-            results = results.tolist()
-            logger.setLevel(level)
-
-    # ------
-    # Verify the output format
-    results = [r[:2] for r in results]
-
-    if len(id_) == 1:  # type: ignore
-        results = results[0]
-
-    return results  # type: ignore
 
 
 async def _identify(id_, type_, local, progress_bar, task):
@@ -184,7 +77,7 @@ async def _resolve(id_, type_, session, local, progress_bar, task):
 
     # Local resolution failed, do remote query
     id_ = _standardize_id_for_quaero(id_)
-    response = await _query_quaero(id_, type_, session)
+    response = await quaero.query(id_, type_, session)
 
     if response is None:  # query failed with 502
         return (None, np.nan, None, None)
@@ -194,7 +87,7 @@ async def _resolve(id_, type_, session, local, progress_bar, task):
         return (None, np.nan, None, None)
 
     progress_bar.update(task, advance=1)
-    return _parse_quaero_response(response["data"], str(id_))
+    return quaero.parse_response(response["data"], str(id_))
 
 
 def _local_lookup(id_, type_):
@@ -330,95 +223,6 @@ def _standardize_id_for_quaero(id_):
             "\nShould be integer, float, or string."
         )
     return id_
-
-
-async def _query_quaero(id_, type_, session):
-    """Query quaero and parse result for a single object.
-
-    Parameters
-    ----------
-    id_ : str, int, float
-        Asteroid name, number, or designation.
-    type_: str
-        The type of the minor body. Choose one of ['Asteroid', 'Comet', 'Satellite'].
-        Default is None, which includes asteroids (and dwarf planets).
-    session : aiohttp.ClientSession
-        asyncio session
-
-    Returns
-    -------
-    dict, None, or False
-        Quaero response in json format if successful. None if ContentTypeError.
-        False if query failed.
-    """
-
-    url = "https://api.ssodnet.imcce.fr/quaero/1/sso/search"
-    type_ = "Asteroid OR 'Dwarf Planet'" if type_ == "Asteroid" else type_
-
-    params = {
-        "q": f'type:({type_}) AND "{id_}"~0',
-        "from": "rocks",
-        "limit": 100,
-    }
-
-    try:
-        response = await session.request(method="GET", url=url, params=params)
-    except aiohttp.client_exceptions.ClientConnectorError:
-        logger.error(f"Failed to establish connection to {url}")
-        return None
-
-    try:
-        response = await response.json(content_type=None)
-    except aiohttp.ContentTypeError:
-        return None
-
-    if "data" not in response.keys():  # no match found
-        logger.error(f"Could not identify {type_.lower()} '{id_}'.")
-        return False
-
-    elif not response["data"]:  # empty response
-        logger.error(f"Could not identify {type_.lower()} '{id_}'.")
-        return False
-
-    return response
-
-
-def _parse_quaero_response(data, id_):
-    """Parse JSON response from Quaero.
-
-    Parameters
-    ----------
-    data : list of dict
-        Quaero query response in json format.
-    id_ : str, int, float
-        Asteroid name, number, or designation.
-
-    Returns
-    -------
-    tuple : (str, int, str), (None, np.nan, None)
-        Tuple containing the asteroid's name, number, and SsODNet ID if the
-        identifier was resolved. Otherwise, the values are None for name and
-        SsODNet and np.nan for the number.
-    """
-
-    id_ = str(id_).lower()
-
-    for match in data:
-        if match["name"].lower() == id_:
-            break
-        elif match["id"].lower() == id_:
-            break
-        elif any(alias.lower() == id_ for alias in match["aliases"]):
-            break
-    else:
-        # Unclear which match is correct.
-        logger.warning(f"Could not identify {type_.lower()} '{id_}'.")
-        return (None, np.nan, None)
-
-    # Found match
-    numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]
-    number = min(numeric) if numeric else np.nan
-    return (match["name"], number, match["id"], match["aliases"])
 
 
 def _interactive():
