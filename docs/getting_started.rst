@@ -17,7 +17,7 @@ Install ``rocks``
 
    $ pip install space-rocks
 
-The minimum version requirement for ``python`` is ``3.7``. After
+The minimum version requirement for ``python`` is ``3.8``. After
 installation, you have the ``rocks`` executable available system-wide.
 In addition, you can now import the ``rocks`` ``python`` package.
 
