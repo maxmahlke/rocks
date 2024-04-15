@@ -399,7 +399,7 @@ def _get_index_file(id_: typing.Union[int, str]) -> dict:
     # Is it a name?
     elif re.match(r"^[a-z\'-]*$", id_) or id_ == r"g!kun||'homdima":
         if id_[0] == "'":  # catch 'aylo'chaxnim
-            which = f"{id_[0]}.pkl"
+            which = config.PATH_INDEX / "a.pkl"
         else:
             which = config.PATH_INDEX / f"{id_[0]}.pkl"
 
