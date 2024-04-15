@@ -167,6 +167,33 @@ async def _query_ssodnet(id_ssodnet, session):
 def _postprocess_ssocard(card):
     """Apply ssoCard structure improvements for pydantic deserialization."""
 
+    def remove_nulls(d):
+        """Overwrite 'NULL' and other values"""
+
+        VALUES_TO_REMOVE = ["NULL", "null", "None", "none", ""]
+
+        # Base case: If d is not a dictionary, return d as it is
+        if not isinstance(d, dict):
+            return d
+
+        # Create a list to store keys that need to be deleted
+        keys_to_delete = []
+
+        # Iterate through each key-value pair in the dictionary
+        for key, value in d.items():
+            # If the value is a dictionary, recursively call the function
+            if isinstance(value, dict):
+                d[key] = remove_nulls(value)
+            # If the value is in the list of values to check, add the key to the list of keys to delete
+            elif value in VALUES_TO_REMOVE:
+                keys_to_delete.append(key)
+
+        # Delete keys with values that match any value in values_to_check
+        for key in keys_to_delete:
+            del d[key]
+
+        return d
+
     def make_dict(values):
         """Turn lower-level dict values into dicts."""
         for key, value in values.items():
@@ -189,6 +216,8 @@ def _postprocess_ssocard(card):
                 # Turn non-dict value into dict for merging with metadata
                 values[key] = {"value": value}
         return values
+
+    card = remove_nulls(card)
 
     # Turn low-level parameters into dictionaries
     card["parameters"] = make_dict(card["parameters"])
