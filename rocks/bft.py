@@ -36,6 +36,8 @@ COLUMNS = [
     "mass.value",
     "taxonomy.class",
     "taxonomy.complex",
+    "taxonomy.waverange",
+    "taxonomy.technique",
     "thermal_inertia.value",
     "spins.1.period.value",
 ]

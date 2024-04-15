@@ -66,7 +66,7 @@ Install from PyPi using `pip`:
 
      $ pip install space-rocks
 
-The minimum required `python` version is 3.7.
+The minimum required `python` version is 3.8.
 
 
 ## Documentation
