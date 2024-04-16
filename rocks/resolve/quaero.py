@@ -1,14 +1,16 @@
+import re
+
 import aiohttp
+import numpy as np
 import requests
 
-import numpy as np
 
 from rocks.logging import logger
 
 URL = "https://api.ssodnet.imcce.fr/quaero/1/sso/search"
 
 
-async def query(id, type="asteroid", session=None):
+async def query(id, type: str = "asteroid", session=None) -> dict:
     """Query quaero to identify an asteroid, a comet, or a satellite.
 
     Parameters
@@ -68,9 +70,13 @@ async def query(id, type="asteroid", session=None):
         logger.error(f"Could not identify {type} '{id}' [no match found]")
         return {}
 
-    # ------
-    # Identify matching response entry
+    # Identify matching response entry based on minor body type
     match = identify_unique_match(id, response["data"], type)
+
+    # Remove unnecessary keys
+    for key in list(match.keys()):
+        if key not in ["name", "number", "type", "id", "aliases", "links"]:
+            del match[key]
 
     if not match:
         logger.warning(f"Could not identify {type} '{id}' [non-unique match]")
@@ -166,8 +172,8 @@ def _identify_unique_comet(id, matches):
         else:  # ambiguous
             return {}
 
-    match["number"] = match["name"]
-    match["name"] = match["aliases"][0]
+    # match["number"] = match["name"]
+    # match["name"] = match["aliases"][0]
     return match
 
 
@@ -200,3 +206,80 @@ def _identify_unique_satellite(id, matches):
     ]
     match["number"] = min(numeric) if numeric else np.nan
     return match
+
+
+def standardize_id(id_):
+    """Try to infer id_ type and re-format if necessary to ensure
+    successful remote lookup.
+
+    Parameters
+    ----------
+    id_ : str, int, float
+        The minor body's name, designation, or number.
+
+    Returns
+    -------
+    str, int, None
+        The standardized name, designation, or number. None if id_ is NaN or None.
+    """
+    if isinstance(id_, (int, float)):
+        return int(id_)
+
+    elif isinstance(id_, str):
+        # Strip leading and trailing whitespace
+        id_ = id_.strip()
+
+        # String id_. Perform some regex tests to make sure it's well formatted
+
+        # Asteroid number
+        try:
+            id_ = int(float(id_))
+            return id_
+        except ValueError:
+            pass
+
+        # Ensure that there is no suffix
+        id_ = id_.replace("_(Asteroid)", "")
+
+        # Asteroid name
+        if re.match(r"^[A-Za-z _]*$", id_):
+            # make case-independent
+            id_ = id_.lower()
+
+        # Asteroid designation
+        elif re.match(
+            r"(^([1A][8-9][0-9]{2}[ _]?[A-Za-z]{2}[0-9]{0,3}$)|"
+            r"(^20[0-9]{2}[_ ]?[A-Za-z]{2}[0-9]{0,3}$))",
+            id_,
+        ):
+            # Ensure whitespace between year and id_
+            id_ = re.sub(r"[\W_]+", "", id_)
+            ind = re.search(r"[A18920]{1,2}[0-9]{2}", id_).end()  # type: ignore
+            id_ = f"{id_[:ind]} {id_[ind:]}"
+
+            # Replace A by 1
+            id_ = re.sub(r"^A", "1", id_)
+
+            # Ensure uppercase
+            id_ = id_.upper()
+
+        # Palomar-Leiden / Transit
+        elif re.match(r"^[1-9][0-9]{3}[ _]?(P-L|T-[1-3])$", id_):
+            # Ensure whitespace
+            id_ = re.sub(r"[ _]+", "", id_)
+            id_ = f"{id_[:4]} {id_[4:]}"
+
+        # Comet
+        elif re.match(r"(^[PDCXAI]/[- 0-9A-Za-z]*)", id_):
+            pass
+
+        # Remaining should be unconventional asteroid names like
+        # "G!kun||'homdima" or packed designations
+        else:
+            pass
+    else:
+        logger.warning(
+            f"Did not understand type of id: {type(id_)}"
+            "\nShould be integer, float, or string."
+        )
+    return id_
