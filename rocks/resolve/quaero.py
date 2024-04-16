@@ -39,7 +39,6 @@ async def query(id, type="asteroid", session=None):
         'Asteroid OR "Dwarf Planet"' if type == "asteroid" else type.capitalize()
     )
     params = {"q": f'type:({query_type}) AND  "{id}"~0', "from": "rocks", "limit": 100}
-    print(params)
 
     # ------
     # Run query in async session or in sync
@@ -149,7 +148,6 @@ def _identify_unique_comet(id, matches):
         or match["id"].lower() == id
         or any(alias.lower() == id for alias in match["aliases"])
     ]
-    print(candidates)
 
     if not candidates:
         # No match found

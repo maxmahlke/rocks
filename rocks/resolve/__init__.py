@@ -1,6 +1,9 @@
 import asyncio
 
 from . import quaero
+from . import id
+
+from rocks import config
 
 
 def get_or_create_eventloop():
