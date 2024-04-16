@@ -47,7 +47,7 @@ def _build_index():
 
     # ------
     # Process index with multiple process
-    N_WORKERS = 5  # number of processes to launch
+    N_WORKERS = min(7, multiprocessing.cpu_count())  # number of processes to launch
 
     with progress.Progress(
         "[progress.description]{task.description}",
@@ -115,22 +115,18 @@ def _build_number_index(index, pbar, task_id):
 
     # Find next 10,000 to largest number
     numbered = index[
-        (~pd.isna(index.Number)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+        (~pd.isna(index.number)) & (index.type.isin(["Asteroid", "Dwarf Planet"]))
     ]
-    parts = np.arange(1, np.ceil(numbered.Number.max() / SIZE) * SIZE, SIZE, dtype=int)
+
+    parts = np.arange(1, np.ceil(numbered.number.max() / SIZE) * SIZE, SIZE, dtype=int)
     pbar[task_id] = {"progress": 0, "total": len(parts)}
 
     for i, part in enumerate(parts):
         part_index = numbered.loc[
-            (part <= numbered.Number) & (numbered.Number < part + SIZE)
+            (part <= numbered.number) & (numbered.number < part + SIZE)
         ]
 
-        part_index = dict(
-            zip(
-                part_index.Number,
-                part_index[["Name", "SsODNetID"]].to_numpy().tolist(),
-            )
-        )
+        part_index = dict(zip(part_index.number, part_index.to_dict("records")))
 
         _write_to_cache(part_index, f"{part}.pkl")
 
@@ -152,10 +148,10 @@ def _build_name_index(index, pbar, task_id):
     pbar[task_id] = {"progress": 0, "total": len(parts)}
 
     index = index[
-        (~pd.isna(index.Number)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+        (~pd.isna(index.number)) & (index.type.isin(["Asteroid", "Dwarf Planet"]))
     ]
 
-    names = set(red for red in index.Reduced if re.match(r"^[a-z\'-]*$", red))
+    names = set(red for red in index.reduced if re.match(r"^[a-z\'-]*$", red))
     names.add(r"g!kun||'homdima")  # everyone's favourite shell injection
 
     for i, part in enumerate(parts):
@@ -165,13 +161,8 @@ def _build_name_index(index, pbar, task_id):
             names_subset.add(
                 "'aylo'chaxnim"
             )  # another edge case for the daughter of venus
-        part_index = index.loc[index.Reduced.isin(names_subset)]
-        part_index = dict(
-            zip(
-                part_index.Reduced,
-                part_index[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
-            )
-        )
+        part_index = index.loc[index.reduced.isin(names_subset)]
+        part_index = dict(zip(part_index.reduced, part_index.to_dict("records")))
 
         _write_to_cache(part_index, f"{part}.pkl")
         pbar[task_id] = {"progress": i + 1, "total": len(parts)}
@@ -188,29 +179,18 @@ def _build_designation_index(index, pbar, task_id):
     import pandas as pd
 
     def _convert_part(part, part_index):
-        no_number = pd.isna(part_index.Number)
+        no_number = pd.isna(part_index.number)
         has_number = part_index[~no_number]
         no_number = part_index[no_number]
 
-        part_index = dict(
-            zip(
-                has_number.Reduced,
-                has_number[["Name", "Number", "SsODNetID"]].values.tolist(),
-            )
-        )
-
-        part_index.update(
-            zip(
-                no_number.Reduced,
-                no_number[["Name", "SsODNetID"]].values.tolist(),
-            )
-        )
+        part_index = dict(zip(has_number.reduced, has_number.to_dict("records")))
+        part_index.update(dict(zip(no_number.reduced, no_number.to_dict("records"))))
 
         _write_to_cache(part_index, f"d{part}.pkl")
 
     designations = set(
         red
-        for red in index.Reduced
+        for red in index.reduced
         if re.match(
             r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
             r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
@@ -219,14 +199,14 @@ def _build_designation_index(index, pbar, task_id):
     )
 
     index = index[
-        (index.Reduced.isin(designations))
-        & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+        (index.reduced.isin(designations))
+        & (index.type.isin(["Asteroid", "Dwarf Planet"]))
     ]
 
     # treat 18xx and 19xx separately
-    part_18 = index.Reduced.str.startswith("18")
+    part_18 = index.reduced.str.startswith("18")
     pbar[task_id] = {"progress": 1, "total": 26}
-    part_19 = index.Reduced.str.startswith("19")
+    part_19 = index.reduced.str.startswith("19")
     pbar[task_id] = {"progress": 2, "total": 26}
 
     _convert_part("18", index[part_18])
@@ -235,7 +215,7 @@ def _build_designation_index(index, pbar, task_id):
     index = index[(~part_18) & (~part_19)]
 
     # now divide by year
-    index["parts"] = index.Reduced.str[:4]
+    index["parts"] = index.reduced.str[:4]
     for i, (part, part_index) in enumerate(index.groupby("parts")):
         _convert_part(part, part_index)
         pbar[task_id] = {"progress": i + 3, "total": 26}
@@ -256,7 +236,7 @@ def _build_palomar_transit_index(index, pbar, task_id):
     pbar[task_id] = {"progress": 1, "total": 2}
     rest = set(
         red
-        for red in index.Reduced
+        for red in index.reduced
         if not re.match(
             r"(^([11][8-9][0-9]{2}[a-z]{2}[0-9]{0,3}$)|"
             r"(^20[0-9]{2}[a-z]{2}[0-9]{0,3}$))",
@@ -266,26 +246,15 @@ def _build_palomar_transit_index(index, pbar, task_id):
     )
 
     part_index = index.loc[
-        (index.Reduced.isin(rest)) & (index.Type.isin(["Asteroid", "Dwarf Planet"]))
+        (index.reduced.isin(rest)) & (index.type.isin(["Asteroid", "Dwarf Planet"]))
     ]
 
-    no_number = pd.isna(part_index.Number)
+    no_number = pd.isna(part_index.number)
     has_number = part_index[~no_number]
     no_number = part_index[no_number]
 
-    part_index = dict(
-        zip(
-            has_number.Reduced,
-            has_number[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
-        )
-    )
-
-    part_index.update(
-        zip(
-            no_number.Reduced,
-            no_number[["Name", "SsODNetID"]].to_numpy().tolist(),
-        )
-    )
+    part_index = dict(zip(has_number.reduced, has_number.to_dict("records")))
+    part_index.update(dict(zip(no_number.reduced, no_number.to_dict("records"))))
 
     _write_to_cache(part_index, "PLT.pkl")
     pbar[task_id] = {"progress": 2, "total": 2}
@@ -301,14 +270,8 @@ def _build_comet_index(index, pbar, task_id):
     """
     pbar[task_id] = {"progress": 1, "total": 2}
 
-    index = index[index.Type.isin(["Comet"])]
-
-    index = dict(
-        zip(
-            index.Reduced,
-            index[["Name", "Number", "Aliases"]].to_numpy().tolist(),
-        )
-    )
+    index = index[index.type.isin(["Comet"])]
+    index = dict(zip(index.reduced, index.to_dict("records")))
 
     _write_to_cache(index, f"comets.pkl")
     pbar[task_id] = {"progress": 2, "total": 2}
@@ -324,14 +287,8 @@ def _build_satellite_index(index, pbar, task_id):
     """
     pbar[task_id] = {"progress": 1, "total": 2}
 
-    index = index[index.Type.isin(["Satellite"])]
-
-    index = dict(
-        zip(
-            index.Reduced,
-            index[["Name", "Number", "SsODNetID"]].to_numpy().tolist(),
-        )
-    )
+    index = index[index.type.isin(["Satellite"])]
+    index = dict(zip(index.reduced, index.to_dict("records")))
 
     _write_to_cache(index, f"satellites.pkl")
     pbar[task_id] = {"progress": 2, "total": 2}
@@ -350,24 +307,24 @@ def _build_fuzzy_searchable_index(index, pbar, task_id):
 
     pbar[task_id] = {"progress": 1, "total": 2}
 
-    index = index.sort_values(["Number", "Name"])
+    index = index.sort_values(["number", "name"])
 
-    no_number = pd.isna(index.Number)
+    no_number = pd.isna(index.number)
     has_number = index[~no_number]
     no_number = index[no_number]
 
     numbered = (
-        has_number["Number"].apply(lambda number: f"({number}) ".rjust(13)).astype(str)
-        + has_number["Name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
+        has_number["number"].apply(lambda number: f"({number}) ".rjust(13)).astype(str)
+        + has_number["name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
         + "\u001b[2m ["
-        + has_number["Type"].astype(str)
+        + has_number["type"].astype(str)
         + "]\u001b[0m"
     )
     unnumbered = (
         "".rjust(13)
-        + no_number["Name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
+        + no_number["name"].apply(lambda name: f"{name}".ljust(15)).astype(str)
         + "\u001b[2m ["
-        + no_number["Type"].astype(str)
+        + no_number["type"].astype(str)
         + "]\u001b[0m"
     )
     LINES = [
@@ -419,9 +376,13 @@ def _retrieve_index_from_ssodnet():
     # There are some spurious spaces in the column headers
     index = index.rename(columns={c: c.replace(" ", "") for c in index.columns})
 
-    # We use NaNs instead of 0 for unnumbered objects
+    # Add 'links' column and do minor formatting
     index.loc[index["Number"] == 0, "Number"] = np.nan
     index["Number"] = index["Number"].astype("Int64")
+    index["links"] = "https://api.ssodnet.imcce.fr/quaero/1/sso/" + index["SsODNetID"]
+    index["Aliases"] = index["Aliases"].str.split(";")
+    index = index.rename(columns={**{col: col.lower() for col in index.columns}})
+    index = index.rename(columns={"ssodnetid": "id"})
 
     return index
 
