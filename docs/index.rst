@@ -146,19 +146,35 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
 
 .. rubric:: Footnotes
 
-.. [#f1] Latest version: 1.9.7  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
+.. [#f1] Latest version: 2.0  - `What's new? <https://github.com/maxmahlke/rocks/blob/master/CHANGELOG.md>`_  | Comment, bug or feature request? Open an issue on `GitHub <https://github.com/maxmahlke/rocks/issues>`_.
 .. [#f2] That's what we are aiming for. Is there a data source you are missing? `Email us! <mailto:benoit.carry@oca.eu>`_
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: Welcome to rocks
    :hidden:
-
    Home<self>
    Getting Started<getting_started>
-   Available Data<ssodnet>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Usage
+   :hidden:
+
    Basic Usage<cli>
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Data
+   :hidden:
+
+   Available Data<ssodnet>
    credit
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference
+   :hidden:
    tutorials
    appendix
    glossary
