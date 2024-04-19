@@ -53,7 +53,7 @@ def retrieve(which):
         _retrieve_citations()
         return
 
-    FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_sso"
+    FILENAME = "ssodnet_biblio" if which == "authors" else "metadata_asteroid"
     URL = f"{ssodnet.URL_SSODNET}/data/{FILENAME}.json"
     logger.debug(URL)
 
