@@ -36,7 +36,6 @@ docs = [
   "sphinx",
   "sphinx-copybutton",
   "sphinx-hoverxref",
-  "sphinx-redactor-theme",
   "spinx_design"
 ]
 
@@ -44,7 +43,6 @@ docs = [
 rocks = "rocks.cli:cli_rocks"
 
 [tool.poetry.dev-dependencies]
-sphinx-redactor-theme = {version = "^0.0.1", optional = true}
 sphinx-hoverxref = {version = "*", optional = true}
 jinja2 = {version = "<3.1", optional = true}
 pytest = "^7.2.1"

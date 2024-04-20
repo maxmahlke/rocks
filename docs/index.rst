@@ -153,6 +153,7 @@ exploration and via ``python`` for scripted analysis. The syntax is simple and i
    :maxdepth: 2
    :caption: Welcome to rocks
    :hidden:
+
    Home<self>
    Getting Started<getting_started>
 
