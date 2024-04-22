@@ -100,6 +100,7 @@ html_theme_options = {
     "top_of_page_button": None,
     "light_logo": "logo_rocks.svg",
     "dark_logo": "logo_rocks_light.svg",
+    "announcement": "<em>rocks version 2 has landed</em> announcement! Check out the <a href='https://rocks.readthedocs.io/en/latest/v2.html'><font style='color:blue;'>migration guide</font></a> to see what's new.",
     # "logo_only": True,
     # "display_version": True,
     # "prev_next_buttons_location": "bottom",
