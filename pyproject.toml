@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-rocks"
-version = "1.9.7"
+version = "1.9.8"
 description = "Python client for SsODNet data access."
 authors = ["Max Mahlke <max.mahlke@oca.eu>"]
 license = "MIT"
@@ -8,13 +8,13 @@ readme = "README.md"
 homepage = "https://rocks.readthedocs.io/en/latest/"
 documentation = "https://rocks.readthedocs.io/en/latest/"
 repository = "https://github.com/maxmahlke/rocks.git"
-packages = [{'include' = 'rocks'}]
+packages = [{ 'include' = 'rocks' }]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
 numpy = [
-    {version = ">=1.24", python = "^3.11"},
-    {version = ">=1.21", python = ">=3.7,<3.11"},
+  { version = ">=1.24", python = "^3.11" },
+  { version = ">=1.21", python = ">=3.7,<3.11" },
 ]
 matplotlib = ">=3.4.3"
 aiohttp = ">=3.9.2"
@@ -37,16 +37,16 @@ docs = [
   "sphinx-copybutton",
   "sphinx-hoverxref",
   "sphinx-redactor-theme",
-  "spinx_design"
+  "spinx_design",
 ]
 
 [tool.poetry.scripts]
 rocks = "rocks.cli:cli_rocks"
 
 [tool.poetry.dev-dependencies]
-sphinx-redactor-theme = {version = "^0.0.1", optional = true}
-sphinx-hoverxref = {version = "*", optional = true}
-jinja2 = {version = "<3.1", optional = true}
+sphinx-redactor-theme = { version = "^0.0.1", optional = true }
+sphinx-hoverxref = { version = "*", optional = true }
+jinja2 = { version = "<3.1", optional = true }
 pytest = "^7.2.1"
 pytest-cov = "^4.0.0"
 

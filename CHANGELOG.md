@@ -1,3 +1,6 @@
+# 1.9.8 - 2024-04-22
+- Correct link for SsODNet metadata file (#36)
+
 # 1.9.7 - 2024-03-01
 - Drop support for python3.7
 - 'sso_number' column in BFT is now of type Int64
