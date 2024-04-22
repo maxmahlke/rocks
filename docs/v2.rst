@@ -1,0 +1,17 @@
+rocks 2.0: Now with comets and satellites
+
+----
+why
+
+----
+what's changing practically
+
+not much. The biggest change is the return value of rocks.id, which is no longer a tuple of name, number (too asteroid-specific),
+but an instance of the ID class, which stores many ID related attributes.
+
+----
+Steps to upgrade
+
+python -m pip install space-rocks
+
+rockst status -> clear cache, recompute index
