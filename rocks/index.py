@@ -179,13 +179,7 @@ def _build_designation_index(index, pbar, task_id):
     import pandas as pd
 
     def _convert_part(part, part_index):
-        no_number = pd.isna(part_index.number)
-        has_number = part_index[~no_number]
-        no_number = part_index[no_number]
-
-        part_index = dict(zip(has_number.reduced, has_number.to_dict("records")))
-        part_index.update(dict(zip(no_number.reduced, no_number.to_dict("records"))))
-
+        part_index = dict(zip(part_index.reduced, part_index.to_dict("records")))
         _write_to_cache(part_index, f"d{part}.pkl")
 
     designations = set(
@@ -217,6 +211,7 @@ def _build_designation_index(index, pbar, task_id):
     # now divide by year
     index["parts"] = index.reduced.str[:4]
     for i, (part, part_index) in enumerate(index.groupby("parts")):
+        part_index.drop(columns="parts", inplace=True)
         _convert_part(part, part_index)
         pbar[task_id] = {"progress": i + 3, "total": 26}
 
@@ -407,7 +402,7 @@ def _get_index_file(id_: typing.Union[int, str], type_: str) -> dict:
     """
 
     # Satellites and comets?
-    if type_ in ["Satellite", "Comet"]:
+    if type_ in ["satellite", "comet"]:
         which = f"{type_.lower()}s.pkl"
         return _load(which)
 
@@ -541,12 +536,12 @@ def _ensure_index_exists():
         rich.print(GREETING)
 
         use_cache = Confirm.ask(
-            f"    Use cache directory [[dim]{config.PATH_CACHE}[/dim]]?"
+            f"    Use cache directory [[dim]{config.PATH_CACHE}[/dim]]?\n"
         )
 
         if not use_cache:
             rich.print(
-                "\n    Not using a cache. Set [dim]ROCKS_CACHE_DIR='no-cache'[/dim] to make this\n"
+                "    Not using a cache. Set [dim]ROCKS_CACHE_DIR='no-cache'[/dim] to make this\n"
                 "    decision permanent.\n"
             )
             config.CACHELESS = True

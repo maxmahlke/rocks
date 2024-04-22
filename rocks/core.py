@@ -1012,7 +1012,7 @@ class Rock(pydantic.BaseModel):
         id_provided = id_
 
         if not skip_id_check:
-            _, _, id_ = resolve.identify(id_, return_id=True)  # type: ignore
+            id_ = resolve.identify(id_).id  # type: ignore
 
         # Get ssoCard and datcloud catalogues
         if not pd.isnull(id_):

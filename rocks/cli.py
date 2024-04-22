@@ -78,6 +78,7 @@ def id(id_):
 
     if not id_:
         id_ = resolve._interactive()
+        id_ = " ".join(id_.split()[:-1])
     else:
         id_ = id_[0]
 
@@ -85,11 +86,11 @@ def id(id_):
     found = False
     logger.addFilter(lambda s: not re.match("Could not identify", s.getMessage()))
 
-    for type_ in ["Asteroid", "Comet", "Satellite"]:
-        name, number = resolve.identify(id_, type_=type_)  # type: ignore
+    for type in ["asteroid", "comet", "satellite"]:
+        match = resolve.identify(id_, type=type)  # type: ignore
 
-        if isinstance(name, (str)):
-            rich.print(f"[dim] \[{type_}] [/dim]".rjust(25) + f"({number}) {name}")
+        if match:
+            rich.print(str(match))
             found = True
 
     if not found:
@@ -125,21 +126,18 @@ def parameters():
 
 
 @cli_rocks.command(hidden=True)
-@click.argument("id_", nargs=-1)
-def ids(id_):
+@click.argument("id", nargs=-1)
+def ids(id):
     """Echo the aliases of an asteroid."""
 
-    if not id_:
-        id_ = resolve._interactive()
+    if not id:
+        id = resolve._interactive()
     else:
-        id_ = id_[0]
+        id = id[0]
 
-    name, number, *aliases = resolve.identify(id_, return_aliases=True, local=False)  # type: ignore
-
-    if name is None:
-        sys.exit()
-
-    rich.print(f"({number}) {name}, aka \n {aliases}")
+    for type in ["asteroid", "comet", "satellite"]:
+        match = resolve.identify(id, type=type)  # type: ignore
+        rich.print(f"{str(match)}, aka \n {match.aliases}")
 
 
 @cli_rocks.command()
