@@ -1,4 +1,5 @@
 """Functionality for SsODNet metadata interaction with rocks."""
+
 from functools import lru_cache
 import html
 import json
@@ -14,6 +15,7 @@ from rocks import config
 from rocks.logging import logger
 from rocks import ssodnet
 from rocks import __version__
+from rocks import index
 
 
 @lru_cache(None)
@@ -43,6 +45,8 @@ def retrieve(which):
     which : str
         Which metadata to retrieve. Choose from ['mappings', 'authors'].
     """
+    if not config.PATH_INDEX.is_dir() and not config.CACHELESS:
+        index._ensure_index_exists()
 
     if which not in ["mappings", "authors", "citations"]:
         raise ValueError(

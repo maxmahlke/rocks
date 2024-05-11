@@ -520,6 +520,7 @@ def _ensure_index_exists():
             return
 
         config.PATH_CACHE.mkdir(parents=True)
+        print("\n")
 
     # Cache exists but index is missing
     else:
