@@ -1,3 +1,6 @@
+# 1.9.9 - 2024-05-11
+- Check that cache directory exists on author-lookup
+
 # 1.9.8 - 2024-04-22
 - Correct link for SsODNet metadata file (#36)
 
