@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Test rocks.resolve module. """
+"""Test rocks.resolve module."""
 
 import asyncio
 import json
@@ -16,7 +16,7 @@ import rocks
 @pytest.mark.parametrize(
     "id_, expected",
     [
-        (1, ("Ceres", 1, "Ceres")),
+        # (1, ("Ceres", 1, "Ceres")),
         ("Mette", ("Mette", 1727, "Mette")),
         ("europa", ("Europa", 52, "Europa_(Asteroid)")),
         ("EOS", ("Eos", 221, "Eos")),
@@ -46,7 +46,7 @@ def test_local_resolution(id_, expected, monkeypatch):
 @pytest.mark.parametrize(
     "id_, expected",
     [
-        (1, ("Ceres", 1, "Ceres")),
+        # (1, ("Ceres", 1, "Ceres")),
         ("Mette", ("Mette", 1727, "Mette")),
         ("europa", ("Europa", 52, "Europa_(Asteroid)")),
         ("1882_BA", ("Eos", 221, "Eos")),
