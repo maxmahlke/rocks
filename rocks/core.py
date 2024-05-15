@@ -488,8 +488,8 @@ class TisserandParameters(Parameter):
 
 
 class Yarkovsky(Parameter):
-    s: FloatValue = FloatValue(**{})
-    a2: FloatValue = FloatValue(**{})
+    S: FloatValue = FloatValue(**{})
+    A2: FloatValue = FloatValue(**{})
     snr: FloatValue = FloatValue(**{})
     dadt: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})

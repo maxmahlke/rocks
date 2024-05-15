@@ -1,3 +1,6 @@
+# 1.9.10 - 2024-05-15
+- Fix capitalisations of Yarkovsky parameter names
+
 # 1.9.9 - 2024-05-11
 - Check that cache directory exists on author-lookup
 
