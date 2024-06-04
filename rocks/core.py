@@ -821,6 +821,9 @@ class Taxonomy(Parameter):
             return "No taxonomy on record."
         return self.class_.value
 
+    def __rich__(self):
+        return self.__str__()
+
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.taxonomy")
