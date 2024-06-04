@@ -424,9 +424,19 @@ def _parse_quaero_response(data, id_):
         elif any(alias == id_ for alias in match["aliases"]):
             break
     else:
-        # Unclear which match is correct.
-        logger.warning(f"Could not identify '{id_}'.")
-        return (None, np.nan, None)
+        id_ = str(id_).lower()
+
+        for match in data:
+            if match["name"].lower() == id_:
+                break
+            elif match["id"].lower() == id_:
+                break
+            elif any(alias.lower() == id_ for alias in match["aliases"]):
+                break
+        else:
+            # Unclear which match is correct.
+            logger.warning(f"Could not identify '{id_}'.")
+            return (None, np.nan, None)
 
     # Found match
     numeric = [int(alias) for alias in match["aliases"] if alias.isnumeric()]
