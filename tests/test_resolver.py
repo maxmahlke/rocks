@@ -22,8 +22,6 @@ import rocks
         ("EOS", ("Eos", 221, "Eos")),
         ("edUARda", ("Eduarda", 340, "Eduarda")),
         ("1999 vh114", ("1999 VH114", 23004, "1999_VH114")),
-        ("z1882", ("2007 HE45", 611882, "2007_HE45")),
-        ("Z1882", ("2006 SQ139", 351882, "2006_SQ139")),
     ],
 )
 def test_local_resolution(id_, expected, monkeypatch):
@@ -55,6 +53,8 @@ def test_local_resolution(id_, expected, monkeypatch):
         ("edUARda", ("Eduarda", 340, "Eduarda")),
         ("1999 vh114", ("1999 VH114", 23004, "1999_VH114")),
         ("K20A01B", ("2020 AB1", np.nan, "2020_AB1")),
+        ("z1882", ("2007 HE45", 611882, "2007_HE45")),
+        ("Z1882", ("2006 SQ139", 351882, "2006_SQ139")),
     ],
 )
 def test_remote_resolution(id_, expected):

@@ -1,4 +1,4 @@
-# 1.9.11 - 2024-06-04
+# 1.9.10 - 2024-06-04
 - Fixed behaviour which lead to wrong identification of packed designations
 - Fix capitalisations of Yarkovsky parameter names
 - Fix printing of taxonomic class on command line
