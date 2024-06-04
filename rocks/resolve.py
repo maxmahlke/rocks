@@ -124,20 +124,21 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
 
         # ------
         # Check if any failed due to 502 and rerun them
-        idx_failed = [
-            i for i, result in enumerate(results) if result == (None, None, None)
-        ]
-
-        if idx_failed:
-            # avoid repeating error messages
-            level = logger.level
-            logger.setLevel("CRITICAL")
-            results = np.array(results)
-            results[idx_failed] = loop.run_until_complete(
-                _identify(np.array(id_)[idx_failed], local, progress_bar, task)
-            )
-            results = results.tolist()
-            logger.setLevel(level)
+        # TODO: Does this check run all the time or just when it makes sense?
+        # idx_failed = [
+        #     i for i, result in enumerate(results) if result == (None, None, None)
+        # ]
+        #
+        # if idx_failed:
+        #     # avoid repeating error messages
+        #     level = logger.level
+        #     logger.setLevel("CRITICAL")
+        #     results = np.array(results)
+        #     results[idx_failed] = loop.run_until_complete(
+        #         _identify(np.array(id_)[idx_failed], local, progress_bar, task)
+        #     )
+        #     results = results.tolist()
+        #     logger.setLevel(level)
 
     # ------
     # Verify the output format
