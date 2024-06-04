@@ -413,14 +413,14 @@ def _parse_quaero_response(data, id_):
         SsODNet and np.nan for the number.
     """
 
-    id_ = str(id_).lower()
+    id_ = str(id_)
 
     for match in data:
-        if match["name"].lower() == id_:
+        if match["name"] == id_:
             break
-        elif match["id"].lower() == id_:
+        elif match["id"] == id_:
             break
-        elif any(alias.lower() == id_ for alias in match["aliases"]):
+        elif any(alias == id_ for alias in match["aliases"]):
             break
     else:
         # Unclear which match is correct.
