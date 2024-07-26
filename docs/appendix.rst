@@ -59,6 +59,16 @@ that ssoCard parameters are accessed via singular-case attribute names while the
 +---------------------------------------------+-----------------------------------------------+
 | parameters.dynamical.pairs                  |  ``pair``                                     |
 +---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.delta_v                |  ``delta_v``                                  |
++---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.delta_v.2burns         |  ``delta_v.two_burns``                        |
++---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.delta_v.tt_3burns      |  ``delta_v.tt_three_burns``                   |
++---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.delta_v.3burns         |  ``delta_v.three_burns``                      |
++---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.delta_v.tt_2burns      |  ``delta_v.tt_two_burns``                     |
++---------------------------------------------+-----------------------------------------------+
 | parameters.dynamical.tisserand_parameter    |  ``tisserand_parameter``                      |
 +---------------------------------------------+-----------------------------------------------+
 | parameters.dynamical.yarkovsky              |  ``yarkovsky``                                |

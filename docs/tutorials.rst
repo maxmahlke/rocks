@@ -389,7 +389,7 @@ SsODNet and ``rocks``
   got an invalid response from SsODNet. This can have different reasons:
 
   - The confirmed identifier is outdated. This may happen if an asteroid has
-    recently been named or the designation has changed. In this cases, the ssoCard is associated to
+    recently been named or the designation has changed. In these cases, the ssoCard is associated to
     the new name of the asteroid, while ``rocks`` may still look for it under its previous
     designation. Updating the :term:`Asteroid name-number index` via ``$ rocks status`` fixes this.
 

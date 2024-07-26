@@ -27,14 +27,15 @@ else:
 # ssoCard
 ALIASES = {
     "dynamical": {
-        "parameters.dynamical.orbital_elements": "orbital_elements",
+        "parameters.dynamical.delta_v": "delta_v",
         "parameters.dynamical.family": "family",
         "parameters.dynamical.moid": "moid",
+        "parameters.dynamical.orbital_elements": "orbital_elements",
         "parameters.dynamical.pair": "pair",
         "parameters.dynamical.proper_elements": "proper_elements",
+        "parameters.dynamical.source_regions": "source_regions",
         "parameters.dynamical.tisserand_parameters": "tisserand_parameters",
         "parameters.dynamical.yarkovsky": "yarkovsky",
-        "parameters.dynamical.source_regions": "source_regions",
     },
     "physical": {
         "D": "diameter",

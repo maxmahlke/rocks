@@ -1,3 +1,6 @@
+# 1.9.11 - 2024-07-26
+- Add support for delta_v dynamical parameter
+
 # 1.9.10 - 2024-06-04
 - Fixed behaviour which lead to wrong identification of packed designations
 - Fix capitalisations of Yarkovsky parameter names
