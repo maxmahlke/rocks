@@ -3,7 +3,7 @@
 import inspect
 
 # Welcome to rocks
-__version__ = "1.9.10"
+__version__ = "1.9.11"
 
 # Only define user API if rocks is not called via command line
 context = inspect.stack()[-1].code_context

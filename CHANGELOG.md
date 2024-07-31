@@ -1,4 +1,4 @@
-# 1.9.11 - 2024-07-26
+# 1.9.11 - 2024-07-31
 - Add support for delta_v dynamical parameter
 
 # 1.9.10 - 2024-06-04
