@@ -470,7 +470,8 @@ class Pair(Parameter):
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
-class DeltaVEntry(FloatValue):
+class DeltaV(Parameter):
+    delta_v: FloatValue = FloatValue(**{})
     transfer_time: FloatValue = FloatValue(**{})
     n_burns: IntegerValue = IntegerValue(**{})
     method: List[Method] = [Method(**{})]
@@ -478,38 +479,21 @@ class DeltaVEntry(FloatValue):
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.physical.delta_v.delta_v")
-
-    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
-        "bibref", mode="before"
-    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
-
-
-class DeltaV(Parameter):
-    delta_v: DeltaVEntry = DeltaVEntry(**{})
-    two_burns: FloatValue = FloatValue(**{})
-    three_burns: FloatValue = FloatValue(**{})
-    best_n_burns: IntegerValue = IntegerValue(**{})
-    tt_two_burns: FloatValue = FloatValue(**{})
-    transfer_time: FloatValue = FloatValue(**{})
-    tt_three_burns: FloatValue = FloatValue(**{})
+        return add_paths(cls, values, "parameters.dynamical.delta_v")
 
     def __rich__(self):
         return _build_rich_repr(
             self,
             {
-                "delta_v": "delta_v",
-                "best_n_burns": "best_n_burns",
-                "two_burns": "two_burns",
-                "three_burns": "three_burns",
-                "tt_two_burns": "tt_two_burns",
-                "tt_three_burns": "tt_three_burns",
+                "delta_v": "Delta V",
+                "transfer_time": "Transfer Time",
+                "n_burns": "N Burns",
             },
         )
 
-    @pydantic.model_validator(mode="after")
-    def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.dynamical.delta_v")
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
 class TisserandParameters(Parameter):
