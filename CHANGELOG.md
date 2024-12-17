@@ -1,3 +1,6 @@
+# 1.9.12 - 2024-12-17
+- Ease dependency requirements
+
 # 1.9.11 - 2024-07-31
 - Add support for delta_v dynamical parameter
 
