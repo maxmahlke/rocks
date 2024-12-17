@@ -71,6 +71,10 @@ that ssoCard parameters are accessed via singular-case attribute names while the
 +---------------------------------------------+-----------------------------------------------+
 | parameters.dynamical.tisserand_parameter    |  ``tisserand_parameter``                      |
 +---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.moid                   |  ``moid``                                     |
++---------------------------------------------+-----------------------------------------------+
+| parameters.dynamical.source_regions         |  ``source_regions``                           |
++---------------------------------------------+-----------------------------------------------+
 | parameters.dynamical.yarkovsky              |  ``yarkovsky``                                |
 +---------------------------------------------+-----------------------------------------------+
 |                                             |                                               |
