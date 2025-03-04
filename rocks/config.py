@@ -147,6 +147,17 @@ DATACLOUD = {
             "delta_time",
         ],
     },
+    "densities": {
+        "attr_name": "densities",
+        "ssodnet_name": "density",
+        "print_columns": [
+            "density",
+            "err_density_up",
+            "err_density_down",
+            "method",
+            "shortbib",
+        ],
+    },
     "diamalbedo": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",
