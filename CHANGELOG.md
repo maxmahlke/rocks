@@ -1,3 +1,6 @@
+# 1.9.13 - 2025-03-04
+- Add missing densities catalogue
+
 # 1.9.12 - 2024-12-17
 - Ease dependency requirements
 
