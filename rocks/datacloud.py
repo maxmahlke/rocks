@@ -63,7 +63,7 @@ def pretty_print(rock, catalogue, parameter):
 
     # Only show the caption if there is a preferred entry
     if any(preferred):
-        caption = "Green: preferred entry"
+        caption = "Bold: preferred entry"
     else:
         caption = None
 
