@@ -33,6 +33,13 @@ def pretty_print(rock, catalogue, parameter):
         rich.print(f"No {parameter} on record for {rock.name}.")
         return
 
+    # Albedo/diameter requested but only diameters/albedos present
+    if (parameter == "diameters" and pd.isna(catalogue["diameter"]).all()) or (
+        parameter == "albedos" and pd.isna(catalogue["albedo"]).all()
+    ):
+        rich.print(f"No {parameter} on record for {rock.name}.")
+        return
+
     # Sort catalogue by year of reference
     if "year" in catalogue.columns:
         catalogue = catalogue.sort_values("year").reset_index()
