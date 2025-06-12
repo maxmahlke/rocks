@@ -1,3 +1,6 @@
+# 1.9.14 -
+- Fix edge-case in datacloud.diamalbedo output if no albedo present but diameter was observed (#44)
+
 # 1.9.13 - 2025-03-04
 - Add missing densities catalogue
 
