@@ -751,6 +751,9 @@ class PhaseFunction(Parameter):
     # ATLAS
     misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
     misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
+    # ZTF
+    palomar_ztf_g: Phase = pydantic.Field(Phase(**{}), alias="Palomar/ZTF.g")
+    palomar_ztf_r: Phase = pydantic.Field(Phase(**{}), alias="Palomar/ZTF.r")
 
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
@@ -769,6 +772,8 @@ class PhaseFunction(Parameter):
                     "generic_johnson_V",
                     "misc_atlas_cyan",
                     "misc_atlas_orange",
+                    "palomar_ztf_g",
+                    "palomar_ztf_r",
                 ]
             ]
         )
@@ -782,6 +787,8 @@ class PhaseFunction(Parameter):
             "generic_johnson_V",
             "misc_atlas_cyan",
             "misc_atlas_orange",
+            "palomar_ztf_g",
+            "palomar_ztf_r",
         ]:
             entry = getattr(self, filter_)
             if not np.isnan(entry.H.value):
