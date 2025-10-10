@@ -962,6 +962,7 @@ class Rock(pydantic.BaseModel):
     system: str = ""
     filename: str = ""
     siblings: list = []
+    is_valid: bool = True
 
     # the heart
     parameters: Parameters = Parameters(**{})
@@ -1079,7 +1080,7 @@ class Rock(pydantic.BaseModel):
                         )
         else:
             # Something failed. Instantiate minimal ssoCard for meaningful error output.
-            ssocard = {"name": id_provided}
+            ssocard = {"name": id_provided, "is_valid": False}
 
         # Add filename attribute
         ssocard["filename"] = "".join(

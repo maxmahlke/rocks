@@ -1,3 +1,6 @@
+# 1.9.15
+- Add "is_valid" attribute to Rock class which is False if no ssoCard could be retrieved
+
 # 1.9.14 - 2025-09-17
 - Fix edge-case in datacloud.diamalbedo output if no albedo present but diameter was observed (#44)
 - Add Palomar ZTF g/r to phase_function
