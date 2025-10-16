@@ -145,6 +145,7 @@ DATACLOUD = {
             "phot_sys",
             "observer",
             "delta_time",
+            "shortbib",
         ],
     },
     "densities": {
