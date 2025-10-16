@@ -1,5 +1,7 @@
-# 1.9.15
+# 1.9.15 - 2025-10-16
+- Add shortbib to "rocks colors" output
 - Add "is_valid" attribute to Rock class which is False if no ssoCard could be retrieved
+- Limit pydantic to version <=2.10
 
 # 1.9.14 - 2025-09-17
 - Fix edge-case in datacloud.diamalbedo output if no albedo present but diameter was observed (#44)
