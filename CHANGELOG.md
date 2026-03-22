@@ -1,3 +1,6 @@
+# 1.9.16 - 2026-03-22
+- Add support for np.int64 and np.float64 in rocks.id (#47)
+
 # 1.9.15 - 2025-10-16
 - Add shortbib to "rocks colors" output
 - Add "is_valid" attribute to Rock class which is False if no ssoCard could be retrieved
