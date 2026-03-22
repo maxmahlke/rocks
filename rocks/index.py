@@ -531,4 +531,4 @@ def _ensure_index_exists():
     config.PATH_INDEX.mkdir(parents=True)
     _build_index()
 
-    rich.print("\nAll done. Find out more by running [green]$ rocks docs[/green]\n")
+    rich.print("\nFind out more by running [green]$ rocks docs[/green]\n")
