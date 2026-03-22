@@ -76,7 +76,7 @@ def identify(id_, return_id=False, return_aliases=False, local=True, progress=Fa
 
     # ------
     # Verify input
-    if isinstance(id_, (str, int, float)):
+    if isinstance(id_, (str, int, float, np.int64, np.float64)):
         id_ = [id_]
     elif isinstance(id_, np.ndarray):
         id_ = id_.tolist()
