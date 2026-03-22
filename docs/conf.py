@@ -87,8 +87,8 @@ html_theme = "furo"
 html_static_path = ["_static"]
 # html_logo = "gfx/logo_rocks.svg"
 
-pygments_style = "monokai"
-pygments_dark_style = "monokai"
+pygments_style = "nord"
+pygments_dark_style = "nord-darker"
 
 html_show_copyright = False
 html_show_sphinx = False
