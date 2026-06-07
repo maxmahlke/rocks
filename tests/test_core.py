@@ -1,10 +1,23 @@
 #!/usr/bin/env python
 """Test serialization and deserialization of ssoCard and Rock class."""
+import json
 
 import numpy as np
 import pytest
 
 import rocks
+
+# Mock the get_ssocard function to read from test data instead of making remote calls
+def load_ssocard_from_test_data(id_):
+    """Load ssoCard from test data. """
+
+    USE_UNRELEASED_SSOCARDS = True
+    PATH_TEST_DATA = "tests/data/1.2.0" if USE_UNRELEASED_SSOCARDS else "tests/data"
+
+    with open(f"{PATH_TEST_DATA}/{id_}.json", "r") as f:
+        return json.load(f)
+
+rocks.ssodnet.get_ssocard = lambda x: load_ssocard_from_test_data(x)
 
 # ------
 # Instantiation
@@ -44,6 +57,46 @@ def test_albedo(id_, exists):
         # Albedo evaluates as False
         assert not rock.albedo
 
+
+# COLOR
+COLOR_EXISTS = [221]
+COLOR_MISSING = [494721, 594721]
+
+# Misc/Atlas.orange
+# Generic/Johnson.V
+
+
+@pytest.mark.parametrize(
+    "id_, exists",
+    [(id_, True) for id_ in COLOR_EXISTS] + [(id_, False) for id_ in COLOR_MISSING],  # type: ignore
+    ids=str,
+)
+def test_color(id_, exists):
+    """Verify color parameter access."""
+
+    rock = rocks.Rock(id_)
+
+    if exists:
+        # Color is instantiated
+        assert isinstance(rock.color.misc_atlas_cyan.H.value, float)
+
+        # Shortcuts works
+        assert rock.color.cyan is rock.color.misc_atlas_cyan
+        assert rock.color.orange is rock.color.misc_atlas_orange
+        assert rock.color.V is rock.color.generic_johnson_V
+
+        # Color is not NaN
+        assert np.isfinite(rock.color.cyan.H.value)
+
+        # Color evaluates as True
+        assert rock.color
+
+    else:
+        # Color is instantiated and NaN
+        assert not rock.color.cyan
+
+        # Color evaluates as False
+        assert not rock.color
 
 # Phase
 PHASE_EXISTS = [221]
