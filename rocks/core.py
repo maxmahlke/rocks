@@ -179,6 +179,9 @@ class FloatValue(Parameter):
 
     @pydantic.model_validator(mode="before")
     def _compute_mean_error(cls, values):
+        # If the value is a float, convert it to a dict with value and error keys
+        if isinstance(values, float):
+            values = {"value": values, "error": {"min": np.nan, "max": np.nan}}
         if "error" in values:
             if "min" in values["error"] and "max" in values["error"]:
                 values["error_"] = np.mean(
@@ -567,6 +570,7 @@ class Albedo(FloatValue):
 
 
 class ColorEntry(Parameter):
+    index: StringValue = StringValue(**{})
     color: FloatValue = FloatValue(**{})
     epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
@@ -600,67 +604,110 @@ class ColorEntry(Parameter):
 
 
 class Color(Parameter):
-    g_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-i")
-    g_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-r")
-    g_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="g-z")
-    i_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="i-z")
-    r_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="r-i")
-    r_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="r-z")
-    u_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-g")
-    u_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-g")
-    u_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-r")
-    u_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-z")
-    J_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="J-K")
-    Y_J: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-J")
-    Y_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-K")
-    c_o: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="c-o")
-    v_g: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-g")
-    v_i: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-i")
-    v_r: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-r")
-    v_z: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="v-z")
-    H_K: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="H-K")
-    J_H: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="J-H")
-    Y_H: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="Y-H")
-    u_v: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="u-v")
-    V_I: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-I")
-    V_R: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="V-R")
-    B_V: ColorEntry = pydantic.Field(ColorEntry(**{}), alias="B-V")
+    entries: dict = pydantic.Field(default_factory=dict)
+
+    @pydantic.model_validator(mode="before")
+    def _parse_entries(cls, values):
+        """Parse v1.2.0 list schema into an index->ColorEntry mapping."""
+
+        if values in (None, ""):
+            return {"entries": {}}
+
+        if isinstance(values, dict) and "entries" in values:
+            return values
+
+        # Legacy/object schema where each key is already a color index.
+        if isinstance(values, dict):
+            converted = {}
+            for index, entry in values.items():
+                if not isinstance(entry, dict):
+                    continue
+                normalized = dict(entry)
+                normalized["index"] = {"value": index}
+                for key in [
+                    "facility",
+                    "observer",
+                    "phot_sys",
+                    "technique",
+                    "id_filter_1",
+                    "id_filter_2",
+                ]:
+                    if key in normalized and not isinstance(normalized[key], dict):
+                        normalized[key] = {"value": normalized[key]}
+                converted[index] = ColorEntry(**normalized)
+            return {"entries": converted}
+
+        if isinstance(values, list):
+            converted = {}
+            for entry in values:
+                if not isinstance(entry, dict):
+                    continue
+
+                index = entry.get("index")
+                if not index:
+                    continue
+
+                normalized = dict(entry)
+                normalized["index"] = {"value": index}
+
+                for key in [
+                    "facility",
+                    "observer",
+                    "phot_sys",
+                    "technique",
+                    "id_filter_1",
+                    "id_filter_2",
+                ]:
+                    if key in normalized and not isinstance(normalized[key], dict):
+                        normalized[key] = {"value": normalized[key]}
+
+                converted[index] = ColorEntry(**normalized)
+
+            return {"entries": converted}
+
+        return {"entries": {}}
+
+    def __getitem__(self, key):
+        return self.entries[key]
+
+    def __contains__(self, key):
+        return key in self.entries
+
+    def get(self, key, default=None):
+        return self.entries.get(key, default)
+
+    def keys(self):
+        return self.entries.keys()
+
+    def values(self):
+        return self.entries.values()
+
+    def items(self):
+        return self.entries.items()
+
+    def __iter__(self):
+        return iter(self.entries.items())
+
+    def __len__(self):
+        return len(self.entries)
+
+    def __bool__(self):
+        return any(bool(entry) for entry in self.entries.values())
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.physical.colors")
+        values.path = "parameters.physical.colors"
+
+        for index, entry in values.entries.items():
+            entry.path = f"parameters.physical.colors.{index}.color"
+            entry.index.path = f"parameters.physical.colors.{index}.index"
+
+        return values
 
     def __str__(self):
         observed = []
 
-        for filter_ in [
-            "g_i",
-            "g_r",
-            "g_z",
-            "i_z",
-            "r_i",
-            "r_z",
-            "u_g",
-            "u_g",
-            "u_r",
-            "u_z",
-            "J_K",
-            "Y_J",
-            "Y_K",
-            "c_o",
-            "v_g",
-            "v_i",
-            "v_r",
-            "v_z",
-            "H_K",
-            "J_H",
-            "Y_H",
-            "u_v",
-            "V_I",
-            "V_R",
-            "B_V",
-        ]:
-            entry = getattr(self, filter_)
+        for filter_, entry in self.entries.items():
             if not np.isnan(entry.color.value):
                 observed.append(rf"[{filter_}] {entry.color.value:.2f}")
         if observed:

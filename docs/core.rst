@@ -83,7 +83,14 @@ Differences to the ``ssoCard`` structure arise in two cases:
 
 - the ``ssoCard`` uses keywords which are protected in ``python``, such as the ``class`` keyword. These keywords have an underscore appended to them: ``class``, ``id``, ``min``, ``max``
 
-- the ``ssoCard`` uses keywords which are invalid variable names in ``python``, such as the name of colours: "c-o" becomes "c_o". In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
+- the ``ssoCard`` uses keywords which are invalid variable names in ``python``. In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
+
+    ``colors`` are exposed as a mapping keyed by the original color index strings. For example:
+
+    .. code-block:: python
+
+            >>> eos.color["c-o"].color.value
+            0.351
 
  .. TODO Document the errors_ attribute of the Values class
 

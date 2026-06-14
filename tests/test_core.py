@@ -59,8 +59,8 @@ def test_albedo(id_, exists):
 
 
 # COLOR
-COLOR_EXISTS = [221]
-COLOR_MISSING = [494721, 594721]
+COLOR_EXISTS = [221, 494721]
+COLOR_MISSING = [594721]
 
 # Misc/Atlas.orange
 # Generic/Johnson.V
@@ -77,26 +77,34 @@ def test_color(id_, exists):
     rock = rocks.Rock(id_)
 
     if exists:
-        # Color is instantiated
-        assert isinstance(rock.color.misc_atlas_cyan.H.value, float)
-
-        # Shortcuts works
-        assert rock.color.cyan is rock.color.misc_atlas_cyan
-        assert rock.color.orange is rock.color.misc_atlas_orange
-        assert rock.color.V is rock.color.generic_johnson_V
-
-        # Color is not NaN
-        assert np.isfinite(rock.color.cyan.H.value)
-
-        # Color evaluates as True
+        # Color behaves like a mapping from color index to ColorEntry
         assert rock.color
+        assert len(rock.color) > 0
+
+        keys = list(rock.color.keys())
+        assert all(isinstance(key, str) for key in keys)
+
+        first_key = keys[0]
+        first_entry = rock.color[first_key]
+
+        assert first_entry.index.value == first_key
+        assert isinstance(first_entry.color.value, float)
+        assert any(np.isfinite(entry.color.value) for entry in rock.color.values())
+
+        # Spot checks for known indices in test fixtures
+        if id_ == 221:
+            assert "B-V" in rock.color
+            assert np.isfinite(rock.color["B-V"].color.value)
+        if id_ == 494721:
+            assert "g-i" in rock.color
+            assert np.isfinite(rock.color["g-i"].color.value)
 
     else:
-        # Color is instantiated and NaN
-        assert not rock.color.cyan
-
-        # Color evaluates as False
+        # Empty mapping if no color is available
+        assert len(rock.color) == 0
         assert not rock.color
+        assert "B-V" not in rock.color
+        assert rock.color.get("B-V") is None
 
 # Phase
 PHASE_EXISTS = [221]

@@ -217,9 +217,11 @@ A complete list is given in the :ref:`appendix <parameter_aliases>`.\ [#f1]_
 .. admonition:: Another Warning
    :class: warning
 
-   Some parameter names in the :ref:`ssoCard` are invalid variable names in ``python``,
-   such as the name of colors (e.g. ``c-o``). In general, characters such
-   as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names (e.g. ``c_o``).
+   Some parameter names in the :ref:`ssoCard` are invalid variable names in ``python``.
+   In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_``
+   in parameter names. One exception is ``color`` entries, which are exposed as
+   a mapping keyed by their original index strings, e.g.
+   ``rocks.Rock(221).color["c-o"].color.value``.
 
 Both the best-estimates stored in the :term:`ssoCard` and the literature compilation
 of the parameters stored in the :term:`datacloud <Datacloud Catalogue>` are available for look-up.
