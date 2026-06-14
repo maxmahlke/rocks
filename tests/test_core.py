@@ -125,26 +125,34 @@ def test_phase_function(id_, exists):
     rock = rocks.Rock(id_)
 
     if exists:
-        # Phase is instantiated
-        assert isinstance(rock.phase_function.misc_atlas_cyan.H.value, float)
+        # Phase function behaves like a mapping from filter id to Phase entries
+        assert rock.phase_function
+        assert len(rock.phase_function) > 0
 
-        # Shortcuts works
-        assert rock.phase_function.cyan is rock.phase_function.misc_atlas_cyan
-        assert rock.phase_function.orange is rock.phase_function.misc_atlas_orange
-        assert rock.phase_function.V is rock.phase_function.generic_johnson_V
+        keys = list(rock.phase_function.keys())
+        assert all(isinstance(key, str) for key in keys)
 
-        # Phase is not NaN
+        first_key = keys[0]
+        first_entry = rock.phase_function[first_key]
+        assert first_entry.id_filter.value == first_key
+
+        # Backward-compatible shortcuts
+        assert rock.phase_function.cyan is rock.phase_function["Misc/Atlas.cyan"]
+        assert rock.phase_function.orange is rock.phase_function["Misc/Atlas.orange"]
+        if "Generic/Johnson.V" in rock.phase_function:
+            assert rock.phase_function.V is rock.phase_function["Generic/Johnson.V"]
+        else:
+            assert not rock.phase_function.V
+
+        # Known finite filter in the test fixture
         assert np.isfinite(rock.phase_function.cyan.H.value)
 
-        # Phase evaluates as True
-        assert rock.phase_function
-
     else:
-        # Phase is instantiated and NaN
-        assert not rock.phase_function.cyan
-
-        # Phase evaluates as False
+        # Empty mapping if no phase function is available
+        assert len(rock.phase_function) == 0
         assert not rock.phase_function
+        assert "Misc/Atlas.cyan" not in rock.phase_function
+        assert not rock.phase_function.cyan
 
 
 # # Spin

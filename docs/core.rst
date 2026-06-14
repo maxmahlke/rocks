@@ -92,6 +92,17 @@ Differences to the ``ssoCard`` structure arise in two cases:
             >>> eos.color["c-o"].color.value
             0.351
 
+      ``phase_function`` entries are likewise exposed as a mapping keyed by
+      the filter identifier from the ssoCard:
+
+      .. code-block:: python
+
+          >>> eos.phase_function["Misc/Atlas.cyan"].H.value
+          7.605
+
+      Shortcut access remains available for common filters, e.g.
+      ``eos.phase_function.cyan`` and ``eos.phase_function.V``.
+
  .. TODO Document the errors_ attribute of the Values class
 
 Access of ``datacloud`` tables

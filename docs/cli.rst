@@ -221,7 +221,9 @@ A complete list is given in the :ref:`appendix <parameter_aliases>`.\ [#f1]_
    In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_``
    in parameter names. One exception is ``color`` entries, which are exposed as
    a mapping keyed by their original index strings, e.g.
-   ``rocks.Rock(221).color["c-o"].color.value``.
+   ``rocks.Rock(221).color["c-o"].color.value``. The same applies to
+   ``phase_function`` entries, e.g.
+   ``rocks.Rock(221).phase_function["Misc/Atlas.cyan"].H.value``.
 
 Both the best-estimates stored in the :term:`ssoCard` and the literature compilation
 of the parameters stored in the :term:`datacloud <Datacloud Catalogue>` are available for look-up.

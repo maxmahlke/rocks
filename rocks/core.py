@@ -3,7 +3,7 @@
 from functools import reduce
 import datetime as dt
 import keyword
-from typing import List, Generator
+from typing import ClassVar, List, Generator
 
 import numpy as np
 import pandas as pd
@@ -760,6 +760,7 @@ class Mass(FloatValue):
 
 
 class Phase(Parameter):
+    id_filter: StringValue = StringValue(**{})
     H: FloatValue = FloatValue(**{})
     N: FloatValue = FloatValue(**{})
     G1: FloatValue = FloatValue(**{})
@@ -790,54 +791,116 @@ class Phase(Parameter):
 
 
 class PhaseFunction(Parameter):
-    # Generic
-    generic_johnson_V: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.V")
-    generic_johnson_R: Phase = pydantic.Field(Phase(**{}), alias="Generic/Johnson.R")
-    # Gaia
-    gaia_gaia3_G: Phase = pydantic.Field(Phase(**{}), alias="GAIA/GAIA3.G")
-    # ATLAS
-    misc_atlas_cyan: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.cyan")
-    misc_atlas_orange: Phase = pydantic.Field(Phase(**{}), alias="Misc/Atlas.orange")
-    # ZTF
-    palomar_ztf_g: Phase = pydantic.Field(Phase(**{}), alias="Palomar/ZTF.g")
-    palomar_ztf_r: Phase = pydantic.Field(Phase(**{}), alias="Palomar/ZTF.r")
+    entries: dict = pydantic.Field(default_factory=dict)
+
+    _LEGACY_FIELD_TO_FILTER: ClassVar[dict] = {
+        "generic_johnson_V": "Generic/Johnson.V",
+        "generic_johnson_R": "Generic/Johnson.R",
+        "gaia_gaia3_G": "GAIA/GAIA3.G",
+        "misc_atlas_cyan": "Misc/Atlas.cyan",
+        "misc_atlas_orange": "Misc/Atlas.orange",
+        "palomar_ztf_g": "Palomar/ZTF.g",
+        "palomar_ztf_r": "Palomar/ZTF.r",
+    }
+
+    @pydantic.model_validator(mode="before")
+    def _parse_entries(cls, values):
+        """Parse phase function entries from list or dictionary schemas."""
+
+        def _normalize(entry, filter_id):
+            normalized = dict(entry)
+            normalized["id_filter"] = {"value": filter_id}
+
+            for key in ["H", "N", "G1", "G2", "rms"]:
+                if key in normalized and not isinstance(normalized[key], dict):
+                    normalized[key] = {"value": float(normalized[key])}
+
+            for key in ["name_filter", "facility", "technique"]:
+                if key in normalized and not isinstance(normalized[key], dict):
+                    normalized[key] = {"value": normalized[key]}
+
+            return normalized
+
+        if values in (None, ""):
+            return {"entries": {}}
+
+        if isinstance(values, dict) and "entries" in values:
+            return values
+
+        # Legacy/object schema where each key is already a filter identifier.
+        if isinstance(values, dict):
+            converted = {}
+            for key, entry in values.items():
+                if not isinstance(entry, dict):
+                    continue
+
+                normalized = _normalize(entry, key)
+                converted[key] = Phase(**normalized)
+
+            return {"entries": converted}
+
+        if isinstance(values, list):
+            converted = {}
+            for entry in values:
+                if not isinstance(entry, dict):
+                    continue
+
+                filter_id = entry.get("id_filter")
+                if not filter_id:
+                    continue
+
+                normalized = _normalize(entry, filter_id)
+                converted[filter_id] = Phase(**normalized)
+
+            return {"entries": converted}
+
+        return {"entries": {}}
 
     def __getattr__(self, name):
         """Implement attribute shortcuts. Gets called if __getattribute__ fails."""
 
-        if name in config.ALIASES["phase_function"].keys():
-            return getattr(self, config.ALIASES["phase_function"][name])
+        if name in config.ALIASES["phase_function"]:
+            name = config.ALIASES["phase_function"][name]
+
+        if name in type(self)._LEGACY_FIELD_TO_FILTER:
+            return self.entries.get(type(self)._LEGACY_FIELD_TO_FILTER[name], Phase(**{}))
+
+        if name in self.entries:
+            return self.entries[name]
+
         raise AttributeError
 
+    def __getitem__(self, key):
+        return self.entries[key]
+
+    def __contains__(self, key):
+        return key in self.entries
+
+    def get(self, key, default=None):
+        return self.entries.get(key, default)
+
+    def keys(self):
+        return self.entries.keys()
+
+    def values(self):
+        return self.entries.values()
+
+    def items(self):
+        return self.entries.items()
+
+    def __iter__(self):
+        return iter(self.entries.items())
+
+    def __len__(self):
+        return len(self.entries)
+
     def __bool__(self):
-        return any(
-            [
-                np.isfinite(getattr(self, filter_).H.value)
-                for filter_ in [
-                    "gaia_gaia3_G",
-                    "generic_johnson_R",
-                    "generic_johnson_V",
-                    "misc_atlas_cyan",
-                    "misc_atlas_orange",
-                    "palomar_ztf_g",
-                    "palomar_ztf_r",
-                ]
-            ]
-        )
+        return any(bool(entry) for entry in self.entries.values())
 
     def __str__(self):
         observed = []
 
-        for filter_ in [
-            "gaia_gaia3_G",
-            "generic_johnson_R",
-            "generic_johnson_V",
-            "misc_atlas_cyan",
-            "misc_atlas_orange",
-            "palomar_ztf_g",
-            "palomar_ztf_r",
-        ]:
-            entry = getattr(self, filter_)
+        for filter_, entry in self.entries.items():
             if not np.isnan(entry.H.value):
                 observed.append(
                     rf"H: {entry.H.value:.2f}  G1: {entry.G1.value:.2f}  G2: {entry.G2.value:.2f}  \[{filter_}]"
@@ -851,7 +914,15 @@ class PhaseFunction(Parameter):
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
-        return add_paths(cls, values, "parameters.physical.phase_functions")
+        values.path = "parameters.physical.phase_functions"
+
+        for filter_id, entry in values.entries.items():
+            entry.path = f"parameters.physical.phase_functions.{filter_id}"
+            entry.id_filter.path = (
+                f"parameters.physical.phase_functions.{filter_id}.id_filter"
+            )
+
+        return values
 
 
 class Spin(Parameter):
