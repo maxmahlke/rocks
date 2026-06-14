@@ -927,8 +927,13 @@ class PhaseFunction(Parameter):
 
 class Spin(Parameter):
     t0: FloatValue = FloatValue(**{})
+    W0: FloatValue = FloatValue(**{})
     Wp: FloatValue = FloatValue(**{})
-    id_: IntegerValue = IntegerValue(**{})
+    id_: IntegerValue = pydantic.Field(
+        IntegerValue(**{}),
+        alias="id_spin",
+        validation_alias=pydantic.AliasChoices("id_spin", "id_"),
+    )
     lat: FloatValue = FloatValue(**{})
     RA0: FloatValue = FloatValue(**{})
     DEC0: FloatValue = FloatValue(**{})
@@ -940,6 +945,36 @@ class Spin(Parameter):
     obliquity: FloatValue = FloatValue(**{})
     technique: StringValue = StringValue(**{})
     period_type: StringValue = StringValue(**{})
+    period_flag: StringValue = StringValue(**{})
+
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        """Normalize raw v1.2.0 spin entries into Value-like dictionaries."""
+
+        if not isinstance(values, dict):
+            return values
+
+        normalized = dict(values)
+
+        if "id_spin" not in normalized and "id_" in normalized:
+            normalized["id_spin"] = normalized["id_"]
+
+        if "id_spin" in normalized and not isinstance(normalized["id_spin"], dict):
+            normalized["id_spin"] = {"value": int(normalized["id_spin"])}
+
+        for key in ["t0", "W0", "Wp", "lat", "RA0", "DEC0", "long", "period", "obliquity"]:
+            if key in normalized and normalized[key] is not None and not isinstance(
+                normalized[key], dict
+            ):
+                normalized[key] = {"value": float(normalized[key])}
+
+        for key in ["technique", "period_type", "period_flag"]:
+            if key in normalized and normalized[key] is not None and not isinstance(
+                normalized[key], dict
+            ):
+                normalized[key] = {"value": normalized[key]}
+
+        return normalized
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
