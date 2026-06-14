@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 import rocks
+from rocks.core import Spin
 
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
@@ -155,39 +156,41 @@ def test_phase_function(id_, exists):
         assert not rock.phase_function.cyan
 
 
-# # Spin
-# SPIN_EXISTS = [1, 221]
-# SPIN_MISSING = [92384, 385186]
+# Spin
+SPIN_EXISTS = ["Eos", "Ceres"]
+SPIN_MISSING = ["2005_SO191", "2017_UE95"]
 
 
-# @pytest.mark.parametrize(
-#     "id_",
-#     "exists",
-#     SPIN_EXISTS + SPIN_MISSING,
-#     [True] * len(SPIN_EXISTS) + [False] * len(SPIN_EXISTS),
-#     ids=str,
-# )
-# def test_spin(id_, exists):
-#     """Verify spin parameter access."""
+@pytest.mark.parametrize(
+    "id_, exists",
+    [(id_, True) for id_ in SPIN_EXISTS] + [(id_, False) for id_ in SPIN_MISSING],  # type: ignore
+    ids=str,
+)
+def test_spin(id_, exists):
+    """Verify spin parameter access for known and unknown spin states."""
 
-#     rock = rocks.Rock(id_)
+    card = load_ssocard_from_test_data(id_)
+    spins = card["parameters"]["physical"].get("spins", "")
 
-#     if exists:
-#         # Spin is instantiated
-#         assert isinstance(rock.spin.class_.value, str)
+    if exists:
+        assert isinstance(spins, list)
+        assert len(spins) > 0
 
-#         # Spin is not NaN
-#         assert rock.spin.class_.value
+        spin = Spin.model_validate(spins[0])
+        assert isinstance(spin.id_.value, int)
+        assert isinstance(spin.W0.value, float)
+        assert spin.period_flag.value
+        assert np.isfinite(spin.period.value)
+        assert spin.period
 
-#         # Spin evaluates as True
-#         assert rock.spin
+    else:
+        # v1.2.0 cards serialize unknown spin as an empty string
+        assert spins == ""
 
-#     else:
-#         # Spin is instantiated and NaN
-#         assert not rock.spin.class_.value
+        spin = Spin.model_validate({})
+        assert not spin.period
+        assert not spin.period_flag
 
-#         # Spin evaluates as False
-#         assert not rock.spin
 
 
 # Taxonomy
