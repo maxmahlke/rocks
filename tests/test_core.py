@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import rocks
-from rocks.core import OrbitalElements, Spin
+from rocks.core import MOID, OrbitalElements, Spin
 
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
@@ -212,6 +212,20 @@ def test_orbital_elements():
     assert not missing.ceu_epoch
     assert not missing.pericenter_date
     assert not missing.ref_center
+
+
+def test_moid():
+    """Verify MOID parses Earth key and supports legacy EMB input."""
+
+    card = load_ssocard_from_test_data("Eos")
+    entry = card["parameters"]["dynamical"]["moid"]
+    moid = MOID.model_validate(entry)
+
+    assert np.isfinite(moid.emb.value)
+    assert moid.earth is moid.emb
+
+    legacy = MOID.model_validate({"EMB": {"value": 0.123}})
+    assert np.isclose(legacy.emb.value, 0.123)
 
 
 
