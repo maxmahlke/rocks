@@ -200,12 +200,19 @@ by the abbreviation on the right. Feel free to suggest a new alias via the `GitH
 +---------------------------+------------------------+
 | absolute_magnitude        |  H                     |
 +---------------------------+------------------------+
-| generic_johnson_V         |  V                     |
-+---------------------------+------------------------+
-| misc_atlas_cyan           |  cyan                  |
-+---------------------------+------------------------+
-| misc_atlas_orange         |  orange                |
-+---------------------------+------------------------+
+
+The following shortcuts are available on the ``phase_function`` mapping to avoid
+typing the full filter identifier string:
+
++----------------------------------+------------------------+
+| phase_function key               |  Shortcut              |
++----------------------------------+------------------------+
+| ``Generic/Johnson.V``            |  ``V``                 |
++----------------------------------+------------------------+
+| ``Misc/Atlas.cyan``              |  ``cyan``              |
++----------------------------------+------------------------+
+| ``Misc/Atlas.orange``            |  ``orange``            |
++----------------------------------+------------------------+
 
 .. _need_suffix:
 

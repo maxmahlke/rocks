@@ -85,23 +85,26 @@ Differences to the ``ssoCard`` structure arise in two cases:
 
 - the ``ssoCard`` uses keywords which are invalid variable names in ``python``. In general, characters such as ``-``, ``/``, ``.``, are replaced by ``_`` in parameter names.
 
-    ``colors`` are exposed as a mapping keyed by the original color index strings. For example:
+  Two exceptions use a mapping approach instead of attribute access:
+
+  - ``color`` entries are keyed by the original color index string:
 
     .. code-block:: python
 
-            >>> eos.color["c-o"].color.value
-            0.351
+        >>> eos.color["c-o"].color.value
+        0.351
+        >>> list(eos.color.keys())
+        ['B-V', 'c-o', 'g-i', ...]
 
-      ``phase_function`` entries are likewise exposed as a mapping keyed by
-      the filter identifier from the ssoCard:
+  - ``phase_function`` entries are keyed by the filter identifier:
 
-      .. code-block:: python
+    .. code-block:: python
 
-          >>> eos.phase_function["Misc/Atlas.cyan"].H.value
-          7.605
+        >>> eos.phase_function["Misc/Atlas.cyan"].H.value
+        7.605
 
-      Shortcut access remains available for common filters, e.g.
-      ``eos.phase_function.cyan`` and ``eos.phase_function.V``.
+    Shortcuts are available for common filters: ``phase_function.cyan``,
+    ``phase_function.orange``, ``phase_function.V``.
 
  .. TODO Document the errors_ attribute of the Values class
 
