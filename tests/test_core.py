@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import rocks
-from rocks.core import MOID, OrbitalElements, Spin
+from rocks.core import Ellipsoid, HillSphereRadius, MOID, OrbitalElements, Spin
 
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
@@ -226,6 +226,67 @@ def test_moid():
 
     legacy = MOID.model_validate({"EMB": {"value": 0.123}})
     assert np.isclose(legacy.emb.value, 0.123)
+
+
+# Hill sphere radius
+HSR_EXISTS = [221, 1]
+HSR_MISSING = [594721]
+
+
+@pytest.mark.parametrize(
+    "id_, exists",
+    [(id_, True) for id_ in HSR_EXISTS] + [(id_, False) for id_ in HSR_MISSING],  # type: ignore
+    ids=str,
+)
+def test_hill_sphere_radius(id_, exists):
+    """Verify hill_sphere_radius parameter access."""
+
+    rock = rocks.Rock(id_)
+
+    if exists:
+        assert isinstance(rock.hill_sphere_radius.value, float)
+        assert np.isfinite(rock.hill_sphere_radius.value)
+        assert rock.hill_sphere_radius
+    else:
+        assert not rock.hill_sphere_radius
+
+
+def test_hill_sphere_radius_schema_v120():
+    """Verify HillSphereRadius parses both dict and empty-string forms."""
+
+    eos = load_ssocard_from_test_data("Eos")
+    value = eos["parameters"]["physical"]["hill_sphere_radius"]
+    hsr = HillSphereRadius.model_validate(value)
+    assert np.isfinite(hsr.value)
+
+    missing = HillSphereRadius.model_validate("")
+    assert not missing
+
+
+def test_ellipsoid():
+    """Verify ellipsoid parameter access for known and unknown cases."""
+
+    ceres = rocks.Rock(1)
+    assert np.isfinite(ceres.ellipsoid.a_b.value)
+    assert np.isfinite(ceres.ellipsoid.a_c.value)
+    assert np.isfinite(ceres.ellipsoid.b_c.value)
+
+    eos = rocks.Rock(221)
+    assert not eos.ellipsoid.a_b
+    assert not eos.ellipsoid.a_c
+    assert not eos.ellipsoid.b_c
+
+
+def test_ellipsoid_schema_v120():
+    """Verify Ellipsoid parses both dictionary and empty-string forms."""
+
+    ceres = load_ssocard_from_test_data("Ceres")
+    value = ceres["parameters"]["physical"]["ellipsoid"]
+    ellipsoid = Ellipsoid.model_validate(value)
+    assert np.isfinite(ellipsoid.a_b.value)
+
+    missing = Ellipsoid.model_validate("")
+    assert not missing.a_b
 
 
 
