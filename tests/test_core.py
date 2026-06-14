@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import rocks
-from rocks.core import Spin
+from rocks.core import OrbitalElements, Spin
 
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
@@ -190,6 +190,28 @@ def test_spin(id_, exists):
         spin = Spin.model_validate({})
         assert not spin.period
         assert not spin.period_flag
+
+
+def test_orbital_elements():
+    """Verify OrbitalElements parses v1.2.0 dynamical fields."""
+
+    card = load_ssocard_from_test_data("Eos")
+    entry = card["parameters"]["dynamical"]["orbital_elements"]
+    oe = OrbitalElements.model_validate(entry)
+
+    assert isinstance(oe.number_observations.value, int)
+    assert oe.number_observation is oe.number_observations
+    assert np.isfinite(oe.ceu_epoch.value)
+    assert np.isfinite(oe.pericenter_date.value)
+    assert oe.ref_center.value
+    assert oe.ref_plane.value
+    assert oe.ref_epoch_timescale.value
+
+    missing = OrbitalElements.model_validate({})
+    assert missing.number_observations.value is None
+    assert not missing.ceu_epoch
+    assert not missing.pericenter_date
+    assert not missing.ref_center
 
 
 
