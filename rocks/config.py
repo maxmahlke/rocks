@@ -45,6 +45,8 @@ ALIASES = {
         "parameters.physical.colors": "color",
         "parameters.physical.diameter": "diameter",
         "parameters.physical.density": "density",
+        "parameters.physical.ellipsoid": "ellipsoid",
+        "parameters.physical.hill_sphere_radius": "hill_sphere_radius",
         "parameters.physical.mass": "mass",
         "parameters.physical.phase_function": "phase_function",
         "parameters.physical.spin": "spin",

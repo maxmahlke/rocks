@@ -808,6 +808,49 @@ class Mass(FloatValue):
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
+class HillSphereRadius(FloatValue):
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
+
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        if values in (None, ""):
+            return {}
+        return values
+
+    @pydantic.model_validator(mode="after")
+    def _add_paths(cls, values):
+        return add_paths(
+            cls, values, "parameters.physical.hill_sphere_radius.hill_sphere_radius"
+        )
+
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+
+class Ellipsoid(Parameter):
+    a_b: FloatValue = pydantic.Field(FloatValue(**{}), alias="a/b")
+    a_c: FloatValue = pydantic.Field(FloatValue(**{}), alias="a/c")
+    b_c: FloatValue = pydantic.Field(FloatValue(**{}), alias="b/c")
+    links: LinksParameter = LinksParameter(**{})
+    method: List[Method] = [Method(**{})]
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
+
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        if values in (None, ""):
+            return {}
+        return values
+
+    @pydantic.model_validator(mode="after")
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "parameters.physical.ellipsoid")
+
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+
 class Phase(Parameter):
     id_filter: StringValue = StringValue(**{})
     H: FloatValue = FloatValue(**{})
@@ -1108,6 +1151,8 @@ class PhysicalParameters(Parameter):
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
     diameter: Diameter = Diameter(**{})
+    hill_sphere_radius: HillSphereRadius = HillSphereRadius(**{})
+    ellipsoid: Ellipsoid = Ellipsoid(**{})
     taxonomy: Taxonomy = Taxonomy(**{})
     phase_function: PhaseFunction = pydantic.Field(
         PhaseFunction(**{}), alias="phase_functions"
