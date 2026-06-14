@@ -469,7 +469,11 @@ class Family(Parameter):
 class MOID(Parameter):
     mercury: FloatValue = pydantic.Field(FloatValue(**{}), alias="Mercury")
     venus: FloatValue = pydantic.Field(FloatValue(**{}), alias="Venus")
-    emb: FloatValue = pydantic.Field(FloatValue(**{}), alias="EMB")
+    emb: FloatValue = pydantic.Field(
+        FloatValue(**{}),
+        alias="Earth",
+        validation_alias=pydantic.AliasChoices("Earth", "EMB"),
+    )
     mars: FloatValue = pydantic.Field(FloatValue(**{}), alias="Mars")
     jupiter: FloatValue = pydantic.Field(FloatValue(**{}), alias="Jupiter")
     saturn: FloatValue = pydantic.Field(FloatValue(**{}), alias="Saturn")
@@ -477,6 +481,12 @@ class MOID(Parameter):
     neptune: FloatValue = pydantic.Field(FloatValue(**{}), alias="Neptune")
     method: List[Method] = [Method(**{})]
     links: LinksParameter = LinksParameter(**{})
+
+    @property
+    def earth(self):
+        """Alias for emb to match v1.2.0 naming."""
+
+        return self.emb
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
