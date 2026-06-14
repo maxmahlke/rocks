@@ -319,11 +319,15 @@ class OrbitalElements(Parameter):
     """parameters.dynamical.oribtal_elements"""
 
     ceu: FloatValue = FloatValue(**{})
+    ceu_epoch: FloatValue = FloatValue(**{})
     links: LinksParameter = LinksParameter(**{})
     author: StringValue = StringValue(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
     ceu_rate: FloatValue = FloatValue(**{})
     ref_epoch: FloatValue = FloatValue(**{})
+    ref_epoch_timescale: StringValue = StringValue(**{})
+    ref_plane: StringValue = StringValue(**{})
+    ref_center: StringValue = StringValue(**{})
     inclination: FloatValue = FloatValue(**{})
     mean_motion: FloatValue = FloatValue(**{})
     orbital_arc: IntegerValue = IntegerValue(**{})
@@ -333,9 +337,44 @@ class OrbitalElements(Parameter):
     orbital_period: FloatValue = FloatValue(**{})
     semi_major_axis: FloatValue = FloatValue(**{})
     apoapsis_distance: FloatValue = FloatValue(**{})
-    number_observation: IntegerValue = IntegerValue(**{})
+    number_observations: IntegerValue = pydantic.Field(
+        IntegerValue(**{}),
+        validation_alias=pydantic.AliasChoices(
+            "number_observations", "number_observation"
+        ),
+    )
     periapsis_argument: FloatValue = FloatValue(**{})
     periapsis_distance: FloatValue = FloatValue(**{})
+    pericenter_date: FloatValue = FloatValue(**{})
+
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        """Normalize raw v1.2.0 orbital elements into Value-like dictionaries."""
+
+        if not isinstance(values, dict):
+            return values
+
+        normalized = dict(values)
+
+        for key in ["author", "ref_epoch_timescale", "ref_plane", "ref_center"]:
+            if key in normalized and normalized[key] is not None and not isinstance(
+                normalized[key], dict
+            ):
+                normalized[key] = {"value": normalized[key]}
+
+        for key in ["orbital_arc", "number_observations", "number_observation"]:
+            if key in normalized and normalized[key] is not None and not isinstance(
+                normalized[key], dict
+            ):
+                normalized[key] = {"value": int(normalized[key])}
+
+        return normalized
+
+    @property
+    def number_observation(self):
+        """Backward-compatible alias for number_observations."""
+
+        return self.number_observations
 
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
