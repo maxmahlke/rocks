@@ -357,14 +357,18 @@ class OrbitalElements(Parameter):
         normalized = dict(values)
 
         for key in ["author", "ref_epoch_timescale", "ref_plane", "ref_center"]:
-            if key in normalized and normalized[key] is not None and not isinstance(
-                normalized[key], dict
+            if (
+                key in normalized
+                and normalized[key] is not None
+                and not isinstance(normalized[key], dict)
             ):
                 normalized[key] = {"value": normalized[key]}
 
         for key in ["orbital_arc", "number_observations", "number_observation"]:
-            if key in normalized and normalized[key] is not None and not isinstance(
-                normalized[key], dict
+            if (
+                key in normalized
+                and normalized[key] is not None
+                and not isinstance(normalized[key], dict)
             ):
                 normalized[key] = {"value": int(normalized[key])}
 
@@ -955,7 +959,9 @@ class PhaseFunction(Parameter):
             name = config.ALIASES["phase_function"][name]
 
         if name in type(self)._LEGACY_FIELD_TO_FILTER:
-            return self.entries.get(type(self)._LEGACY_FIELD_TO_FILTER[name], Phase(**{}))
+            return self.entries.get(
+                type(self)._LEGACY_FIELD_TO_FILTER[name], Phase(**{})
+            )
 
         if name in self.entries:
             return self.entries[name]
@@ -1054,15 +1060,29 @@ class Spin(Parameter):
         if "id_spin" in normalized and not isinstance(normalized["id_spin"], dict):
             normalized["id_spin"] = {"value": int(normalized["id_spin"])}
 
-        for key in ["t0", "W0", "Wp", "lat", "RA0", "DEC0", "long", "period", "obliquity"]:
-            if key in normalized and normalized[key] is not None and not isinstance(
-                normalized[key], dict
+        for key in [
+            "t0",
+            "W0",
+            "Wp",
+            "lat",
+            "RA0",
+            "DEC0",
+            "long",
+            "period",
+            "obliquity",
+        ]:
+            if (
+                key in normalized
+                and normalized[key] is not None
+                and not isinstance(normalized[key], dict)
             ):
                 normalized[key] = {"value": float(normalized[key])}
 
         for key in ["technique", "period_type", "period_flag"]:
-            if key in normalized and normalized[key] is not None and not isinstance(
-                normalized[key], dict
+            if (
+                key in normalized
+                and normalized[key] is not None
+                and not isinstance(normalized[key], dict)
             ):
                 normalized[key] = {"value": normalized[key]}
 
@@ -1354,6 +1374,12 @@ class Rock(pydantic.BaseModel):
 
         # Deserialize the asteroid data
         try:
+            if ssocard["ssocard"]["version"] < "1.2.0":
+                raise ValueError(
+                    f"Unsupported ssoCard version {ssocard['ssocard']['version']}.\n"
+                    "Please update your ssoCard to version 1.2.0 or later using `rocks status` -> `Clear cache`."
+                )
+
             super().__init__(**ssocard)  # type: ignore
         except pydantic.ValidationError as message:
             self.__parse_error_message(message, id_, ssocard)
