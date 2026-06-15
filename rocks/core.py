@@ -1092,6 +1092,17 @@ class Taxonomy(Parameter):
     technique: StringValue = StringValue(**{})
     waverange: StringValue = StringValue(**{})
 
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        """Wrap raw v1.2.0 string leaves into StringValue-compatible dicts."""
+        if not isinstance(values, dict):
+            return values
+        normalized = dict(values)
+        for key in ["class", "scheme", "complex", "technique", "waverange"]:
+            if key in normalized and not isinstance(normalized[key], dict):
+                normalized[key] = {"value": normalized[key]}
+        return normalized
+
     def __bool__(self):
         return bool(self.class_.value)
 
@@ -1146,7 +1157,10 @@ class AbsoluteMagnitude(FloatValue):
 
 class PhysicalParameters(Parameter):
     mass: Mass = Mass(**{})
-    spin: ListWithAttributes = [Spin(**{})]
+    spin: ListWithAttributes = pydantic.Field(
+        [Spin(**{})],
+        validation_alias=pydantic.AliasChoices("spins", "spin"),
+    )
     color: Color = pydantic.Field(Color(**{}), alias="colors")
     albedo: Albedo = Albedo(**{})
     density: Density = Density(**{})
@@ -1160,9 +1174,13 @@ class PhysicalParameters(Parameter):
     thermal_inertia: ThermalInertia = ThermalInertia(**{})
     absolute_magnitude: AbsoluteMagnitude = AbsoluteMagnitude(**{})
 
-    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
-        "spin", mode="before"
-    )(lambda list_: ListWithAttributes([Spin(**element) for element in list_]))
+    @pydantic.field_validator("spin", mode="before")
+    def _parse_spin(cls, value):
+        """Accept both the old postprocessed 'spin' list and raw v1.2.0 'spins' list."""
+        if isinstance(value, list):
+            return ListWithAttributes([Spin(**element) for element in value])
+        # Empty string (missing spin in v1.2.0) or None
+        return ListWithAttributes([Spin(**{})])
 
 
 # ------

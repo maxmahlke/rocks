@@ -117,8 +117,6 @@ async def _local_or_remote(id_ssodnet, session, progress_bar, progress, local):
     card = await _query_ssodnet(id_ssodnet, session)
 
     if card is not None:
-        card = _postprocess_ssocard(card)
-
         if not config.CACHELESS:
             with open(PATH_CARD, "w") as file_card:
                 json.dump(card, file_card)
@@ -162,60 +160,6 @@ async def _query_ssodnet(id_ssodnet, session):
         return None
 
     return response_json
-
-
-def _postprocess_ssocard(card):
-    """Apply ssoCard structure improvements for pydantic deserialization."""
-
-    def make_dict(values):
-        """Turn lower-level dict values into dicts."""
-        for key, value in values.items():
-            if isinstance(value, dict):
-                make_dict(value)
-            else:
-                # These keys are not touched, they don't have metadata
-                if key in [
-                    "bibref",
-                    "method",
-                    "value",
-                    "error",
-                    "min",
-                    "max",
-                    "links",
-                    "datacloud",
-                    "selection",
-                ]:
-                    continue
-                # Turn non-dict value into dict for merging with metadata
-                values[key] = {"value": value}
-        return values
-
-    # Turn low-level parameters into dictionaries
-    card["parameters"] = make_dict(card["parameters"])
-
-    # ------
-    # Convert spin to list
-    if "spins" not in card["parameters"]["physical"]:
-        card["parameters"]["physical"]["spins"] = {}
-
-    spins = card["parameters"]["physical"]["spins"]
-    spin_solutions = []
-
-    for key, spin in spins.items():
-        # spin entries have integer ids
-        if not key.isnumeric():
-            continue
-
-        # convert the spin key to an entry in the solution dict
-        spin["id_"] = {
-            "value": key,
-        }
-
-        spin_solutions.append(spin)
-    card["parameters"]["physical"]["spin"] = spin_solutions
-    del card["parameters"]["physical"]["spins"]
-
-    return card
 
 
 # ------
