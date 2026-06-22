@@ -7,10 +7,11 @@ from rocks import ssodnet
 PATH = config.PATH_CACHE / "ssoBFT-latest_Asteroid.parquet"
 
 COLUMNS = [
-    "sso_id",
-    "sso_number",
-    "sso_name",
-    "sso_class",
+    "id",
+    "number",
+    "name",
+    "class",
+    "children",
     "orbital_elements.semi_major_axis.value",
     "orbital_elements.eccentricity.value",
     "orbital_elements.inclination.value",
@@ -24,13 +25,11 @@ COLUMNS = [
     "family.family_name",
     "pair.sibling_number",
     "pair.sibling_name",
-    "pair.distance",
     "pair.age.value",
     "yarkovsky.dadt.value",
     "yarkovsky.A2.value",
-    "yarkovsky.S",
     "albedo.value",
-    "absolute_magnitude.value",
+    "absolute_magnitude.H.value",
     "density.value",
     "diameter.value",
     "mass.value",
@@ -39,7 +38,7 @@ COLUMNS = [
     "taxonomy.waverange",
     "taxonomy.technique",
     "thermal_inertia.value",
-    "spins.1.period.value",
+    "spins.period.value",
 ]
 
 
