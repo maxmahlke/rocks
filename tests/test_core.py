@@ -227,12 +227,19 @@ def test_moid():
     legacy = MOID.model_validate({"EMB": {"value": 0.123}})
     assert np.isclose(legacy.emb.value, 0.123)
 
+def test_absolute_magnitude():
+    """Verify absolute magnitude parses correctely."""
+
+    card = load_ssocard_from_test_data("Ceres")
+    ceres = rocks.Rock(1, ssocard=card)
+
+    assert np.isfinite(ceres.absolute_magnitude.H.value)
+    assert np.isfinite(ceres.absolute_magnitude.G.value)
+
 
 # Hill sphere radius
 HSR_EXISTS = [221, 1]
 HSR_MISSING = [594721]
-
-
 @pytest.mark.parametrize(
     "id_, exists",
     [(id_, True) for id_ in HSR_EXISTS] + [(id_, False) for id_ in HSR_MISSING],  # type: ignore
