@@ -1160,7 +1160,8 @@ class ThermalInertia(FloatValue):
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
 
 
-class AbsoluteMagnitude(FloatValue):
+class AbsoluteMagnitude(Parameter):
+    H: FloatValue = FloatValue(**{})
     G: FloatValue = FloatValue(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
 
@@ -1169,6 +1170,17 @@ class AbsoluteMagnitude(FloatValue):
         return add_paths(
             cls, values, "parameters.physical.absolute_magnitude.absolute_magnitude"
         )
+
+    def __bool__(self):
+        return bool(self.H.value)
+
+    def __str__(self):
+        if not self.H.value:
+            return "No absolute magnitude on record."
+        return f"H={self.H.value}+-{self.H.error_} G={self.G.value}+-{self.G.error_}"
+
+    def __rich__(self):
+        return self.__str__()
 
     _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
         "bibref", mode="before"
