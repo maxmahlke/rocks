@@ -850,6 +850,21 @@ class Ellipsoid(Parameter):
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.physical.ellipsoid")
 
+    def __bool__(self):
+        return any(
+            np.isfinite(getattr(self, axis).value) for axis in ["a_b", "a_c", "b_c"]
+        )
+
+    def __str__(self):
+        if self.__bool__():
+            return (
+                f"a/b: {self.a_b.value:.2f}  a/c: {self.a_c.value:.2f}  b/c: {self.b_c.value:.2f}"
+            )
+        return "No ellipsoid on record."
+
+    def __rich__(self):
+        return self.__str__()
+
     _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
         "bibref", mode="before"
     )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
