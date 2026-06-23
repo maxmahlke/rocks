@@ -29,6 +29,7 @@ requests = ">=2.26.0"
 Levenshtein = ">=0.16.0"
 platformdirs = ">=2.6.2"
 rapidfuzz = ">=3"
+pyarrow = ">=24"
 
 [tool.poetry.extras]
 docs = [
