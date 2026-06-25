@@ -256,6 +256,21 @@ DATACLOUD = {
             "method",
         ],
     },
+    "polarimetric_observations": {
+        "attr_name": "polarimetric_observations",
+        "ssodnet_name": "polarimetric_observations",
+        "print_columns": [
+            "pr",
+            "err_pr",
+            "name_filter",
+            "jd_obs",
+            "observatory",
+            "instrument",
+            "observer",
+            "method",
+            "shortbib",
+        ],
+    },
     "phase_functions": {
         "attr_name": "phase_functions",
         "ssodnet_name": "phase_function",

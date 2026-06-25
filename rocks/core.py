@@ -1295,6 +1295,9 @@ class Rock(pydantic.BaseModel):
     mpcatobs: dc.Mpcatobs = dc.Mpcatobs(**{})
     mpcorb: dc.Mpcorb = dc.Mpcorb(**{})
     pairs: dc.Pairs = dc.Pairs(**{})
+    polarimetric_observations: dc.Polarimetric_observations = (
+        dc.Polarimetric_observations(**{})
+    )
     proper_elements_: dc.Proper_elements = dc.Proper_elements(**{})
     phase_functions: dc.Phase_function = dc.Phase_function(**{})
     taxonomies: dc.Taxonomies = dc.Taxonomies(**{})

@@ -671,6 +671,35 @@ class Pairs(Collection):
     iddataset: List[Optional[int]] = [None]
 
 
+class Polarimetric_observations(Collection):
+    """Compilation of measurements of linear polarization degrees."""
+
+    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
+    number: List[Optional[str]] = pydantic.Field([""], alias="num")
+    name: List[Optional[str]] = [""]
+    type: List[Optional[str]] = [""]
+    pr: List[Optional[float]] = [np.nan]
+    err_pr: List[Optional[float]] = [np.nan]
+    observatory: List[Optional[str]] = [""]
+    site: List[Optional[str]] = [""]
+    telescope: List[Optional[str]] = [""]
+    instrument: List[Optional[str]] = [""]
+    observer: List[Optional[str]] = [""]
+    jd_obs: List[Optional[float]] = [np.nan]
+    name_filter: List[Optional[str]] = [""]
+    id_filter: List[Optional[str]] = [""]
+    selection: List[Optional[int]] = [None]
+    method: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
+
+    @pydantic.model_validator(mode="before")
+    def _convert_observer_to_str(cls, values):
+        if "observer" in values:
+            values["observer"] = [str(o) for o in values["observer"]]
+
+        return values
+
+
 class Spin(Collection):
     """Database of Sso spin coordiantes"""
 
@@ -716,6 +745,20 @@ class Yarkovsky(Collection):
     err_dadt: List[Optional[float]] = [np.nan]
     snr: List[Optional[float]] = [np.nan]
     S: List[Optional[float]] = [np.nan]
+    selection: List[Optional[int]] = [None]
+    method: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
+
+
+class Yorp(Collection):
+    """Database of Sso Yorp effect"""
+
+    id_: List[Optional[int]] = pydantic.Field([None], alias="id")
+    number: List[Optional[int]] = pydantic.Field([None], alias="num")
+    name: List[Optional[str]] = [""]
+    yorp: List[Optional[float]] = [np.nan]
+    err_up: List[Optional[float]] = [np.nan]
+    err_low: List[Optional[float]] = [np.nan]
     selection: List[Optional[int]] = [None]
     method: List[Optional[str]] = [""]
     iddataset: List[Optional[int]] = [None]
