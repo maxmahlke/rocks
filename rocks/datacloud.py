@@ -1,7 +1,7 @@
 """Implement the Datacloud catalogue pydantic models."""
 
 import re
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import numpy as np
 import pandas as pd
@@ -512,6 +512,12 @@ class Diamalbedo(Collection):
     err_emissivity: List[Optional[float]] = [np.nan]
     selection: List[Optional[int]] = [None]
     method: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
+    ref_diameter: List[Optional[float]] = [np.nan]
+    err_ref_diameter_up: List[Optional[float]] = [np.nan]
+    err_ref_diameter_down: List[Optional[float]] = [np.nan]
+    type_diameter: List[Optional[str]] = [""]
+    type_albedo: List[Optional[str]] = [""]
     bibcode: List[Optional[str]] = [""]
 
     preferred_albedo: List[bool] = [False]
@@ -552,6 +558,10 @@ class Masses(Collection):
     method: List[Optional[str]] = [""]
     selection: List[Optional[int]] = [None]
     iddataset: List[Optional[int]] = [None]
+    ref_mass: List[Optional[float]] = [np.nan]
+    err_ref_mass_up: List[Optional[float]] = [np.nan]
+    err_ref_mass_down: List[Optional[float]] = [np.nan]
+    type_mass: List[Optional[str]] = [""]
 
     preferred: List[bool] = [False]
 
@@ -576,6 +586,7 @@ class Taxonomies(Collection):
     method: List[Optional[str]] = [""]
     shortbib: List[Optional[str]] = [""]
     waverange: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
 
     preferred: List[bool] = [False]
 
@@ -635,6 +646,7 @@ class Phase_function(Collection):
     facility: List[Optional[str]] = [""]
     name_filter: List[Optional[str]] = [""]
     id_filter: List[Optional[str]] = [""]
+    method: List[Optional[str]] = [""]
     selection: List[Optional[int]] = [None]
     iddataset: List[Optional[int]] = [None]
 
@@ -712,14 +724,14 @@ class Spin(Collection):
     t0: List[Optional[float]] = [np.nan]
     W0: List[Optional[float]] = [np.nan]
     Wp: List[Optional[float]] = [np.nan]
+    err_Wp: List[Optional[float]] = [np.nan]
     RA0: List[Optional[float]] = [np.nan]
     DEC0: List[Optional[float]] = [np.nan]
     err_RA0: List[Optional[float]] = [np.nan]
     err_DEC0: List[Optional[float]] = [np.nan]
     period: List[Optional[float]] = [np.nan]
     err_period: List[Optional[float]] = [np.nan]
-    # NOTE: period_flag type should be str only, current datacloud issue
-    period_flag: List[Optional[Union[str, int]]] = [""]
+    period_flag: List[Optional[str]] = [""]
     period_type: List[Optional[str]] = [""]
     long_: List[Optional[float]] = pydantic.Field([np.nan], alias="long")
     lat: List[Optional[float]] = [np.nan]
@@ -727,7 +739,7 @@ class Spin(Collection):
     err_lat: List[Optional[float]] = [np.nan]
     selection: List[Optional[int]] = [None]
     method: List[Optional[str]] = [""]
-    iddataset: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
 
     # pydantic does not like attributes with "model_" prefix
     model_config = pydantic.ConfigDict(protected_namespaces=())
