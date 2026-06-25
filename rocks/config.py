@@ -324,4 +324,15 @@ DATACLOUD = {
             "shortbib",
         ],
     },
+    "yorps": {
+        "attr_name": "yorps",
+        "ssodnet_name": "yorp",
+        "print_columns": [
+            "yorp",
+            "err_up",
+            "err_low",
+            "method",
+            "shortbib",
+        ],
+    },
 }

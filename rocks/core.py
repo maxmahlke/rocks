@@ -1301,6 +1301,7 @@ class Rock(pydantic.BaseModel):
     thermal_inertias: dc.Thermal_inertia = dc.Thermal_inertia(**{})
     spins: dc.Spin = dc.Spin(**{})
     yarkovskys: dc.Yarkovsky = dc.Yarkovsky(**{})
+    yorps: dc.Yorp = dc.Yorp(**{})
 
     def __init__(
         self,
