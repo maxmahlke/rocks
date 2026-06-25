@@ -161,6 +161,22 @@ DATACLOUD = {
             "shortbib",
         ],
     },
+    "ellipsoids": {
+        "attr_name": "ellipsoids",
+        "ssodnet_name": "ellipsoids",
+        "print_columns": [
+            "a_b",
+            "err_a_b_up",
+            "err_a_b_low",
+            "a_c",
+            "err_a_c_up",
+            "err_a_c_low",
+            "b_c",
+            "err_b_c_up",
+            "err_b_c_low",
+            "method",
+        ],
+    },
     "diamalbedo": {
         "attr_name": "diamalbedo",
         "ssodnet_name": "diamalbedo",

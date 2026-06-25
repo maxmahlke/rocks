@@ -1289,6 +1289,7 @@ class Rock(pydantic.BaseModel):
     colors: dc.Colors = dc.Colors(**{})
     densities: dc.Density = dc.Density(**{})
     diamalbedo: dc.Diamalbedo = dc.Diamalbedo(**{})
+    ellipsoids: dc.Ellipsoids = dc.Ellipsoids(**{})
     families: dc.Families = dc.Families(**{})
     masses: dc.Masses = dc.Masses(**{})
     mpcatobs: dc.Mpcatobs = dc.Mpcatobs(**{})
@@ -1298,7 +1299,6 @@ class Rock(pydantic.BaseModel):
     phase_functions: dc.Phase_function = dc.Phase_function(**{})
     taxonomies: dc.Taxonomies = dc.Taxonomies(**{})
     thermal_inertias: dc.Thermal_inertia = dc.Thermal_inertia(**{})
-    shapes: dc.Shape = dc.Shape(**{})
     spins: dc.Spin = dc.Spin(**{})
     yarkovskys: dc.Yarkovsky = dc.Yarkovsky(**{})
 

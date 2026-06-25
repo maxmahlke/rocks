@@ -822,23 +822,26 @@ class Mpcatobs(Collection):
         return [str(v) for v in values]
 
 
-class Shape(Collection):
-    """Database of Sso triaxial ellipsoid and shape models"""
+class Ellipsoids(Collection):
+    """Ellipsoids database from literature"""
 
     id_: List[Optional[int]] = pydantic.Field([None], alias="id")
-    iddataset: List[Optional[int]] = [None]
     number: List[Optional[int]] = pydantic.Field([None], alias="num")
     name: List[Optional[str]] = [""]
-    model_dbid: List[Optional[str]] = [""]
-    model_name: List[Optional[str]] = [""]
-    model_id: List[Optional[str]] = [""]
-    scaled: List[Optional[int]] = [None]
-    radius_a: List[Optional[float]] = [np.nan]
-    radius_b: List[Optional[float]] = [np.nan]
-    radius_c: List[Optional[float]] = [np.nan]
-    selected: List[Optional[int]] = [None]
-
-    model_config = pydantic.ConfigDict(protected_namespaces=())
+    a_b: List[Optional[float]] = [np.nan]
+    err_a_b_up: List[Optional[float]] = [np.nan]
+    err_a_b_low: List[Optional[float]] = [np.nan]
+    a_c: List[Optional[float]] = [np.nan]
+    err_a_c_up: List[Optional[float]] = [np.nan]
+    err_a_c_low: List[Optional[float]] = [np.nan]
+    b_c: List[Optional[float]] = [np.nan]
+    err_b_c_up: List[Optional[float]] = [np.nan]
+    err_b_c_low: List[Optional[float]] = [np.nan]
+    ref_a: List[Optional[float]] = [np.nan]
+    err_a: List[Optional[float]] = [np.nan]
+    selection: List[Optional[int]] = [None]
+    method: List[Optional[str]] = [""]
+    iddataset: List[Optional[int]] = [None]
 
 
 def weighted_average(catalogue, parameter):
