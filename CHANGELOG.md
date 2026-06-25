@@ -1,3 +1,6 @@
+# 1.10 - 2026-06-25
+- BREAKING CHANGE: Implement ssoCard version 1.2.0 - cards in the older format will no longer work. Run rocks status to update your cached data.
+
 # 1.9.16 - 2026-03-22
 - Add support for np.int64 and np.float64 in rocks.id (#47)
 
