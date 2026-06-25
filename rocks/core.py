@@ -1242,6 +1242,24 @@ class EqStateVector(Parameter):
         return add_paths(cls, values, "parameters.eq_state_vector")
 
 
+class ObservationData(Parameter):
+    links: LinksParameter = LinksParameter(**{})
+    bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
+
+    _convert_list_to_parameterlist: classmethod = pydantic.field_validator(
+        "bibref", mode="before"
+    )(lambda list_: ListWithAttributes([Bibref(**element) for element in list_]))
+
+
+class Observations(Parameter):
+    astrometric: ObservationData = ObservationData(**{})
+    polarimetric: ObservationData = ObservationData(**{})
+
+    @pydantic.model_validator(mode="after")
+    def _add_paths(cls, values):
+        return add_paths(cls, values, "observations")
+
+
 # ------
 # Highest level branches
 class Parameters(Parameter):
@@ -1278,6 +1296,7 @@ class Rock(pydantic.BaseModel):
 
     # the heart
     parameters: Parameters = Parameters(**{})
+    observations: Observations = Observations(**{})
 
     # the meta
     links: Links = Links(**{})
