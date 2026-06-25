@@ -6,7 +6,14 @@ import numpy as np
 import pytest
 
 import rocks
-from rocks.core import Ellipsoid, HillSphereRadius, MOID, OrbitalElements, Spin
+from rocks.core import (
+    Ellipsoid,
+    HillSphereRadius,
+    MOID,
+    Observations,
+    OrbitalElements,
+    Spin,
+)
 
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
@@ -235,6 +242,83 @@ def test_absolute_magnitude():
 
     assert np.isfinite(ceres.absolute_magnitude.H.value)
     assert np.isfinite(ceres.absolute_magnitude.G.value)
+
+
+def test_observations_branch():
+    """Verify top-level observations branch parsing."""
+
+    observations = Observations.model_validate(
+        {
+            "astrometric": {
+                "links": {"datacloud": "https://ssp.imcce.fr/ws/astrometric"},
+                "bibref": [
+                    {
+                        "shortbib": "Carry+ 2025",
+                        "title": "Astrometric observations",
+                        "year": 2025,
+                        "bibcode": "2025A&A...000A...1C",
+                        "doi": "10.0000/example",
+                    }
+                ],
+            },
+            "polarimetric": {
+                "links": {"datacloud": "https://ssp.imcce.fr/ws/polarimetric"},
+                "bibref": [
+                    {
+                        "shortbib": "Mahlke+ 2026",
+                        "title": "Polarimetric observations",
+                        "year": 2026,
+                        "bibcode": "2026A&A...000A...2M",
+                        "doi": "10.0000/example2",
+                    }
+                ],
+            },
+        }
+    )
+
+    assert observations.astrometric.links.datacloud.endswith("/astrometric")
+    assert observations.polarimetric.links.datacloud.endswith("/polarimetric")
+    assert observations.astrometric.bibref[0].shortbib == "Carry+ 2025"
+    assert observations.polarimetric.bibref[0].shortbib == "Mahlke+ 2026"
+
+
+def test_rock_observations_from_ssocard():
+    """Verify Rock deserializes observations at top-level from provided ssoCard."""
+
+    card = load_ssocard_from_test_data("Ceres")
+    card["observations"] = {
+        "astrometric": {
+            "links": {"datacloud": "https://ssp.imcce.fr/ws/astrometric"},
+            "bibref": [
+                {
+                    "shortbib": "Carry+ 2025",
+                    "title": "Astrometric observations",
+                    "year": 2025,
+                    "bibcode": "2025A&A...000A...1C",
+                    "doi": "10.0000/example",
+                }
+            ],
+        },
+        "polarimetric": {
+            "links": {"datacloud": "https://ssp.imcce.fr/ws/polarimetric"},
+            "bibref": [
+                {
+                    "shortbib": "Mahlke+ 2026",
+                    "title": "Polarimetric observations",
+                    "year": 2026,
+                    "bibcode": "2026A&A...000A...2M",
+                    "doi": "10.0000/example2",
+                }
+            ],
+        },
+    }
+
+    rock = rocks.Rock(1, ssocard=card)
+
+    assert rock.observations.astrometric.links.datacloud.endswith("/astrometric")
+    assert rock.observations.polarimetric.links.datacloud.endswith("/polarimetric")
+    assert rock.observations.astrometric.bibref[0].shortbib == "Carry+ 2025"
+    assert rock.observations.polarimetric.bibref[0].shortbib == "Mahlke+ 2026"
 
 
 # Hill sphere radius
