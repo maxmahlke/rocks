@@ -395,8 +395,8 @@ class OrbitalElements(Parameter):
 class ProperElements(Parameter):
     links: LinksParameter = LinksParameter(**{})
     bibref: ListWithAttributes = ListWithAttributes([Bibref(**{})])
-    lyapunov_time: FloatValue = FloatValue(**{})
-    integration_time: FloatValue = FloatValue(**{})
+    lyapunov_time: IntegerValue = IntegerValue(**{})
+    integration_time: IntegerValue = IntegerValue(**{})
     proper_eccentricity: FloatValue = FloatValue(**{})
     proper_inclination: FloatValue = FloatValue(**{})
     proper_semi_major_axis: FloatValue = FloatValue(**{})
@@ -1469,9 +1469,7 @@ class Rock(pydantic.BaseModel):
                             except KeyError:
                                 pass
                 else:
-                    print(offending_part)
                     for location in error["loc"][:-1]:
-                        print(location)
                         offending_part = offending_part[location]
 
                     del offending_part[error["loc"][-1]]
