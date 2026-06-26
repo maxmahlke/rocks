@@ -1,4 +1,7 @@
-# 1.10 - 2026-06-26
+# 1.10.1 - 2026-06-26
+- Fixed minor issues in ssoCard and datacloud parsing
+
+# 1.10.0 - 2026-06-26
 - BREAKING CHANGE: Implement ssoCard version 1.2.0 - cards in the older format will no longer work. Run rocks status to update your cached data. Refer to https://ssp.imcce.fr/webservices/ssodnet/changelog/ for more information.
 
 # 1.9.16 - 2026-03-22
