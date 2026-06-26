@@ -298,7 +298,7 @@ DATACLOUD = {
     },
     "spins": {
         "attr_name": "spins",
-        "ssodnet_name": "spin",
+        "ssodnet_name": "spins",
         "print_columns": ["period", "long_", "lat", "RA0", "DEC0", "Wp", "shortbib"],
     },
     "taxonomies": {
