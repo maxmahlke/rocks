@@ -637,6 +637,24 @@ class ColorEntry(Parameter):
     id_filter_1: StringValue = StringValue(**{})
     id_filter_2: StringValue = StringValue(**{})
 
+    @pydantic.model_validator(mode="before")
+    def _normalize_observer(cls, values):
+        # If the observer is a string or int, convert it to a dict with a str value key
+        if not isinstance(values, dict) or "observer" not in values:
+            return values
+
+        normalized = dict(values)
+        observer = normalized["observer"]
+
+        if isinstance(observer, int):
+            normalized["observer"] = {"value": str(observer)}
+        elif isinstance(observer, dict) and isinstance(observer.get("value"), int):
+            observer_value = dict(observer)
+            observer_value["value"] = str(observer_value["value"])
+            normalized["observer"] = observer_value
+
+        return normalized
+
     def __bool__(self):
         return bool(np.isfinite(self.color.value))
 
@@ -1451,7 +1469,9 @@ class Rock(pydantic.BaseModel):
                             except KeyError:
                                 pass
                 else:
+                    print(offending_part)
                     for location in error["loc"][:-1]:
+                        print(location)
                         offending_part = offending_part[location]
 
                     del offending_part[error["loc"][-1]]
