@@ -1,3 +1,6 @@
+# 1.10.4 -
+- Add 'children' attribute to Rock (#54)
+
 # 1.10.3 - 2026-07-09
 - Fix conversion of integer error values (#50)
 

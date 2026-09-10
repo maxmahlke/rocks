@@ -1310,6 +1310,7 @@ class Rock(pydantic.BaseModel):
     system: str = ""
     filename: str = ""
     siblings: list = []
+    children: list = []
     is_valid: bool = True
 
     # the heart
