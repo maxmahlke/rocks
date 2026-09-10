@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Test serialization and deserialization of ssoCard and Rock class."""
+
 import json
 
 import numpy as np
@@ -15,15 +16,17 @@ from rocks.core import (
     Spin,
 )
 
+
 # Mock the get_ssocard function to read from test data instead of making remote calls
 def load_ssocard_from_test_data(id_):
-    """Load ssoCard from test data. """
+    """Load ssoCard from test data."""
 
-    USE_UNRELEASED_SSOCARDS = True
+    USE_UNRELEASED_SSOCARDS = False
     PATH_TEST_DATA = "tests/data/1.2.0" if USE_UNRELEASED_SSOCARDS else "tests/data"
 
     with open(f"{PATH_TEST_DATA}/{id_}.json", "r") as f:
         return json.load(f)
+
 
 rocks.ssodnet.get_ssocard = lambda x: load_ssocard_from_test_data(x)
 
@@ -113,6 +116,7 @@ def test_color(id_, exists):
         assert not rock.color
         assert "B-V" not in rock.color
         assert rock.color.get("B-V") is None
+
 
 # Phase
 PHASE_EXISTS = [221]
@@ -234,6 +238,7 @@ def test_moid():
     legacy = MOID.model_validate({"EMB": {"value": 0.123}})
     assert np.isclose(legacy.emb.value, 0.123)
 
+
 def test_absolute_magnitude():
     """Verify absolute magnitude parses correctely."""
 
@@ -324,6 +329,8 @@ def test_rock_observations_from_ssocard():
 # Hill sphere radius
 HSR_EXISTS = [221, 1]
 HSR_MISSING = [594721]
+
+
 @pytest.mark.parametrize(
     "id_, exists",
     [(id_, True) for id_ in HSR_EXISTS] + [(id_, False) for id_ in HSR_MISSING],  # type: ignore
@@ -378,7 +385,6 @@ def test_ellipsoid_schema_v120():
 
     missing = Ellipsoid.model_validate("")
     assert not missing.a_b
-
 
 
 # Taxonomy
