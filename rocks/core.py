@@ -450,7 +450,6 @@ class Family(Parameter):
     method: List[Method] = [Method(**{})]
     family_name: StringValue = StringValue(**{})
     family_number: IntegerValue = IntegerValue(**{})
-    family_status: StringValue = StringValue(**{})
 
     def __rich__(self):
         if self.family_number.value is not None:
