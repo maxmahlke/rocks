@@ -1,5 +1,6 @@
-# 1.10.4 -
+# 1.10.4 - 2026-09-10
 - Add 'children' attribute to Rock (#54)
+- Fix family_name and family_number ingestion
 
 # 1.10.3 - 2026-07-09
 - Fix conversion of integer error values (#50)

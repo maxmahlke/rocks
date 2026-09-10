@@ -885,9 +885,7 @@ class Ellipsoid(Parameter):
 
     def __str__(self):
         if self.__bool__():
-            return (
-                f"a/b: {self.a_b.value:.2f}  a/c: {self.a_c.value:.2f}  b/c: {self.b_c.value:.2f}"
-            )
+            return f"a/b: {self.a_b.value:.2f}  a/c: {self.a_c.value:.2f}  b/c: {self.b_c.value:.2f}"
         return "No ellipsoid on record."
 
     def __rich__(self):
@@ -1453,7 +1451,7 @@ class Rock(pydantic.BaseModel):
 
         # Deserialize the asteroid data
         try:
-            if ssocard["ssocard"]["version"] < "1.2.0":
+            if "ssocard" in ssocard and ssocard["ssocard"]["version"] < "1.2.0":
                 raise ValueError(
                     f"Unsupported ssoCard version {ssocard['ssocard']['version']}.\n"
                     "Please update your ssoCard to version 1.2.0 or later using `rocks status` -> `Clear cache`."
