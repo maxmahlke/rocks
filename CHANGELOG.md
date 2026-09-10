@@ -1,3 +1,6 @@
+# 1.10.5 -
+- Add alias columns for orbital elements in BFT: a, e, i, ap, ep, ip, sinip
+
 # 1.10.4 - 2026-09-10
 - Add 'children' attribute to Rock (#54)
 - Fix family_name and family_number ingestion

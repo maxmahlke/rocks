@@ -41,6 +41,16 @@ COLUMNS = [
     "spins.period.value",
 ]
 
+ALIASES = {
+    "orbital_elements.semi_major_axis.value": "a",
+    "orbital_elements.eccentricity.value": "e",
+    "orbital_elements.inclination.value": "i",
+    "proper_elements.proper_semi_major_axis.value": "ap",
+    "proper_elements.proper_eccentricity.value": "ep",
+    "proper_elements.proper_inclination.value": "ip",
+    "proper_elements.proper_sine_inclination.value": "sinip",
+}
+
 
 def load_bft(full=False, **kwargs):
     """Load the BFT from the cache or optionally from remote.
@@ -78,6 +88,11 @@ def load_bft(full=False, **kwargs):
     LOAD = PATH if not config.CACHELESS else URL
     bft = pd.read_parquet(LOAD, **kwargs)
 
-    if "sso_number" in bft.columns:
-        bft["sso_number"] = bft["sso_number"].astype("Int64")
+    if "number" in bft.columns:
+        bft["number"] = bft["number"].astype("Int64")
+
+    for col, alias in ALIASES.items():
+        if col in bft.columns:
+            bft[alias] = bft[col]
+
     return bft
