@@ -161,7 +161,7 @@ def status(clear, update):
 
         {len(cached_cards)} ssoCards
         {len(cached_catalogues)} datacloud catalogues\n
-        {'1 ssoBFT' if bft.PATH.is_file() else ''}
+        {"1 ssoBFT" if bft.PATH.is_file() else ""}
         Index updated on:  {date_index}\n"""
     )
 
@@ -324,21 +324,11 @@ def debug():
 
 
 def echo():
-    """Echos asteroid parameter to command line. Optionally opens plot."""
+    """Echos asteroid parameter to command line."""
     import keyword
 
     from rocks import core
     from rocks import datacloud
-
-    # Should we plot?
-    for arg in ["-p", "--plot"]:
-        if arg in sys.argv:
-            sys.argv.remove(arg)
-
-            plot = True
-            break
-    else:
-        plot = False
 
     # Verbose output?
     for arg in ["-v", "--verbose"]:
@@ -411,16 +401,6 @@ def echo():
 
                     console = Console(theme=Theme({"repr.number": ""}))
                     console.print(value)
-
-        if plot:
-            if param not in datacloud:
-                print(
-                    "Only datacloud collections can be plotted. "
-                    f"Try the plural of {param}."
-                )
-                sys.exit()
-
-            core.rgetattr(rock, param).plot(param)
 
     # Avoid error message from click
     sys.exit()
