@@ -460,6 +460,17 @@ class Family(Parameter):
     def __bool__(self):
         return bool(self.family_name)
 
+    @pydantic.model_validator(mode="before")
+    def _normalize_values(cls, values):
+        """Wrap raw v1.2.0 string leaves into StringValue-compatible dicts."""
+        if not isinstance(values, dict):
+            return values
+        normalized = dict(values)
+        for key in ["family_name", "family_number"]:
+            if key in normalized and not isinstance(normalized[key], dict):
+                normalized[key] = {"value": normalized[key]}
+        return normalized
+
     @pydantic.model_validator(mode="after")
     def _add_paths(cls, values):
         return add_paths(cls, values, "parameters.dynamical.family")
