@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from pathlib import Path
 
@@ -6,7 +7,10 @@ import rocks
 
 # Change to True to use tests/data/ssoBFT-latest_Asteroid.parquet as the BFT source
 USE_TEST_BFT = True
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
+
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions.")
 def test_load_bft():
     """Load BFT with default columns"""
 
