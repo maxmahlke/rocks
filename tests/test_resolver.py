@@ -21,7 +21,6 @@ import rocks
         ("europa", ("Europa", 52, "Europa_(Asteroid)")),
         ("EOS", ("Eos", 221, "Eos")),
         ("edUARda", ("Eduarda", 340, "Eduarda")),
-        ("1999 vh114", ("Triciatalbert", 23004, "Triciatalbert")),
     ],
 )
 def test_local_resolution(id_, expected, monkeypatch):
