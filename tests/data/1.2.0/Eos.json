@@ -1,0 +1,1853 @@
+{
+    "id": "Eos",
+    "title": "(221) Eos",
+    "name": "Eos",
+    "number": 221,
+    "type": "Asteroid",
+    "class": "MB>Outer",
+    "aliases": [
+        "00221",
+        "1882 BA",
+        "20000221",
+        "221",
+        "I82B00A"
+    ],
+    "system": "Sun",
+    "parent": "Sun",
+    "ephemeris": true,
+    "physical-ephemeris": true,
+    "physical-models": [
+        2,
+        1
+    ],
+    "ssocard": {
+        "version": "1.2.3",
+        "datetime": "2026-06-03T00:00:01+00:00"
+    },
+    "links": {
+        "self": "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=Eos",
+        "metadata": "https://ssp.imcce.fr/data/metadata_asteroid.json"
+    },
+    "parameters": {
+        "dynamical": {
+            "orbital_elements": {
+                "ref_epoch": 2461200.5,
+                "ref_epoch_timescale": "TT",
+                "ref_plane": "Ecliptic",
+                "ref_center": "Heliocenter",
+                "number_observations": 5045,
+                "orbital_arc": 46656,
+                "ceu": {
+                    "value": 0.0087,
+                    "error": {
+                        "min": -0.0001,
+                        "max": 0.0001
+                    }
+                },
+                "ceu_rate": {
+                    "value": 2.0e-5,
+                    "error": {
+                        "min": -1.0e-5,
+                        "max": 1.0e-5
+                    }
+                },
+                "ceu_epoch": 2461192.5,
+                "semi_major_axis": {
+                    "value": 3.0119012,
+                    "error": {
+                        "min": -1.0000000000000002e-7,
+                        "max": 1.0000000000000002e-7
+                    }
+                },
+                "eccentricity": {
+                    "value": 0.10088814,
+                    "error": {
+                        "min": -1.0000000000000002e-8,
+                        "max": 1.0000000000000002e-8
+                    }
+                },
+                "inclination": {
+                    "value": 10.890729,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "node_longitude": {
+                    "value": 141.710985,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "periapsis_argument": {
+                    "value": 192.429023,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "pericenter_date": {
+                    "value": 2461058.887354493,
+                    "error": {
+                        "min": -1.0000000000000003e-9,
+                        "max": 1.0000000000000003e-9
+                    }
+                },
+                "mean_anomaly": {
+                    "value": 26.702076,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "mean_motion": {
+                    "value": 0.18855714406321344,
+                    "error": {
+                        "min": -0.1,
+                        "max": 0.1
+                    }
+                },
+                "orbital_period": {
+                    "value": 1909.235535935518,
+                    "error": {
+                        "min": -1.0000000000000002e-12,
+                        "max": 1.0000000000000002e-12
+                    }
+                },
+                "periapsis_distance": {
+                    "value": 2.70803609,
+                    "error": {
+                        "min": -9.48e-8,
+                        "max": 9.48e-8
+                    }
+                },
+                "apoapsis_distance": {
+                    "value": 3.31576631,
+                    "error": {
+                        "min": -1.14e-7,
+                        "max": 1.14e-7
+                    }
+                },
+                "author": "L.H._Wasserman",
+                "bibref": [
+                    {
+                        "shortbib": "Moskovitz+2022",
+                        "title": "The astorb database at Lowell Observatory",
+                        "year": 2022,
+                        "bibcode": "2022A&C....4100661M",
+                        "doi": "10.1016/j.ascom.2022.100661"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=asteroid_orbits&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=asteroid_orbits:id=135555&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "proper_elements": {
+                "proper_semi_major_axis": {
+                    "value": 3.012585,
+                    "error": {
+                        "min": -4.8e-5,
+                        "max": 4.8e-5
+                    }
+                },
+                "proper_eccentricity": {
+                    "value": 0.074273,
+                    "error": {
+                        "min": -0.00052,
+                        "max": 0.00052
+                    }
+                },
+                "proper_inclination": {
+                    "value": 9.90284,
+                    "error": {
+                        "min": -0.0126051,
+                        "max": 0.0126051
+                    }
+                },
+                "proper_sine_inclination": {
+                    "value": 0.171978,
+                    "error": {
+                        "min": -0.00022,
+                        "max": 0.00022
+                    }
+                },
+                "proper_frequency_perihelion_longitude": {
+                    "value": 74.105825,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "proper_frequency_nodal_longitude": {
+                    "value": -72.276827,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "bibref": [
+                    {
+                        "shortbib": "Nesvorny+2024",
+                        "title": "Catalog of Proper Orbits for 1.25 Million Main Belt Asteroids and Discovery of 136 New Collisional Families",
+                        "year": 2024,
+                        "bibcode": "2024ApJS..274...25N",
+                        "doi": "10.3847/1538-4365/ad675c"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=proper_elements&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=proper_elements:id=817687&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "delta_v": {
+                "delta_v": 10.406,
+                "transfer_time": 577.382,
+                "n_burns": 2,
+                "method": [
+                    {
+                        "label": "delta_v",
+                        "name": "Flight burn schemes of SSOs",
+                        "description": "Computation of spacecraft velocity change (Delta-V) required to visit SSOs",
+                        "shortbib": "Taylor+2018",
+                        "year": 2018,
+                        "source": "Acta Astronautica",
+                        "title": "A Delta-V map of the known Main Belt Asteroids",
+                        "bibcode": "2018AcAau.146...73T",
+                        "doi": "10.1016/j.actaastro.2018.02.014"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Gareth+2015",
+                        "title": "Minor Planet Center",
+                        "year": 2015,
+                        "bibcode": "2015hchp.book..719W",
+                        "doi": "10.1007/978-3-319-03952-7_89"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=delta_v&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=delta_v:id=135555&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "tisserand_parameters": {
+                "Jupiter": {
+                    "value": 3.214,
+                    "error": {
+                        "min": -2.88e-7,
+                        "max": 2.88e-7
+                    }
+                },
+                "Saturn": {
+                    "value": 4.2657,
+                    "error": {
+                        "min": -2.28e-7,
+                        "max": 2.28e-7
+                    }
+                },
+                "Uranus": {
+                    "value": 7.1449,
+                    "error": {
+                        "min": -2.48e-7,
+                        "max": 2.48e-7
+                    }
+                },
+                "Neptune": {
+                    "value": 10.602,
+                    "error": {
+                        "min": -3.43e-7,
+                        "max": 3.43e-7
+                    }
+                },
+                "method": [
+                    {
+                        "label": "Computed",
+                        "name": "Computed property",
+                        "description": "The property is calculated using the best estimated values of the parameters on which it depends",
+                        "shortbib": "Berthier+2023",
+                        "year": 2023,
+                        "source": "A&A",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ]
+            },
+            "moid": {
+                "Mercury": {
+                    "value": 2.267083,
+                    "error": {
+                        "min": -1.22e-15,
+                        "max": 1.22e-15
+                    }
+                },
+                "Venus": {
+                    "value": 1.99101,
+                    "error": {
+                        "min": -1.245e-15,
+                        "max": 1.245e-15
+                    }
+                },
+                "Earth": {
+                    "value": 1.71132,
+                    "error": {
+                        "min": -1.283e-15,
+                        "max": 1.283e-15
+                    }
+                },
+                "Mars": {
+                    "value": 1.29881,
+                    "error": {
+                        "min": -1.364e-15,
+                        "max": 1.364e-15
+                    }
+                },
+                "Jupiter": {
+                    "value": 1.766334,
+                    "error": {
+                        "min": -2.67e-15,
+                        "max": 2.67e-15
+                    }
+                },
+                "Saturn": {
+                    "value": 5.797547,
+                    "error": {
+                        "min": -4.269e-15,
+                        "max": 4.269e-15
+                    }
+                },
+                "Uranus": {
+                    "value": 15.247031,
+                    "error": {
+                        "min": -8.268e-15,
+                        "max": 8.268e-15
+                    }
+                },
+                "Neptune": {
+                    "value": 26.527732,
+                    "error": {
+                        "min": -1.332e-14,
+                        "max": 1.332e-14
+                    }
+                },
+                "method": [
+                    {
+                        "label": "MOID",
+                        "name": "Minimum Orbit Intersection Distance",
+                        "description": "Global minimum distance between two Keplerian orbits",
+                        "shortbib": "Baluev&Mikryukov2019",
+                        "year": 2019,
+                        "source": "AC",
+                        "title": "Fast error-controlling MOID computation for confocal elliptic orbits",
+                        "bibcode": "2019A&C....27...11B",
+                        "doi": "10.1016/j.ascom.2019.02.005"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=moid&-mime=json&-from=SsODNetSsoCard"
+                }
+            }
+        },
+        "physical": {
+            "absolute_magnitude": {
+                "H": {
+                    "value": 7.71,
+                    "error": {
+                        "min": -0.01,
+                        "max": 0.01
+                    }
+                },
+                "G": {
+                    "value": 0.15,
+                    "error": {
+                        "min": -0.01,
+                        "max": 0.01
+                    }
+                },
+                "bibref": [
+                    {
+                        "shortbib": "Moskovitz+2022",
+                        "title": "The astorb database at Lowell Observatory",
+                        "year": 2022,
+                        "bibcode": "2022A&C....4100661M",
+                        "doi": "10.1016/j.ascom.2022.100661"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=absolute_magnitude&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=absolute_magnitude:id=135555&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "diameter": {
+                "value": 85.701,
+                "error": {
+                    "min": -1.385,
+                    "max": 5.304
+                },
+                "method": [
+                    {
+                        "label": "TPM",
+                        "name": "ThermoPhysical Model",
+                        "description": "Diameter, albedo, thermal inertia derived by fitting mid-infrared data with a thermal model taking into account the spin, shape of the target",
+                        "shortbib": "Lagerros1996",
+                        "year": 1996,
+                        "source": "A&A",
+                        "title": "Thermal physics of asteroids. I. Effects of shape, heat conduction and beaming",
+                        "bibcode": "1996A&A...310.1011L"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Hung+2022",
+                        "title": "Thermal Properties of 1847 WISE-observed Asteroids",
+                        "year": 2022,
+                        "bibcode": "2022PSJ.....3...56H",
+                        "doi": "10.3847/PSJ/ac4d1f"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=diamalbedo&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=diamalbedo:id=88983,88984&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "albedo": {
+                "value": 0.199,
+                "error": {
+                    "min": -0.022,
+                    "max": 0.005
+                },
+                "method": [
+                    {
+                        "label": "TPM",
+                        "name": "ThermoPhysical Model",
+                        "description": "Diameter, albedo, thermal inertia derived by fitting mid-infrared data with a thermal model taking into account the spin, shape of the target",
+                        "shortbib": "Lagerros1996",
+                        "year": 1996,
+                        "source": "A&A",
+                        "title": "Thermal physics of asteroids. I. Effects of shape, heat conduction and beaming",
+                        "bibcode": "1996A&A...310.1011L"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Hung+2022",
+                        "title": "Thermal Properties of 1847 WISE-observed Asteroids",
+                        "year": 2022,
+                        "bibcode": "2022PSJ.....3...56H",
+                        "doi": "10.3847/PSJ/ac4d1f"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=diamalbedo&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=diamalbedo:id=88983,88984&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "mass": {
+                "value": 1.3328297005878766e+18,
+                "error": {
+                    "min": -5.4086826275156294e+17,
+                    "max": 5.4086826275156294e+17
+                },
+                "method": [
+                    {
+                        "label": "EPHEM",
+                        "name": "Mass from ephemerides",
+                        "description": "The mass is determined from general ephemerides of the Solar System",
+                        "shortbib": "Baer&Chesley2008",
+                        "year": 2008,
+                        "source": "CeMDA",
+                        "title": "Astrometric masses of 21 asteroids, and an integrated asteroid ephemeris",
+                        "bibcode": "2008CeMDA.100...27B",
+                        "doi": "10.1007/s10569-007-9103-8"
+                    },
+                    {
+                        "label": "DEFLECT",
+                        "name": "Mass from close encounter deflection",
+                        "description": "The mass is determined from the orbital deflection of smaller asteroids",
+                        "shortbib": "Standish&Hellings1989",
+                        "year": 1989,
+                        "source": "Icarus",
+                        "title": "A determination of the masses of Ceres, Pallas, and Vesta from their perturbations upon the orbit of Mars",
+                        "bibcode": "1989Icar...80..326S",
+                        "doi": "10.1016/0019-1035(89)90143-7"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Fienga+2020b",
+                        "title": "INPOP new release: INPOP19a",
+                        "year": 2020,
+                        "bibcode": "2020jsrs.conf..293F"
+                    },
+                    {
+                        "shortbib": "Fienga+2019",
+                        "title": "INPOP19a planetary ephemerides",
+                        "year": 2019,
+                        "bibcode": "2019NSTIM.109.....F"
+                    },
+                    {
+                        "shortbib": "Mariani+2026",
+                        "title": "Boosting decision trees for the selection of main belt asteroids in planetary ephemerides: An alternative model",
+                        "year": 2026,
+                        "bibcode": "2026A&A...705A.189M",
+                        "doi": "10.1051/0004-6361/202555476"
+                    },
+                    {
+                        "shortbib": "Folkner+2014",
+                        "title": "The Planetary and Lunar Ephemerides DE430 and DE431",
+                        "year": 2014,
+                        "bibcode": "2014IPNPR.196C...1F"
+                    },
+                    {
+                        "shortbib": "Goffin+2014",
+                        "title": "Astrometric asteroid masses: a simultaneous determination",
+                        "year": 2014,
+                        "bibcode": "2014A&A...565A..56G",
+                        "doi": "10.1051/0004-6361/201322766"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=masses&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=masses:id=916,917,918,919,920&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "density": {
+                "value": 4044.067,
+                "error": {
+                    "min": -1837.167,
+                    "max": 2391.958
+                },
+                "method": [
+                    {
+                        "label": "Computed",
+                        "name": "Computed property",
+                        "description": "The property is calculated using the best estimated values of the parameters on which it depends",
+                        "shortbib": "Berthier+2023",
+                        "year": 2023,
+                        "source": "A&A",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=density&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=density:id=361&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "hill_sphere_radius": {
+                "value": 0.00016432,
+                "error": {
+                    "min": -0.13526816,
+                    "max": 0.13526816
+                },
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ]
+            },
+            "taxonomy": {
+                "class": "K",
+                "complex": "K",
+                "technique": "Spec",
+                "waverange": "VISNIR",
+                "scheme": "Mahlke",
+                "method": [
+                    {
+                        "label": "Spec",
+                        "name": "Reflectance spectroscopy",
+                        "description": "Reflectance spectroscopy",
+                        "shortbib": "McCord+1970",
+                        "year": 1970,
+                        "source": "Science",
+                        "title": "Asteroid Vesta: Spectral Reflectivity and Compositional Implications",
+                        "bibcode": "1970Sci...168.1445M",
+                        "doi": "10.1126/science.168.3938.1445"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Mahlke+2022",
+                        "title": "Asteroid taxonomy from cluster analysis of spectrometry and albedo",
+                        "year": 2022,
+                        "bibcode": "2022A&A...665A..26M",
+                        "doi": "10.1051/0004-6361/202243587"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=taxonomy&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=taxonomy:id=104327&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "thermal_inertia": {
+                "value": 9.46,
+                "error": {
+                    "min": -4.39,
+                    "max": 27.482
+                },
+                "method": [
+                    {
+                        "label": "TPM",
+                        "name": "ThermoPhysical Model",
+                        "description": "Diameter, albedo, thermal inertia derived by fitting mid-infrared data with a thermal model taking into account the spin, shape of the target",
+                        "shortbib": "Lagerros1996",
+                        "year": 1996,
+                        "source": "A&A",
+                        "title": "Thermal physics of asteroids. I. Effects of shape, heat conduction and beaming",
+                        "bibcode": "1996A&A...310.1011L"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Hung+2022",
+                        "title": "Thermal Properties of 1847 WISE-observed Asteroids",
+                        "year": 2022,
+                        "bibcode": "2022PSJ.....3...56H",
+                        "doi": "10.3847/PSJ/ac4d1f"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=thermal_inertia&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=thermal_inertia:id=1610,1611&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "spins": [
+                {
+                    "id_spin": 1,
+                    "period": {
+                        "value": 10.42213,
+                        "error": {
+                            "min": -2.0e-5,
+                            "max": 2.0e-5
+                        }
+                    },
+                    "period_type": "Sidereal",
+                    "period_flag": "Quality of the period not rated.",
+                    "t0": 2451545,
+                    "W0": 0,
+                    "Wp": {
+                        "value": 829.005,
+                        "error": {
+                            "min": -0.00159086,
+                            "max": 0.00159086
+                        }
+                    },
+                    "RA0": {
+                        "value": 294.985,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5.0
+                        }
+                    },
+                    "DEC0": {
+                        "value": -44.805,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5.0
+                        }
+                    },
+                    "long": {
+                        "value": 289,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5
+                        }
+                    },
+                    "lat": {
+                        "value": -23,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5
+                        }
+                    },
+                    "obliquity": {
+                        "value": 118.5,
+                        "error": {
+                            "min": -1.6,
+                            "max": 1.6
+                        }
+                    },
+                    "technique": "LCI",
+                    "method": [
+                        {
+                            "label": "LCI",
+                            "name": "Lightcurve Inversion",
+                            "description": "Spin and convex 3-D shape determined from optical lightcurves",
+                            "shortbib": "Kaasalainen&Torppa2002",
+                            "year": 2002,
+                            "source": "Icarus",
+                            "title": "Optimization Methods for Asteroid Lightcurve Inversion - I. Shape Determination",
+                            "bibcode": "2001Icar..153...24K",
+                            "doi": "10.1006/icar.2001.6673"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Hanuš+2018c",
+                            "title": "Spin states of asteroids in the Eos collisional family",
+                            "year": 2018,
+                            "bibcode": "2018Icar..299...84H",
+                            "doi": "10.1016/j.icarus.2017.07.007"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=spin&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=spin:id=87854&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "id_spin": 2,
+                    "period": {
+                        "value": 10.42213,
+                        "error": {
+                            "min": -2.0e-5,
+                            "max": 2.0e-5
+                        }
+                    },
+                    "period_type": "Sidereal",
+                    "period_flag": "Quality of the period not rated.",
+                    "t0": 2451545,
+                    "W0": 0,
+                    "Wp": {
+                        "value": 829.005,
+                        "error": {
+                            "min": -0.00159086,
+                            "max": 0.00159086
+                        }
+                    },
+                    "RA0": {
+                        "value": 113.743,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5.0
+                        }
+                    },
+                    "DEC0": {
+                        "value": -15.921,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5.0
+                        }
+                    },
+                    "long": {
+                        "value": 119,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5
+                        }
+                    },
+                    "lat": {
+                        "value": -37,
+                        "error": {
+                            "min": -5.0,
+                            "max": 5
+                        }
+                    },
+                    "obliquity": {
+                        "value": 122.2,
+                        "error": {
+                            "min": -1.9,
+                            "max": 1.9
+                        }
+                    },
+                    "technique": "LCI",
+                    "method": [
+                        {
+                            "label": "LCI",
+                            "name": "Lightcurve Inversion",
+                            "description": "Spin and convex 3-D shape determined from optical lightcurves",
+                            "shortbib": "Kaasalainen&Torppa2002",
+                            "year": 2002,
+                            "source": "Icarus",
+                            "title": "Optimization Methods for Asteroid Lightcurve Inversion - I. Shape Determination",
+                            "bibcode": "2001Icar..153...24K",
+                            "doi": "10.1006/icar.2001.6673"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Hanuš+2018c",
+                            "title": "Spin states of asteroids in the Eos collisional family",
+                            "year": 2018,
+                            "bibcode": "2018Icar..299...84H",
+                            "doi": "10.1016/j.icarus.2017.07.007"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=spin&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=spin:id=87853&-mime=json&-from=SsODNetSsoCard"
+                    }
+                }
+            ],
+            "phase_functions": [
+                {
+                    "id_filter": "Misc/Atlas.orange",
+                    "name_filter": "orange",
+                    "H": {
+                        "value": 7.253,
+                        "error": {
+                            "min": -7.206,
+                            "max": 7.301
+                        }
+                    },
+                    "G1": {
+                        "value": 0.391,
+                        "error": {
+                            "min": -0.331,
+                            "max": 0.456
+                        }
+                    },
+                    "G2": {
+                        "value": 0.21,
+                        "error": {
+                            "min": -0.187,
+                            "max": 0.233
+                        }
+                    },
+                    "N": 644,
+                    "phase": {
+                        "min": 0.878,
+                        "max": 21.249
+                    },
+                    "rms": 0.093,
+                    "facility": "ATLAS",
+                    "technique": "serendipitous",
+                    "bibref": [
+                        {
+                            "shortbib": "Mahlke+2021",
+                            "title": "Asteroid phase curves from ATLAS dual-band photometry",
+                            "year": 2021,
+                            "bibcode": "2021Icar..35414094M",
+                            "doi": "10.1016/j.icarus.2020.114094"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=phase_function&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=phase_function:id=154893&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "id_filter": "Misc/Atlas.cyan",
+                    "name_filter": "cyan",
+                    "H": {
+                        "value": 7.604,
+                        "error": {
+                            "min": -7.543,
+                            "max": 7.665
+                        }
+                    },
+                    "G1": {
+                        "value": 0.446,
+                        "error": {
+                            "min": -0.352,
+                            "max": 0.549
+                        }
+                    },
+                    "G2": {
+                        "value": 0.185,
+                        "error": {
+                            "min": -0.139,
+                            "max": 0.229
+                        }
+                    },
+                    "N": 182,
+                    "phase": {
+                        "min": 0.693,
+                        "max": 20.058
+                    },
+                    "rms": 0.083,
+                    "facility": "ATLAS",
+                    "technique": "serendipitous",
+                    "bibref": [
+                        {
+                            "shortbib": "Mahlke+2021",
+                            "title": "Asteroid phase curves from ATLAS dual-band photometry",
+                            "year": 2021,
+                            "bibcode": "2021Icar..35414094M",
+                            "doi": "10.1016/j.icarus.2020.114094"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=phase_function&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=phase_function:id=154894&-mime=json&-from=SsODNetSsoCard"
+                    }
+                }
+            ],
+            "colors": [
+                {
+                    "index": "B-V",
+                    "color": {
+                        "value": 0.81,
+                        "error": {
+                            "min": -0.018,
+                            "max": 0.018
+                        }
+                    },
+                    "epoch": 2443223.96,
+                    "phot_sys": "Vega",
+                    "technique": "LC_COR",
+                    "id_filter_1": "Generic/Johnson.B",
+                    "id_filter_2": "Generic/Johnson.V",
+                    "method": [
+                        {
+                            "label": "lc_cor",
+                            "name": "Colors derived from apparent magnitudes corrected for lightcurve",
+                            "description": "Colors computed from the apparent magnitudes, corrected for short-term variability introduced by lightcurve",
+                            "shortbib": "Erasmus+2019",
+                            "year": 2019,
+                            "source": "ApJ",
+                            "title": "A Taxonomic Study of Asteroid Families from KMTNET-SAAO Multiband Photometry",
+                            "bibcode": "2019ApJS..242...15E",
+                            "doi": "10.3847/1538-4365/ab1344"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Degewij+1978a",
+                            "title": "Minor planets and related objects. XXV. UBV photometry of 145 faint asteroids",
+                            "year": 1978,
+                            "bibcode": "1978AJ.....83..643D",
+                            "doi": "10.1086/112248"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470064&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "c-o",
+                    "color": {
+                        "value": 0.351,
+                        "error": {
+                            "min": -0.122,
+                            "max": 0.122
+                        }
+                    },
+                    "phot_sys": "AB",
+                    "technique": "ABS>HG1G2",
+                    "facility": "ATLAS",
+                    "observer": "T05",
+                    "id_filter_1": "Misc/Atlas.cyan",
+                    "id_filter_2": "Misc/Atlas.orange",
+                    "method": [
+                        {
+                            "label": "abs",
+                            "name": "Colors derived from absolute magnitudes",
+                            "description": "Colors computed from the absolute magnitudes in the two filters",
+                            "shortbib": "Mahlke+2021",
+                            "year": 2021,
+                            "source": "Icarus",
+                            "title": "Asteroid phase curves from ATLAS dual-band photometry",
+                            "bibcode": "2021Icar..35414094M",
+                            "doi": "10.1016/j.icarus.2020.114094"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Mahlke+2021",
+                            "title": "Asteroid phase curves from ATLAS dual-band photometry",
+                            "year": 2021,
+                            "bibcode": "2021Icar..35414094M",
+                            "doi": "10.1016/j.icarus.2020.114094"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470065&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "g-i",
+                    "color": {
+                        "value": 0.7545,
+                        "error": {
+                            "min": -0.0007,
+                            "max": 0.0007
+                        }
+                    },
+                    "epoch": 2453634.869515,
+                    "delta_time": 143.4,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.g",
+                    "id_filter_2": "SLOAN/SDSS.i",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470067&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "g-r",
+                    "color": {
+                        "value": 0.5763,
+                        "error": {
+                            "min": -0.0007,
+                            "max": 0.0007
+                        }
+                    },
+                    "epoch": 2453634.868685,
+                    "delta_time": 286.8,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.g",
+                    "id_filter_2": "SLOAN/SDSS.r",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470069&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "g-z",
+                    "color": {
+                        "value": 0.5436,
+                        "error": {
+                            "min": -0.0047,
+                            "max": 0.0047
+                        }
+                    },
+                    "epoch": 2456753.239219,
+                    "delta_time": 94.5,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.g",
+                    "id_filter_2": "SkyMapper/SkyMapper.z",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470070&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "H-K",
+                    "color": {
+                        "value": 0.077,
+                        "error": {
+                            "min": -0.048,
+                            "max": 0.048
+                        }
+                    },
+                    "epoch": 2451868.78482,
+                    "phot_sys": "Vega",
+                    "technique": "APP",
+                    "facility": "2MASS",
+                    "observer": "G91",
+                    "id_filter_1": "2MASS/2MASS.H",
+                    "id_filter_2": "2MASS/2MASS.Ks",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sykes+2000",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "year": 2000,
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470072&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "i-z",
+                    "color": {
+                        "value": 0.0222,
+                        "error": {
+                            "min": -0.0047,
+                            "max": 0.0047
+                        }
+                    },
+                    "epoch": 2456753.239884,
+                    "delta_time": 37.0,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.i",
+                    "id_filter_2": "SkyMapper/SkyMapper.z",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470073&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "J-H",
+                    "color": {
+                        "value": 0.331,
+                        "error": {
+                            "min": -0.045,
+                            "max": 0.045
+                        }
+                    },
+                    "epoch": 2451868.78482,
+                    "phot_sys": "Vega",
+                    "technique": "APP",
+                    "facility": "2MASS",
+                    "observer": "G91",
+                    "id_filter_1": "2MASS/2MASS.J",
+                    "id_filter_2": "2MASS/2MASS.H",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sykes+2000",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "year": 2000,
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470075&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "J-K",
+                    "color": {
+                        "value": 0.408,
+                        "error": {
+                            "min": -0.037,
+                            "max": 0.037
+                        }
+                    },
+                    "epoch": 2451868.78482,
+                    "phot_sys": "Vega",
+                    "technique": "APP",
+                    "facility": "2MASS",
+                    "observer": "G91",
+                    "id_filter_1": "2MASS/2MASS.J",
+                    "id_filter_2": "2MASS/2MASS.Ks",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sykes+2000",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "year": 2000,
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470076&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "r-i",
+                    "color": {
+                        "value": 0.1782,
+                        "error": {
+                            "min": -0.0006,
+                            "max": 0.0006
+                        }
+                    },
+                    "epoch": 2453634.867855,
+                    "delta_time": 143.4,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.r",
+                    "id_filter_2": "SLOAN/SDSS.i",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470077&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "r-z",
+                    "color": {
+                        "value": 0.167,
+                        "error": {
+                            "min": -0.0047,
+                            "max": 0.0047
+                        }
+                    },
+                    "epoch": 2456753.239578,
+                    "delta_time": 63.5,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.r",
+                    "id_filter_2": "SkyMapper/SkyMapper.z",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470080&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "U-B",
+                    "color": {
+                        "value": 0.38,
+                        "error": {
+                            "min": -0.039,
+                            "max": 0.039
+                        }
+                    },
+                    "epoch": 2443223.96,
+                    "phot_sys": "Vega",
+                    "technique": "LC_COR",
+                    "id_filter_1": "Generic/Johnson.U",
+                    "id_filter_2": "Generic/Johnson.B",
+                    "method": [
+                        {
+                            "label": "lc_cor",
+                            "name": "Colors derived from apparent magnitudes corrected for lightcurve",
+                            "description": "Colors computed from the apparent magnitudes, corrected for short-term variability introduced by lightcurve",
+                            "shortbib": "Erasmus+2019",
+                            "year": 2019,
+                            "source": "ApJ",
+                            "title": "A Taxonomic Study of Asteroid Families from KMTNET-SAAO Multiband Photometry",
+                            "bibcode": "2019ApJS..242...15E",
+                            "doi": "10.3847/1538-4365/ab1344"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Degewij+1978a",
+                            "title": "Minor planets and related objects. XXV. UBV photometry of 145 faint asteroids",
+                            "year": 1978,
+                            "bibcode": "1978AJ.....83..643D",
+                            "doi": "10.1086/112248"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470081&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "u-g",
+                    "color": {
+                        "value": 1.608,
+                        "error": {
+                            "min": -0.013,
+                            "max": 0.013
+                        }
+                    },
+                    "epoch": 2453634.8691,
+                    "delta_time": 215.1,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.u",
+                    "id_filter_2": "SLOAN/SDSS.g",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470082&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "u-i",
+                    "color": {
+                        "value": 2.363,
+                        "error": {
+                            "min": -0.013,
+                            "max": 0.013
+                        }
+                    },
+                    "epoch": 2453634.86827,
+                    "delta_time": 71.7,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.u",
+                    "id_filter_2": "SLOAN/SDSS.i",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470083&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "u-r",
+                    "color": {
+                        "value": 2.185,
+                        "error": {
+                            "min": -0.013,
+                            "max": 0.013
+                        }
+                    },
+                    "epoch": 2453634.86744,
+                    "delta_time": 71.7,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.u",
+                    "id_filter_2": "SLOAN/SDSS.r",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470084&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "u-z",
+                    "color": {
+                        "value": 2.33,
+                        "error": {
+                            "min": -0.032,
+                            "max": 0.032
+                        }
+                    },
+                    "epoch": 2453634.86869,
+                    "delta_time": 143.4,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SDSS",
+                    "observer": "645",
+                    "id_filter_1": "SLOAN/SDSS.u",
+                    "id_filter_2": "SLOAN/SDSS.z",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev&Carry2021",
+                            "title": "A million asteroid observations in the Sloan Digital Sky Survey",
+                            "year": 2021,
+                            "bibcode": "2021A&A...652A..59S",
+                            "doi": "10.1051/0004-6361/202140430"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470085&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "v-g",
+                    "color": {
+                        "value": 1.479,
+                        "error": {
+                            "min": -0.005,
+                            "max": 0.005
+                        }
+                    },
+                    "epoch": 2456753.23883,
+                    "delta_time": 33.5,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.v",
+                    "id_filter_2": "SkyMapper/SkyMapper.g",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470086&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "v-i",
+                    "color": {
+                        "value": 2.045,
+                        "error": {
+                            "min": -0.005,
+                            "max": 0.005
+                        }
+                    },
+                    "epoch": 2456753.23883,
+                    "delta_time": 91.0,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.v",
+                    "id_filter_2": "SkyMapper/SkyMapper.i",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470087&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "v-r",
+                    "color": {
+                        "value": 1.856,
+                        "error": {
+                            "min": -0.005,
+                            "max": 0.005
+                        }
+                    },
+                    "epoch": 2456753.23883,
+                    "delta_time": 64.5,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.v",
+                    "id_filter_2": "SkyMapper/SkyMapper.r",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470088&-mime=json&-from=SsODNetSsoCard"
+                    }
+                },
+                {
+                    "index": "v-z",
+                    "color": {
+                        "value": 2.023,
+                        "error": {
+                            "min": -0.005,
+                            "max": 0.005
+                        }
+                    },
+                    "epoch": 2456753.23883,
+                    "delta_time": 128.0,
+                    "phot_sys": "AB",
+                    "technique": "APP",
+                    "facility": "SMSS",
+                    "observer": "Q55",
+                    "id_filter_1": "SkyMapper/SkyMapper.v",
+                    "id_filter_2": "SkyMapper/SkyMapper.z",
+                    "method": [
+                        {
+                            "label": "app",
+                            "name": "Colors derived from apparent magnitudes",
+                            "description": "Colors computed from the apparent magnitudes",
+                            "shortbib": "Sykes+2000",
+                            "year": 2000,
+                            "source": "Icarus",
+                            "title": "The 2MASS Asteroid and Comet Survey",
+                            "bibcode": "2000Icar..146..161S",
+                            "doi": "10.1006/icar.2000.6366"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Sergeyev+2022",
+                            "title": "Multifilter photometry of Solar System objects from the SkyMapper Southern Survey",
+                            "year": 2022,
+                            "bibcode": "2022A&A...658A.109S",
+                            "doi": "10.1051/0004-6361/202142074"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=colors:id=1470089&-mime=json&-from=SsODNetSsoCard"
+                    }
+                }
+            ]
+        },
+        "eq_state_vector": {
+            "source": "ASTORB",
+            "ref_epoch": 2461200.5,
+            "position": [
+                2.70723241738152,
+                0.41409553160551205,
+                -0.2203531806483391
+            ],
+            "velocity": [
+                -0.0008105402048987796,
+                0.010407795886776431,
+                0.002858743850496881
+            ]
+        }
+    },
+    "observations": {
+        "astrometric": {
+            "links": {
+                "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=astrometric_observations:id=537813&-mime=json&-from=SsODNetSsoCard"
+            },
+            "bibref": [
+                {
+                    "shortbib": "Gareth+2015",
+                    "title": "Minor Planet Center",
+                    "year": 2015,
+                    "bibcode": "2015hchp.book..719W",
+                    "doi": "10.1007/978-3-319-03952-7_89"
+                }
+            ]
+        },
+        "polarimetric": {
+            "links": {
+                "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Eos&-resource=polarimetric_observations:id=2719-2776&-mime=json&-from=SsODNetSsoCard"
+            },
+            "bibref": [
+                {
+                    "shortbib": "Cellino+2005",
+                    "title": "Asteroid polarimetric observations using the Torino UBVRI polarimeter",
+                    "year": 2005,
+                    "bibcode": "2005Icar..179..304C",
+                    "doi": "10.1016/j.icarus.2005.07.016"
+                },
+                {
+                    "shortbib": "Gil-Hutton&Cañada-Assandri2011",
+                    "title": "Polarimetric survey of main-belt asteroids. I. Results for fifty seven S-, L-, and K-type objects",
+                    "year": 2011,
+                    "bibcode": "2011A&A...529A..86G",
+                    "doi": "10.1051/0004-6361/201015402"
+                },
+                {
+                    "shortbib": "Bendjoya+2022",
+                    "title": "The Calern Asteroid Polarisation Survey. An updated catalogue of asteroid polarimetric data",
+                    "year": 2022,
+                    "bibcode": "2022A&A...665A..66B",
+                    "doi": "10.1051/0004-6361/202142960"
+                },
+                {
+                    "shortbib": "Gil-Hutton&García-Migani+2017",
+                    "title": "Polarimetric survey of main-belt asteroids. VI. New results from the second epoch of the CASLEO survey",
+                    "year": 2017,
+                    "bibcode": "2017A&A...607A.103G",
+                    "doi": "10.1051/0004-6361/201731388"
+                },
+                {
+                    "shortbib": "Gil-Hutton+2014",
+                    "title": "Polarimetric survey of main-belt asteroids. IV. New results from the first epoch of the CASLEO survey",
+                    "year": 2014,
+                    "bibcode": "2014A&A...569A.122G",
+                    "doi": "10.1051/0004-6361/201424238"
+                },
+                {
+                    "shortbib": "Devogèle+2017",
+                    "title": "The Calern Asteroid Polarimetric Survey using the Torino polarimeter: assessment of instrument performances and first scientific results",
+                    "year": 2017,
+                    "bibcode": "2017MNRAS.465.4335D",
+                    "doi": "10.1093/mnras/stw2952"
+                }
+            ]
+        }
+    }
+}

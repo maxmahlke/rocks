@@ -1,0 +1,760 @@
+{
+    "id": "Bennu",
+    "title": "(101955) Bennu",
+    "name": "Bennu",
+    "number": 101955,
+    "type": "Asteroid",
+    "class": "NEA>Apollo",
+    "aliases": [
+        "101955",
+        "1999 RQ36",
+        "20101955",
+        "A1955",
+        "J99R36Q"
+    ],
+    "system": "Sun",
+    "parent": "Sun",
+    "ephemeris": true,
+    "physical-ephemeris": false,
+    "ssocard": {
+        "version": "1.2.1",
+        "datetime": "2026-06-18T23:00:02+00:00"
+    },
+    "links": {
+        "self": "https://ssp.imcce.fr/webservices/ssodnet/api/ssocard.php?q=Bennu",
+        "metadata": "https://ssp.imcce.fr/data/metadata_asteroid.json"
+    },
+    "parameters": {
+        "dynamical": {
+            "orbital_elements": {
+                "ref_epoch": 2461200.5,
+                "ref_epoch_timescale": "TT",
+                "ref_plane": "Ecliptic",
+                "ref_center": "Heliocenter",
+                "number_observations": 592,
+                "orbital_arc": 9361,
+                "ceu": {
+                    "value": 0.02,
+                    "error": {
+                        "min": -0.01,
+                        "max": 0.01
+                    }
+                },
+                "ceu_rate": {
+                    "value": -6.3e-5,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "ceu_epoch": 2461209.5,
+                "semi_major_axis": {
+                    "value": 1.12595073,
+                    "error": {
+                        "min": -1.0000000000000002e-8,
+                        "max": 1.0000000000000002e-8
+                    }
+                },
+                "eccentricity": {
+                    "value": 0.20368223,
+                    "error": {
+                        "min": -1.0000000000000002e-8,
+                        "max": 1.0000000000000002e-8
+                    }
+                },
+                "inclination": {
+                    "value": 6.032951,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "node_longitude": {
+                    "value": 1.966564,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "periapsis_argument": {
+                    "value": 66.41058,
+                    "error": {
+                        "min": -1.0e-5,
+                        "max": 1.0e-5
+                    }
+                },
+                "pericenter_date": {
+                    "value": 2461112.6737980596,
+                    "error": {
+                        "min": -1.0000000000000003e-10,
+                        "max": 1.0000000000000003e-10
+                    }
+                },
+                "mean_anomaly": {
+                    "value": 72.451786,
+                    "error": {
+                        "min": -1.0000000000000002e-6,
+                        "max": 1.0000000000000002e-6
+                    }
+                },
+                "mean_motion": {
+                    "value": 0.8249449981796187,
+                    "error": {
+                        "min": -0.1,
+                        "max": 0.1
+                    }
+                },
+                "orbital_period": {
+                    "value": 436.3927301752252,
+                    "error": {
+                        "min": -1.0000000000000002e-13,
+                        "max": 1.0000000000000002e-13
+                    }
+                },
+                "periapsis_distance": {
+                    "value": 0.89661457,
+                    "error": {
+                        "min": -1.38e-8,
+                        "max": 1.38e-8
+                    }
+                },
+                "apoapsis_distance": {
+                    "value": 1.35528689,
+                    "error": {
+                        "min": -1.65e-8,
+                        "max": 1.65e-8
+                    }
+                },
+                "author": "L.H._Wasserman",
+                "bibref": [
+                    {
+                        "shortbib": "Moskovitz+2022",
+                        "title": "The astorb database at Lowell Observatory",
+                        "year": 2022,
+                        "bibcode": "2022A&C....4100661M",
+                        "doi": "10.1016/j.ascom.2022.100661"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=asteroid_orbits&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=asteroid_orbits:id=2171&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "delta_v": {
+                "delta_v": 7.368,
+                "transfer_time": 233.394,
+                "n_burns": 3,
+                "method": [
+                    {
+                        "label": "delta_v",
+                        "name": "Flight burn schemes of SSOs",
+                        "description": "Computation of spacecraft velocity change (Delta-V) required to visit SSOs",
+                        "shortbib": "Taylor+2018",
+                        "year": 2018,
+                        "source": "Acta Astronautica",
+                        "title": "A Delta-V map of the known Main Belt Asteroids",
+                        "bibcode": "2018AcAau.146...73T",
+                        "doi": "10.1016/j.actaastro.2018.02.014"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Gareth+2015",
+                        "title": "Minor Planet Center",
+                        "year": 2015,
+                        "bibcode": "2015hchp.book..719W",
+                        "doi": "10.1007/978-3-319-03952-7_89"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=delta_v&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=delta_v:id=2171&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "tisserand_parameters": {
+                "Jupiter": {
+                    "value": 5.5264,
+                    "error": {
+                        "min": -1.03e-7,
+                        "max": 1.03e-7
+                    }
+                },
+                "Saturn": {
+                    "value": 9.1431,
+                    "error": {
+                        "min": -1.01e-7,
+                        "max": 1.01e-7
+                    }
+                },
+                "Uranus": {
+                    "value": 17.5133,
+                    "error": {
+                        "min": -1.57e-7,
+                        "max": 1.57e-7
+                    }
+                },
+                "Neptune": {
+                    "value": 27.0827,
+                    "error": {
+                        "min": -2.39e-7,
+                        "max": 2.39e-7
+                    }
+                },
+                "method": [
+                    {
+                        "label": "Computed",
+                        "name": "Computed property",
+                        "description": "The property is calculated using the best estimated values of the parameters on which it depends",
+                        "shortbib": "Berthier+2023",
+                        "year": 2023,
+                        "source": "A&A",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ]
+            },
+            "moid": {
+                "Mercury": {
+                    "value": 0.545778,
+                    "error": {
+                        "min": -4.395e-16,
+                        "max": 4.395e-16
+                    }
+                },
+                "Venus": {
+                    "value": 0.174413,
+                    "error": {
+                        "min": -5.131e-16,
+                        "max": 5.131e-16
+                    }
+                },
+                "Earth": {
+                    "value": 0.084097,
+                    "error": {
+                        "min": -6.01e-16,
+                        "max": 6.01e-16
+                    }
+                },
+                "Mars": {
+                    "value": 0.242541,
+                    "error": {
+                        "min": -9.141e-16,
+                        "max": 9.141e-16
+                    }
+                },
+                "Jupiter": {
+                    "value": 3.906171,
+                    "error": {
+                        "min": -2.333e-15,
+                        "max": 2.333e-15
+                    }
+                },
+                "Saturn": {
+                    "value": 7.71453,
+                    "error": {
+                        "min": -4.058e-15,
+                        "max": 4.058e-15
+                    }
+                },
+                "Uranus": {
+                    "value": 16.927536,
+                    "error": {
+                        "min": -8.141e-15,
+                        "max": 8.141e-15
+                    }
+                },
+                "Neptune": {
+                    "value": 28.55755,
+                    "error": {
+                        "min": -1.328e-14,
+                        "max": 1.328e-14
+                    }
+                },
+                "method": [
+                    {
+                        "label": "MOID",
+                        "name": "Minimum Orbit Intersection Distance",
+                        "description": "Global minimum distance between two Keplerian orbits",
+                        "shortbib": "Baluev&Mikryukov2019",
+                        "year": 2019,
+                        "source": "AC",
+                        "title": "Fast error-controlling MOID computation for confocal elliptic orbits",
+                        "bibcode": "2019A&C....27...11B",
+                        "doi": "10.1016/j.ascom.2019.02.005"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=moid&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "yarkovsky": {
+                "dadt": {
+                    "value": -18.8931,
+                    "error": {
+                        "min": -0.098883,
+                        "max": 0.098883
+                    }
+                },
+                "A2": {
+                    "value": -45.2555,
+                    "error": {
+                        "min": -0.23686,
+                        "max": 0.23686
+                    }
+                },
+                "snr": 191.064,
+                "method": [
+                    {
+                        "label": "Astrometry(O+R)",
+                        "name": "Yarkovsky drift from optical astrometry and radar delays",
+                        "description": "Determination of the semi-major drift due to Yarkovsky using astrometry from optical observations and radar delays",
+                        "shortbib": "Chesley+2003",
+                        "year": 2003,
+                        "source": "Science",
+                        "title": "Direct Detection of the Yarkovsky Effect by Radar Ranging to Asteroid 6489 Golevka",
+                        "bibcode": "2003Sci...302.1739C",
+                        "doi": "10.1126/science.1091452"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Fenucci+2024",
+                        "title": "An automated procedure for the detection of the Yarkovsky effect and results from the ESA NEO Coordination Centre",
+                        "year": 2024,
+                        "bibcode": "2024A&A...682A..29F",
+                        "doi": "10.1051/0004-6361/202347820"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=yarkovsky&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=yarkovsky:id=12&-mime=json&-from=SsODNetSsoCard"
+                }
+            }
+        },
+        "physical": {
+            "absolute_magnitude": {
+                "H": {
+                    "value": 20.68,
+                    "error": {
+                        "min": -0.01,
+                        "max": 0.01
+                    }
+                },
+                "G": {
+                    "value": 0.15,
+                    "error": {
+                        "min": -0.01,
+                        "max": 0.01
+                    }
+                },
+                "bibref": [
+                    {
+                        "shortbib": "Moskovitz+2022",
+                        "title": "The astorb database at Lowell Observatory",
+                        "year": 2022,
+                        "bibcode": "2022A&C....4100661M",
+                        "doi": "10.1016/j.ascom.2022.100661"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=absolute_magnitude&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=absolute_magnitude:id=2171&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "diameter": {
+                "value": 0.488,
+                "error": {
+                    "min": -0.019,
+                    "max": 0.019
+                },
+                "method": [
+                    {
+                        "label": "SPACE",
+                        "name": "Rendez-vous with a spacecraft",
+                        "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                        "shortbib": "Belton+1992",
+                        "year": 1992,
+                        "source": "Science",
+                        "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                        "bibcode": "1992Sci...257.1647B",
+                        "doi": "10.1126/science.257.5077.1647"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Barnouin+2019",
+                        "title": "Shape of (101955) Bennu indicative of a rubble pile with internal stiffness",
+                        "year": 2019,
+                        "bibcode": "2019NatGe..12..247B",
+                        "doi": "10.1038/s41561-019-0330-x"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=diamalbedo&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=diamalbedo:id=8035&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "ellipsoid": {
+                "a/b": {
+                    "value": 1.027,
+                    "error": {
+                        "min": 0.0,
+                        "max": 0.0
+                    }
+                },
+                "a/c": {
+                    "value": 1.105,
+                    "error": {
+                        "min": -0.001,
+                        "max": 0.001
+                    }
+                },
+                "b/c": {
+                    "value": 1.077,
+                    "error": {
+                        "min": -0.001,
+                        "max": 0.001
+                    }
+                },
+                "method": [
+                    {
+                        "label": "SPACE",
+                        "name": "Rendez-vous with a spacecraft",
+                        "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                        "shortbib": "Belton+1992",
+                        "year": 1992,
+                        "source": "Science",
+                        "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                        "bibcode": "1992Sci...257.1647B",
+                        "doi": "10.1126/science.257.5077.1647"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Barnouin+2019",
+                        "title": "Shape of (101955) Bennu indicative of a rubble pile with internal stiffness",
+                        "year": 2019,
+                        "bibcode": "2019NatGe..12..247B",
+                        "doi": "10.1038/s41561-019-0330-x"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=ellipsoids&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=ellipsoids:id=105&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "albedo": {
+                "value": 0.044,
+                "error": {
+                    "min": -0.002,
+                    "max": 0.002
+                },
+                "method": [
+                    {
+                        "label": "SPACE",
+                        "name": "Rendez-vous with a spacecraft",
+                        "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                        "shortbib": "Belton+1992",
+                        "year": 1992,
+                        "source": "Science",
+                        "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                        "bibcode": "1992Sci...257.1647B",
+                        "doi": "10.1126/science.257.5077.1647"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "DellaGiustina+2019",
+                        "title": "Properties of rubble-pile asteroid (101955) Bennu from OSIRIS-REx imaging and thermal analysis",
+                        "year": 2019,
+                        "bibcode": "2019NatAs...3..341D",
+                        "doi": "10.1038/s41550-019-0731-1"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=diamalbedo&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=diamalbedo:id=8039&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "mass": {
+                "value": 73303956923.07692,
+                "error": {
+                    "min": -5261538.461538462,
+                    "max": 5261538.461538462
+                },
+                "method": [
+                    {
+                        "label": "SPACE",
+                        "name": "Rendez-vous with a spacecraft",
+                        "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                        "shortbib": "Belton+1992",
+                        "year": 1992,
+                        "source": "Science",
+                        "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                        "bibcode": "1992Sci...257.1647B",
+                        "doi": "10.1126/science.257.5077.1647"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Scheeres+2019",
+                        "title": "The dynamic geophysical environment of (101955) Bennu based on OSIRIS-REx measurements",
+                        "year": 2019,
+                        "bibcode": "2019NatAs...3..352S",
+                        "doi": "10.1038/s41550-019-0721-3"
+                    },
+                    {
+                        "shortbib": "Goossens+2021",
+                        "title": "Mass and Shape Determination of (101955) Bennu Using Differenced Data from Multiple OSIRIS-REx Mission Phases",
+                        "year": 2021,
+                        "bibcode": "2021PSJ.....2..219G",
+                        "doi": "10.3847/PSJ/ac26c4"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=masses&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=masses:id=10,11&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "density": {
+                "value": 1204.673,
+                "error": {
+                    "min": -140.796,
+                    "max": 140.796
+                },
+                "method": [
+                    {
+                        "label": "Computed",
+                        "name": "Computed property",
+                        "description": "The property is calculated using the best estimated values of the parameters on which it depends",
+                        "shortbib": "Berthier+2023",
+                        "year": 2023,
+                        "source": "A&A",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=density&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=density:id=497&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "hill_sphere_radius": {
+                "value": 2.1e-7,
+                "error": {
+                    "min": 0.0,
+                    "max": 0.0
+                },
+                "bibref": [
+                    {
+                        "shortbib": "Berthier+2023",
+                        "title": "SsODNet: Solar system Open Database Network",
+                        "year": 2022,
+                        "bibcode": "2023A&A...671A.151B",
+                        "doi": "10.1051/0004-6361/202244878"
+                    }
+                ]
+            },
+            "taxonomy": {
+                "class": "B",
+                "complex": "B",
+                "technique": "Spec",
+                "waverange": "VISNIR",
+                "scheme": "Mahlke",
+                "method": [
+                    {
+                        "label": "Spec",
+                        "name": "Reflectance spectroscopy",
+                        "description": "Reflectance spectroscopy",
+                        "shortbib": "McCord+1970",
+                        "year": 1970,
+                        "source": "Science",
+                        "title": "Asteroid Vesta: Spectral Reflectivity and Compositional Implications",
+                        "bibcode": "1970Sci...168.1445M",
+                        "doi": "10.1126/science.168.3938.1445"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "Mahlke+2022",
+                        "title": "Asteroid taxonomy from cluster analysis of spectrometry and albedo",
+                        "year": 2022,
+                        "bibcode": "2022A&A...665A..26M",
+                        "doi": "10.1051/0004-6361/202243587"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=taxonomy&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=taxonomy:id=2221&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "thermal_inertia": {
+                "value": 401.286,
+                "error": {
+                    "min": -20.0,
+                    "max": 20.0
+                },
+                "method": [
+                    {
+                        "label": "SPACE",
+                        "name": "Rendez-vous with a spacecraft",
+                        "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                        "shortbib": "Belton+1992",
+                        "year": 1992,
+                        "source": "Science",
+                        "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                        "bibcode": "1992Sci...257.1647B",
+                        "doi": "10.1126/science.257.5077.1647"
+                    }
+                ],
+                "bibref": [
+                    {
+                        "shortbib": "DellaGiustina+2019",
+                        "title": "Properties of rubble-pile asteroid (101955) Bennu from OSIRIS-REx imaging and thermal analysis",
+                        "year": 2019,
+                        "bibcode": "2019NatAs...3..341D",
+                        "doi": "10.1038/s41550-019-0731-1"
+                    }
+                ],
+                "links": {
+                    "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=thermal_inertia&-mime=json&-from=SsODNetSsoCard",
+                    "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=thermal_inertia:id=30&-mime=json&-from=SsODNetSsoCard"
+                }
+            },
+            "spins": [
+                {
+                    "id_spin": 1,
+                    "period": {
+                        "value": 4.296057,
+                        "error": {
+                            "min": -2.0e-6,
+                            "max": 2.0e-6
+                        }
+                    },
+                    "period_type": "sidereal",
+                    "t0": 2451545,
+                    "W0": 0,
+                    "Wp": {
+                        "value": 2011.15,
+                        "error": {
+                            "min": -0.000936276,
+                            "max": 0.000936276
+                        }
+                    },
+                    "RA0": {
+                        "value": 85.65,
+                        "error": {
+                            "min": -0.12,
+                            "max": 0.12
+                        }
+                    },
+                    "DEC0": {
+                        "value": -60.17,
+                        "error": {
+                            "min": -0.09,
+                            "max": 0.09
+                        }
+                    },
+                    "long": {
+                        "value": 71.067,
+                        "error": {
+                            "min": -0.12,
+                            "max": 0.12
+                        }
+                    },
+                    "lat": {
+                        "value": -83.322,
+                        "error": {
+                            "min": -0.09,
+                            "max": 0.09
+                        }
+                    },
+                    "obliquity": {
+                        "value": 177.6,
+                        "error": {
+                            "min": -0.3,
+                            "max": 0.3
+                        }
+                    },
+                    "technique": "SPACE",
+                    "method": [
+                        {
+                            "label": "SPACE",
+                            "name": "Rendez-vous with a spacecraft",
+                            "description": "The results are based on data which had an encounter (flyby or orbit) with the target",
+                            "shortbib": "Belton+1992",
+                            "year": 1992,
+                            "source": "Science",
+                            "title": "Galileo Encounter with 951 Gaspra: First Pictures of an Asteroid",
+                            "bibcode": "1992Sci...257.1647B",
+                            "doi": "10.1126/science.257.5077.1647"
+                        }
+                    ],
+                    "bibref": [
+                        {
+                            "shortbib": "Barnouin+2019",
+                            "title": "Shape of (101955) Bennu indicative of a rubble pile with internal stiffness",
+                            "year": 2019,
+                            "bibcode": "2019NatGe..12..247B",
+                            "doi": "10.1038/s41561-019-0330-x"
+                        }
+                    ],
+                    "links": {
+                        "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=spins&-mime=json&-from=SsODNetSsoCard",
+                        "selection": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=spins:id=2099&-mime=json&-from=SsODNetSsoCard"
+                    }
+                }
+            ]
+        },
+        "eq_state_vector": {
+            "source": "ASTORB",
+            "ref_epoch": 2461200.5,
+            "position": [
+                -1.0607737971849112,
+                0.25875461842567193,
+                0.15060419153666654
+            ],
+            "velocity": [
+                -0.007632459269476952,
+                -0.012805357889537086,
+                -0.007204073635674381
+            ]
+        }
+    },
+    "observations": {
+        "astrometric": {
+            "links": {
+                "datacloud": "https://ssp.imcce.fr/webservices/ssodnet/api/datacloud.php?-name=id:Bennu&-resource=astrometric_observations:id=873087&-mime=json&-from=SsODNetSsoCard"
+            },
+            "bibref": [
+                {
+                    "shortbib": "Gareth+2015",
+                    "title": "Minor Planet Center",
+                    "year": 2015,
+                    "bibcode": "2015hchp.book..719W",
+                    "doi": "10.1007/978-3-319-03952-7_89"
+                }
+            ]
+        }
+    }
+}
