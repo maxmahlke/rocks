@@ -21,8 +21,7 @@ from rocks.core import (
 def load_ssocard_from_test_data(id_):
     """Load ssoCard from test data."""
 
-    USE_UNRELEASED_SSOCARDS = False
-    PATH_TEST_DATA = "tests/data/1.2.0" if USE_UNRELEASED_SSOCARDS else "tests/data"
+    PATH_TEST_DATA = "tests/data/"
 
     with open(f"{PATH_TEST_DATA}/{id_}.json", "r") as f:
         return json.load(f)
