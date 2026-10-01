@@ -1,3 +1,6 @@
+# 1.10.6 - 2026-10-01
+- Losen pydantic version requirement for python 3.14 support
+
 # 1.10.5 - 2026-09-14
 - Add alias columns for orbital elements in BFT: a, e, i, ap, ep, ip, sinip
 
